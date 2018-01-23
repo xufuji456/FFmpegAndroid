@@ -4,4 +4,23 @@
     <string name="audio_cut">音频剪切</string>
     <string name="audio_concat">音频合并</string>
     <string name="audio_mix">音频混合</string>
+
+    <string name="audio_handle">音频处理</string>
+    <string name="media_handle">音视频处理</string>
+    <string name="video_handle">视频处理</string>
+
+    <string name="media_mux">音视频合成</string>
+    <string name="media_extra_audio">提取音频</string>
+    <string name="media_extract_video">提取视频</string>
+
+    <string name="video_cut">视频剪切</string>
+    <string name="video_concat">视频拼接</string>
+    <string name="video_text_mark">视频文字水印</string>
+    <string name="video_photo_mark">视频图片水印</string>
+    <string name="video_to_gif">视频转Gif</string>
+    <string name="video_transform">视频转码</string>
+    <string name="video_screen_shot">视频截图</string>
+    <string name="video_extract_frame">视频抽帧</string>
+    <string name="video_part_zoom">视频局部放大</string>
+
 </resources>

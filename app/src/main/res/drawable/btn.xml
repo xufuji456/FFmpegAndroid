@@ -4,6 +4,6 @@
     android:shape="rectangle" >
     <corners android:radius="10dp" /><!-- 圆角半径 -->
     <gradient
-        android:endColor="@color/orange"
-        android:startColor="@color/orange" /><!-- 矩形的内部颜色，这里设置成白色，即空心 -->
+        android:endColor="@color/colorPrimary"
+        android:startColor="@color/colorAccent" /><!-- 矩形的内部颜色，这里设置成白色，即空心 -->
 </shape>
