@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.frank.MainActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:id="@+id/playerPlan">
+        <!--渲染层-->
+        <SurfaceView
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/surfaceView"/>
+        <VideoView
+            android:id="@+id/videoPreview"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/imgPreview"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.ant.liao.GifView android:id="@+id/gifView"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:enabled="false" />
+    </RelativeLayout>
+    <LinearLayout
+        android:padding="5dp"
+        android:id="@+id/timePlan"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="00:00"
+            android:id="@+id/currentTime_t"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="0"
+            android:maxHeight="10dp"/>
+        <TextView
+            android:text="00:00"
+            android:id="@+id/totalTime_t"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="@color/trasnsWhite"
+        android:padding="4dp"
+        android:id="@+id/controlPlan"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:textSize="10sp"
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:id="@+id/switchCameraBtn"
+            android:text="切换镜头"/>
+        <Button
+            android:text="选择图片"
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:id="@+id/imgBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp" />
+        <Button
+            android:text="选择视频"
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:id="@+id/movBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp" />
+        <Button
+            android:text="选择音乐"
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:id="@+id/musicBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp" />
+        <Button
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:text="修改标题"
+            android:id="@+id/titleBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp" />
+        <Button
+            android:layout_margin="@dimen/item_margin_small"
+            android:background="@drawable/btn"
+            android:text="合成视频"
+            android:id="@+id/makeBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp" />
+        <Button
+            android:background="@drawable/btn"
+            android:layout_margin="@dimen/item_margin_small"
+            android:text="testBtn"
+            android:id="@+id/testBtn"
+            android:textSize="10sp"
+            android:layout_width="70dp"
+            android:layout_height="30dp"/>
+    </LinearLayout>
+    <Button
+        android:layout_margin="4dp"
+        android:background="@drawable/btn"
+        android:text="再来一发"
+        android:id="@+id/newBtn"
+        android:textSize="10sp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="70dp"
+        android:layout_height="30dp" />
+    <FrameLayout
+        android:background="@drawable/btncircle"
+        android:id="@+id/recodePlan"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true">
+        <Button
+            android:layout_gravity="center"
+            android:background="@drawable/btnpoint"
+            android:id="@+id/cameraBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+        <Button
+            android:layout_gravity="center"
+            android:background="@color/redBtn"
+            android:id="@+id/stopCameraBtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+    </FrameLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/titlePlan"
+        android:padding="4dp"
+        android:background="@drawable/whitebg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:text="输入视频信息，显示三秒片头字幕"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="标题："
+                android:layout_marginRight="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:text="测试视频abcdefg"
+                android:maxLines="1"
+                android:padding="5dp"
+                android:background="@color/gray"
+                android:id="@+id/title_t"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="作者："
+                android:layout_marginRight="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:maxLines="1"
+                android:text="qzd"
+                android:padding="5dp"
+                android:background="@color/gray"
+                android:id="@+id/author_t"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="描述："
+                android:layout_marginRight="5dp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:maxLines="1"
+                android:text="没什么好说的"
+                android:padding="5dp"
+                android:background="@color/gray"
+                android:id="@+id/description_t"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <Button
+            android:text="就噶"
+            android:background="@drawable/btn"
+            android:layout_margin="5dp"
+            android:id="@+id/enter_Btn"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+        <TextView
+            android:text="做好事不留名，跳过！"
+            android:padding="5dp"
+            android:id="@+id/skip_t"
+            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <!--缓冲图标-->
+    <LinearLayout
+        android:id="@+id/bufferIcon"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/infoText"
+            android:textColor="@android:color/white"
+            android:text="合成中，请等待。几分钟就压完了（吧）。"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>

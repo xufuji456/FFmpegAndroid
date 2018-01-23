@@ -1,0 +1,47 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16sp</dimen>
+    <dimen name="activity_vertical_margin">16sp</dimen>
+    <dimen name="activity_top_margin">22sp</dimen>
+    <dimen name="listview_padding">9sp</dimen>
+
+    <dimen name="all_padding">0sp</dimen>
+    <dimen name="menu_padding_big">20sp</dimen>
+    <dimen name="menu_padding">10sp</dimen>
+    <dimen name="menu_padding_small">5sp</dimen>
+    <dimen name="menu_padding_tiny">2sp</dimen>
+    <dimen name="textField_roundRadius">5sp</dimen>
+    <dimen name="textField_roundRadiusSmall">10sp</dimen>
+    <dimen name="textField_roundRadiusBig">15sp</dimen>
+    <dimen name="item_margin">5dp</dimen>
+    <dimen name="top_margin">3dp</dimen>
+    <dimen name="item_marginBig">10dp</dimen>
+    <dimen name="line_margin">15dp</dimen>
+    <dimen name="zero">0dp</dimen>
+
+    <dimen name="item_margin_small">2sp</dimen>
+    <dimen name="item_margin_bord">1sp</dimen>
+    <dimen name="menutextsize">16sp</dimen>
+    <dimen name="titlesize">24sp</dimen>
+    <dimen name="title2size">20sp</dimen>
+    <dimen name="title4size">12sp</dimen>
+    <dimen name="title10size">9sp</dimen>
+    <dimen name="title11size">10sp</dimen>
+    <dimen name="title12size">11sp</dimen>
+    <dimen name="title3size">16sp</dimen>
+    <dimen name="title9size">14sp</dimen>
+    <dimen name="title5size">20sp</dimen>
+    <dimen name="title7size">30sp</dimen>
+    <dimen name="title8size">22sp</dimen>
+    <dimen name="title6size">17sp</dimen>
+
+    <dimen name="indicator_right_padding">10dp</dimen>
+    <dimen name="indicator_corner_radius">12dp</dimen>
+    <dimen name="indicator_internal_padding">4dp</dimen>
+    <dimen name="header_footer_left_right_padding">24dp</dimen>
+    <dimen name="header_footer_top_bottom_padding">12dp</dimen>
+
+
+
+
+</resources>

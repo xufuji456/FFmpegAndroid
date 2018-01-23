@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--空心圆角矩形  -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+    <corners android:radius="10dp" /><!-- 圆角半径 -->
+    <gradient
+        android:endColor="@android:color/white"
+        android:startColor="@android:color/white" /><!-- 矩形的内部颜色，这里设置成白色，即空心 -->
+</shape>
