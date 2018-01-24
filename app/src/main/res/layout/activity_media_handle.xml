@@ -31,4 +31,11 @@
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/btn_extract_audio"/>
 
+        <ProgressBar
+            android:id="@+id/progress_media"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
 </RelativeLayout>

@@ -5,4 +5,84 @@
     android:layout_height="match_parent"
     tools:context="com.frank.ffmpeg.activity.VideoHandleActivity">
 
+    <Button
+        android:id="@+id/btn_video_transform"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/video_transform"/>
+
+    <Button
+        android:id="@+id/btn_video_cut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_video_transform"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_cut"/>
+
+    <Button
+        android:id="@+id/btn_video_concat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_video_cut"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_concat"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btn_screen_shot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_video_concat"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_screen_shot"/>
+
+    <Button
+        android:id="@+id/btn_water_mark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_screen_shot"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_water_mark"/>
+
+    <Button
+        android:id="@+id/btn_generate_gif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_water_mark"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_to_gif"/>
+
+    <Button
+        android:id="@+id/btn_screen_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_generate_gif"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_screen_record"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btn_combine_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_screen_record"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_from_photo"/>
+
+    <ProgressBar
+        android:id="@+id/progress_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>

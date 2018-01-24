@@ -10,12 +10,10 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-
+import android.widget.ProgressBar;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.FFmpegUtil;
-
 import java.io.File;
 
 /**
@@ -30,42 +28,58 @@ public class MediaHandleActivity extends AppCompatActivity implements View.OnCli
     private String videoFile = PATH + File.separator + "flash-tree.mp4";//flash-tree.mp4
     String temp = PATH + File.separator + "temp.mp4";
     private boolean isMux;
+    private final static int MSG_MUX = 100;
+    private final static int MSG_BEGIN = 101;
+    private final static int MSG_FINISH = 102;
+    private ProgressBar progress_media;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if(msg.what == 100){
-                String audioFile = PATH + File.separator + "tiger.mp3";//tiger.mp3
-                String muxFile = PATH + File.separator + "media-mux.mp4";
+            switch (msg.what){
+                case MSG_MUX:
+                    String audioFile = PATH + File.separator + "tiger.mp3";//tiger.mp3
+                    String muxFile = PATH + File.separator + "media-mux.mp4";
 
-                try {
-                    //使用MediaPlayer获取视频时长
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setDataSource(videoFile);
-                    mediaPlayer.prepare();
-                    //单位为ms
-                    int videoDuration = mediaPlayer.getDuration()/1000;
-                    Log.i(TAG, "videoDuration=" + videoDuration);
-                    mediaPlayer.release();
-                    //使用MediaMetadataRetriever获取音频时长
-                    MediaMetadataRetriever mediaRetriever = new MediaMetadataRetriever();
-                    mediaRetriever.setDataSource(audioFile);
-                    //单位为ms
-                    String duration = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                    int audioDuration = (int)(Long.parseLong(duration)/1000);
-                    Log.i(TAG, "audioDuration=" + audioDuration);
-                    mediaRetriever.release();
-                    //如果视频时长比音频长，采用音频时长，否则用视频时长
-                    int mDuration = Math.min(audioDuration, videoDuration);
-                    //使用纯视频与音频进行合成
-                    String[] commandLine = FFmpegUtil.mediaMux(temp, audioFile, mDuration, muxFile);
-                    executeFFmpegCmd(commandLine);
-                    isMux = false;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        //使用MediaPlayer获取视频时长
+                        MediaPlayer mediaPlayer = new MediaPlayer();
+                        mediaPlayer.setDataSource(videoFile);
+                        mediaPlayer.prepare();
+                        //单位为ms
+                        int videoDuration = mediaPlayer.getDuration()/1000;
+                        Log.i(TAG, "videoDuration=" + videoDuration);
+                        mediaPlayer.release();
+                        //使用MediaMetadataRetriever获取音频时长
+                        MediaMetadataRetriever mediaRetriever = new MediaMetadataRetriever();
+                        mediaRetriever.setDataSource(audioFile);
+                        //单位为ms
+                        String duration = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        int audioDuration = (int)(Long.parseLong(duration)/1000);
+                        Log.i(TAG, "audioDuration=" + audioDuration);
+                        mediaRetriever.release();
+                        //如果视频时长比音频长，采用音频时长，否则用视频时长
+                        int mDuration = Math.min(audioDuration, videoDuration);
+                        //使用纯视频与音频进行合成
+                        String[] commandLine = FFmpegUtil.mediaMux(temp, audioFile, mDuration, muxFile);
+                        executeFFmpegCmd(commandLine);
+                        isMux = false;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case MSG_BEGIN:
+                    progress_media.setVisibility(View.VISIBLE);
+                    setGone();
+                    break;
+                case MSG_FINISH:
+                    progress_media.setVisibility(View.GONE);
+                    setVisible();
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -79,9 +93,22 @@ public class MediaHandleActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initView() {
+        progress_media = (ProgressBar) findViewById(R.id.progress_media) ;
         findViewById(R.id.btn_mux).setOnClickListener(this);
         findViewById(R.id.btn_extract_audio).setOnClickListener(this);
         findViewById(R.id.btn_extract_video).setOnClickListener(this);
+    }
+
+    private void setVisible() {
+        findViewById(R.id.btn_mux).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_extract_audio).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_extract_video).setVisibility(View.VISIBLE);
+    }
+
+    private void setGone() {
+        findViewById(R.id.btn_mux).setVisibility(View.GONE);
+        findViewById(R.id.btn_extract_audio).setVisibility(View.GONE);
+        findViewById(R.id.btn_extract_video).setVisibility(View.GONE);
     }
 
     @Override
@@ -146,20 +173,16 @@ public class MediaHandleActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onBegin() {
                 Log.i(TAG, "handle media onBegin...");
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
             }
 
             @Override
             public void onEnd(int result) {
                 Log.i(TAG, "handle media onEnd...");
                 if(isMux){
-                    mHandler.obtainMessage(100).sendToTarget();
+                    mHandler.obtainMessage(MSG_MUX).sendToTarget();
                 }else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MediaHandleActivity.this, "handle media finish...", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    mHandler.obtainMessage(MSG_FINISH).sendToTarget();
                 }
             }
         });

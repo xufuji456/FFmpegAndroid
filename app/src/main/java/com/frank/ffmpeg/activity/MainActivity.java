@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
-
 import com.frank.ffmpeg.R;
 
 /**
@@ -38,8 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, MediaHandleActivity.class));
                 break;
             case R.id.btn_video://视频处理
-                Toast.makeText(this, "暂时还没完善该功能...", Toast.LENGTH_LONG).show();
-//                startActivity(new Intent(MainActivity.this, VideoHandleActivity.class));
+                startActivity(new Intent(MainActivity.this, VideoHandleActivity.class));
                 break;
             default:
                 break;

@@ -1,12 +1,14 @@
 package com.frank.ffmpeg.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-
+import android.widget.ProgressBar;
 import java.io.File;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
@@ -20,9 +22,32 @@ import com.frank.ffmpeg.util.FFmpegUtil;
 public class AudioHandleActivity extends AppCompatActivity implements View.OnClickListener{
 
     private final static String TAG = AudioHandleActivity.class.getSimpleName();
-    private static final String PATH = Environment.getExternalStorageDirectory().getPath();
-    String srcFile = PATH + File.separator + "tiger.mp3";
-    String appendFile = PATH + File.separator + "test.mp3";
+    private final static String PATH = Environment.getExternalStorageDirectory().getPath();
+    private String srcFile = PATH + File.separator + "tiger.mp3";
+    private String appendFile = PATH + File.separator + "test.mp3";
+    private final static int MSG_BEGIN = 11;
+    private final static int MSG_FINISH = 12;
+    private ProgressBar progress_audio;
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case MSG_BEGIN:
+                    progress_audio.setVisibility(View.VISIBLE);
+                    setGone();
+                    break;
+                case MSG_FINISH:
+                    progress_audio.setVisibility(View.GONE);
+                    setVisible();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +58,25 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initView() {
+        progress_audio = (ProgressBar) findViewById(R.id.progress_audio);
         findViewById(R.id.btn_transform).setOnClickListener(this);
         findViewById(R.id.btn_cut).setOnClickListener(this);
         findViewById(R.id.btn_concat).setOnClickListener(this);
         findViewById(R.id.btn_mix).setOnClickListener(this);
+    }
+
+    private void setVisible() {
+        findViewById(R.id.btn_transform).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_cut).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_concat).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_mix).setVisibility(View.VISIBLE);
+    }
+
+    private void setGone() {
+        findViewById(R.id.btn_transform).setVisibility(View.GONE);
+        findViewById(R.id.btn_cut).setVisibility(View.GONE);
+        findViewById(R.id.btn_concat).setVisibility(View.GONE);
+        findViewById(R.id.btn_mix).setVisibility(View.GONE);
     }
 
     @Override
@@ -103,17 +143,13 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onBegin() {
                 Log.i(TAG, "handle audio onBegin...");
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
             }
 
             @Override
             public void onEnd(int result) {
                 Log.i(TAG, "handle audio onEnd...");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(AudioHandleActivity.this, "handle audio finish...", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                mHandler.obtainMessage(MSG_FINISH).sendToTarget();
             }
         });
     }

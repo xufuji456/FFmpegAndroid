@@ -15,11 +15,12 @@
 
     <string name="video_cut">视频剪切</string>
     <string name="video_concat">视频拼接</string>
-    <string name="video_text_mark">视频文字水印</string>
-    <string name="video_photo_mark">视频图片水印</string>
+    <string name="video_water_mark">视频水印</string>
     <string name="video_to_gif">视频转Gif</string>
     <string name="video_transform">视频转码</string>
     <string name="video_screen_shot">视频截图</string>
+    <string name="video_screen_record">屏幕录制</string>
+    <string name="video_from_photo">图片合成视频</string>
     <string name="video_extract_frame">视频抽帧</string>
     <string name="video_part_zoom">视频局部放大</string>
 
