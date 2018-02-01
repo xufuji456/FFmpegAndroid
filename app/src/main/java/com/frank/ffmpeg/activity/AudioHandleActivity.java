@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import java.io.File;
+
+import com.frank.ffmpeg.AudioPlayer;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.FFmpegUtil;
@@ -63,6 +65,8 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_cut).setOnClickListener(this);
         findViewById(R.id.btn_concat).setOnClickListener(this);
         findViewById(R.id.btn_mix).setOnClickListener(this);
+        findViewById(R.id.btn_play_audio).setOnClickListener(this);
+        findViewById(R.id.btn_play_opensl).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -70,6 +74,8 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_cut).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_concat).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_mix).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_play_audio).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_play_opensl).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -77,6 +83,8 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_cut).setVisibility(View.GONE);
         findViewById(R.id.btn_concat).setVisibility(View.GONE);
         findViewById(R.id.btn_mix).setVisibility(View.GONE);
+        findViewById(R.id.btn_play_audio).setVisibility(View.GONE);
+        findViewById(R.id.btn_play_opensl).setVisibility(View.GONE);
     }
 
     @Override
@@ -94,6 +102,12 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_mix:
                 handleType = 3;
+                break;
+            case R.id.btn_play_audio:
+                handleType = 4;
+                break;
+            case R.id.btn_play_opensl:
+                handleType = 5;
                 break;
             default:
                 handleType = 0;
@@ -125,6 +139,22 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 String mixFile = PATH + File.separator + "mix.aac";
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
+            case 4://解码播放（AudioTrack）
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new AudioPlayer().play(srcFile);
+                    }
+                }).start();
+                return;
+            case 5://解码播放（OpenSL ES）
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new AudioPlayer().playAudio(srcFile);
+                    }
+                }).start();
+                return;
             default:
                 break;
         }

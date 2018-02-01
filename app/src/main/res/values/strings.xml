@@ -4,6 +4,8 @@
     <string name="audio_cut">音频剪切</string>
     <string name="audio_concat">音频合并</string>
     <string name="audio_mix">音频混合</string>
+    <string name="audio_play">音频解码AudioTrack播放</string>
+    <string name="audio_opensl">音频解码OpenSL播放</string>
 
     <string name="audio_handle">音频处理</string>
     <string name="media_handle">音视频处理</string>

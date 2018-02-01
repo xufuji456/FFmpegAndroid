@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             audio-handle
+             media-handle
 
              # Sets the library as a shared library.
              SHARED
@@ -21,7 +21,9 @@ add_library( # Sets the name of the library.
              src/main/cpp/cmdutils.c
              src/main/cpp/ffmpeg.c
              src/main/cpp/ffmpeg_filter.c
-             src/main/cpp/ffmpeg_opt.c)
+             src/main/cpp/ffmpeg_opt.c
+             src/main/cpp/audio_player.c
+             src/main/cpp/openSL_audio_player.c)
 
 add_library( ffmpeg
              SHARED
@@ -38,8 +40,11 @@ find_library( # Sets the name of the path variable.
               log )
 
 target_link_libraries( # Specifies the target library.
-                       audio-handle
+                       media-handle
                        ffmpeg
+                       -landroid #native_window
+                       -ljnigraphics #bitmap
+                       -lOpenSLES #openSLES
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )

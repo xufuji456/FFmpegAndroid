@@ -48,4 +48,22 @@
         android:layout_centerInParent="true"
         android:visibility="gone"/>
 
+    <Button
+        android:id="@+id/btn_play_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_play"
+        android:layout_below="@+id/btn_concat"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btn_play_opensl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/audio_opensl"
+        android:layout_below="@+id/btn_play_audio"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

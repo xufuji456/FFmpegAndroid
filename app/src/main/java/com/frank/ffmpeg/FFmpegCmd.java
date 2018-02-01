@@ -8,7 +8,7 @@ public class FFmpegCmd {
     }
 
     static{
-        System.loadLibrary("audio-handle");
+        System.loadLibrary("media-handle");
     }
 
     //开子线程调用native方法进行音频处理
