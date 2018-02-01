@@ -201,7 +201,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
                 commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
                 break;
-            case 8:
+            case 8://视频解码播放
                 startActivity(new Intent(VideoHandleActivity.this, VideoPlayerActivity.class));
                 return;
             default:

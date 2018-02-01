@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_audio).setOnClickListener(this);
         findViewById(R.id.btn_media).setOnClickListener(this);
         findViewById(R.id.btn_video).setOnClickListener(this);
+        findViewById(R.id.btn_push).setOnClickListener(this);
     }
 
     @Override
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_video://视频处理
                 startActivity(new Intent(MainActivity.this, VideoHandleActivity.class));
+                break;
+            case R.id.btn_push://FFmpeg推流
+                startActivity(new Intent(MainActivity.this, PushActivity.class));
                 break;
             default:
                 break;

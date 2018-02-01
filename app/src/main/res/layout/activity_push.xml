@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.frank.ffmpeg.activity.PushActivity">
+
+    <EditText
+        android:id="@+id/edit_file_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:minWidth="200dp"
+        android:layout_centerInParent="true"/>
+
+
+    <EditText
+        android:id="@+id/edit_live_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:minWidth="200dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/edit_file_path"/>
+
+    <Button
+        android:id="@+id/btn_push_stream"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/edit_live_url"
+        android:layout_centerHorizontal="true"
+        android:text="@string/video_push"/>
+
+</RelativeLayout>

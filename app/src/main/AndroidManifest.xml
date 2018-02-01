@@ -20,23 +20,25 @@
         android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".activity.AudioHandleActivity"/>
-
-        <activity android:name=".activity.MediaHandleActivity"/>
-
-        <activity android:name=".activity.VideoHandleActivity"/>
-
-        <activity android:name=".activity.VideoPlayerActivity"
-            android:screenOrientation="landscape">
-        </activity>
+        <!--音频处理-->
+        <activity android:name=".activity.AudioHandleActivity" />
+        <!--音视频处理-->
+        <activity android:name=".activity.MediaHandleActivity" />
+        <!--视频处理-->
+        <activity android:name=".activity.VideoHandleActivity" />
+        <!--视频解码播放-->
+        <activity
+            android:name=".activity.VideoPlayerActivity"
+            android:screenOrientation="landscape"/>
+        <!--推流直播-->
+        <activity android:name=".activity.PushActivity"/>
 
     </application>
 

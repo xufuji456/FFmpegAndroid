@@ -24,7 +24,8 @@ add_library( # Sets the name of the library.
              src/main/cpp/ffmpeg_opt.c
              src/main/cpp/audio_player.c
              src/main/cpp/openSL_audio_player.c
-             src/main/cpp/video_player.c)
+             src/main/cpp/video_player.c
+             src/main/cpp/ffmpeg_pusher.cpp)
 
 add_library( ffmpeg
              SHARED

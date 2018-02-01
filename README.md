@@ -17,9 +17,12 @@ android端基于FFmpeg库在中的使用。<br>
 - #### 视频添加水印
 - #### 图片合成视频
 - #### 视频解码播放
-
+- #### 本地直播推流
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/live.png)
+左边是ffplay客户端拉流播放，中间是web网页播放：
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/live.gif)
 ***
 
-后续会加上音视频解码同步播放、直播推流。
+后续会加上音视频解码同步播放。
 <br><br>
 

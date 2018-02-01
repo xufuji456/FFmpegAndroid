@@ -31,7 +31,6 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
-#include "logjam.h"
 
 #if HAVE_IO_H
 #include <io.h>
