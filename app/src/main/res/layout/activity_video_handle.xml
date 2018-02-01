@@ -85,4 +85,13 @@
         android:layout_centerInParent="true"
         android:visibility="gone"/>
 
+    <Button
+        android:id="@+id/btn_play_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_combine_video"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_play"/>
+
 </RelativeLayout>

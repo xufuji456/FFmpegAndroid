@@ -34,6 +34,10 @@
 
         <activity android:name=".activity.VideoHandleActivity"/>
 
+        <activity android:name=".activity.VideoPlayerActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
     </application>
 
 </manifest>

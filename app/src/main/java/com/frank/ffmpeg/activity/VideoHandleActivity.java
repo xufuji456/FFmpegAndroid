@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -65,6 +66,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_generate_gif).setOnClickListener(this);
         findViewById(R.id.btn_screen_record).setOnClickListener(this);
         findViewById(R.id.btn_combine_video).setOnClickListener(this);
+        findViewById(R.id.btn_play_video).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -116,6 +118,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_combine_video:
                 handleType = 7;
+                break;
+            case R.id.btn_play_video:
+                handleType = 8;
                 break;
             default:
                 handleType = 0;
@@ -196,6 +201,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
                 commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
                 break;
+            case 8:
+                startActivity(new Intent(VideoHandleActivity.this, VideoPlayerActivity.class));
+                return;
             default:
                 break;
         }
