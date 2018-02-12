@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/audio_play"
-        android:layout_below="@+id/btn_concat"
+        android:layout_below="@+id/btn_mix"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"/>
 

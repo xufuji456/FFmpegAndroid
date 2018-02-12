@@ -19,7 +19,7 @@ import java.io.File;
  * Created by frank on 2018/2/1.
  */
 public class VideoPlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback {
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = VideoPlayerActivity.class.getSimpleName();
     SurfaceHolder surfaceHolder;
     private final static String PATH = Environment.getExternalStorageDirectory().getPath() + File.separator;
     private String filePath = PATH + "hello.mp4";
