@@ -20,8 +20,8 @@
 
 #include <stdint.h>
 
-#include "ffmpeg.h"
-#include "cmdutils.h"
+#include "ffmpeg/ffmpeg.h"
+#include "ffmpeg/cmdutils.h"
 
 #include "libavformat/avformat.h"
 
@@ -3106,7 +3106,7 @@ static int opt_progress(void *optctx, const char *opt, const char *arg)
 #define OFFSET(x) offsetof(OptionsContext, x)
 const OptionDef options[] = {
     /* main options */
-#include "cmdutils_common_opts.h"
+#include "ffmpeg/cmdutils_common_opts.h"
     { "f",              HAS_ARG | OPT_STRING | OPT_OFFSET |
                         OPT_INPUT | OPT_OUTPUT,                      { .off       = OFFSET(format) },
         "force format", "fmt" },

@@ -22,7 +22,7 @@
 #define AVUTIL_ARM_TIMER_H
 
 #include <stdint.h>
-#include "config.h"
+#include "ffmpeg/config.h"
 
 #if HAVE_INLINE_ASM && defined(__ARM_ARCH_7A__)
 

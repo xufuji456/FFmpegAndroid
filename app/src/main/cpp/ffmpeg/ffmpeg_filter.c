@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#include "ffmpeg.h"
+#include "ffmpeg/ffmpeg.h"
 
 #include "libavfilter/avfilter.h"
 #include "libavfilter/buffersink.h"

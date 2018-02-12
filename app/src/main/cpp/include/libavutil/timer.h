@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "config.h"
+#include "ffmpeg/config.h"
 
 #if HAVE_MACH_MACH_TIME_H
 #include <mach/mach_time.h>

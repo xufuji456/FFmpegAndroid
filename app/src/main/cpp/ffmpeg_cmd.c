@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "ffmpeg.h"
+#include "ffmpeg/ffmpeg.h"
 
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_FFmpegCmd_handle
 (JNIEnv *env, jclass obj, jobjectArray commands){

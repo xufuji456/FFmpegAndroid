@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "libavutil/common.h"
-#include "config.h"
+#include "ffmpeg/config.h"
 
 #define MAX_NEG_CROP 1024
 

@@ -78,6 +78,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_generate_gif).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
         findViewById(R.id.btn_combine_video).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_play_video).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -89,6 +90,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_generate_gif).setVisibility(View.GONE);
         findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
         findViewById(R.id.btn_combine_video).setVisibility(View.GONE);
+        findViewById(R.id.btn_play_video).setVisibility(View.GONE);
     }
 
     @Override

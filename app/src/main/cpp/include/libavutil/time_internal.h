@@ -20,7 +20,7 @@
 #define AVUTIL_TIME_INTERNAL_H
 
 #include <time.h>
-#include "config.h"
+#include "ffmpeg/config.h"
 
 #if !HAVE_GMTIME_R && !defined(gmtime_r)
 static inline struct tm *gmtime_r(const time_t* clock, struct tm *result)
