@@ -341,22 +341,26 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
             player_wait_for_frame(player, player->audio_clock + AUDIO_TIME_ADJUST_US);
         }
 
-        JNIEnv * env;
-        (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-        jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
-        jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
-        //拷贝缓冲数据
-        memcpy(sample_byte_array, player->audio_buffer, (size_t) out_buffer_size);
-        //释放数组
-        (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
-        //调用AudioTrack的write方法进行播放
-        (*env)->CallIntMethod(env, player->audio_track, player->audio_track_write_mid,
-                              audio_sample_array,0,out_buffer_size);
-        //释放局部引用
-        (*env)->DeleteLocalRef(env,audio_sample_array);
+        if(javaVM != NULL){
+            JNIEnv * env;
+            (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+            jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
+            jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
+            //拷贝缓冲数据
+            memcpy(sample_byte_array, player->audio_buffer, (size_t) out_buffer_size);
+            //释放数组
+            (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
+            //调用AudioTrack的write方法进行播放
+            (*env)->CallIntMethod(env, player->audio_track, player->audio_track_write_mid,
+                                  audio_sample_array,0,out_buffer_size);
+            //释放局部引用
+            (*env)->DeleteLocalRef(env,audio_sample_array);
 //        usleep(1000 * 16);
+        }
     }
-    (*javaVM)->DetachCurrentThread(javaVM);
+    if(javaVM != NULL){
+        (*javaVM)->DetachCurrentThread(javaVM);
+    }
     return 0;
 }
 

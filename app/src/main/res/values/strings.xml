@@ -32,4 +32,8 @@
     <string name="video_slow">慢放</string>
     <string name="video_fast">快进</string>
 
+    <string name="swap">切换</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+
 </resources>

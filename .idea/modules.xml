@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://D:\git-repository\FFmpegAndroid\ConcatAudio.iml" filepath="D:\git-repository\FFmpegAndroid\ConcatAudio.iml" />
       <module fileurl="file://$PROJECT_DIR$/FFmpegAndroid.iml" filepath="$PROJECT_DIR$/FFmpegAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Live/Live.iml" filepath="$PROJECT_DIR$/Live/Live.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:\Users\frank\Desktop\ffmpegCLDemo-master\ffmpegCLDemo.iml" filepath="C:\Users\frank\Desktop\ffmpegCLDemo-master\ffmpegCLDemo.iml" />
     </modules>

@@ -37,10 +37,13 @@
         <activity
             android:name=".activity.VideoPlayerActivity"
             android:screenOrientation="landscape" />
-        <!-- 推流直播 -->
-        <activity android:name=".activity.PushActivity" />
         <!--音视频解码播放-->
         <activity android:name=".activity.MediaPlayerActivity"
+            android:screenOrientation="landscape"/>
+        <!-- 本地推流直播 -->
+        <activity android:name=".activity.PushActivity" />
+        <!-- 实时推流直播 -->
+        <activity android:name=".activity.LiveActivity"
             android:screenOrientation="landscape"/>
     </application>
 

@@ -37,6 +37,8 @@ set_target_properties( ffmpeg
                        PROPERTIES IMPORTED_LOCATION
                        ../../../../libs/armeabi-v7a/libffmpeg.so )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+
 include_directories(src/main/cpp)
 include_directories(src/main/cpp/include)
 

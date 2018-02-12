@@ -50,8 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, PushActivity.class));
                 break;
             case R.id.btn_live://实时推流直播:AAC音频编码、H264视频编码、RTMP推流
-                Toast.makeText(MainActivity.this, "暂时没该功能...", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(MainActivity.this, PushActivity.class));
+                startActivity(new Intent(MainActivity.this, LiveActivity.class));
                 break;
             default:
                 break;
