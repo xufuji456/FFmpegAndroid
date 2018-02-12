@@ -66,6 +66,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private void initView(){
         findViewById(R.id.btn_swap).setOnClickListener(this);
         ((ToggleButton)findViewById(R.id.btn_live)).setOnCheckedChangeListener(this);
+        ((ToggleButton)findViewById(R.id.btn_mute)).setOnCheckedChangeListener(this);
         SurfaceView surface_camera = (SurfaceView) findViewById(R.id.surface_camera);
         surfaceHolder = surface_camera.getHolder();
     }
@@ -87,17 +88,27 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.btn_swap){
+        if(v.getId() == R.id.btn_swap){//切换摄像头
             livePusher.switchCamera();
         }
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked){
-            livePusher.startPush(LIVE_URL, this);
-        }else {
-            livePusher.stopPush();
+        switch (buttonView.getId()){
+            case R.id.btn_live://开始/停止直播
+                if(isChecked){
+                    livePusher.startPush(LIVE_URL, this);
+                }else {
+                    livePusher.stopPush();
+                }
+                break;
+            case R.id.btn_mute://设置静音
+                Log.i(TAG, "isChecked=" + isChecked);
+                livePusher.setMute(isChecked);
+                break;
+            default:
+                break;
         }
     }
 

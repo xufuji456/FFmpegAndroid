@@ -117,7 +117,6 @@ void *push_thread(void * args){
                 goto end;
             }
             RTMPPacket_Free(packet);
-            LOGI("RTMP_SendPacket success...");
         }
         pthread_mutex_unlock(&mutex);
     }

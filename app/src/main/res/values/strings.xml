@@ -35,5 +35,7 @@
     <string name="swap">切换</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>
+    <string name="mute">静音</string>
+    <string name="sound">声音</string>
 
 </resources>

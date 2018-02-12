@@ -59,4 +59,13 @@ public class LivePusher {
         audioPusher.release();
         liveUtil.release();
     }
+
+    /**
+     * 设置静音
+     * @param isMute 是否静音
+     */
+    public void setMute(boolean isMute){
+        audioPusher.setMute(isMute);
+    }
+
 }

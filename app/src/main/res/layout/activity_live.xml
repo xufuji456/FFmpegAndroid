@@ -15,7 +15,8 @@
         android:id="@+id/btn_swap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/swap"/>
+        android:text="@string/swap"
+        android:layout_marginTop="20dp"/>
 
     <ToggleButton
         android:id="@+id/btn_live"
@@ -24,5 +25,14 @@
         android:textOn="@string/stop"
         android:textOff="@string/start"
         android:layout_centerVertical="true"/>
+
+    <ToggleButton
+        android:id="@+id/btn_mute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="@string/sound"
+        android:textOff="@string/mute"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

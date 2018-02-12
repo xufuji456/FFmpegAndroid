@@ -17,6 +17,7 @@ public class AudioPusher extends Pusher {
     private boolean isPushing;
     private int minBufferSize;
     private LiveUtil liveUtil;
+    private boolean isMute;
 
     AudioPusher(AudioParam audioParam, LiveUtil liveUtil){
         this.liveUtil = liveUtil;
@@ -65,16 +66,26 @@ public class AudioPusher extends Pusher {
         public void run() {
             super.run();
             audioRecord.startRecording();
-            while (isPushing){
-                byte[] audioBuffer = new byte[minBufferSize];
-                int length = audioRecord.read(audioBuffer, 0, audioBuffer.length);
-                if(length > 0){
-//                    Log.i("AudioPusher", "is recording...");
-                    liveUtil.pushAudioData(audioBuffer, length);
+            while (isPushing){//处于推流状态
+                if(!isMute){//如果不静音，才推音频流
+                    byte[] audioBuffer = new byte[minBufferSize];
+                    int length = audioRecord.read(audioBuffer, 0, audioBuffer.length);
+                    if(length > 0){
+//                        Log.i("AudioPusher", "is recording...");
+                        liveUtil.pushAudioData(audioBuffer, length);
+                    }
                 }
             }
             audioRecord.stop();
         }
+    }
+
+    /**
+     * 设置静音
+     * @param isMute 是否静音
+     */
+    void setMute(boolean isMute){
+        this.isMute = isMute;
     }
 
 }
