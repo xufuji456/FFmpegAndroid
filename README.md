@@ -38,11 +38,11 @@ android端基于FFmpeg库在中的使用。<br>
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/VideoToGif.gif)
 
 滤镜效果：
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_cool.jpg)
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_cool.jpg)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_romantic.jpg)
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_romantic.jpg)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_sketch.jpg)
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.jpg)
 
 ***
 
