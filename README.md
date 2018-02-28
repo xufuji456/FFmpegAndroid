@@ -20,6 +20,7 @@ android端基于FFmpeg库在中的使用。<br>
 - #### 本地直播推流
 - #### 实时直播推流
 - #### 音视频解码播放
+- #### OpenGL+GPUImage滤镜
 
 本地直播截图：
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/live.png)
@@ -36,8 +37,15 @@ android端基于FFmpeg库在中的使用。<br>
 视频转成GIF动图：
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/VideoToGif.gif)
 
+滤镜效果：
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_cool.jpg)
+
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_romantic.jpg)
+
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/filter_sketch.jpg)
+
 ***
 
-后续会完善音视频解码同步播放、推流直播加上滤镜。
+后续会完善音视频播放、推流直播。
 <br><br>
 
