@@ -320,8 +320,8 @@ Java_com_frank_live_LiveUtil_pushVideo(JNIEnv *env, jobject instance, jbyteArray
     jbyte *nv21_buffer = (*env)->GetByteArrayElements(env, data_, NULL);
     //Y相同，直接拷贝
     memcpy(picture_in.img.plane[0], nv21_buffer, (size_t) y_len);
-    jbyte *u_buffer = (jbyte *) picture_in.img.plane[1];
     jbyte *v_buffer = (jbyte *) picture_in.img.plane[2];
+    jbyte *u_buffer = (jbyte *) picture_in.img.plane[1];
     int i;
     //U和V交换
     for(i=0; i<uv_len; i++){

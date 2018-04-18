@@ -1,6 +1,7 @@
 # FFmpegAndroid
-android端基于FFmpeg库在中的使用。<br>
+android端基于FFmpeg库的使用。<br>
 基于ffmpeg3.2.4版本，编译生成libffmpeg.so文件。<br>
+添加编译ffmpeg源码的参考脚本<br>
 目前音视频相关处理：<br>
 
 - #### 音频剪切、拼接
