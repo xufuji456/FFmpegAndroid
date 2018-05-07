@@ -211,4 +211,17 @@ public class FFmpegUtil {
         return combineVideo.split(" ");//以空格分割为字符串数组
     }
 
+    /**
+     * 音频编码
+     * @param srcFile 源文件pcm裸流
+     * @param targetFile 编码后目标文件
+     * @return 音频编码的命令行
+     */
+    public static  String[] encodeAudio(String srcFile, String targetFile){
+        String combineVideo = "ffmpeg -f s16le -ar 8000 -ac 1 -i %s %s";
+        combineVideo = String.format(combineVideo, srcFile, targetFile);
+        combineVideo = combineVideo.replace("#", "%");
+        return combineVideo.split(" ");
+    }
+
 }

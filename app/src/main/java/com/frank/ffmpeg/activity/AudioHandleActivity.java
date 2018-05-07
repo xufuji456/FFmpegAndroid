@@ -67,6 +67,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_mix).setOnClickListener(this);
         findViewById(R.id.btn_play_audio).setOnClickListener(this);
         findViewById(R.id.btn_play_opensl).setOnClickListener(this);
+        findViewById(R.id.btn_audio_encode).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -76,6 +77,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_mix).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_play_audio).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_play_opensl).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_audio_encode).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -85,6 +87,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_mix).setVisibility(View.GONE);
         findViewById(R.id.btn_play_audio).setVisibility(View.GONE);
         findViewById(R.id.btn_play_opensl).setVisibility(View.GONE);
+        findViewById(R.id.btn_audio_encode).setVisibility(View.GONE);
     }
 
     @Override
@@ -108,6 +111,9 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_play_opensl:
                 handleType = 5;
+                break;
+            case R.id.btn_audio_encode:
+                handleType = 6;
                 break;
             default:
                 handleType = 0;
@@ -155,6 +161,12 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                     }
                 }).start();
                 return;
+            case 6://音频编码
+                //可编码成WAV、AAC。如果需要编码成MP3、AMR，ffmpeg需要重新编译，把MP3、AMR库enable
+                String pcmFile = PATH + File.separator + "audio.pcm";
+                String wavFile = PATH + File.separator + "output.wav";
+                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile);
+                break;
             default:
                 break;
         }
