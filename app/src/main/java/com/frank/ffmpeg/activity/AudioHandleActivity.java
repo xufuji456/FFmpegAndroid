@@ -165,7 +165,11 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 //可编码成WAV、AAC。如果需要编码成MP3、AMR，ffmpeg需要重新编译，把MP3、AMR库enable
                 String pcmFile = PATH + File.separator + "audio.pcm";
                 String wavFile = PATH + File.separator + "output.wav";
-                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile);
+                //pcm数据的采样率，一般采样率为8000、16000、44100
+                int sampleRate = 8000;
+                //pcm数据的声道，单声道为1，立体声道为2
+                int channel = 1;
+                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
             default:
                 break;

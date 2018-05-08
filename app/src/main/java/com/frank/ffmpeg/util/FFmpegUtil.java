@@ -215,12 +215,13 @@ public class FFmpegUtil {
      * 音频编码
      * @param srcFile 源文件pcm裸流
      * @param targetFile 编码后目标文件
+     * @param sampleRate 采样率
+     * @param channel 声道:单声道为1/立体声道为2
      * @return 音频编码的命令行
      */
-    public static  String[] encodeAudio(String srcFile, String targetFile){
-        String combineVideo = "ffmpeg -f s16le -ar 8000 -ac 1 -i %s %s";
-        combineVideo = String.format(combineVideo, srcFile, targetFile);
-        combineVideo = combineVideo.replace("#", "%");
+    public static  String[] encodeAudio(String srcFile, String targetFile, int sampleRate, int channel){
+        String combineVideo = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
+        combineVideo = String.format(combineVideo, sampleRate, channel, srcFile, targetFile);
         return combineVideo.split(" ");
     }
 
