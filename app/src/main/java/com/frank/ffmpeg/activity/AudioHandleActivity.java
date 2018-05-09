@@ -15,6 +15,7 @@ import com.frank.ffmpeg.AudioPlayer;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.FFmpegUtil;
+import com.frank.ffmpeg.util.FileUtil;
 
 /**
  * 使用ffmpeg处理音频
@@ -68,6 +69,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_audio).setOnClickListener(this);
         findViewById(R.id.btn_play_opensl).setOnClickListener(this);
         findViewById(R.id.btn_audio_encode).setOnClickListener(this);
+        findViewById(R.id.btn_pcm_concat).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -78,6 +80,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_audio).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_play_opensl).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_audio_encode).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_pcm_concat).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -88,6 +91,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_audio).setVisibility(View.GONE);
         findViewById(R.id.btn_play_opensl).setVisibility(View.GONE);
         findViewById(R.id.btn_audio_encode).setVisibility(View.GONE);
+        findViewById(R.id.btn_pcm_concat).setVisibility(View.GONE);
     }
 
     @Override
@@ -115,6 +119,9 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
             case R.id.btn_audio_encode:
                 handleType = 6;
                 break;
+            case R.id.btn_pcm_concat:
+                handleType = 7;
+                break;
             default:
                 handleType = 0;
                 break;
@@ -137,7 +144,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 String cutFile = PATH + File.separator + "cut.mp3";
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
-            case 2://合并
+            case 2://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
                 break;
@@ -163,14 +170,22 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 return;
             case 6://音频编码
                 //可编码成WAV、AAC。如果需要编码成MP3、AMR，ffmpeg需要重新编译，把MP3、AMR库enable
-                String pcmFile = PATH + File.separator + "audio.pcm";
-                String wavFile = PATH + File.separator + "output.wav";
+                String pcmFile = PATH + File.separator + "concat.pcm";
+                String wavFile = PATH + File.separator + "new.wav";
                 //pcm数据的采样率，一般采样率为8000、16000、44100
                 int sampleRate = 8000;
                 //pcm数据的声道，单声道为1，立体声道为2
                 int channel = 1;
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
+            case 7://PCM裸流音频文件合并
+                String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
+                String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
+                String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+                FileUtil.concatFile(srcPCM, appendPCM, concatPCM);
+                mHandler.obtainMessage(MSG_FINISH).sendToTarget();
+                return;
             default:
                 break;
         }

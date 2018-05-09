@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/audio_transform"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:layout_centerHorizontal="true"/>
 
     <Button
@@ -72,6 +72,15 @@
         android:layout_height="wrap_content"
         android:text="@string/audio_encode"
         android:layout_below="@+id/btn_play_opensl"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btn_pcm_concat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pcm_concat"
+        android:layout_below="@+id/btn_audio_encode"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"/>
 
