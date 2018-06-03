@@ -138,8 +138,8 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
     private void doHandleVideo(int handleType){
         String[] commandLine = null;
         switch (handleType){
-            case 0://视频转码
-                String transformVideo = PATH + File.separator + "transformVideo.wmv";
+            case 0://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
+                String transformVideo = PATH + File.separator + "transformVideo.flv";
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
                 break;
             case 1://视频剪切

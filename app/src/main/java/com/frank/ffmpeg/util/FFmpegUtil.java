@@ -115,8 +115,9 @@ public class FFmpegUtil {
      * @return 转码后的文件
      */
     public static String[] transformVideo(String srcFile, String targetFile){
+        //指定目标视频的帧率、码率、分辨率
 //        String transformVideoCmd = "ffmpeg -i %s -r 25 -b 200 -s 1080x720 %s";
-        String transformVideoCmd = "ffmpeg -i %s %s";
+        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy %s";
         transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
         return transformVideoCmd.split(" ");//以空格分割为字符串数组
     }
