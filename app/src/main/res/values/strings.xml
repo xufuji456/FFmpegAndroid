@@ -31,6 +31,7 @@
     <string name="video_extract_frame">视频抽帧</string>
     <string name="video_part_zoom">视频局部放大</string>
     <string name="video_play">视频播放</string>
+    <string name="video_filter">滤镜特效</string>
     <string name="video_slow">慢放</string>
     <string name="video_fast">快进</string>
 
@@ -39,5 +40,17 @@
     <string name="stop">停止</string>
     <string name="mute">静音</string>
     <string name="sound">声音</string>
+
+    <string name="video_sketch">素描</string>
+    <string name="video_hue">hue</string>
+    <string name="video_lut">lut</string>
+    <string name="video_edge">边缘</string>
+    <string name="video_blur">模糊</string>
+    <string name="video_grid">九宫格</string>
+    <string name="video_rotate">旋转</string>
+    <string name="video_flip">翻转</string>
+    <string name="video_box">矩形</string>
+    <string name="video_noise">噪声</string>
+    <string name="video_balance">色彩平衡</string>
 
 </resources>
