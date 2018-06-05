@@ -50,7 +50,7 @@
     <string name="video_rotate">旋转</string>
     <string name="video_flip">翻转</string>
     <string name="video_box">矩形</string>
-    <string name="video_noise">噪声</string>
+    <string name="video_flash">闪烁</string>
     <string name="video_balance">色彩平衡</string>
 
 </resources>

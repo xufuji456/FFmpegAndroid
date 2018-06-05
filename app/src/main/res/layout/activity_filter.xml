@@ -8,62 +8,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:scrollbarAlwaysDrawHorizontalTrack="true"
-        android:layout_alignParentBottom="true">
-        <Button
-            android:id="@+id/btn_sketch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_sketch"/>
-        <Button
-            android:id="@+id/btn_hue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_hue"/>
-        <Button
-            android:id="@+id/btn_lut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_lut"/>
-        <Button
-            android:id="@+id/btn_edge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_edge"/>
-        <Button
-            android:id="@+id/btn_blur"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_blur"/>
-        <Button
-            android:id="@+id/btn_grid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_grid"/>
-        <Button
-            android:id="@+id/btn_balance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_balance"/>
-        <Button
-            android:id="@+id/btn_box"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_box"/>
-        <Button
-            android:id="@+id/btn_rotate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_rotate"/>
-        <Button
-            android:id="@+id/btn_flip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/video_flip"/>
-    </LinearLayout>
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

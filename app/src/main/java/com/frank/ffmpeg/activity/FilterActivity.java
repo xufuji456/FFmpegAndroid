@@ -3,14 +3,20 @@ package com.frank.ffmpeg.activity;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.VideoPlayer;
+import com.frank.ffmpeg.adapter.HorizontalAdapter;
+import com.frank.ffmpeg.listener.OnItemClickListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class FilterActivity extends AppCompatActivity implements View.OnClickListener, SurfaceHolder.Callback{
+public class FilterActivity extends AppCompatActivity implements SurfaceHolder.Callback{
 
     //SD卡根目录
     private final static String PATH = Environment.getExternalStorageDirectory().getPath();
@@ -19,30 +25,46 @@ public class FilterActivity extends AppCompatActivity implements View.OnClickLis
 
     private VideoPlayer videoPlayer;
     private SurfaceHolder surfaceHolder;
+    //surface是否已经创建
     private boolean surfaceCreated;
-
+    //是否正在播放
+    private boolean isPlaying;
+    //滤镜数组
     private String[] filters = new String[]{
             "lutyuv='u=128:v=128'",
             "hue='h=60:s=-3'",
             "lutrgb='r=0:g=0'",
             "edgedetect=low=0.1:high=0.4",
-            "fftfilt=dc_Y=0:weight_Y='exp(-4 * ((Y+X)/(W+H)))'",
+            "boxblur=2:1",
             "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
             "colorbalance=bs=0.3",
-            "drawbox=x=100:y=100:w=100:h=100:color=pink@0.5'",
-            "rotate=90",
+            "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
+            "vignette='PI/4+random(1)*PI/50':eval=frame",
             "vflip",
             "noise=alls=20:allf=t+u",
-            "vignette='PI/4+random(1)*PI/50':eval=frame"
     };
-    private int filterType;
+    private String[] txtArray = new String[]{
+            "素描",
+            "鲜明",//hue
+            "暖蓝",
+            "边缘",
+            "模糊",
+            "九宫格",
+            "均衡",
+            "矩形",
+            "闪烁",//左上角闪烁
+            "翻转"//vflip上下翻转,hflip是左右翻转
+    };
+    private HorizontalAdapter horizontalAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
 
         initView();
+        registerLister();
     }
 
     private void initView(){
@@ -51,63 +73,37 @@ public class FilterActivity extends AppCompatActivity implements View.OnClickLis
         surfaceHolder.addCallback(this);
         videoPlayer = new VideoPlayer();
 
-        findViewById(R.id.btn_sketch).setOnClickListener(this);
-        findViewById(R.id.btn_hue).setOnClickListener(this);
-        findViewById(R.id.btn_lut).setOnClickListener(this);
-        findViewById(R.id.btn_edge).setOnClickListener(this);
-        findViewById(R.id.btn_blur).setOnClickListener(this);
-        findViewById(R.id.btn_grid).setOnClickListener(this);
-        findViewById(R.id.btn_balance).setOnClickListener(this);
-        findViewById(R.id.btn_box).setOnClickListener(this);
-        findViewById(R.id.btn_rotate).setOnClickListener(this);
-        findViewById(R.id.btn_flip).setOnClickListener(this);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        List<String> itemList = new ArrayList<>();
+        itemList.addAll(Arrays.asList(txtArray));
+        horizontalAdapter = new HorizontalAdapter(itemList);
+        recyclerView.setAdapter(horizontalAdapter);
     }
 
-    @Override
-    public void onClick(View v) {
-        if(!surfaceCreated)
-            return;
-        switch (v.getId()){
-            case R.id.btn_sketch://素描
-                filterType = 0;
-                break;
-            case R.id.btn_hue://hue
-                filterType = 1;
-                break;
-            case R.id.btn_lut://lut
-                filterType = 2;
-                break;
-            case R.id.btn_edge://边缘
-                filterType = 3;
-                break;
-            case R.id.btn_blur://模糊
-                filterType = 4;
-                break;
-            case R.id.btn_grid://九宫格
-                filterType = 5;
-                break;
-            case R.id.btn_balance://色彩平衡
-                filterType = 6;
-                break;
-            case R.id.btn_box://box绘制矩形区域
-                filterType = 7;
-                break;
-            case R.id.btn_rotate://旋转
-                filterType = 8;
-                break;
-            case R.id.btn_flip://翻转
-                filterType = 9;
-                break;
-            default:
-                filterType = 0;
-                break;
-        }
-        new Thread(new Runnable() {
+    //注册监听器
+    private void registerLister(){
+        horizontalAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void run() {
-                videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[filterType]);
+            public void onItemClick(int position) {
+                if(!surfaceCreated)
+                    return;
+                final int mPosition = position;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //切换播放
+                        if(isPlaying){
+                            videoPlayer.again();
+                        }
+                        isPlaying = true;
+                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition]);
+                    }
+                }).start();
             }
-        }).start();
+        });
     }
 
     @Override
@@ -123,6 +119,15 @@ public class FilterActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         surfaceCreated = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isPlaying = false;
+        videoPlayer.release();
+        videoPlayer = null;
+        horizontalAdapter = null;
     }
 
 }

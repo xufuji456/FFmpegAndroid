@@ -35,13 +35,21 @@ ANativeWindow_Buffer windowBuffer;
 
 ANativeWindow* nativeWindow;
 
-AVFrame * pFrame;
+AVFrame *pFrame;
 
-AVFrame * pFrameRGBA;
+AVFrame *pFrameRGBA;
 
-uint8_t * buffer;
+AVFrame *filter_frame;
+
+uint8_t *buffer;
 
 struct SwsContext *sws_ctx;
+
+int is_playing;
+
+int again;
+
+int release;
 
 /**
  * colorbalance:
@@ -71,10 +79,8 @@ struct SwsContext *sws_ctx;
 //const char *filter_descr = "drawbox=x=100:y=100:w=100:h=100:color=pink@0.5'";//绘制矩形
 //const char *filter_descr = "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5";//九宫格分割
 //const char *filter_descr = "edgedetect=low=0.1:high=0.4";//边缘检测
-//const char *filter_descr = "fftfilt=dc_Y=0:weight_Y='exp(-4 * ((Y+X)/(W+H)))'";//fft模糊
 //const char *filter_descr = "lutrgb='r=0:g=0'";//去掉红色、绿色分量，只保留蓝色
 //const char *filter_descr = "noise=alls=20:allf=t+u";//添加噪声
-//const char *filter_descr = "pad=640:480:40:0:violet";//pad填充颜色
 //const char *filter_descr = "vignette='PI/4+random(1)*PI/50':eval=frame";//闪烁装饰-->Make a flickering vignetting
 
 //const char *filter_descr = "gblur=sigma=0.5:steps=1:planes=1:sigmaV=1";//高斯模糊
@@ -167,8 +173,6 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     LOGI("open file:%s\n", file_name);
     //注册所有组件
     av_register_all();
-    //注册滤波器
-    avfilter_register_all();
     //分配上下文
     pFormatCtx = avformat_alloc_context();
     //打开视频文件
@@ -246,18 +250,20 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     const char *filter_descr = (*env)->GetStringUTFChars(env, filterDescr, JNI_FALSE);
     //打开输入文件
-    if((ret = open_input(env, file_name, surface) < 0)){
-        LOGE("Couldn't allocate video frame.");
-        goto end;
-    }
-    //注册滤波器
-    avfilter_register_all();
-
-    AVFrame * filter_frame = av_frame_alloc();
-    if(filter_frame == NULL) {
-        LOGE("Couldn't allocate video frame.");
-        ret = -1;
-        goto end;
+    if(!is_playing){
+        LOGI("open_input...");
+        if((ret = open_input(env, file_name, surface) < 0)){
+            LOGE("Couldn't allocate video frame.");
+            goto end;
+        }
+        //注册滤波器
+        avfilter_register_all();
+        filter_frame = av_frame_alloc();
+        if(filter_frame == NULL) {
+            LOGE("Couldn't allocate filter frame.");
+            ret = -1;
+            goto end;
+        }
     }
 
     //初始化滤波器
@@ -266,10 +272,15 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
         goto end;
     }
 
+    is_playing = 1;
     int frameFinished;
     AVPacket packet;
 
-    while(av_read_frame(pFormatCtx, &packet)>=0) {
+    while(av_read_frame(pFormatCtx, &packet)>=0 && !release) {
+        //切换滤波器，退出当初播放
+        if(again){
+            goto again;
+        }
         //判断是否为视频流
         if(packet.stream_index == video_stream_index) {
             //对该帧进行解码
@@ -311,6 +322,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
         av_packet_unref(&packet);
     }
     end:
+    is_playing = 0;
     //释放内存以及关闭文件
     av_free(buffer);
     av_free(pFrameRGBA);
@@ -318,8 +330,22 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
     av_free(pFrame);
     avcodec_close(pCodecCtx);
     avformat_close_input(&pFormatCtx);
+    avfilter_free(buffersrc_ctx);
+    avfilter_free(buffersink_ctx);
     avfilter_graph_free(&filter_graph);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     (*env)->ReleaseStringUTFChars(env, filterDescr, filter_descr);
+    LOGE("do release...");
+    again:
+    again = 0;
+    LOGE("play again...");
     return ret;
+}
+
+JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_again(JNIEnv * env, jclass clazz) {
+    again = 1;
+}
+
+JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_release(JNIEnv * env, jclass clazz) {
+    release = 1;
 }
