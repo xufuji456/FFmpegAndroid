@@ -17,6 +17,7 @@ android端基于FFmpeg库的使用。<br>
 - #### 视频截图
 - #### 视频转GIF动图
 - #### 视频添加水印
+- #### 视频画面拼接
 - #### 图片合成视频
 - #### 视频解码播放
 - #### 本地直播推流
@@ -38,17 +39,21 @@ android端基于FFmpeg库的使用。<br>
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/VideoToGif.gif)
 
 滤镜效果：
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_balance.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_balance.png)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.png)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_bright.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_bright.png)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_edge.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_edge.png)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_blue.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_blue.png)
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
+
+视频画面拼接：
+![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/mp4/multi.mp4)
+
 ***
 
 后续会完善音视频播放、推流直播。

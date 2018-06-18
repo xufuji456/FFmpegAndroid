@@ -3,6 +3,8 @@ package com.frank.ffmpeg.util;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
+import com.frank.ffmpeg.format.VideoLayout;
+
 /**
  * ffmpeg工具：拼接命令行处理音视频
  * Created by frank on 2018/1/23.
@@ -220,10 +222,30 @@ public class FFmpegUtil {
      * @param channel 声道:单声道为1/立体声道为2
      * @return 音频编码的命令行
      */
+    @SuppressLint("DefaultLocale")
     public static  String[] encodeAudio(String srcFile, String targetFile, int sampleRate, int channel){
         String combineVideo = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
         combineVideo = String.format(combineVideo, sampleRate, channel, srcFile, targetFile);
         return combineVideo.split(" ");
+    }
+
+    /**
+     * 多画面拼接视频
+     * @param input1 输入文件1
+     * @param input2 输入文件2
+     * @param targetFile 画面拼接文件
+     *
+     * @return 画面拼接的命令行
+     */
+    public static  String[] multiVideo(String input1, String input2, String targetFile, int videoLayout){
+//        String multiVideo = "ffmpeg -i %s -i %s -i %s -i %s -filter_complex " +
+//                "\"[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h\" %s";
+        String multiVideo = "ffmpeg -i %s -i %s -filter_complex hstack %s";//hstack:水平拼接，默认
+        if(videoLayout == VideoLayout.LAYOUT_VERTICAL){//vstack:垂直拼接
+            multiVideo = multiVideo.replace("hstack", "vstack");
+        }
+        multiVideo = String.format(multiVideo, input1, input2, targetFile);
+        return multiVideo.split(" ");
     }
 
 }

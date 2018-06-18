@@ -34,6 +34,7 @@
     <string name="video_filter">滤镜特效</string>
     <string name="video_slow">慢放</string>
     <string name="video_fast">快进</string>
+    <string name="video_multi">画面拼接</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>
@@ -52,5 +53,6 @@
     <string name="video_box">矩形</string>
     <string name="video_flash">闪烁</string>
     <string name="video_balance">色彩平衡</string>
+    <string name="video_sharp">锐化</string>
 
 </resources>

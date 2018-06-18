@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.util.FFmpegUtil;
 
 import java.io.File;
@@ -67,6 +68,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_screen_record).setOnClickListener(this);
         findViewById(R.id.btn_combine_video).setOnClickListener(this);
         findViewById(R.id.btn_play_video).setOnClickListener(this);
+        findViewById(R.id.btn_multi_video).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -79,6 +81,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
         findViewById(R.id.btn_combine_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_play_video).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_multi_video).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -91,6 +94,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
         findViewById(R.id.btn_combine_video).setVisibility(View.GONE);
         findViewById(R.id.btn_play_video).setVisibility(View.GONE);
+        findViewById(R.id.btn_multi_video).setVisibility(View.GONE);
     }
 
     @Override
@@ -123,6 +127,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_play_video:
                 handleType = 8;
+                break;
+            case R.id.btn_multi_video:
+                handleType = 9;
                 break;
             default:
                 handleType = 0;
@@ -206,6 +213,12 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
             case 8://视频解码播放
                 startActivity(new Intent(VideoHandleActivity.this, VideoPlayerActivity.class));
                 return;
+            case 9://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
+                String input1 = PATH + File.separator + "input1.mp4";
+                String input2 = PATH + File.separator + "input2.mp4";
+                String outputFile = PATH + File.separator + "multi.mp4";
+                commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
+                break;
             default:
                 break;
         }

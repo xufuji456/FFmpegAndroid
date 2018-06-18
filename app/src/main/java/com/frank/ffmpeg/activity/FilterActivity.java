@@ -41,7 +41,7 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
             "vignette='PI/4+random(1)*PI/50':eval=frame",
             "vflip",
-            "noise=alls=20:allf=t+u",
+            "unsharp"
     };
     private String[] txtArray = new String[]{
             "素描",
@@ -53,7 +53,8 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             "均衡",
             "矩形",
             "闪烁",//左上角闪烁
-            "翻转"//vflip上下翻转,hflip是左右翻转
+            "翻转",//vflip上下翻转,hflip是左右翻转
+            "锐化"
     };
     private HorizontalAdapter horizontalAdapter;
 
