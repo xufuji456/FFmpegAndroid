@@ -52,7 +52,7 @@ android端基于FFmpeg库的使用。<br>
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
 
 视频画面拼接：
-![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/honrizontal.gif)
+![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/horizontal.gif)
 
 ***
 
