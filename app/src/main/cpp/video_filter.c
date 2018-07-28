@@ -62,6 +62,7 @@ enum AVSampleFormat out_sample_fmt;
 int audio_stream_index = -1;
 int got_frame;
 AVCodecContext *audioCodecCtx;
+jboolean playAudio = JNI_TRUE;
 
 //const char *filter_descr = "lutyuv='u=128:v=128'";//黑白
 //const char *filter_descr = "hue='h=60:s=-3'";//hue滤镜
@@ -328,7 +329,7 @@ int play_audio(JNIEnv * env, AVPacket* packet, AVFrame* frame){
 }
 
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
-        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface, jstring filterDescr, jboolean playAudio){
+        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface, jstring filterDescr){
 
     int ret;
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
@@ -452,4 +453,8 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_again(JNIEnv * env, jcl
 
 JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_release(JNIEnv * env, jclass clazz) {
     release = 1;
+}
+
+JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_playAudio(JNIEnv * env, jclass clazz, jboolean play_audio) {
+    playAudio = play_audio;
 }

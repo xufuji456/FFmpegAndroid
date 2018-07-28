@@ -1,12 +1,19 @@
 package com.frank.ffmpeg.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.ToggleButton;
+
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.VideoPlayer;
 import com.frank.ffmpeg.adapter.HorizontalAdapter;
@@ -24,6 +31,7 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
     private final static String VIDEO_PATH = PATH + File.separator + "Beyond.mp4";
 
     private VideoPlayer videoPlayer;
+    private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
     //surface是否已经创建
     private boolean surfaceCreated;
@@ -55,8 +63,32 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             "锐化"
     };
     private HorizontalAdapter horizontalAdapter;
+    private RecyclerView recyclerView;
     //是否播放音频
     private boolean playAudio = true;
+    private ToggleButton btnSound;
+
+    private final static int MSG_HIDE = 222;
+    private final static int DELAY_TIME = 5000;
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == MSG_HIDE){//无操作5s后隐藏滤镜操作栏
+                recyclerView.setVisibility(View.GONE);
+                btnSound.setVisibility(View.GONE);
+            }
+        }
+    };
+
+    private class HideRunnable implements Runnable{
+        @Override
+        public void run() {
+            mHandler.obtainMessage(MSG_HIDE).sendToTarget();
+        }
+    }
+    private HideRunnable hideRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,15 +98,19 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
 
         initView();
         registerLister();
+
+        hideRunnable = new HideRunnable();
+        mHandler.postDelayed(hideRunnable, DELAY_TIME);
     }
 
     private void initView(){
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_filter);
+        surfaceView = (SurfaceView) findViewById(R.id.surface_filter);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         videoPlayer = new VideoPlayer();
+        btnSound = (ToggleButton) findViewById(R.id.btn_sound);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -100,11 +136,33 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
                             videoPlayer.again();
                         }
                         isPlaying = true;
-                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition], playAudio);
+                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition]);
                     }
                 }).start();
             }
         });
+
+        surfaceView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnSound.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);//按下SurfaceView，弹出滤镜操作栏
+                mHandler.postDelayed(hideRunnable, DELAY_TIME);//5s后发消息通知隐藏滤镜操作栏
+            }
+        });
+
+        btnSound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setPlayAudio();
+            }
+        });
+    }
+
+    //设置是否静音
+    private void setPlayAudio(){
+        playAudio = !playAudio;
+        videoPlayer.playAudio(playAudio);
     }
 
     @Override

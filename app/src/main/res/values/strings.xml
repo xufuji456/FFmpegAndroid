@@ -41,6 +41,8 @@
     <string name="stop">停止</string>
     <string name="mute">静音</string>
     <string name="sound">声音</string>
+    <string name="sound_open">声音开</string>
+    <string name="sound_close">声音关</string>
 
     <string name="video_sketch">素描</string>
     <string name="video_hue">hue</string>

@@ -14,4 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
 
+    <ToggleButton
+        android:id="@+id/btn_sound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:textOff="@string/sound_close"
+        android:textOn="@string/sound_open"/>
+
 </RelativeLayout>

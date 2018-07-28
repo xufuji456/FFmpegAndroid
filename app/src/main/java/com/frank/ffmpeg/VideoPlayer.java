@@ -17,10 +17,17 @@ public class VideoPlayer {
     public native int play(String filePath, Object surface);
     public native int setPlayRate(float playRate);
 
-    public native int filter(String filePath, Object surface, String filterType, boolean playAudio);
+    public native int filter(String filePath, Object surface, String filterType);
     public native void again();
     public native void release();
+    public native void playAudio(boolean play);
 
+    /**
+     * 创建AudioTrack对象，供JNI调用
+     * @param sampleRate sampleRate
+     * @param channels channels
+     * @return AudioTrack
+     */
     public AudioTrack createAudioTrack(int sampleRate, int channels){
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         int channelConfig;
