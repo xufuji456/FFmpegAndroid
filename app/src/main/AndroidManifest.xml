@@ -36,20 +36,25 @@
         <!-- 视频解码播放 -->
         <activity
             android:name=".activity.VideoPlayerActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:screenOrientation="landscape" />
         <!-- 音视频解码播放 -->
         <activity
             android:name=".activity.MediaPlayerActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:screenOrientation="landscape" />
         <!-- 本地推流直播 -->
-        <activity android:name=".activity.PushActivity" />
+        <activity android:name=".activity.PushActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
         <!-- 实时推流直播 -->
         <activity
             android:name=".activity.LiveActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:screenOrientation="landscape" />
         <!--滤镜特效-->
         <activity
             android:name=".activity.FilterActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:screenOrientation="landscape" />
     </application>
 

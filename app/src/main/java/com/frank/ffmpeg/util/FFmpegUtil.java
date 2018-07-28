@@ -233,6 +233,7 @@ public class FFmpegUtil {
      * 多画面拼接视频
      * @param input1 输入文件1
      * @param input2 输入文件2
+     * @param videoLayout 视频布局
      * @param targetFile 画面拼接文件
      *
      * @return 画面拼接的命令行

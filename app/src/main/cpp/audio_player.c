@@ -122,23 +122,23 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
 			//解码一帧成功
 			if(got_frame > 0){
 				LOGI("decode frame count=%d",index++);
-	//音频格式转换
-	swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
-	int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
-			frame->nb_samples, out_sample_fmt, 1);
+                //音频格式转换
+                swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
+                int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
+                        frame->nb_samples, out_sample_fmt, 1);
 
-	jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
-	jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
-	//拷贝缓冲数据
-	memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
-	//释放数组
-	(*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
-	//调用AudioTrack的write方法进行播放
-	(*env)->CallIntMethod(env,audio_track,audio_track_write_mid,
-			audio_sample_array,0,out_buffer_size);
-	//释放局部引用
-	(*env)->DeleteLocalRef(env,audio_sample_array);
-	usleep(1000 * 16);
+                jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
+                jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
+                //拷贝缓冲数据
+                memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
+                //释放数组
+                (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
+                //调用AudioTrack的write方法进行播放
+                (*env)->CallIntMethod(env,audio_track,audio_track_write_mid,
+                        audio_sample_array,0,out_buffer_size);
+                //释放局部引用
+                (*env)->DeleteLocalRef(env,audio_sample_array);
+                usleep(1000 * 16);
 			}
 		}
 		av_free_packet(packet);

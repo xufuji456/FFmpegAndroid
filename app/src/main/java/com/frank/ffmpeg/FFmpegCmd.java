@@ -11,7 +11,7 @@ public class FFmpegCmd {
         System.loadLibrary("media-handle");
     }
 
-    //开子线程调用native方法进行音频处理
+    //开子线程调用native方法进行音视频处理
     public static void execute(final String[] commands, final OnHandleListener onHandleListener){
         new Thread(new Runnable() {
             @Override

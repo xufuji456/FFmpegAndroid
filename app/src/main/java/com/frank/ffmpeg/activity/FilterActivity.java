@@ -39,7 +39,6 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
             "colorbalance=bs=0.3",
             "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
-            "vignette='PI/4+random(1)*PI/50':eval=frame",
             "vflip",
             "unsharp"
     };
@@ -52,11 +51,12 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             "九宫格",
             "均衡",
             "矩形",
-            "闪烁",//左上角闪烁
             "翻转",//vflip上下翻转,hflip是左右翻转
             "锐化"
     };
     private HorizontalAdapter horizontalAdapter;
+    //是否播放音频
+    private boolean playAudio = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +100,7 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
                             videoPlayer.again();
                         }
                         isPlaying = true;
-                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition]);
+                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition], playAudio);
                     }
                 }).start();
             }

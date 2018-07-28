@@ -35,7 +35,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private final static String TAG = LiveActivity.class.getSimpleName();
     private final static int CODE_CAMERA_RECORD = 0x0001;
     private final static String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-    private final static String LIVE_URL = "rtmp://192.168.8.115/live/stream";
+    private final static String LIVE_URL = "rtmp://192.168.1.102/live/stream";
     private final static int MSG_ERROR = 100;
     private SurfaceHolder surfaceHolder;
     private LivePusher livePusher;

@@ -14,6 +14,7 @@
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/avfiltergraph.h>
 #include <libavutil/opt.h>
+#include "libswresample/swresample.h"
 
 #define TAG "VideoFilter"
 #define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
@@ -51,27 +52,19 @@ int again;
 
 int release;
 
-/**
- * colorbalance:
-    rs/gs/bs
-    Adjust red, green and blue shadows (darkest pixels).
-    rm/gm/bm
-    Adjust red, green and blue midtones (medium pixels).
-    rh/gh/bh
-    Adjust red, green and blue highlights (brightest pixels).
- */
-
-/**
- * Draw text
- * Draw a text string or text from a specified file on top of a video, using the libfreetype library.
- * To enable compilation of this filter, you need to configure FFmpeg with --enable-libfreetype.
- * To enable default font fallback and the font option you need to configure FFmpeg with --enable-libfontconfig.
- * To enable the text_shaping option, you need to configure FFmpeg with --enable-libfribidi.
- * Video center: drawtext="fontsize=30:fontfile=FreeSerif.ttf:text='hello world':x=(w-text_w)/2:y=(h-text_h)/2"
- */
+#define MAX_AUDIO_FRAME_SIZE 48000 * 4
+jmethodID audio_track_write_mid;
+uint8_t *out_buffer;
+jobject audio_track;
+SwrContext *audio_swr_ctx;
+int out_channel_nb;
+enum AVSampleFormat out_sample_fmt;
+int audio_stream_index = -1;
+int got_frame;
+AVCodecContext *audioCodecCtx;
 
 //const char *filter_descr = "lutyuv='u=128:v=128'";//黑白
-//const char *filter_descr = "hue='h=60:s=-3'";//hue滤镜-->Set the hue to 60 degrees and the saturation to -3
+//const char *filter_descr = "hue='h=60:s=-3'";//hue滤镜
 //const char *filter_descr = "vflip";//上下反序
 //const char *filter_descr = "hflip";//左右反序
 //const char *filter_descr = "rotate=90";//旋转90°
@@ -81,10 +74,9 @@ int release;
 //const char *filter_descr = "edgedetect=low=0.1:high=0.4";//边缘检测
 //const char *filter_descr = "lutrgb='r=0:g=0'";//去掉红色、绿色分量，只保留蓝色
 //const char *filter_descr = "noise=alls=20:allf=t+u";//添加噪声
-//const char *filter_descr = "vignette='PI/4+random(1)*PI/50':eval=frame";//闪烁装饰-->Make a flickering vignetting
-
+//const char *filter_descr = "vignette='PI/4+random(1)*PI/50':eval=frame";//闪烁装饰
 //const char *filter_descr = "gblur=sigma=0.5:steps=1:planes=1:sigmaV=1";//高斯模糊
-//const char *filter_descr = "drawtext=fontfile='app/src/main/cpp/arial.ttf':fontcolor=green:fontsize=30:text='Hello world'";//绘制文字
+//const char *filter_descr = "drawtext=fontfile='arial.ttf':fontcolor=green:fontsize=30:text='Hello world'";//绘制文字
 //const char *filter_descr = "movie=my_logo.png[wm];[in][wm]overlay=5:5[out]";//添加图片水印
 
 //初始化滤波器
@@ -133,23 +125,11 @@ int init_filters(const char *filters_descr) {
         goto end;
     }
 
-    /*
-     * The buffer source output must be connected to the input pad of
-     * the first filter described by filters_descr; since the first
-     * filter input label is not specified, it is set to "in" by
-     * default.
-     */
     outputs->name       = av_strdup("in");
     outputs->filter_ctx = buffersrc_ctx;
     outputs->pad_idx    = 0;
     outputs->next       = NULL;
 
-    /*
-     * The buffer sink input must be connected to the output pad of
-     * the last filter described by filters_descr; since the last
-     * filter output label is not specified, it is set to "out" by
-     * default.
-     */
     inputs->name       = av_strdup("out");
     inputs->filter_ctx = buffersink_ctx;
     inputs->pad_idx    = 0;
@@ -169,6 +149,7 @@ int init_filters(const char *filters_descr) {
     return ret;
 }
 
+//初始化视频解码器与播放器
 int open_input(JNIEnv * env, const char* file_name, jobject surface){
     LOGI("open file:%s\n", file_name);
     //注册所有组件
@@ -243,8 +224,111 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     return 0;
 }
 
+//初始化音频解码器与播放器
+int init_audio(JNIEnv * env, jclass jthiz){
+    //获取音频流索引位置
+    int i;
+    for(i=0; i < pFormatCtx->nb_streams;i++){
+        if(pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO){
+            audio_stream_index = i;
+            break;
+        }
+    }
+
+    //获取音频解码器
+    audioCodecCtx = pFormatCtx->streams[audio_stream_index]->codec;
+    AVCodec *codec = avcodec_find_decoder(audioCodecCtx->codec_id);
+    if(codec == NULL){
+        LOGI("%s","无法获取音频解码器");
+        return -1;
+    }
+    //打开音频解码器
+    if(avcodec_open2(audioCodecCtx,codec,NULL) < 0){
+        LOGI("%s","无法打开音频解码器");
+        return -1;
+    }
+    //frame->16bit 44100 PCM 统一音频采样格式与采样率
+    audio_swr_ctx = swr_alloc();
+
+    //输入的采样格式
+    enum AVSampleFormat in_sample_fmt = audioCodecCtx->sample_fmt;
+    //输出采样格式16bit PCM
+    out_sample_fmt = AV_SAMPLE_FMT_S16;
+    //输入采样率
+    int in_sample_rate = audioCodecCtx->sample_rate;
+    //输出采样率
+    int out_sample_rate = in_sample_rate;
+    //声道布局（2个声道，默认立体声stereo）
+    uint64_t in_ch_layout = audioCodecCtx->channel_layout;
+    //输出的声道布局（立体声）
+    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+
+    swr_alloc_set_opts(audio_swr_ctx,
+                       out_ch_layout,out_sample_fmt,out_sample_rate,
+                       in_ch_layout,in_sample_fmt,in_sample_rate,
+                       0, NULL);
+    swr_init(audio_swr_ctx);
+
+    //输出的声道个数
+    out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
+
+    jclass player_class = (*env)->GetObjectClass(env,jthiz);
+    if(!player_class){
+        LOGE("player_class not found...");
+        return -1;
+    }
+    //AudioTrack对象
+    jmethodID audio_track_method = (*env)->GetMethodID(env,player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
+    if(!audio_track_method){
+        LOGE("audio_track_method not found...");
+        return -1;
+    }
+    audio_track = (*env)->CallObjectMethod(env,jthiz,audio_track_method,out_sample_rate,out_channel_nb);
+
+    //调用play方法
+    jclass audio_track_class = (*env)->GetObjectClass(env,audio_track);
+    jmethodID audio_track_play_mid = (*env)->GetMethodID(env,audio_track_class,"play","()V");
+    (*env)->CallVoidMethod(env,audio_track,audio_track_play_mid);
+
+    //获取write()方法
+    audio_track_write_mid = (*env)->GetMethodID(env,audio_track_class,"write","([BII)I");
+
+    //16bit 44100 PCM 数据
+    out_buffer = (uint8_t *)av_malloc(MAX_AUDIO_FRAME_SIZE);
+    return 0;
+}
+
+int play_audio(JNIEnv * env, AVPacket* packet, AVFrame* frame){
+    //解码
+    int ret = avcodec_decode_audio4(audioCodecCtx, frame, &got_frame, packet);
+    if(ret < 0){
+        return ret;
+    }
+    //解码一帧成功
+    if(got_frame > 0){
+        //音频格式转换
+        swr_convert(audio_swr_ctx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
+        int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
+                                                         frame->nb_samples, out_sample_fmt, 1);
+
+        jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
+        jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
+        //拷贝缓冲数据
+        memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
+        //释放数组
+        (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
+        //调用AudioTrack的write方法进行播放
+        (*env)->CallIntMethod(env,audio_track,audio_track_write_mid,
+                              audio_sample_array,0,out_buffer_size);
+        //释放局部引用
+        (*env)->DeleteLocalRef(env,audio_sample_array);
+        usleep(1000);//1000 * 16
+    }
+    return 0;
+}
+
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
-        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface, jstring filterDescr){
+        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface, jstring filterDescr, jboolean playAudio){
 
     int ret;
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
@@ -252,7 +336,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
     //打开输入文件
     if(!is_playing){
         LOGI("open_input...");
-        if((ret = open_input(env, file_name, surface) < 0)){
+        if((ret = open_input(env, file_name, surface)) < 0){
             LOGE("Couldn't allocate video frame.");
             goto end;
         }
@@ -264,6 +348,12 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
             ret = -1;
             goto end;
         }
+        //初始化音频解码器
+        if ((ret = init_audio(env, clazz)) < 0){
+            LOGE("Couldn't init_audio.");
+            goto end;
+        }
+
     }
 
     //初始化滤波器
@@ -315,9 +405,14 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
                 }
                 av_frame_unref(filter_frame);
             }
-            av_frame_unref(pFrame);
             //延迟等待
-            usleep((unsigned long) (1000 * 40));
+            if (!playAudio){
+                usleep((unsigned long) (1000 * 40));//1000 * 40
+            }
+        } else if(packet.stream_index == audio_stream_index){//音频帧
+            if (playAudio){
+                play_audio(env, &packet, pFrame);
+            }
         }
         av_packet_unref(&packet);
     }
@@ -333,6 +428,15 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
     avfilter_free(buffersrc_ctx);
     avfilter_free(buffersink_ctx);
     avfilter_graph_free(&filter_graph);
+    avcodec_close(audioCodecCtx);
+    free(buffer);
+    free(sws_ctx);
+    free(&windowBuffer);
+    free(out_buffer);
+    free(audio_swr_ctx);
+    free(audio_track);
+    free(audio_track_write_mid);
+    ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     (*env)->ReleaseStringUTFChars(env, filterDescr, filter_descr);
     LOGE("do release...");
