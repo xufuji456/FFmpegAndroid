@@ -1,6 +1,9 @@
 package com.frank.ffmpeg.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,12 +15,19 @@ import com.frank.ffmpeg.R;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private final static String[] mPermissions = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+    private final static int CODE_STORAGE = 999;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initView();
+        checkPermission();
     }
 
     private void initView() {
@@ -59,6 +69,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
         startActivity(intent);
+    }
+
+    //动态申请权限
+    private void checkPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(mPermissions[0]) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(mPermissions, CODE_STORAGE);
+            }
+        }
     }
 
 }
