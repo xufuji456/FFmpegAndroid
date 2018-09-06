@@ -69,6 +69,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_combine_video).setOnClickListener(this);
         findViewById(R.id.btn_play_video).setOnClickListener(this);
         findViewById(R.id.btn_multi_video).setOnClickListener(this);
+        findViewById(R.id.btn_reverse_video).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -82,6 +83,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_combine_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_play_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_multi_video).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_reverse_video).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -95,6 +97,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_combine_video).setVisibility(View.GONE);
         findViewById(R.id.btn_play_video).setVisibility(View.GONE);
         findViewById(R.id.btn_multi_video).setVisibility(View.GONE);
+        findViewById(R.id.btn_reverse_video).setVisibility(View.GONE);
     }
 
     @Override
@@ -130,6 +133,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_multi_video:
                 handleType = 9;
+                break;
+            case R.id.btn_reverse_video:
+                handleType = 10;
                 break;
             default:
                 handleType = 0;
@@ -218,6 +224,11 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String input2 = PATH + File.separator + "input2.mp4";
                 String outputFile = PATH + File.separator + "multi.mp4";
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
+                break;
+            case 10://视频反序倒播
+                String input = PATH + File.separator + "beyond.mp4";
+                String output = PATH + File.separator + "reverse.mp4";
+                commandLine = FFmpegUtil.reverseVideo(input, output);
                 break;
             default:
                 break;

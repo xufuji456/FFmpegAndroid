@@ -249,4 +249,19 @@ public class FFmpegUtil {
         return multiVideo.split(" ");
     }
 
+    /**
+     * 视频反序倒播
+     * @param inputFile 输入文件
+     * @param targetFile 反序文件
+     *
+     * @return 视频反序的命令行
+     */
+    public static  String[] reverseVideo(String inputFile, String targetFile){
+        //FIXME 音频也反序
+//        String reverseVideo = "ffmpeg -i %s -filter_complex [0:v]reverse[v];[0:a]areverse[a] -map [v] -map [a] %s";
+        String reverseVideo = "ffmpeg -i %s -filter_complex [0:v]reverse[v] -map [v] %s";//单纯视频反序
+        reverseVideo = String.format(reverseVideo, inputFile, targetFile);
+        return reverseVideo.split(" ");
+    }
+
 }
