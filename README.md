@@ -37,6 +37,7 @@ android端基于FFmpeg库的使用。<br>
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/Textmark.png)
 
 视频转成GIF动图：
+
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/VideoToGif.gif)
 
 滤镜效果：
