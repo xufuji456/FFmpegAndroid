@@ -18,6 +18,7 @@ android端基于FFmpeg库的使用。<br>
 - #### 视频转GIF动图
 - #### 视频添加水印
 - #### 视频画面拼接
+- #### 视频反序倒播
 - #### 图片合成视频
 - #### 视频解码播放
 - #### 本地直播推流
@@ -52,7 +53,10 @@ android端基于FFmpeg库的使用。<br>
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
 
 视频画面拼接：
-![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/horizontal.gif)
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/horizontal.gif)
+
+视频倒播：
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/reverse.gif)
 
 ***
 

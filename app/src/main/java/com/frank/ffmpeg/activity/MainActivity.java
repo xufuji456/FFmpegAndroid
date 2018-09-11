@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_push).setOnClickListener(this);
         findViewById(R.id.btn_live).setOnClickListener(this);
         findViewById(R.id.btn_filter).setOnClickListener(this);
+        findViewById(R.id.btn_reverse).setOnClickListener(this);
     }
 
     @Override
@@ -64,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_filter://滤镜特效
                 intent.setClass(MainActivity.this, FilterActivity.class);
+                break;
+            case R.id.btn_reverse://视频倒播
+                intent.setClass(MainActivity.this, VideoReverseActivity.class);
                 break;
             default:
                 break;

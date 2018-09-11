@@ -7,7 +7,7 @@
         android:id="@+id/btn_audio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:text="@string/audio_handle"/>
 
@@ -64,5 +64,14 @@
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/btn_live"/>
+
+    <Button
+        android:id="@+id/btn_reverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/video_reverse"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btn_filter"/>
 
 </RelativeLayout>

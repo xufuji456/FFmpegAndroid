@@ -66,4 +66,20 @@ public class FileUtil {
         return true;
     }
 
+    /**
+     * 判断文件是否存在
+     * @param path 文件路径
+     * @return 文件是否存在
+     */
+    public static boolean checkFileExist(String path){
+        if (TextUtils.isEmpty(path)) {
+            throw new NullPointerException(path + "is null!");
+        }
+        File file = new File(path);
+        if(!file.exists()){
+            throw new NullPointerException(path + " is not exist!");
+        }
+        return true;
+    }
+
 }

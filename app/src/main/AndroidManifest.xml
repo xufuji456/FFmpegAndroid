@@ -36,26 +36,31 @@
         <!-- 视频解码播放 -->
         <activity
             android:name=".activity.VideoPlayerActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <!-- 音视频解码播放 -->
         <activity
             android:name=".activity.MediaPlayerActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <!-- 本地推流直播 -->
-        <activity android:name=".activity.PushActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        <activity
+            android:name=".activity.PushActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <!-- 实时推流直播 -->
         <activity
             android:name=".activity.LiveActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:screenOrientation="landscape" />
-        <!--滤镜特效-->
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <!-- 滤镜特效 -->
         <activity
             android:name=".activity.FilterActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        <!--视频倒播-->
+        <activity android:name=".activity.VideoReverseActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
     </application>
 
 </manifest>
