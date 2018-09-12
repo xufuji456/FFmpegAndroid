@@ -27,14 +27,11 @@ android端基于FFmpeg库的使用。<br>
 - #### OpenGL+GPUImage滤镜
 - #### FFmpeg的AVFilter滤镜
 
-本地直播截图：
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/live.png)
-
 左边是ffplay客户端拉流播放，中间是web网页播放：
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/live.gif)
 
 视频添加文字水印（文字白色背景可以改为透明）：
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/Textmark.png)
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/water_mark.png)
 
 视频转成GIF动图：
 
@@ -45,11 +42,7 @@ android端基于FFmpeg库的使用。<br>
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.png)
 
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_bright.png)
-
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_edge.png)
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_blue.png)
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
 
