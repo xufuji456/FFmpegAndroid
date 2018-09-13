@@ -42,7 +42,6 @@ build_one(){
 --enable-jni \
 --extra-cflags="-fpic -mfpu=neon -mcpu=cortex-a8 -mfloat-abi=softfp -marm -march=armv7-a" 
 }
-#march=armv7-a
 build_one
 
 make
