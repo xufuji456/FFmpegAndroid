@@ -8,9 +8,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.VideoPlayer;
+import com.frank.ffmpeg.util.FileUtil;
 
 import java.io.File;
 
@@ -75,6 +77,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements SurfaceHol
         new Thread(new Runnable() {
             @Override
             public void run() {
+                if (!FileUtil.checkFileExist(filePath)){
+                    return;
+                }
+
                 videoPlayer.play(filePath, surfaceHolder.getSurface());
             }
         }).start();

@@ -8,6 +8,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.frank.ffmpeg.MediaPlayer;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.util.FileUtil;
+
 import java.io.File;
 
 /**
@@ -45,7 +47,10 @@ public class MediaPlayerActivity extends AppCompatActivity implements SurfaceHol
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.i(TAG, "surfaceCreated");
+        if (!FileUtil.checkFileExist(filePath)){
+            return;
+        }
+
         new Thread(new Runnable() {
             @Override
             public void run() {

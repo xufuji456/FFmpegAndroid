@@ -18,6 +18,8 @@ import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.VideoPlayer;
 import com.frank.ffmpeg.adapter.HorizontalAdapter;
 import com.frank.ffmpeg.listener.OnItemClickListener;
+import com.frank.ffmpeg.util.FileUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,6 +129,10 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onItemClick(int position) {
                 if(!surfaceCreated)
                     return;
+                if (!FileUtil.checkFileExist(VIDEO_PATH)){
+                    return;
+                }
+
                 final int mPosition = position;
                 new Thread(new Runnable() {
                     @Override

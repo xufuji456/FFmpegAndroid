@@ -14,6 +14,8 @@ import android.widget.ProgressBar;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.FFmpegUtil;
+import com.frank.ffmpeg.util.FileUtil;
+
 import java.io.File;
 
 /**
@@ -139,6 +141,9 @@ public class MediaHandleActivity extends AppCompatActivity implements View.OnCli
         String[] commandLine = null;
         switch (handleType){
             case 0://音视频合成
+                if (!FileUtil.checkFileExist(videoFile)){
+                    return;
+                }
                 try {
                     //视频文件有音频,先把纯视频文件抽取出来
                     commandLine = FFmpegUtil.extractVideo(videoFile, temp);
@@ -148,10 +153,16 @@ public class MediaHandleActivity extends AppCompatActivity implements View.OnCli
                 }
                 break;
             case 1://提取音频
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String extractAudio = PATH + File.separator + "extractAudio.aac";
                 commandLine = FFmpegUtil.extractAudio(srcFile, extractAudio);
                 break;
             case 2://提取视频
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String extractVideo = PATH + File.separator + "extractVideo.mp4";
                 commandLine = FFmpegUtil.extractVideo(srcFile, extractVideo);
                 break;

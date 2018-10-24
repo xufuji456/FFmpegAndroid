@@ -135,6 +135,9 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
      */
     private void doHandleAudio(int handleType){
         String[] commandLine = null;
+        if (!FileUtil.checkFileExist(srcFile)){
+            return;
+        }
         switch (handleType){
             case 0://转码
                 String transformFile = PATH + File.separator + "transform.aac";
@@ -145,10 +148,16 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
             case 2://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
+                if (!FileUtil.checkFileExist(appendFile)){
+                    return;
+                }
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
                 break;
             case 3://混合
+                if (!FileUtil.checkFileExist(appendFile)){
+                    return;
+                }
                 String mixFile = PATH + File.separator + "mix.aac";
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
@@ -182,6 +191,10 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
                 String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
                 String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
+                if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)){
+                    return;
+                }
+
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
                 FileUtil.concatFile(srcPCM, appendPCM, concatPCM);
                 mHandler.obtainMessage(MSG_FINISH).sendToTarget();

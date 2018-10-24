@@ -15,6 +15,7 @@ import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.util.FFmpegUtil;
+import com.frank.ffmpeg.util.FileUtil;
 
 import java.io.File;
 
@@ -150,12 +151,21 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
      */
     private void doHandleVideo(int handleType){
         String[] commandLine = null;
+        if (!FileUtil.checkFileExist(srcFile) || !FileUtil.checkFileExist(appendVideo)){
+            return;
+        }
         switch (handleType){
             case 0://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String transformVideo = PATH + File.separator + "transformVideo.flv";
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
                 break;
             case 1://视频剪切
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String cutVideo = PATH + File.separator + "cutVideo.mp4";
                 int startTime = 0;
                 int duration = 20;
@@ -181,11 +191,17 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
 //                commandLine = FFmpegUtil.concatVideo(srcFile, concatFile.getAbsolutePath(), concatVideo);
                 break;
             case 3://视频截图
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String screenShot = PATH + File.separator + "screenShot.jpg";
                 String size = "1080x720";
                 commandLine = FFmpegUtil.screenShot(srcFile, size, screenShot);
                 break;
             case 4://视频添加水印
+                if (!FileUtil.checkFileExist(appendVideo)){
+                    return;
+                }
                 //1、图片
                 String photo = PATH + File.separator + "launcher.png";
                 String photoMark = PATH + File.separator + "photoMark.mp4";
@@ -199,6 +215,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 //commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, textMark);
                 break;
             case 5://视频转成gif
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";
                 int gifStart = 30;
                 int gifDuration = 5;
@@ -213,6 +232,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
             case 7://图片合成视频
                 //图片所在路径，图片命名格式img+number.jpg
                 String picturePath = PATH + File.separator + "img/";
+                if (!FileUtil.checkFileExist(picturePath)){
+                    return;
+                }
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
                 commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
                 break;
@@ -223,11 +245,17 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";
                 String outputFile = PATH + File.separator + "multi.mp4";
+                if (!FileUtil.checkFileExist(input1) || !FileUtil.checkFileExist(input2)){
+                    return;
+                }
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
                 break;
             case 10://视频反序倒播
                 String input = PATH + File.separator + "beyond.mp4";
                 String output = PATH + File.separator + "reverse.mp4";
+                if (!FileUtil.checkFileExist(input) || !FileUtil.checkFileExist(output)){
+                    return;
+                }
                 commandLine = FFmpegUtil.reverseVideo(input, output);
                 break;
             default:
