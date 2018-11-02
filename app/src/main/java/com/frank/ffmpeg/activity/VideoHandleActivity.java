@@ -10,13 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
-
 import java.io.File;
 
 public class VideoHandleActivity extends AppCompatActivity implements View.OnClickListener{
@@ -71,6 +69,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_video).setOnClickListener(this);
         findViewById(R.id.btn_multi_video).setOnClickListener(this);
         findViewById(R.id.btn_reverse_video).setOnClickListener(this);
+        findViewById(R.id.btn_denoise_video).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -85,6 +84,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_multi_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_reverse_video).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_denoise_video).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -99,6 +99,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_play_video).setVisibility(View.GONE);
         findViewById(R.id.btn_multi_video).setVisibility(View.GONE);
         findViewById(R.id.btn_reverse_video).setVisibility(View.GONE);
+        findViewById(R.id.btn_denoise_video).setVisibility(View.GONE);
     }
 
     @Override
@@ -138,6 +139,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
             case R.id.btn_reverse_video:
                 handleType = 10;
                 break;
+            case R.id.btn_denoise_video:
+                handleType = 11;
+                break;
             default:
                 handleType = 0;
                 break;
@@ -151,9 +155,6 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
      */
     private void doHandleVideo(int handleType){
         String[] commandLine = null;
-        if (!FileUtil.checkFileExist(srcFile) || !FileUtil.checkFileExist(appendVideo)){
-            return;
-        }
         switch (handleType){
             case 0://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
                 if (!FileUtil.checkFileExist(srcFile)){
@@ -207,12 +208,12 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String photoMark = PATH + File.separator + "photoMark.mp4";
                 commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, photoMark);
                 //2、文字
-                //String text = "Hello,FFmpeg";
-                //String textPath = PATH + File.separator + "text.jpg";
-                //boolean result = BitmapUtil.textToPicture(textPath, text, this);
-                //Log.i(TAG, "text to pitcture result=" + result);
-                //String textMark = PATH + File.separator + "textMark.mp4";
-                //commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, textMark);
+//                String text = "Hello,FFmpeg";
+//                String textPath = PATH + File.separator + "text.jpg";
+//                boolean result = BitmapUtil.textToPicture(textPath, text, this);
+//                Log.i(TAG, "text to pitcture result=" + result);
+//                String textMark = PATH + File.separator + "textMark.mp4";
+//                commandLine = FFmpegUtil.addWaterMark(appendVideo, textPath, textMark);
                 break;
             case 5://视频转成gif
                 if (!FileUtil.checkFileExist(srcFile)){
@@ -251,12 +252,18 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
                 break;
             case 10://视频反序倒播
-                String input = PATH + File.separator + "beyond.mp4";
                 String output = PATH + File.separator + "reverse.mp4";
-                if (!FileUtil.checkFileExist(input) || !FileUtil.checkFileExist(output)){
+                if (!FileUtil.checkFileExist(srcFile)){
                     return;
                 }
-                commandLine = FFmpegUtil.reverseVideo(input, output);
+                commandLine = FFmpegUtil.reverseVideo(srcFile, output);
+                break;
+            case 11://视频降噪
+                String denoise = PATH + File.separator + "denoise.mp4";
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
+                commandLine = FFmpegUtil.denoiseVideo(srcFile, denoise);
                 break;
             default:
                 break;

@@ -264,4 +264,17 @@ public class FFmpegUtil {
         return reverseVideo.split(" ");
     }
 
+    /**
+     * 视频降噪
+     * @param inputFile 输入文件
+     * @param targetFile 输出文件
+     *
+     * @return 视频降噪的命令行
+     */
+    public static  String[] denoiseVideo(String inputFile, String targetFile){
+        String reverseVideo = "ffmpeg -i %s -nr 500 %s";
+        reverseVideo = String.format(reverseVideo, inputFile, targetFile);
+        return reverseVideo.split(" ");
+    }
+
 }

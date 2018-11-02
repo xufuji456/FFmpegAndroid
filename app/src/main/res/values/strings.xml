@@ -36,6 +36,7 @@
     <string name="video_fast">快进</string>
     <string name="video_multi">画面拼接</string>
     <string name="video_reverse">视频倒播</string>
+    <string name="video_denoise">视频降噪</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>

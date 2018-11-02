@@ -112,4 +112,13 @@
         android:layout_marginTop="10dp"
         android:text="@string/video_reverse"/>
 
+    <Button
+        android:id="@+id/btn_denoise_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_reverse_video"
+        android:layout_marginTop="10dp"
+        android:text="@string/video_denoise"/>
+
 </RelativeLayout>
