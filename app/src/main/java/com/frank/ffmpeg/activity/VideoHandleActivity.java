@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.ProgressBar;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
@@ -51,6 +52,10 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().hide();
+        }
         setContentView(R.layout.activity_video_handle);
 
         intView();
@@ -70,6 +75,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_multi_video).setOnClickListener(this);
         findViewById(R.id.btn_reverse_video).setOnClickListener(this);
         findViewById(R.id.btn_denoise_video).setOnClickListener(this);
+        findViewById(R.id.btn_to_image).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -85,6 +91,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_multi_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_reverse_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_denoise_video).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_to_image).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -100,6 +107,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_multi_video).setVisibility(View.GONE);
         findViewById(R.id.btn_reverse_video).setVisibility(View.GONE);
         findViewById(R.id.btn_denoise_video).setVisibility(View.GONE);
+        findViewById(R.id.btn_to_image).setVisibility(View.GONE);
     }
 
     @Override
@@ -141,6 +149,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_denoise_video:
                 handleType = 11;
+                break;
+            case R.id.btn_to_image:
+                handleType = 12;
                 break;
             default:
                 handleType = 0;
@@ -264,6 +275,21 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                     return;
                 }
                 commandLine = FFmpegUtil.denoiseVideo(srcFile, denoise);
+                break;
+            case 12://视频转图片
+                String srcFile = PATH + File.separator + "beyond.mp4";
+                if (!FileUtil.checkFileExist(srcFile)){
+                    return;
+                }
+                String imagePath = PATH + File.separator + "Video2Image/";//图片保存路径
+                File imageFile = new File(imagePath);
+                if (!imageFile.exists()){
+                    imageFile.mkdir();
+                }
+                int mStartTime = 10;//开始时间
+                int mDuration = 20;//持续时间（注意开始时间+持续时间之和不能大于视频总时长）
+                int mFrameRate = 10;//帧率（从视频中每秒抽多少帧）
+                commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, imagePath);
                 break;
             default:
                 break;

@@ -1,6 +1,8 @@
 package com.frank.ffmpeg.util;
 
 import android.text.TextUtils;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,11 +75,11 @@ public class FileUtil {
      */
     public static boolean checkFileExist(String path){
         if (TextUtils.isEmpty(path)) {
-            throw new NullPointerException(path + "is null!");
+            Log.e("FileUtil", path + "is null!");
         }
         File file = new File(path);
         if(!file.exists()){
-            throw new NullPointerException(path + " is not exist!");
+            Log.e("FileUtil", path + " is not exist!");
         }
         return true;
     }

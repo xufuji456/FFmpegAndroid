@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.frank.ffmpeg.format.VideoLayout;
 
+import java.util.Locale;
+
 /**
  * ffmpeg工具：拼接命令行处理音视频
  * Created by frank on 2018/1/23.
@@ -275,6 +277,26 @@ public class FFmpegUtil {
         String reverseVideo = "ffmpeg -i %s -nr 500 %s";
         reverseVideo = String.format(reverseVideo, inputFile, targetFile);
         return reverseVideo.split(" ");
+    }
+
+    /**
+     * 视频抽帧转成图片
+     * @param inputFile 输入文件
+     * @param startTime 开始时间
+     * @param duration 持续时间
+     * @param frameRate 帧率
+     * @param targetFile 输出文件
+     *
+     * @return 视频抽帧的命令行
+     */
+    public static  String[] videoToImage(String inputFile, int startTime, int duration, int frameRate, String targetFile){
+        //-ss：开始时间，单位为秒
+        //-t：持续时间，单位为秒
+        //-r：帧率，每秒抽多少帧
+        String toImage = "ffmpeg -i %s -ss %s -t %s -r %s %s";
+        toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, targetFile);
+        toImage = toImage + "%3d.jpg";
+        return toImage.split(" ");
     }
 
 }
