@@ -21,6 +21,7 @@ android端基于FFmpeg库的使用。<br>
 - #### 视频添加水印
 - #### 视频画面拼接
 - #### 视频反序倒播
+- #### 视频画中画
 - #### 图片合成视频
 - #### 视频解码播放
 - #### 本地直播推流
@@ -51,6 +52,10 @@ android端基于FFmpeg库的使用。<br>
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_edge.png)
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
+
+视频画中画：
+
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/picture_in_picture.png)
 
 视频画面拼接：
 
