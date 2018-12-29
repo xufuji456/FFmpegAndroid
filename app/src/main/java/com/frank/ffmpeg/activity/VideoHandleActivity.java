@@ -76,6 +76,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_reverse_video).setOnClickListener(this);
         findViewById(R.id.btn_denoise_video).setOnClickListener(this);
         findViewById(R.id.btn_to_image).setOnClickListener(this);
+        findViewById(R.id.btn_pip).setOnClickListener(this);
     }
 
     private void setVisible() {
@@ -92,6 +93,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_reverse_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_denoise_video).setVisibility(View.VISIBLE);
         findViewById(R.id.btn_to_image).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_pip).setVisibility(View.VISIBLE);
     }
 
     private void setGone() {
@@ -108,6 +110,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
         findViewById(R.id.btn_reverse_video).setVisibility(View.GONE);
         findViewById(R.id.btn_denoise_video).setVisibility(View.GONE);
         findViewById(R.id.btn_to_image).setVisibility(View.GONE);
+        findViewById(R.id.btn_pip).setVisibility(View.GONE);
     }
 
     @Override
@@ -152,6 +155,9 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btn_to_image:
                 handleType = 12;
+                break;
+            case R.id.btn_pip:
+                handleType = 13;
                 break;
             default:
                 handleType = 0;
@@ -290,6 +296,19 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 int mDuration = 20;//持续时间（注意开始时间+持续时间之和不能大于视频总时长）
                 int mFrameRate = 10;//帧率（从视频中每秒抽多少帧）
                 commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, imagePath);
+                break;
+            case 13://两个视频合成画中画
+                String inputFile1 = PATH + File.separator + "beyond.mp4";
+                String inputFile2 = PATH + File.separator + "small_girl.mp4";
+                if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)){
+                    return;
+                }
+                //x、y坐标点需要根据全屏视频与小视频大小，进行计算
+                //比如：全屏视频为320x240，小视频为120x90，那么x=200 y=150
+                int x = 200;
+                int y = 150;
+                String picInPic = PATH + File.separator + "PicInPic.mp4";
+                commandLine = FFmpegUtil.picInPicVideo(inputFile1, inputFile2, x, y, picInPic);
                 break;
             default:
                 break;

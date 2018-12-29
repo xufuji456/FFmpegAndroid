@@ -38,6 +38,7 @@
     <string name="video_reverse">视频倒播</string>
     <string name="video_denoise">视频降噪</string>
     <string name="video_image">视频转图片</string>
+    <string name="video_pip">视频画中画</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>

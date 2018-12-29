@@ -299,4 +299,21 @@ public class FFmpegUtil {
         return toImage.split(" ");
     }
 
+    /**
+     * 视频叠加成画中画
+     * @param inputFile1 输入文件
+     * @param inputFile2 输入文件
+     * @param targetFile 输出文件
+     * @param x 小视频起点x坐标
+     * @param y 小视频起点y坐标
+     *
+     * @return 视频画中画的命令行
+     */
+    @SuppressLint("DefaultLocale")
+    public static  String[] picInPicVideo(String inputFile1, String inputFile2, int x, int y, String targetFile){
+        String reverseVideo = "ffmpeg -i %s -i %s -filter_complex overlay=%d:%d %s";
+        reverseVideo = String.format(reverseVideo, inputFile1, inputFile2, x, y, targetFile);
+        return reverseVideo.split(" ");
+    }
+
 }
