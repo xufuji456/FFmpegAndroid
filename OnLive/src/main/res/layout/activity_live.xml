@@ -1,0 +1,25 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.frank.living.activity.RtspLiveActivity"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.frank.living.widget.IjkVideoView
+        android:id="@+id/video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+    </com.frank.living.widget.IjkVideoView>
+
+    <TableLayout
+        android:id="@+id/hud_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:background="@color/ijk_transparent_dark"
+        android:padding="8dp"
+        android:visibility="gone"/>
+
+</RelativeLayout>
