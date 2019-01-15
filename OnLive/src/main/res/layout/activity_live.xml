@@ -13,6 +13,25 @@
         android:layout_gravity="center">
     </com.frank.living.widget.IjkVideoView>
 
+    <ImageButton
+        android:id="@+id/btn_play"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_pause"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"/>
+
+    <ImageButton
+        android:id="@+id/btn_sound"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_silence"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"/>
+
     <TableLayout
         android:id="@+id/hud_view"
         android:layout_width="wrap_content"

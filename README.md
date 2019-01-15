@@ -66,7 +66,5 @@ android端基于FFmpeg库的使用。<br>
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/reverse.gif)
 
 ***
-
-后续会完善音视频播放、推流直播。
 <br><br>
 

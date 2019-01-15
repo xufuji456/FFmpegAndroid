@@ -3,18 +3,24 @@ package com.frank.living.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import com.frank.living.R;
 import com.frank.living.listener.IjkPlayerListener;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import com.frank.living.widget.IjkVideoView;
 
-public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerListener{
+public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerListener, View.OnClickListener{
 
     private final static String TAG = RtspLiveActivity.class.getSimpleName();
 
     private IjkMediaPlayer ijkMediaPlayer;
     private IjkVideoView mVideoView;
+    private ImageButton btnPlay;
+    private ImageButton btnSound;
+    private boolean isPause;
+    private boolean isSilence;
 
     private final static String url = "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov";
 
@@ -37,6 +43,12 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
         mVideoView.setIjkPlayerListener(this);
         mVideoView.setVideoPath(url);
         mVideoView.start();
+
+        btnPlay = (ImageButton) findViewById(R.id.btn_play);
+        btnPlay.setOnClickListener(this);
+        btnSound = (ImageButton) findViewById(R.id.btn_sound);
+        btnSound.setOnClickListener(this);
+
     }
 
     private void initOptions(){
@@ -66,6 +78,36 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
     public void onIjkPlayer(IjkMediaPlayer ijkMediaPlayer) {
         this.ijkMediaPlayer = ijkMediaPlayer;
         initOptions();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_play:
+                isPause = !isPause;
+                if (isPause){//直播暂停
+                    mVideoView.pause();
+                    btnPlay.setBackgroundResource(R.drawable.ic_play);
+                }else {//直播继续
+                    mVideoView.start();
+                    btnPlay.setBackgroundResource(R.drawable.ic_pause);
+                }
+                break;
+            case R.id.btn_sound:
+                isSilence = !isSilence;
+                if (ijkMediaPlayer == null)
+                    return;
+                if (isSilence){
+                    ijkMediaPlayer.setVolume(0, 0);
+                    btnSound.setBackgroundResource(R.drawable.ic_sound);
+                }else {
+                    ijkMediaPlayer.setVolume(50, 50);
+                    btnSound.setBackgroundResource(R.drawable.ic_silence);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
