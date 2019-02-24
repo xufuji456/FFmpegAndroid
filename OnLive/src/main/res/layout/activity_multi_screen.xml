@@ -1,0 +1,48 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ijk_color_blue_800"
+        android:layout_centerVertical="true"/>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/ijk_color_blue_800"
+        android:layout_centerHorizontal="true"/>
+
+    <com.frank.living.widget.IjkVideoView
+        android:id="@+id/video_view1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider1"
+        android:layout_toStartOf="@id/divider2"/>
+
+    <com.frank.living.widget.IjkVideoView
+        android:id="@+id/video_view2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider1"
+        android:layout_toEndOf="@id/divider2"/>
+
+    <com.frank.living.widget.IjkVideoView
+        android:id="@+id/video_view3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider1"
+        android:layout_toStartOf="@id/divider2"/>
+
+    <com.frank.living.widget.IjkVideoView
+        android:id="@+id/video_view4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider1"
+        android:layout_toEndOf="@id/divider2"/>
+
+</RelativeLayout>
