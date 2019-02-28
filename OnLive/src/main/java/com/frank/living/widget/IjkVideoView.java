@@ -1182,23 +1182,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return language;
     }
 
-    public ITrackInfo[] getTrackInfo() {
-        if (mMediaPlayer == null)
-            return null;
-
-        return mMediaPlayer.getTrackInfo();
-    }
-
-    public void selectTrack(int stream) {
-        MediaPlayerCompat.selectTrack(mMediaPlayer, stream);
-    }
-
-    public void deselectTrack(int stream) {
-        MediaPlayerCompat.deselectTrack(mMediaPlayer, stream);
-    }
-
-    public int getSelectedTrack(int trackType) {
-        return MediaPlayerCompat.getSelectedTrack(mMediaPlayer, trackType);
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
 }

@@ -30,6 +30,8 @@ android端基于FFmpeg库的使用。<br>
 - #### OpenGL+GPUImage滤镜
 - #### FFmpeg的AVFilter滤镜
 
+- #### IjkPlayer的RTSP超低延时直播
+- #### IjkPlayer的RTSP多路投屏直播
 
 左边是ffplay客户端拉流播放，中间是web网页播放：
 
