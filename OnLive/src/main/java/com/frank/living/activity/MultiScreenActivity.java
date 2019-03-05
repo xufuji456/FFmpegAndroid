@@ -45,7 +45,7 @@ public class MultiScreenActivity extends AppCompatActivity{
     private boolean isMultiScreen;
     //保存客户端ip与通道数对应关系
     private HashMap<String, Integer> clientMap = new HashMap<>();
-    //保存是否投屏与通道数对应关系
+    //记录每个通道的投屏状态
     private TreeMap<Integer, Boolean> channelMap = new TreeMap<>();
 
     private String url = "";
@@ -180,8 +180,6 @@ public class MultiScreenActivity extends AppCompatActivity{
         //设置播放前的最大探测时间,分析码流时长:默认1024*1000
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzedmaxduration", 100);
         //ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "rtsp_transport", "tcp");//tcp传输数据
-        // 音视频同步基线,0-音频为基准,1-视频为基准,3-系统时间戳为基准
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "av_sync_type", 0);
     }
 
     /**
@@ -226,14 +224,14 @@ public class MultiScreenActivity extends AppCompatActivity{
                         removeClient(target);
                         clientMap.remove(ipAddress);
                         channelMap.put(target, false);
-                        //TODO:多屏变为单屏时，自动切换为全屏
-//                        if (num == 1){
-//                            int castingChannel = getCastingChannel();
-//                            enterFullScreen(castingChannel);
-//                        }
+                        //多屏变为单屏时，自动切换为全屏
+                        if (num == 1){
+                            int castingChannel = getCastingChannel();
+                            enterFullScreen(castingChannel);
+                        }
                     }
                     break;
-                case Constants.ACTION_CLIENT_ADD://新增投屏
+                case Constants.ACTION_CLIENT_ADD://增加投屏
                     int clientNum = intent.getIntExtra("clientNum", 0);
                     String otherUrl = intent.getStringExtra("url");
                     String ipAddress = intent.getStringExtra("ip");
@@ -242,7 +240,7 @@ public class MultiScreenActivity extends AppCompatActivity{
                     clientMap.put(ipAddress, channel);
                     channelMap.put(channel, true);
                     addClient(channel, otherUrl);
-                    //TODO:单屏变为两路投屏时，自动切换为多屏模式
+                    //单屏变为两路投屏时，自动切换为多屏模式
                     if (clientNum == 2){
                         exitFullScreen();
                     }
@@ -363,24 +361,44 @@ public class MultiScreenActivity extends AppCompatActivity{
         hideDivider();
         switch (channel){
             case 1:
+                mVideoView1.setRenderViewVisible();
+                mVideoView2.setRenderViewGone();
+                mVideoView3.setRenderViewGone();
+                mVideoView4.setRenderViewGone();
+
                 mVideoView1.setVisibility(View.VISIBLE);
                 mVideoView2.setVisibility(View.GONE);
                 mVideoView3.setVisibility(View.GONE);
                 mVideoView4.setVisibility(View.GONE);
                 break;
             case 2:
+                mVideoView1.setRenderViewGone();
+                mVideoView2.setRenderViewVisible();
+                mVideoView3.setRenderViewGone();
+                mVideoView4.setRenderViewGone();
+
                 mVideoView1.setVisibility(View.GONE);
                 mVideoView2.setVisibility(View.VISIBLE);
                 mVideoView3.setVisibility(View.GONE);
                 mVideoView4.setVisibility(View.GONE);
                 break;
             case 3:
+                mVideoView1.setRenderViewGone();
+                mVideoView2.setRenderViewGone();
+                mVideoView3.setRenderViewVisible();
+                mVideoView4.setRenderViewGone();
+
                 mVideoView1.setVisibility(View.GONE);
                 mVideoView2.setVisibility(View.GONE);
                 mVideoView3.setVisibility(View.VISIBLE);
                 mVideoView4.setVisibility(View.GONE);
                 break;
             case 4:
+                mVideoView1.setRenderViewGone();
+                mVideoView2.setRenderViewGone();
+                mVideoView3.setRenderViewGone();
+                mVideoView4.setRenderViewVisible();
+
                 mVideoView1.setVisibility(View.GONE);
                 mVideoView2.setVisibility(View.GONE);
                 mVideoView3.setVisibility(View.GONE);
@@ -395,6 +413,11 @@ public class MultiScreenActivity extends AppCompatActivity{
      * 退出全屏模式
      */
     private void exitFullScreen(){
+        mVideoView1.setRenderViewVisible();
+        mVideoView2.setRenderViewVisible();
+        mVideoView3.setRenderViewVisible();
+        mVideoView4.setRenderViewVisible();
+
         showDivider();
         mVideoView1.setVisibility(View.VISIBLE);
         mVideoView2.setVisibility(View.VISIBLE);
@@ -402,18 +425,18 @@ public class MultiScreenActivity extends AppCompatActivity{
         mVideoView4.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * 切换分屏模式
-     * @param channel channel
-     */
-    private void changeScreenMode(int channel){
-        isMultiScreen = !isMultiScreen;
-        if (isMultiScreen){
-            enterFullScreen(channel);
-        }else {
-            exitFullScreen();
-        }
+/**
+ * 切换分屏模式
+ * @param channel channel
+ */
+private void changeScreenMode(int channel){
+    isMultiScreen = !isMultiScreen;
+    if (isMultiScreen){
+        enterFullScreen(channel);
+    }else {
+        exitFullScreen();
     }
+}
 
     @Override
     protected void onDestroy() {

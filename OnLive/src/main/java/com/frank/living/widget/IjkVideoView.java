@@ -1187,4 +1187,16 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return super.performClick();
     }
 
+    public void setRenderViewVisible(){
+        if (mRenderView != null){
+            mRenderView.getView().setVisibility(VISIBLE);
+        }
+    }
+
+    public void setRenderViewGone(){
+        if (mRenderView != null){
+            mRenderView.getView().setVisibility(GONE);
+        }
+    }
+
 }
