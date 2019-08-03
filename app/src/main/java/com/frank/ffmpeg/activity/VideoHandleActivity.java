@@ -10,9 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.BounceInterpolator;
 import android.widget.ProgressBar;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.floating.FloatPlayerView;
+import com.frank.ffmpeg.floating.FloatWindow;
+import com.frank.ffmpeg.floating.MoveType;
+import com.frank.ffmpeg.floating.Screen;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
@@ -290,7 +295,10 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String imagePath = PATH + File.separator + "Video2Image/";//图片保存路径
                 File imageFile = new File(imagePath);
                 if (!imageFile.exists()){
-                    imageFile.mkdir();
+                    boolean result = imageFile.mkdir();
+                    if (!result){
+                        return;
+                    }
                 }
                 int mStartTime = 10;//开始时间
                 int mDuration = 20;//持续时间（注意开始时间+持续时间之和不能大于视频总时长）
