@@ -29,7 +29,9 @@ add_library( # Sets the name of the library.
              src/main/cpp/ffmpeg_pusher.cpp
              src/main/cpp/AVpacket_queue.c
              src/main/cpp/media_player.c
-             src/main/cpp/video_filter.c)
+             src/main/cpp/video_filter.c
+             src/main/cpp/audio_lame.c
+        )
 
 add_library( ffmpeg
              SHARED
@@ -37,6 +39,13 @@ add_library( ffmpeg
 set_target_properties( ffmpeg
                        PROPERTIES IMPORTED_LOCATION
                        ../../../../libs/armeabi-v7a/libffmpeg.so )
+
+add_library( mp3lame
+        SHARED
+            IMPORTED )
+set_target_properties( mp3lame
+            PROPERTIES IMPORTED_LOCATION
+            ../../../../libs/armeabi-v7a/libmp3lame.so )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
@@ -49,6 +58,7 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        media-handle
+                       mp3lame
                        ffmpeg
                        -landroid #native_window
                        -ljnigraphics #bitmap

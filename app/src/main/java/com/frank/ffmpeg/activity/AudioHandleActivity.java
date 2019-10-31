@@ -14,6 +14,7 @@ import java.io.File;
 import com.frank.ffmpeg.AudioPlayer;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.mp3.Mp3Converter;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
@@ -140,8 +141,13 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
         }
         switch (handleType){
             case 0://转码
-                String transformFile = PATH + File.separator + "transform.aac";
-                commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
+//                String transformFile = PATH + File.separator + "transform.aac";
+//                commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
+                //使用mp3lame进行转码
+                String inputFile = PATH + File.separator + "hello.aac";
+                String transformFile = PATH + File.separator + "transform.mp3";
+                Mp3Converter mp3Converter = new Mp3Converter();
+                mp3Converter.convertToMp3(inputFile, transformFile);
                 break;
             case 1://剪切
                 String cutFile = PATH + File.separator + "cut.mp3";

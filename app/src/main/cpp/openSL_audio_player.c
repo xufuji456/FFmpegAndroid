@@ -271,7 +271,7 @@ int releaseAudioPlayer() {
 }
 
 JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_playAudio
-        (JNIEnv * env, jclass jobject, jstring filePath) {
+        (JNIEnv * env, jclass jclazz, jstring filePath) {
 
     int rate, channel;
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, NULL);
@@ -292,7 +292,7 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_playAudio
 
 //停止播放，释放相关资源
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_AudioPlayer_stop
-        (JNIEnv * env, jclass jobject) {
+        (JNIEnv * env, jclass jclazz) {
     if (bqPlayerObject != NULL) {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
         bqPlayerObject = NULL;
