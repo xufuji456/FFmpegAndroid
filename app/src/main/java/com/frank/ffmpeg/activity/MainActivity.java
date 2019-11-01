@@ -1,11 +1,7 @@
 package com.frank.ffmpeg.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 
@@ -19,37 +15,32 @@ import com.frank.ffmpeg.floating.Screen;
  * 使用ffmpeg进行音视频处理入口
  * Created by frank on 2018/1/23.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends BaseActivity {
 
-    private final static String[] mPermissions = new String[]{
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
-    private final static int CODE_STORAGE = 999;
+    @Override
+    int getLayoutId() {
+        return R.layout.activity_main;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        initView();
-        checkPermission();
-    }
-
-    private void initView() {
-        findViewById(R.id.btn_audio).setOnClickListener(this);
-        findViewById(R.id.btn_video).setOnClickListener(this);
-        findViewById(R.id.btn_media).setOnClickListener(this);
-        findViewById(R.id.btn_play).setOnClickListener(this);
-        findViewById(R.id.btn_push).setOnClickListener(this);
-        findViewById(R.id.btn_live).setOnClickListener(this);
-        findViewById(R.id.btn_filter).setOnClickListener(this);
-        findViewById(R.id.btn_reverse).setOnClickListener(this);
-        findViewById(R.id.btn_floating).setOnClickListener(this);
+        initViewsWithClick(
+                R.id.btn_audio,
+                R.id.btn_video,
+                R.id.btn_media,
+                R.id.btn_play,
+                R.id.btn_push,
+                R.id.btn_live,
+                R.id.btn_filter,
+                R.id.btn_reverse,
+                R.id.btn_floating
+        );
     }
 
     @Override
-    public void onClick(View v) {
+    public void onViewClick(View v) {
         Intent intent = new Intent();
         switch (v.getId()){
             case R.id.btn_audio://音频处理
@@ -85,15 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(intent);
     }
 
-    //动态申请权限
-    private void checkPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(mPermissions[0]) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(mPermissions, CODE_STORAGE);
-            }
-        }
-    }
-
     /**
      * 悬浮窗播放
      */
@@ -116,4 +98,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatWindow.get().show();
     }
 
+    @Override
+    void onSelectedFile(String filePath) {
+
+    }
+    
 }

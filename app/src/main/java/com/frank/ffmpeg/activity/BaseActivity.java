@@ -1,0 +1,90 @@
+package com.frank.ffmpeg.activity;
+
+import android.Manifest;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+
+import com.frank.ffmpeg.util.ContentUtil;
+
+public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private final static String TAG = BaseActivity.class.getSimpleName();
+
+    private final static int REQUEST_CODE = 1234;
+    private final static String[] permissions = new String[] {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        initWindow();
+        requestPermission();
+        setContentView(getLayoutId());
+    }
+
+    private void initWindow() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, REQUEST_CODE);
+        }
+    }
+
+    protected void initViews(int... viewIds) {
+        for (int viewId : viewIds) {
+            getView(viewId);
+        }
+    }
+
+    protected void initViewsWithClick(int... viewIds) {
+        for (int viewId : viewIds) {
+            getView(viewId).setOnClickListener(this);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        onViewClick(v);
+    }
+
+    protected void selectFile() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        this.startActivityForResult(intent, 123);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(data != null && data.getData() != null) {
+            String filePath = ContentUtil.getPath(this,data.getData());
+            Log.i(TAG,"filePath="+ filePath);
+            onSelectedFile(filePath);
+        }
+    }
+
+    protected <T extends View> T getView(int viewId) {
+        return (T) findViewById(viewId);
+    }
+
+    abstract int getLayoutId();
+
+    abstract void onViewClick(View view);
+
+    abstract void onSelectedFile(String filePath);
+
+}
