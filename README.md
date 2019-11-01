@@ -68,22 +68,22 @@ android端基于FFmpeg库的使用。<br>
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/reverse.gif)
 
 
-mp3lame编译脚本：
-WORKING_DIR := $(call my-dir)
-include $(CLEAR_VARS)
-LOCAL_PATH := $(WORKING_DIR)
-LOCAL_ARM_MODE  := arm
-LOCAL_MODULE    := mp3lame
-LOCAL_SRC_FILES := mp3lame/bitstream.c mp3lame/encoder.c \
-                   mp3lame/fft.c mp3lame/gain_analysis.c mp3lame/id3tag.c \
-                   mp3lame/lame.c mp3lame/newmdct.c mp3lame/quantize.c \
-                   mp3lame/presets.c mp3lame/psymodel.c mp3lame/quantize_pvt.c \
-                   mp3lame/reservoir.c mp3lame/set_get.c mp3lame/tables.c \
-                   mp3lame/takehiro.c mp3lame/util.c mp3lame/vbrquantize.c \
-                   mp3lame/VbrTag.c mp3lame/version.c
-LOCAL_C_INCLUDES := mp3lame
-LOCAL_LDLIBS    := -llog -lz -lm -landroid
-include $(BUILD_STATIC_LIBRARY)
+mp3lame编译脚本：<br>
+WORKING_DIR := $(call my-dir)<br>
+include $(CLEAR_VARS)<br>
+LOCAL_PATH := $(WORKING_DIR)<br>
+LOCAL_ARM_MODE  := arm<br>
+LOCAL_MODULE    := mp3lame<br>
+LOCAL_SRC_FILES := mp3lame/bitstream.c mp3lame/encoder.c \<br>
+                   mp3lame/fft.c mp3lame/gain_analysis.c mp3lame/id3tag.c \<br>
+                   mp3lame/lame.c mp3lame/newmdct.c mp3lame/quantize.c \<br>
+                   mp3lame/presets.c mp3lame/psymodel.c mp3lame/quantize_pvt.c \<br>
+                   mp3lame/reservoir.c mp3lame/set_get.c mp3lame/tables.c \<br>
+                   mp3lame/takehiro.c mp3lame/util.c mp3lame/vbrquantize.c \<br>
+                   mp3lame/VbrTag.c mp3lame/version.c<br>
+LOCAL_C_INCLUDES := mp3lame<br>
+LOCAL_LDLIBS    := -llog -lz -lm -landroid<br>
+include $(BUILD_STATIC_LIBRARY)<br>
 
 ***
 <br><br>
