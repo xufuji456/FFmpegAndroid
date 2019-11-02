@@ -76,10 +76,12 @@ public class FileUtil {
     public static boolean checkFileExist(String path){
         if (TextUtils.isEmpty(path)) {
             Log.e("FileUtil", path + "is null!");
+            return false;
         }
         File file = new File(path);
         if(!file.exists()){
             Log.e("FileUtil", path + " is not exist!");
+            return false;
         }
         return true;
     }

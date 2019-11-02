@@ -1,16 +1,15 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
@@ -20,17 +19,19 @@ import com.frank.ffmpeg.adapter.HorizontalAdapter;
 import com.frank.ffmpeg.listener.OnItemClickListener;
 import com.frank.ffmpeg.util.FileUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FilterActivity extends AppCompatActivity implements SurfaceHolder.Callback{
+/**
+ * 使用ffmpeg进行滤镜
+ * Created by frank on 2018/6/5.
+ */
 
-    //SD卡根目录
-    private final static String PATH = Environment.getExternalStorageDirectory().getPath();
+public class FilterActivity extends BaseActivity implements SurfaceHolder.Callback{
+
     //本地视频路径
-    private final static String VIDEO_PATH = PATH + File.separator + "Beyond.mp4";
+    private String videoPath = "";
 
     private VideoPlayer videoPlayer;
     private SurfaceView surfaceView;
@@ -69,6 +70,7 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
     //是否播放音频
     private boolean playAudio = true;
     private ToggleButton btnSound;
+    private Button btnSelect;
 
     private final static int MSG_HIDE = 222;
     private final static int DELAY_TIME = 5000;
@@ -80,6 +82,7 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             if (msg.what == MSG_HIDE){//无操作5s后隐藏滤镜操作栏
                 recyclerView.setVisibility(View.GONE);
                 btnSound.setVisibility(View.GONE);
+                btnSelect.setVisibility(View.GONE);
             }
         }
     };
@@ -93,10 +96,13 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
     private HideRunnable hideRunnable;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    int getLayoutId() {
+        return R.layout.activity_filter;
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_filter);
 
         initView();
         registerLister();
@@ -106,13 +112,13 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
     }
 
     private void initView(){
-        surfaceView = (SurfaceView) findViewById(R.id.surface_filter);
+        surfaceView = getView(R.id.surface_filter);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         videoPlayer = new VideoPlayer();
-        btnSound = (ToggleButton) findViewById(R.id.btn_sound);
+        btnSound = getView(R.id.btn_sound);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = getView(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -120,6 +126,9 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
         itemList.addAll(Arrays.asList(txtArray));
         horizontalAdapter = new HorizontalAdapter(itemList);
         recyclerView.setAdapter(horizontalAdapter);
+
+        btnSelect = getView(R.id.btn_select_file);
+        initViewsWithClick(R.id.btn_select_file);
     }
 
     //注册监听器
@@ -129,28 +138,18 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onItemClick(int position) {
                 if(!surfaceCreated)
                     return;
-                if (!FileUtil.checkFileExist(VIDEO_PATH)){
+                if (!FileUtil.checkFileExist(videoPath)){
+                    showSelectFile();
                     return;
                 }
-
-                final int mPosition = position;
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //切换播放
-                        if(isPlaying){
-                            videoPlayer.again();
-                        }
-                        isPlaying = true;
-                        videoPlayer.filter(VIDEO_PATH, surfaceHolder.getSurface(), filters[mPosition]);
-                    }
-                }).start();
+                doFilterPlay(position);
             }
         });
 
         surfaceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnSelect.setVisibility(View.VISIBLE);
                 btnSound.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);//按下SurfaceView，弹出滤镜操作栏
                 mHandler.postDelayed(hideRunnable, DELAY_TIME);//5s后发消息通知隐藏滤镜操作栏
@@ -163,6 +162,20 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
                 setPlayAudio();
             }
         });
+    }
+
+    private void doFilterPlay(final int position) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //切换播放
+                if(isPlaying){
+                    videoPlayer.again();
+                }
+                isPlaying = true;
+                videoPlayer.filter(videoPath, surfaceHolder.getSurface(), filters[position]);
+            }
+        }).start();
     }
 
     //设置是否静音
@@ -193,6 +206,22 @@ public class FilterActivity extends AppCompatActivity implements SurfaceHolder.C
         videoPlayer.release();
         videoPlayer = null;
         horizontalAdapter = null;
+    }
+
+    @Override
+    void onViewClick(View view) {
+        if (view.getId() == R.id.btn_select_file) {
+            selectFile();
+        }
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+        videoPath = filePath;
+        //选择滤镜模式
+        doFilterPlay(6);
+        //默认关闭声音
+        btnSound.setChecked(true);
     }
 
 }

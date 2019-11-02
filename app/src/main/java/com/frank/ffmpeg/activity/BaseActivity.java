@@ -6,10 +6,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.ContentUtil;
+
+/**
+ * Activity基类
+ * Created by frank on 2019/11/2.
+ */
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,12 +34,11 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initWindow();
         requestPermission();
         setContentView(getLayoutId());
     }
 
-    private void initWindow() {
+    protected void hideActionBar() {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -75,6 +84,35 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
             Log.i(TAG,"filePath="+ filePath);
             onSelectedFile(filePath);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_setting, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_select:
+                selectFile();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void showToast(String msg) {
+        if (TextUtils.isEmpty(msg)) {
+            return;
+        }
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    protected void showSelectFile() {
+        showToast(getString(R.string.please_select));
     }
 
     protected <T extends View> T getView(int viewId) {
