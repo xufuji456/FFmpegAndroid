@@ -41,8 +41,7 @@
         <!-- 音视频解码播放 -->
         <activity
             android:name=".activity.MediaPlayerActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:screenOrientation="landscape" />
         <!-- 本地推流直播 -->
         <activity
             android:name=".activity.PushActivity"
@@ -55,8 +54,7 @@
         <!-- 滤镜特效 -->
         <activity
             android:name=".activity.FilterActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:screenOrientation="landscape" />
         <!--视频倒播-->
         <activity android:name=".activity.VideoReverseActivity"
             android:screenOrientation="landscape"

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.frank.ffmpeg.activity.MediaPlayerActivity">
+    android:layout_height="match_parent">
 
     <SurfaceView
         android:id="@+id/surface_media"
@@ -29,5 +27,13 @@
         android:layout_margin="16dp"
         android:text="@string/video_fast"
         android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btn_select_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="16dp"
+        android:text="@string/select_file" />
 
 </RelativeLayout>

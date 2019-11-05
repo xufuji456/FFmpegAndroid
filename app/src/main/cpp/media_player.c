@@ -411,7 +411,7 @@ void* decode_func(void* arg){
     //根据stream_index获取对应的AVPacket队列
     AVPacketQueue *queue = player->packets[stream_index];
     int ret = 0;
-    int video_frame_count = 0, audio_frame_count = 0;
+//    int video_frame_count = 0, audio_frame_count = 0;
     for(;;) {
         pthread_mutex_lock(&player->mutex);
         AVPacket *packet = (AVPacket*)queue_pop(queue, &player->mutex, &player->cond);
@@ -419,10 +419,10 @@ void* decode_func(void* arg){
 
         if(stream_index == player->video_stream_index) {//视频流
             ret = decode_video(player, packet);
-            LOGI("decode video stream = %d", video_frame_count++);
+//            LOGI("decode video stream = %d", video_frame_count++);
         } else if(stream_index == player->audio_stream_index) {//音频流
             ret = decode_audio(player, packet);
-            LOGI("decode audio stream = %d", audio_frame_count++);
+//            LOGI("decode audio stream = %d", audio_frame_count++);
         }
         av_packet_unref(packet);
         if(ret < 0){
@@ -432,7 +432,7 @@ void* decode_func(void* arg){
 }
 
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_setup
-        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface){
+        (JNIEnv * env, jobject instance, jstring filePath, jobject surface){
 
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     int ret;
@@ -455,7 +455,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_setup
     //初始化音频相关参数
     audio_decoder_prepare(player);
     //初始化音频播放器
-    audio_player_prepare(player, env,  clazz);
+    audio_player_prepare(player, env,  instance);
     //初始化音视频packet队列
     init_queue(player, PACKET_SIZE);
 
@@ -463,7 +463,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_setup
 }
 
 JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_play
-        (JNIEnv * env, jclass clazz){
+        (JNIEnv * env, jobject instance){
     pthread_mutex_init(&player->mutex, NULL);
     pthread_cond_init(&player->cond, NULL);
 
@@ -488,7 +488,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_play
 }
 
 JNIEXPORT void JNICALL Java_com_frank_ffmpeg_MediaPlayer_release
-        (JNIEnv * env, jclass clazz){
+        (JNIEnv * env, jobject instance){
     //释放内存以及关闭文件
     free(player->audio_track);
     free(player->audio_track_write_mid);

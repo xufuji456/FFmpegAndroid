@@ -3,11 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorMain">#ffffff</color>
-    <color name="colorBord">#d7d7d7</color>
-    <color name="redBtn">#ff2c29</color>
-    <color name="blueBtn">#00ddff</color>
-    <color name="gray">#bebebe</color>
-    <color name="orange">#ff9800</color>
-    <color name="trasnsWhite">#32ffffff</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBord">#D7D7D7</color>
+    <color name="redBtn">#FF2C29</color>
+    <color name="blueBtn">#00DDFF</color>
+    <color name="gray">#BEBEBE</color>
+    <color name="orange">#FF9800</color>
+    <color name="trasnsWhite">#32FFFFFF</color>
 </resources>

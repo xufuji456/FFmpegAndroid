@@ -1,44 +1,53 @@
 package com.frank.ffmpeg.activity;
 
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Button;
+
 import com.frank.ffmpeg.MediaPlayer;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.FileUtil;
-
-import java.io.File;
 
 /**
  * 音视频解码播放
  * Created by frank on 2018/2/12.
  */
 
-public class MediaPlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+public class MediaPlayerActivity extends BaseActivity implements SurfaceHolder.Callback {
+
     private static final String TAG = MediaPlayerActivity.class.getSimpleName();
-    SurfaceHolder surfaceHolder;
-    private final static String PATH = Environment.getExternalStorageDirectory().getPath() + File.separator;
-    private String filePath = PATH + "hello.mp4";
+
+    private SurfaceHolder surfaceHolder;
+
     private MediaPlayer mediaPlayer;
+
+    private boolean surfaceCreated;
+
+    private Button btnSelectFile;
+
+    @Override
+    int getLayoutId() {
+        return R.layout.activity_media_player;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_media_player);
+
+        hideActionBar();
         initView();
         initPlayer();
     }
 
     private void initView(){
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_media);
+        SurfaceView surfaceView = getView(R.id.surface_media);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
-
-//        Button btn_slow = (Button) findViewById(R.id.btn_play_slow);
-//        Button btn_fast = (Button) findViewById(R.id.btn_play_fast);
+        btnSelectFile = getView(R.id.btn_select_file);
+        initViewsWithClick(R.id.btn_select_file);
     }
 
     private void initPlayer(){
@@ -47,21 +56,7 @@ public class MediaPlayerActivity extends AppCompatActivity implements SurfaceHol
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        if (!FileUtil.checkFileExist(filePath)){
-            return;
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int result = mediaPlayer.setup(filePath, surfaceHolder.getSurface());
-                if(result < 0){
-                    Log.e(TAG, "mediaPlayer-->setup");
-                    return;
-                }
-                mediaPlayer.play();
-            }
-        }).start();
+        surfaceCreated = true;
     }
 
     @Override
@@ -83,4 +78,35 @@ public class MediaPlayerActivity extends AppCompatActivity implements SurfaceHol
         }
     }
 
+    private void startPlay(final String filePath) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int result = mediaPlayer.setup(filePath, surfaceHolder.getSurface());
+                if(result < 0){
+                    Log.e(TAG, "mediaPlayer setup error!");
+                    return;
+                }
+                mediaPlayer.play();
+            }
+        }).start();
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+        if (!FileUtil.checkFileExist(filePath)){
+            return;
+        }
+        if (surfaceCreated) {
+            btnSelectFile.setVisibility(View.GONE);
+            startPlay(filePath);
+        }
+    }
+
+    @Override
+    void onViewClick(View view) {
+        if (view.getId() == R.id.btn_select_file) {
+            selectFile();
+        }
+    }
 }

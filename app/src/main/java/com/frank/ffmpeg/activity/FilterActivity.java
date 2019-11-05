@@ -104,6 +104,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        hideActionBar();
         initView();
         registerLister();
 
