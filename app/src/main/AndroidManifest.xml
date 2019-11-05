@@ -36,8 +36,7 @@
         <!-- 视频解码播放 -->
         <activity
             android:name=".activity.VideoPlayerActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:screenOrientation="landscape" />
         <!-- 音视频解码播放 -->
         <activity
             android:name=".activity.MediaPlayerActivity"
@@ -48,8 +47,7 @@
         <!-- 实时推流直播 -->
         <activity
             android:name=".activity.LiveActivity"
-            android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:screenOrientation="landscape" />
         <!-- 滤镜特效 -->
         <activity
             android:name=".activity.FilterActivity"
