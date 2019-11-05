@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,11 +20,11 @@ import java.io.File;
  * Created by frank on 2018/9/12.
  */
 
-public class VideoReverseActivity extends AppCompatActivity {
+public class VideoReverseActivity extends BaseActivity {
 
     private final static String TAG = VideoReverseActivity.class.getSimpleName();
     private final static String ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
-    private final static String VIDEO_NORMAL_PATH = ROOT_PATH + File.separator + "beyond.mp4";
+    private String VIDEO_NORMAL_PATH = "";
     private final static String VIDEO_REVERSE_PATH = ROOT_PATH + File.separator + "reverse.mp4";
 
     private LinearLayout loading;
@@ -33,6 +32,7 @@ public class VideoReverseActivity extends AppCompatActivity {
     private VideoView videoReverse;
 
     private final static int MSG_PLAY = 7777;
+    private final static int MSG_TOAST = 8888;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
         @Override
@@ -41,25 +41,31 @@ public class VideoReverseActivity extends AppCompatActivity {
             if (msg.what == MSG_PLAY){
                 changeVisibility();
                 startPlay();
+            }else if (msg.what == MSG_TOAST) {
+                showToast(getString(R.string.please_click_select));
             }
         }
     };
 
     @Override
+    int getLayoutId() {
+        return R.layout.activity_video_reverse;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_reverse);
 
         initView();
         initPlayer();
-        videoReverse();
-
+        mHandler.sendEmptyMessageDelayed(MSG_TOAST, 1000);
     }
 
     private void initView() {
-        loading = (LinearLayout) findViewById(R.id.layout_loading);
-        videoNormal = (VideoView) findViewById(R.id.video_normal);
-        videoReverse = (VideoView) findViewById(R.id.video_reverse);
+        loading = getView(R.id.layout_loading);
+        videoNormal = getView(R.id.video_normal);
+        videoReverse = getView(R.id.video_reverse);
+        loading.setVisibility(View.GONE);
     }
 
     private void changeVisibility(){
@@ -80,7 +86,6 @@ public class VideoReverseActivity extends AppCompatActivity {
         videoNormal.start();
         videoReverse.start();
     }
-
 
     /**
      * 执行ffmpeg命令行
@@ -115,4 +120,15 @@ public class VideoReverseActivity extends AppCompatActivity {
         executeFFmpegCmd(commandLine);
     }
 
+    @Override
+    void onViewClick(View view) {
+
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+        VIDEO_NORMAL_PATH = filePath;
+        loading.setVisibility(View.VISIBLE);
+        videoReverse();
+    }
 }

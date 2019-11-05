@@ -65,5 +65,6 @@
     <string name="select_file">选择文件</string>
     <string name="please_select">请选择正确文件</string>
     <string name="file_not_found">文件不存在</string>
+    <string name="please_click_select">请点击右上角菜单选择文件</string>
 
 </resources>
