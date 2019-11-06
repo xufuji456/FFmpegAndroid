@@ -45,6 +45,10 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     }
 
     private void requestPermission() {
+        requestPermission(permissions);
+    }
+
+    protected void requestPermission(String[] permissions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissions, REQUEST_CODE);
         }

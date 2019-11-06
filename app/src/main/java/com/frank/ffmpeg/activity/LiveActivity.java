@@ -2,15 +2,11 @@ package com.frank.ffmpeg.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.hardware.Camera;
 import android.media.AudioFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -30,10 +26,9 @@ import com.frank.live.param.VideoParam;
  * Created by frank on 2018/1/28.
  */
 
-public class LiveActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, LiveStateChangeListener {
+public class LiveActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, LiveStateChangeListener {
 
     private final static String TAG = LiveActivity.class.getSimpleName();
-    private final static int CODE_CAMERA_RECORD = 0x0001;
     private final static String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
     private final static String LIVE_URL = "rtmp://192.168.1.102/live/stream";
     private final static int MSG_ERROR = 100;
@@ -54,27 +49,32 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     @Override
+    int getLayoutId() {
+        return R.layout.activity_live;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_live);
 
+        hideActionBar();
         initView();
-        requirePermission();
+        requestPermission(permissions);
         initPusher();
     }
 
     private void initView(){
-        findViewById(R.id.btn_swap).setOnClickListener(this);
+        initViewsWithClick(R.id.btn_swap);
         ((ToggleButton)findViewById(R.id.btn_live)).setOnCheckedChangeListener(this);
         ((ToggleButton)findViewById(R.id.btn_mute)).setOnCheckedChangeListener(this);
-        SurfaceView surface_camera = (SurfaceView) findViewById(R.id.surface_camera);
+        SurfaceView surface_camera = getView(R.id.surface_camera);
         surfaceHolder = surface_camera.getHolder();
     }
 
     private void initPusher() {
-        int width = 640;//分辨率设置很重要
+        int width = 640;//分辨率设置
         int height = 480;
-        int videoBitRate = 400;//kb/s jason-->480kb
+        int videoBitRate = 400;//kb/s
         int videoFrameRate = 25;//fps
         VideoParam videoParam = new VideoParam(width, height,
                 Camera.CameraInfo.CAMERA_FACING_BACK, videoBitRate, videoFrameRate);
@@ -84,13 +84,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         int numChannels = 2;//声道数
         AudioParam audioParam = new AudioParam(sampleRate, channelConfig, audioFormat, numChannels);
         livePusher = new LivePusher(surfaceHolder, videoParam, audioParam);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v.getId() == R.id.btn_swap){//切换摄像头
-            livePusher.switchCamera();
-        }
     }
 
     @Override
@@ -118,24 +111,21 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         mHandler.obtainMessage(MSG_ERROR, msg).sendToTarget();
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    private void requirePermission(){
-        requestPermissions(permissions, CODE_CAMERA_RECORD);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(permissions.length > 0 && grantResults.length == permissions.length){
-            for(int i=0; i<permissions.length; i++){
-                Log.i(TAG, permissions[i] + ":grantResult=" + grantResults[i]);
-            }
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         livePusher.release();
+    }
+
+    @Override
+    void onViewClick(View view) {
+        if(view.getId() == R.id.btn_swap){//切换摄像头
+            livePusher.switchCamera();
+        }
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+
     }
 }
