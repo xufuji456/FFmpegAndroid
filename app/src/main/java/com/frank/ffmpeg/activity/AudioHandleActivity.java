@@ -4,10 +4,10 @@ import android.annotation.SuppressLint;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import java.io.File;
 
@@ -23,29 +23,30 @@ import com.frank.ffmpeg.util.FileUtil;
  * Created by frank on 2018/1/23.
  */
 
-public class AudioHandleActivity extends AppCompatActivity implements View.OnClickListener{
+public class AudioHandleActivity extends BaseActivity {
 
     private final static String TAG = AudioHandleActivity.class.getSimpleName();
     private final static String PATH = Environment.getExternalStorageDirectory().getPath();
-    private String srcFile = PATH + File.separator + "tiger.mp3";
     private String appendFile = PATH + File.separator + "test.mp3";
-    private final static int MSG_BEGIN = 11;
-    private final static int MSG_FINISH = 12;
+    private final static int MSG_BEGIN = 311;
+    private final static int MSG_FINISH = 312;
     private ProgressBar progress_audio;
+    private LinearLayout layoutAudioHandle;
+    private int viewId;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case MSG_BEGIN:
                     progress_audio.setVisibility(View.VISIBLE);
-                    setGone();
+                    layoutAudioHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
                     progress_audio.setVisibility(View.GONE);
-                    setVisible();
+                    layoutAudioHandle.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
@@ -54,93 +55,57 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
     };
 
     @Override
+    int getLayoutId() {
+        return R.layout.activity_audio_handle;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_audio_handle);
 
         initView();
     }
 
     private void initView() {
-        progress_audio = (ProgressBar) findViewById(R.id.progress_audio);
-        findViewById(R.id.btn_transform).setOnClickListener(this);
-        findViewById(R.id.btn_cut).setOnClickListener(this);
-        findViewById(R.id.btn_concat).setOnClickListener(this);
-        findViewById(R.id.btn_mix).setOnClickListener(this);
-        findViewById(R.id.btn_play_audio).setOnClickListener(this);
-        findViewById(R.id.btn_play_opensl).setOnClickListener(this);
-        findViewById(R.id.btn_audio_encode).setOnClickListener(this);
-        findViewById(R.id.btn_pcm_concat).setOnClickListener(this);
-    }
-
-    private void setVisible() {
-        findViewById(R.id.btn_transform).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_cut).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_concat).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_mix).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_play_audio).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_play_opensl).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_audio_encode).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_pcm_concat).setVisibility(View.VISIBLE);
-    }
-
-    private void setGone() {
-        findViewById(R.id.btn_transform).setVisibility(View.GONE);
-        findViewById(R.id.btn_cut).setVisibility(View.GONE);
-        findViewById(R.id.btn_concat).setVisibility(View.GONE);
-        findViewById(R.id.btn_mix).setVisibility(View.GONE);
-        findViewById(R.id.btn_play_audio).setVisibility(View.GONE);
-        findViewById(R.id.btn_play_opensl).setVisibility(View.GONE);
-        findViewById(R.id.btn_audio_encode).setVisibility(View.GONE);
-        findViewById(R.id.btn_pcm_concat).setVisibility(View.GONE);
+        progress_audio = getView(R.id.progress_audio);
+        layoutAudioHandle = getView(R.id.layout_audio_handle);
+        initViewsWithClick(
+                R.id.btn_transform,
+                R.id.btn_cut,
+                R.id.btn_concat,
+                R.id.btn_mix,
+                R.id.btn_play_audio,
+                R.id.btn_play_opensl,
+                R.id.btn_audio_encode,
+                R.id.btn_pcm_concat);
     }
 
     @Override
-    public void onClick(View v) {
-        int handleType;
-        switch (v.getId()){
-            case R.id.btn_transform:
-                handleType = 0;
-                break;
-            case R.id.btn_cut:
-                handleType = 1;
-                break;
-            case R.id.btn_concat:
-                handleType = 2;
-                break;
-            case R.id.btn_mix:
-                handleType = 3;
-                break;
-            case R.id.btn_play_audio:
-                handleType = 4;
-                break;
-            case R.id.btn_play_opensl:
-                handleType = 5;
-                break;
-            case R.id.btn_audio_encode:
-                handleType = 6;
-                break;
-            case R.id.btn_pcm_concat:
-                handleType = 7;
-                break;
-            default:
-                handleType = 0;
-                break;
-        }
-        doHandleAudio(handleType);
+    public void onViewClick(View view) {
+        viewId = view.getId();
+        selectFile();
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+        doHandleAudio(filePath);
     }
 
     /**
      * 调用ffmpeg处理音频
-     * @param handleType handleType
+     * @param srcFile srcFile
      */
-    private void doHandleAudio(int handleType){
+    private void doHandleAudio(final String srcFile) {
         String[] commandLine = null;
-        if (!FileUtil.checkFileExist(srcFile)){
+        if (!FileUtil.checkFileExist(srcFile)) {
             return;
         }
-        switch (handleType){
-            case 0://转码
+        if (!FileUtil.isAudio(srcFile)) {
+            showToast(getString(R.string.wrong_audio_format));
+            return;
+        }
+        switch (viewId) {
+            case R.id.btn_transform://转码
 //                String transformFile = PATH + File.separator + "transform.aac";
 //                commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
                 //使用mp3lame进行转码
@@ -149,25 +114,25 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 Mp3Converter mp3Converter = new Mp3Converter();
                 mp3Converter.convertToMp3(inputFile, transformFile);
                 break;
-            case 1://剪切
-                String cutFile = PATH + File.separator + "cut.mp3";
+            case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致)
+                String cutFile = PATH + File.separator + "cut.aac";
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
-            case 2://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
+            case R.id.btn_concat://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
                 if (!FileUtil.checkFileExist(appendFile)){
                     return;
                 }
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
                 break;
-            case 3://混合
+            case R.id.btn_mix://混合
                 if (!FileUtil.checkFileExist(appendFile)){
                     return;
                 }
                 String mixFile = PATH + File.separator + "mix.aac";
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
-            case 4://解码播放（AudioTrack）
+            case R.id.btn_play_audio://解码播放（AudioTrack）
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -175,7 +140,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                     }
                 }).start();
                 return;
-            case 5://解码播放（OpenSL ES）
+            case R.id.btn_play_opensl://解码播放（OpenSL ES）
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -183,8 +148,8 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                     }
                 }).start();
                 return;
-            case 6://音频编码
-                //可编码成WAV、AAC。如果需要编码成MP3、AMR，ffmpeg需要重新编译，把MP3、AMR库enable
+            case R.id.btn_audio_encode://音频编码
+                //可编码成WAV、AAC。如果需要编码成MP3，ffmpeg需要重新编译，把MP3库enable
                 String pcmFile = PATH + File.separator + "concat.pcm";
                 String wavFile = PATH + File.separator + "new.wav";
                 //pcm数据的采样率，一般采样率为8000、16000、44100
@@ -193,7 +158,7 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
                 int channel = 1;
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
-            case 7://PCM裸流音频文件合并
+            case R.id.btn_pcm_concat://PCM裸流音频文件合并
                 String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
                 String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
                 String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
@@ -215,8 +180,8 @@ public class AudioHandleActivity extends AppCompatActivity implements View.OnCli
      * 执行ffmpeg命令行
      * @param commandLine commandLine
      */
-    private void executeFFmpegCmd(final String[] commandLine){
-        if(commandLine == null){
+    private void executeFFmpegCmd(final String[] commandLine) {
+        if(commandLine == null) {
             return;
         }
         FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {

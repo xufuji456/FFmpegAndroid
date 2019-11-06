@@ -54,12 +54,6 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    protected void initViews(int... viewIds) {
-        for (int viewId : viewIds) {
-            getView(viewId);
-        }
-    }
-
     protected void initViewsWithClick(int... viewIds) {
         for (int viewId : viewIds) {
             getView(viewId).setOnClickListener(this);

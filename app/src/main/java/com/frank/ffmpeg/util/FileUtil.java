@@ -16,6 +16,27 @@ import java.io.IOException;
 
 public class FileUtil {
 
+    private final static String TYPE_MP3 = "mp3";
+    private final static String TYPE_AAC = "aac";
+    private final static String TYPE_AMR = "amr";
+    private final static String TYPE_FLAC = "flac";
+    private final static String TYPE_M4A = "m4a";
+    private final static String TYPE_WMA = "wma";
+    private final static String TYPE_WAV = "wav";
+    private final static String TYPE_OGG = "ogg";
+    private final static String TYPE_AC3 = "ac3";
+
+    private final static String TYPE_MP4 = "mp4";
+    private final static String TYPE_MKV = "mkv";
+    private final static String TYPE_WEBM = "webm";
+    private final static String TYPE_AVI = "avi";
+    private final static String TYPE_WMV = "wmv";
+    private final static String TYPE_FLV = "flv";
+    private final static String TYPE_TS = "ts";
+    private final static String TYPE_M3U8 = "m3u8";
+    private final static String TYPE_3GP = "3gp";
+    private final static String TYPE_MOV = "mov";
+
     public static boolean concatFile(String srcFilePath, String appendFilePath, String concatFilePath){
         if(TextUtils.isEmpty(srcFilePath)
                 || TextUtils.isEmpty(appendFilePath)
@@ -75,7 +96,6 @@ public class FileUtil {
      */
     public static boolean checkFileExist(String path){
         if (TextUtils.isEmpty(path)) {
-            Log.e("FileUtil", path + "is null!");
             return false;
         }
         File file = new File(path);
@@ -84,6 +104,37 @@ public class FileUtil {
             return false;
         }
         return true;
+    }
+
+    public static boolean isAudio(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+        return path.endsWith(TYPE_MP3)
+                || path.endsWith(TYPE_AAC)
+                || path.endsWith(TYPE_AMR)
+                || path.endsWith(TYPE_FLAC)
+                || path.endsWith(TYPE_M4A)
+                || path.endsWith(TYPE_WMA)
+                || path.endsWith(TYPE_WAV)
+                || path.endsWith(TYPE_OGG)
+                || path.endsWith(TYPE_AC3);
+    }
+
+    public static boolean isVideo(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+        return path.endsWith(TYPE_MP4)
+                || path.endsWith(TYPE_MKV)
+                || path.endsWith(TYPE_WEBM)
+                || path.endsWith(TYPE_WMV)
+                || path.endsWith(TYPE_AVI)
+                || path.endsWith(TYPE_FLV)
+                || path.endsWith(TYPE_3GP)
+                || path.endsWith(TYPE_TS)
+                || path.endsWith(TYPE_M3U8)
+                || path.endsWith(TYPE_MOV);
     }
 
 }
