@@ -6,33 +6,28 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.animation.BounceInterpolator;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
-import com.frank.ffmpeg.floating.FloatPlayerView;
-import com.frank.ffmpeg.floating.FloatWindow;
-import com.frank.ffmpeg.floating.MoveType;
-import com.frank.ffmpeg.floating.Screen;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 import java.io.File;
 
-public class VideoHandleActivity extends AppCompatActivity implements View.OnClickListener{
+public class VideoHandleActivity extends BaseActivity {
 
     private static final String TAG = VideoHandleActivity.class.getSimpleName();
     private static final int MSG_BEGIN = 101;
     private static final int MSG_FINISH = 102;
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
-    private static final String srcFile = PATH + File.separator + "hello.mp4";
-    private static final String appendVideo = PATH + File.separator + "test.mp4";
+
     private ProgressBar progress_video;
+    private LinearLayout layoutVideoHandle;
+    private int viewId;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
@@ -42,11 +37,11 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
             switch (msg.what){
                 case MSG_BEGIN:
                     progress_video.setVisibility(View.VISIBLE);
-                    setGone();
+                    layoutVideoHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
                     progress_video.setVisibility(View.GONE);
-                    setVisible();
+                    layoutVideoHandle.setVisibility(View.VISIBLE);
                     break;
                 default:
                     break;
@@ -55,146 +50,75 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
     };
 
     @Override
+    int getLayoutId() {
+        return R.layout.activity_video_handle;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        if (getSupportActionBar() != null){
-            getSupportActionBar().hide();
-        }
-        setContentView(R.layout.activity_video_handle);
 
+        hideActionBar();
         intView();
     }
 
     private void intView() {
-        progress_video = (ProgressBar)findViewById(R.id.progress_video);
-        findViewById(R.id.btn_video_transform).setOnClickListener(this);
-        findViewById(R.id.btn_video_cut).setOnClickListener(this);
-        findViewById(R.id.btn_video_concat).setOnClickListener(this);
-        findViewById(R.id.btn_screen_shot).setOnClickListener(this);
-        findViewById(R.id.btn_water_mark).setOnClickListener(this);
-        findViewById(R.id.btn_generate_gif).setOnClickListener(this);
-        findViewById(R.id.btn_screen_record).setOnClickListener(this);
-        findViewById(R.id.btn_combine_video).setOnClickListener(this);
-        findViewById(R.id.btn_play_video).setOnClickListener(this);
-        findViewById(R.id.btn_multi_video).setOnClickListener(this);
-        findViewById(R.id.btn_reverse_video).setOnClickListener(this);
-        findViewById(R.id.btn_denoise_video).setOnClickListener(this);
-        findViewById(R.id.btn_to_image).setOnClickListener(this);
-        findViewById(R.id.btn_pip).setOnClickListener(this);
-    }
-
-    private void setVisible() {
-        findViewById(R.id.btn_video_transform).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_video_cut).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_video_concat).setVisibility(View.GONE);
-        findViewById(R.id.btn_screen_shot).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_water_mark).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_generate_gif).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
-        findViewById(R.id.btn_combine_video).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_play_video).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_multi_video).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_reverse_video).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_denoise_video).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_to_image).setVisibility(View.VISIBLE);
-        findViewById(R.id.btn_pip).setVisibility(View.VISIBLE);
-    }
-
-    private void setGone() {
-        findViewById(R.id.btn_video_transform).setVisibility(View.GONE);
-        findViewById(R.id.btn_video_cut).setVisibility(View.GONE);
-        findViewById(R.id.btn_video_concat).setVisibility(View.GONE);
-        findViewById(R.id.btn_screen_shot).setVisibility(View.GONE);
-        findViewById(R.id.btn_water_mark).setVisibility(View.GONE);
-        findViewById(R.id.btn_generate_gif).setVisibility(View.GONE);
-        findViewById(R.id.btn_screen_record).setVisibility(View.GONE);
-        findViewById(R.id.btn_combine_video).setVisibility(View.GONE);
-        findViewById(R.id.btn_play_video).setVisibility(View.GONE);
-        findViewById(R.id.btn_multi_video).setVisibility(View.GONE);
-        findViewById(R.id.btn_reverse_video).setVisibility(View.GONE);
-        findViewById(R.id.btn_denoise_video).setVisibility(View.GONE);
-        findViewById(R.id.btn_to_image).setVisibility(View.GONE);
-        findViewById(R.id.btn_pip).setVisibility(View.GONE);
+        progress_video = getView(R.id.progress_video);
+        layoutVideoHandle = getView(R.id.layout_video_handle);
+        initViewsWithClick(
+                R.id.btn_video_transform,
+                R.id.btn_video_cut,
+                R.id.btn_video_concat,
+                R.id.btn_screen_shot,
+                R.id.btn_water_mark,
+                R.id.btn_generate_gif,
+                R.id.btn_screen_record,
+                R.id.btn_combine_video,
+                R.id.btn_play_video,
+                R.id.btn_multi_video,
+                R.id.btn_reverse_video,
+                R.id.btn_denoise_video,
+                R.id.btn_to_image,
+                R.id.btn_pip
+        );
     }
 
     @Override
-    public void onClick(View v) {
-        int handleType;
-        switch (v.getId()){
-            case R.id.btn_video_transform:
-                handleType = 0;
-                break;
-            case R.id.btn_video_cut:
-                handleType = 1;
-                break;
-            case R.id.btn_video_concat:
-                handleType = 2;
-                break;
-            case R.id.btn_screen_shot:
-                handleType = 3;
-                break;
-            case R.id.btn_water_mark:
-                handleType = 4;
-                break;
-            case R.id.btn_generate_gif:
-                handleType = 5;
-                break;
-            case R.id.btn_screen_record:
-                handleType = 6;
-                break;
-            case R.id.btn_combine_video:
-                handleType = 7;
-                break;
-            case R.id.btn_play_video:
-                handleType = 8;
-                break;
-            case R.id.btn_multi_video:
-                handleType = 9;
-                break;
-            case R.id.btn_reverse_video:
-                handleType = 10;
-                break;
-            case R.id.btn_denoise_video:
-                handleType = 11;
-                break;
-            case R.id.btn_to_image:
-                handleType = 12;
-                break;
-            case R.id.btn_pip:
-                handleType = 13;
-                break;
-            default:
-                handleType = 0;
-                break;
-        }
-        doHandleVideo(handleType);
+    public void onViewClick(View view) {
+        viewId = view.getId();
+        selectFile();
+    }
+
+    @Override
+    void onSelectedFile(String filePath) {
+        doHandleVideo(filePath);
     }
 
     /**
      * 调用ffmpeg处理视频
-     * @param handleType handleType
+     * @param srcFile srcFile
      */
-    private void doHandleVideo(int handleType){
+    private void doHandleVideo(String srcFile) {
         String[] commandLine = null;
-        switch (handleType){
-            case 0://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
+        if (!FileUtil.checkFileExist(srcFile)) {
+            return;
+        }
+        if (!FileUtil.isVideo(srcFile)) {
+            showToast(getString(R.string.wrong_video_format));
+            return;
+        }
+        switch (viewId){
+            case R.id.btn_video_transform://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
                 String transformVideo = PATH + File.separator + "transformVideo.flv";
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
                 break;
-            case 1://视频剪切
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
+            case R.id.btn_video_cut://视频剪切
                 String cutVideo = PATH + File.separator + "cutVideo.mp4";
                 int startTime = 0;
                 int duration = 20;
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo);
                 break;
-            case 2://视频合并
+            case R.id.btn_video_concat://视频合并
 //                commandLine = FFmpegUtil.toTs(srcFile, ts1);
 //                concatStep ++;
 //                String concatVideo = PATH + File.separator + "concatVideo.mp4";
@@ -210,49 +134,39 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-//
 //                commandLine = FFmpegUtil.concatVideo(srcFile, concatFile.getAbsolutePath(), concatVideo);
                 break;
-            case 3://视频截图
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
+            case R.id.btn_screen_shot://视频截图
                 String screenShot = PATH + File.separator + "screenShot.jpg";
                 String size = "1080x720";
                 commandLine = FFmpegUtil.screenShot(srcFile, size, screenShot);
                 break;
-            case 4://视频添加水印
-                if (!FileUtil.checkFileExist(appendVideo)){
-                    return;
-                }
+            case R.id.btn_water_mark://视频添加水印
                 //1、图片
                 String photo = PATH + File.separator + "launcher.png";
                 String photoMark = PATH + File.separator + "photoMark.mp4";
-                commandLine = FFmpegUtil.addWaterMark(appendVideo, photo, photoMark);
+                commandLine = FFmpegUtil.addWaterMark(srcFile, photo, photoMark);
                 //2、文字
 //                String text = "Hello,FFmpeg";
 //                String textPath = PATH + File.separator + "text.jpg";
 //                boolean result = BitmapUtil.textToPicture(textPath, text, this);
 //                Log.i(TAG, "text to pitcture result=" + result);
 //                String textMark = PATH + File.separator + "textMark.mp4";
-//                commandLine = FFmpegUtil.addWaterMark(appendVideo, textPath, textMark);
+//                commandLine = FFmpegUtil.addWaterMark(srcFile, textPath, textMark);
                 break;
-            case 5://视频转成gif
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
+            case R.id.btn_generate_gif://视频转成gif
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";
                 int gifStart = 30;
                 int gifDuration = 5;
                 commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration, Video2Gif);
                 break;
-            case 6://屏幕录制
+            case R.id.btn_screen_record://屏幕录制
 //                String screenRecord = PATH + File.separator + "screenRecord.mp4";
 //                String screenSize = "320x240";
 //                int recordTime = 10;
 //                commandLine = FFmpegUtil.screenRecord(screenSize, recordTime, screenRecord);
                 break;
-            case 7://图片合成视频
+            case R.id.btn_combine_video://图片合成视频
                 //图片所在路径，图片命名格式img+number.jpg
                 String picturePath = PATH + File.separator + "img/";
                 if (!FileUtil.checkFileExist(picturePath)){
@@ -261,10 +175,12 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
                 commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
                 break;
-            case 8://视频解码播放
-                startActivity(new Intent(VideoHandleActivity.this, VideoPlayerActivity.class));
+            case R.id.btn_play_video://视频解码播放
+                Intent playIntent = new Intent(VideoHandleActivity.this, VideoPlayerActivity.class);
+                playIntent.putExtra("videoHandlePath", srcFile);
+                startActivity(playIntent);
                 return;
-            case 9://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
+            case R.id.btn_multi_video://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";
                 String outputFile = PATH + File.separator + "multi.mp4";
@@ -273,25 +189,15 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 }
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
                 break;
-            case 10://视频反序倒播
+            case R.id.btn_reverse_video://视频反序倒播
                 String output = PATH + File.separator + "reverse.mp4";
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
                 commandLine = FFmpegUtil.reverseVideo(srcFile, output);
                 break;
-            case 11://视频降噪
+            case R.id.btn_denoise_video://视频降噪
                 String denoise = PATH + File.separator + "denoise.mp4";
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
                 commandLine = FFmpegUtil.denoiseVideo(srcFile, denoise);
                 break;
-            case 12://视频转图片
-                String srcFile = PATH + File.separator + "beyond.mp4";
-                if (!FileUtil.checkFileExist(srcFile)){
-                    return;
-                }
+            case R.id.btn_to_image://视频转图片
                 String imagePath = PATH + File.separator + "Video2Image/";//图片保存路径
                 File imageFile = new File(imagePath);
                 if (!imageFile.exists()){
@@ -305,7 +211,7 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
                 int mFrameRate = 10;//帧率（从视频中每秒抽多少帧）
                 commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, imagePath);
                 break;
-            case 13://两个视频合成画中画
+            case R.id.btn_pip://两个视频合成画中画
                 String inputFile1 = PATH + File.separator + "beyond.mp4";
                 String inputFile2 = PATH + File.separator + "small_girl.mp4";
                 if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)){
@@ -328,8 +234,8 @@ public class VideoHandleActivity extends AppCompatActivity implements View.OnCli
      * 执行ffmpeg命令行
      * @param commandLine commandLine
      */
-    private void executeFFmpegCmd(final String[] commandLine){
-        if(commandLine == null){
+    private void executeFFmpegCmd(final String[] commandLine) {
+        if(commandLine == null) {
             return;
         }
         FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {

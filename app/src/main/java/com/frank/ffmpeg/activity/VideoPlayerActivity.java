@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -23,6 +24,8 @@ public class VideoPlayerActivity extends BaseActivity implements SurfaceHolder.C
 
     private boolean surfaceCreated;
 
+    private String videoPath;
+
     @Override
     int getLayoutId() {
         return R.layout.activity_video_player;
@@ -32,6 +35,7 @@ public class VideoPlayerActivity extends BaseActivity implements SurfaceHolder.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        videoPath = getIntent().getStringExtra("videoHandlePath");
         initView();
         initPlayer();
         showToast(getString(R.string.please_click_select));
@@ -53,6 +57,9 @@ public class VideoPlayerActivity extends BaseActivity implements SurfaceHolder.C
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         surfaceCreated = true;
+        if (!TextUtils.isEmpty(videoPath)) {
+            startPlay(videoPath);
+        }
     }
 
     @Override

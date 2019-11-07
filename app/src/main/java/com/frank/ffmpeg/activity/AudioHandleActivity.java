@@ -63,6 +63,7 @@ public class AudioHandleActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        hideActionBar();
         initView();
     }
 
@@ -77,7 +78,8 @@ public class AudioHandleActivity extends BaseActivity {
                 R.id.btn_play_audio,
                 R.id.btn_play_opensl,
                 R.id.btn_audio_encode,
-                R.id.btn_pcm_concat);
+                R.id.btn_pcm_concat
+        );
     }
 
     @Override
