@@ -30,7 +30,7 @@ public class AudioHandleActivity extends BaseActivity {
     private String appendFile = PATH + File.separator + "test.mp3";
     private final static int MSG_BEGIN = 311;
     private final static int MSG_FINISH = 312;
-    private ProgressBar progress_audio;
+    private ProgressBar progressAudio;
     private LinearLayout layoutAudioHandle;
     private int viewId;
 
@@ -41,11 +41,11 @@ public class AudioHandleActivity extends BaseActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_BEGIN:
-                    progress_audio.setVisibility(View.VISIBLE);
+                    progressAudio.setVisibility(View.VISIBLE);
                     layoutAudioHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
-                    progress_audio.setVisibility(View.GONE);
+                    progressAudio.setVisibility(View.GONE);
                     layoutAudioHandle.setVisibility(View.VISIBLE);
                     break;
                 default:
@@ -68,7 +68,7 @@ public class AudioHandleActivity extends BaseActivity {
     }
 
     private void initView() {
-        progress_audio = getView(R.id.progress_audio);
+        progressAudio = getView(R.id.progress_audio);
         layoutAudioHandle = getView(R.id.layout_audio_handle);
         initViewsWithClick(
                 R.id.btn_transform,

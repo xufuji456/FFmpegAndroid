@@ -25,7 +25,7 @@ public class VideoHandleActivity extends BaseActivity {
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
 
-    private ProgressBar progress_video;
+    private ProgressBar progressVideo;
     private LinearLayout layoutVideoHandle;
     private int viewId;
 
@@ -36,11 +36,11 @@ public class VideoHandleActivity extends BaseActivity {
             super.handleMessage(msg);
             switch (msg.what){
                 case MSG_BEGIN:
-                    progress_video.setVisibility(View.VISIBLE);
+                    progressVideo.setVisibility(View.VISIBLE);
                     layoutVideoHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
-                    progress_video.setVisibility(View.GONE);
+                    progressVideo.setVisibility(View.GONE);
                     layoutVideoHandle.setVisibility(View.VISIBLE);
                     break;
                 default:
@@ -63,7 +63,7 @@ public class VideoHandleActivity extends BaseActivity {
     }
 
     private void intView() {
-        progress_video = getView(R.id.progress_video);
+        progressVideo = getView(R.id.progress_video);
         layoutVideoHandle = getView(R.id.layout_video_handle);
         initViewsWithClick(
                 R.id.btn_video_transform,
