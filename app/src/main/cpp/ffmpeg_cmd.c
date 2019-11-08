@@ -1,8 +1,8 @@
 #include <jni.h>
 #include "ffmpeg/ffmpeg.h"
+#include "ffmpeg_jni_define.h"
 
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_FFmpegCmd_handle
-(JNIEnv *env, jclass obj, jobjectArray commands){
+FFMPEG_FUNC(jint, handle, jobjectArray commands) {
     int argc = (*env)->GetArrayLength(env, commands);
     char **argv = (char**)malloc(argc * sizeof(char*));
     int i;

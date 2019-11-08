@@ -13,28 +13,26 @@
 //重采样
 #include "libswresample/swresample.h"
 #include <android/log.h>
+#include "ffmpeg_jni_define.h"
 
-#define TAG "MediaPlayer"
-#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
+#define TAG "AudioPlayer"
 
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
-  (JNIEnv *env, jobject jthiz, jstring input_jstr){
+AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 	const char* input_cstr = (*env)->GetStringUTFChars(env,input_jstr,NULL);
-	LOGI("input_cstr=%s", input_cstr);
+	LOGI(TAG, "input_cstr=%s", input_cstr);
 	//注册组件
 	av_register_all();
 	AVFormatContext *pFormatCtx = avformat_alloc_context();
 	//打开音频文件
 	if(avformat_open_input(&pFormatCtx,input_cstr,NULL,NULL) != 0){
-		LOGI("%s","无法打开音频文件");
+		LOGE(TAG, "无法打开音频文件");
 		return;
 	}
 	//获取输入文件信息
 	if(avformat_find_stream_info(pFormatCtx,NULL) < 0){
-		LOGI("%s","无法获取输入文件信息");
+		LOGE(TAG, "无法获取输入文件信息");
 		return;
 	}
 	//获取音频流索引位置
@@ -50,12 +48,12 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
 	AVCodecContext *codecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
 	AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
 	if(codec == NULL){
-		LOGI("%s","无法获取解码器");
+		LOGE(TAG, "无法获取解码器");
 		return;
 	}
 	//打开解码器
 	if(avcodec_open2(codecCtx,codec,NULL) < 0){
-		LOGI("%s","无法打开解码器");
+		LOGE(TAG, "无法打开解码器");
 		return;
 	}
 	//压缩数据
@@ -87,16 +85,16 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
 	//输出的声道个数
 	int out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 
-	jclass player_class = (*env)->GetObjectClass(env,jthiz);
+	jclass player_class = (*env)->GetObjectClass(env,thiz);
     if(!player_class){
-        LOGE("player_class not found...");
+        LOGE(TAG, "player_class not found...");
     }
 	//AudioTrack对象
 	jmethodID audio_track_method = (*env)->GetMethodID(env,player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
     if(!audio_track_method){
-        LOGE("audio_track_method not found...");
+        LOGE(TAG, "audio_track_method not found...");
     }
-	jobject audio_track = (*env)->CallObjectMethod(env,jthiz,audio_track_method,out_sample_rate,out_channel_nb);
+	jobject audio_track = (*env)->CallObjectMethod(env,thiz,audio_track_method,out_sample_rate,out_channel_nb);
 
 	//调用play方法
 	jclass audio_track_class = (*env)->GetObjectClass(env,audio_track);
@@ -121,7 +119,7 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
 			}
 			//解码一帧成功
 			if(got_frame > 0){
-				LOGI("decode frame count=%d",index++);
+				LOGI(TAG, "decode frame count=%d", index++);
                 //音频格式转换
                 swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
                 int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
@@ -143,7 +141,7 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_play
 		}
 		av_free_packet(packet);
 	}
-    LOGI("decode audio finish");
+    LOGI(TAG, "decode audio finish");
 	av_frame_free(&frame);
 	av_free(out_buffer);
 	swr_free(&swrCtx);

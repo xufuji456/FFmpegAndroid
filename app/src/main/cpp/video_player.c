@@ -10,32 +10,31 @@
 #include <unistd.h>
 #include <libavutil/imgutils.h>
 #include <android/log.h>
+#include "ffmpeg_jni_define.h"
 
-#define TAG "MediaPlayer"
-#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
+#define TAG "VideoPlayer"
 
 //播放倍率
 float play_rate = 1;
 //视频总时长
 long duration = 0;
 
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_play
-        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface){
+VIDEOO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
 
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
+    LOGE(TAG, "open file:%s\n", file_name);
     //注册所有组件
     av_register_all();
     //分配上下文
     AVFormatContext * pFormatCtx = avformat_alloc_context();
     //打开视频文件
     if(avformat_open_input(&pFormatCtx, file_name, NULL, NULL)!=0) {
-        LOGE("Couldn't open file:%s\n", file_name);
+        LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
     //检索多媒体流信息
     if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
-        LOGE("Couldn't find stream information.");
+        LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
     //寻找视频流的第一帧
@@ -47,14 +46,14 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_play
         }
     }
     if(videoStream==-1) {
-        LOGE("couldn't find a video stream.");
+        LOGE(TAG, "couldn't find a video stream.");
         return -1;
     }
 
     //获取视频总时长
     if (pFormatCtx->duration != AV_NOPTS_VALUE) {
         duration  = (long) (pFormatCtx->duration / AV_TIME_BASE);
-        LOGE("duration=%d", duration);
+        LOGE(TAG, "duration==%ld", duration);
     }
 
     //获取codec上下文指针
@@ -62,11 +61,11 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_play
     //寻找视频流的解码器
     AVCodec * pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if(pCodec==NULL) {
-        LOGE("couldn't find Codec.");
+        LOGE(TAG, "couldn't find Codec.");
         return -1;
     }
     if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-        LOGE("Couldn't open codec.");
+        LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
     // 获取native window
@@ -78,14 +77,14 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_play
     ANativeWindow_setBuffersGeometry(nativeWindow,  videoWidth, videoHeight, WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBuffer;
     if(avcodec_open2(pCodecCtx, pCodec, NULL)<0) {
-        LOGE("Couldn't open codec.");
+        LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
     //申请内存
     AVFrame * pFrame = av_frame_alloc();
     AVFrame * pFrameRGBA = av_frame_alloc();
     if(pFrameRGBA == NULL || pFrame == NULL) {
-        LOGE("Couldn't allocate video frame.");
+        LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
     // buffer中数据用于渲染,且格式为RGBA
@@ -149,13 +148,11 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_play
 }
 
 //设置播放速率
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_setPlayRate
-        (JNIEnv * env, jclass clazz, jfloat playRate){
+VIDEOO_PLAYER_FUNC(jint, setPlayRate, jfloat playRate){
         play_rate = playRate;
 }
 
 //获取视频总时长
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_getDuration
-        (JNIEnv * env, jclass clazz){
+VIDEOO_PLAYER_FUNC(jint, getDuration){
         return duration;
 }
