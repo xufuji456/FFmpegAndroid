@@ -15,10 +15,9 @@
 #include <pthread.h>
 #include <jni.h>
 #include <libavutil/time.h>
+#include "ffmpeg_jni_define.h"
 
 #define TAG "MediaPlayer"
-#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT,##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT,##__VA_ARGS__);
 
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 #define PACKET_SIZE 50
@@ -78,12 +77,12 @@ int init_input_format_context(MediaPlayer* player, const char* file_name){
     player->format_context = avformat_alloc_context();
     //打开视频文件
     if(avformat_open_input(&player->format_context, file_name, NULL, NULL)!=0) {
-        LOGE("Couldn't open file:%s\n", file_name);
+        LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
     //检索多媒体流信息
     if(avformat_find_stream_info(player->format_context, NULL)<0) {
-        LOGE("Couldn't find stream information.");
+        LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
     //寻找音视频流索引位置
@@ -100,15 +99,15 @@ int init_input_format_context(MediaPlayer* player, const char* file_name){
         }
     }
     if(player->video_stream_index==-1) {
-        LOGE("couldn't find a video stream.");
+        LOGE(TAG, "couldn't find a video stream.");
         return -1;
     }
     if(player->audio_stream_index==-1) {
-        LOGE("couldn't find a audio stream.");
+        LOGE(TAG, "couldn't find a audio stream.");
         return -1;
     }
-    LOGI("video_stream_index=%d", player->video_stream_index);
-    LOGI("audio_stream_index=%d", player->audio_stream_index);
+    LOGI(TAG, "video_stream_index=%d", player->video_stream_index);
+    LOGI(TAG, "audio_stream_index=%d", player->audio_stream_index);
     return 0;
 }
 
@@ -119,21 +118,21 @@ int init_condec_context(MediaPlayer* player){
     //寻找视频流的解码器
     player->video_codec = avcodec_find_decoder(player->video_codec_context->codec_id);
     if(player->video_codec == NULL) {
-        LOGE("couldn't find video Codec.");
+        LOGE(TAG, "couldn't find video Codec.");
         return -1;
     }
     if(avcodec_open2(player->video_codec_context, player->video_codec, NULL) < 0) {
-        LOGE("Couldn't open video codec.");
+        LOGE(TAG, "Couldn't open video codec.");
         return -1;
     }
     player->audio_codec_context = player->format_context->streams[player->audio_stream_index]->codec;
     player->audio_codec = avcodec_find_decoder(player->audio_codec_context->codec_id);
     if( player->audio_codec == NULL) {
-        LOGE("couldn't find audio Codec.");
+        LOGE(TAG, "couldn't find audio Codec.");
         return -1;
     }
     if(avcodec_open2(player->audio_codec_context, player->audio_codec, NULL) < 0) {
-        LOGE("Couldn't open audio codec.");
+        LOGE(TAG, "Couldn't open audio codec.");
         return -1;
     }
     // 获取视频宽高
@@ -196,7 +195,7 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
     player->yuv_frame = av_frame_alloc();
     player->rgba_frame = av_frame_alloc();
     if(player->rgba_frame == NULL || player->yuv_frame == NULL) {
-        LOGE("Couldn't allocate video frame.");
+        LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
 
@@ -224,7 +223,7 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
     //对该帧进行解码
     int ret = avcodec_decode_video2(player->video_codec_context, player->yuv_frame, &frameFinished, packet);
     if(ret < 0){
-        LOGE("avcodec_decode_video2 error...");
+        LOGE(TAG, "avcodec_decode_video2 error...");
         return -1;
     }
     if (frameFinished) {
@@ -291,13 +290,13 @@ void audio_decoder_prepare(MediaPlayer* player) {
 void audio_player_prepare(MediaPlayer* player, JNIEnv* env, jclass jthiz){
     jclass player_class = (*env)->GetObjectClass(env,jthiz);
     if(!player_class){
-        LOGE("player_class not found...");
+        LOGE(TAG, "player_class not found...");
     }
     //AudioTrack对象
     jmethodID audio_track_method = (*env)->GetMethodID(
             env,player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
     if(!audio_track_method){
-        LOGE("audio_track_method not found...");
+        LOGE(TAG, "audio_track_method not found...");
     }
     jobject audio_track = (*env)->CallObjectMethod(
             env,jthiz,audio_track_method, player->out_sample_rate, player->out_channel_nb);
@@ -323,7 +322,7 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
     //解码
     ret = avcodec_decode_audio4(player->audio_codec_context, player->audio_frame, &got_frame, packet);
     if(ret < 0){
-        LOGE("avcodec_decode_audio4 error...");
+        LOGE(TAG, "avcodec_decode_audio4 error...");
         return -1;
     }
     //解码一帧成功
@@ -411,7 +410,7 @@ void* decode_func(void* arg){
     //根据stream_index获取对应的AVPacket队列
     AVPacketQueue *queue = player->packets[stream_index];
     int ret = 0;
-//    int video_frame_count = 0, audio_frame_count = 0;
+
     for(;;) {
         pthread_mutex_lock(&player->mutex);
         AVPacket *packet = (AVPacket*)queue_pop(queue, &player->mutex, &player->cond);
@@ -419,10 +418,8 @@ void* decode_func(void* arg){
 
         if(stream_index == player->video_stream_index) {//视频流
             ret = decode_video(player, packet);
-//            LOGI("decode video stream = %d", video_frame_count++);
         } else if(stream_index == player->audio_stream_index) {//音频流
             ret = decode_audio(player, packet);
-//            LOGI("decode audio stream = %d", audio_frame_count++);
         }
         av_packet_unref(packet);
         if(ret < 0){
@@ -431,8 +428,7 @@ void* decode_func(void* arg){
     }
 }
 
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_setup
-        (JNIEnv * env, jobject instance, jstring filePath, jobject surface){
+MEDIA_PLAYER_FUNC(jint, setup, jstring filePath, jobject surface){
 
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     int ret;
@@ -455,15 +451,14 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_setup
     //初始化音频相关参数
     audio_decoder_prepare(player);
     //初始化音频播放器
-    audio_player_prepare(player, env,  instance);
+    audio_player_prepare(player, env, thiz);
     //初始化音视频packet队列
     init_queue(player, PACKET_SIZE);
 
     return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_play
-        (JNIEnv * env, jobject instance){
+MEDIA_PLAYER_FUNC(jint, play){
     pthread_mutex_init(&player->mutex, NULL);
     pthread_cond_init(&player->cond, NULL);
 
@@ -487,8 +482,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_MediaPlayer_play
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_MediaPlayer_release
-        (JNIEnv * env, jobject instance){
+MEDIA_PLAYER_FUNC(void, release){
     //释放内存以及关闭文件
     free(player->audio_track);
     free(player->audio_track_write_mid);
