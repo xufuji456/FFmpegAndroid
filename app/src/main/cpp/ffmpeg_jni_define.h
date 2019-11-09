@@ -18,8 +18,20 @@
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_FFmpegCmd_ ## FUNC_NAME \
     (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
 
-#define VIDEOO_PLAYER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+#define VIDEO_PLAYER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_VideoPlayer_ ## FUNC_NAME \
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
+
+#define MEDIA_PLAYER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_MediaPlayer_ ## FUNC_NAME \
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
+
+#define PUSHER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+extern "C" { \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_Pusher_ ## FUNC_NAME \
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__);\
+} \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_Pusher_ ## FUNC_NAME \
     (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
 
 #endif //FFMPEGANDROID_FFMPEG_JNI_DEFINE_H

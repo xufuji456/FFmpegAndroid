@@ -15,10 +15,9 @@
 #include <libavfilter/avfiltergraph.h>
 #include <libavutil/opt.h>
 #include "libswresample/swresample.h"
+#include "ffmpeg_jni_define.h"
 
 #define TAG "VideoFilter"
-#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
 
 AVFilterContext *buffersink_ctx;
 
@@ -107,7 +106,7 @@ int init_filters(const char *filters_descr) {
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
                                        args, NULL, filter_graph);
     if (ret < 0) {
-        LOGE("Cannot create buffer source\n");
+        LOGE(TAG, "Cannot create buffer source\n");
         goto end;
     }
 
@@ -115,14 +114,14 @@ int init_filters(const char *filters_descr) {
     ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
                                        NULL, NULL, filter_graph);
     if (ret < 0) {
-        LOGE("Cannot create buffer sink\n");
+        LOGE(TAG, "Cannot create buffer sink\n");
         goto end;
     }
 
     ret = av_opt_set_int_list(buffersink_ctx, "pix_fmts", pix_fmts,
                               AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
-        LOGE("Cannot set output pixel format\n");
+        LOGE(TAG, "Cannot set output pixel format\n");
         goto end;
     }
 
@@ -152,19 +151,19 @@ int init_filters(const char *filters_descr) {
 
 //初始化视频解码器与播放器
 int open_input(JNIEnv * env, const char* file_name, jobject surface){
-    LOGI("open file:%s\n", file_name);
+    LOGI(TAG, "open file:%s\n", file_name);
     //注册所有组件
     av_register_all();
     //分配上下文
     pFormatCtx = avformat_alloc_context();
     //打开视频文件
     if(avformat_open_input(&pFormatCtx, file_name, NULL, NULL)!=0) {
-        LOGE("Couldn't open file:%s\n", file_name);
+        LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
     //检索多媒体流信息
     if(avformat_find_stream_info(pFormatCtx, NULL)<0) {
-        LOGE("Couldn't find stream information.");
+        LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
     //寻找视频流的第一帧
@@ -176,7 +175,7 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
         }
     }
     if(video_stream_index == -1) {
-        LOGE("couldn't find a video stream.");
+        LOGE(TAG, "couldn't find a video stream.");
         return -1;
     }
 
@@ -185,11 +184,11 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     //寻找视频流的解码器
     AVCodec * pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if(pCodec==NULL) {
-        LOGE("couldn't find Codec.");
+        LOGE(TAG, "couldn't find Codec.");
         return -1;
     }
     if(avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-        LOGE("Couldn't open codec.");
+        LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
     // 获取native window
@@ -201,7 +200,7 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     pFrame = av_frame_alloc();
     pFrameRGBA = av_frame_alloc();
     if(pFrameRGBA == NULL || pFrame == NULL) {
-        LOGE("Couldn't allocate video frame.");
+        LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
     // buffer中数据用于渲染,且格式为RGBA
@@ -240,12 +239,12 @@ int init_audio(JNIEnv * env, jclass jthiz){
     audioCodecCtx = pFormatCtx->streams[audio_stream_index]->codec;
     AVCodec *codec = avcodec_find_decoder(audioCodecCtx->codec_id);
     if(codec == NULL){
-        LOGI("%s","无法获取音频解码器");
+        LOGE(TAG, "无法获取音频解码器");
         return -1;
     }
     //打开音频解码器
     if(avcodec_open2(audioCodecCtx,codec,NULL) < 0){
-        LOGI("%s","无法打开音频解码器");
+        LOGE(TAG, "无法打开音频解码器");
         return -1;
     }
     //frame->16bit 44100 PCM 统一音频采样格式与采样率
@@ -275,13 +274,13 @@ int init_audio(JNIEnv * env, jclass jthiz){
 
     jclass player_class = (*env)->GetObjectClass(env,jthiz);
     if(!player_class){
-        LOGE("player_class not found...");
+        LOGE(TAG, "player_class not found...");
         return -1;
     }
     //AudioTrack对象
     jmethodID audio_track_method = (*env)->GetMethodID(env,player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
     if(!audio_track_method){
-        LOGE("audio_track_method not found...");
+        LOGE(TAG, "audio_track_method not found...");
         return -1;
     }
     audio_track = (*env)->CallObjectMethod(env,jthiz,audio_track_method,out_sample_rate,out_channel_nb);
@@ -328,30 +327,29 @@ int play_audio(JNIEnv * env, AVPacket* packet, AVFrame* frame){
     return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
-        (JNIEnv * env, jclass clazz, jstring filePath, jobject surface, jstring filterDescr){
+VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filterDescr){
 
     int ret;
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     const char *filter_descr = (*env)->GetStringUTFChars(env, filterDescr, JNI_FALSE);
     //打开输入文件
     if(!is_playing){
-        LOGI("open_input...");
+        LOGI(TAG, "open_input...");
         if((ret = open_input(env, file_name, surface)) < 0){
-            LOGE("Couldn't allocate video frame.");
+            LOGE(TAG, "Couldn't allocate video frame.");
             goto end;
         }
         //注册滤波器
         avfilter_register_all();
         filter_frame = av_frame_alloc();
         if(filter_frame == NULL) {
-            LOGE("Couldn't allocate filter frame.");
+            LOGE(TAG, "Couldn't allocate filter frame.");
             ret = -1;
             goto end;
         }
         //初始化音频解码器
-        if ((ret = init_audio(env, clazz)) < 0){
-            LOGE("Couldn't init_audio.");
+        if ((ret = init_audio(env, thiz)) < 0){
+            LOGE(TAG, "Couldn't init_audio.");
             goto end;
         }
 
@@ -359,7 +357,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
 
     //初始化滤波器
     if ((ret = init_filters(filter_descr)) < 0){
-        LOGE("init_filter error, ret=%d\n", ret);
+        LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
 
@@ -380,7 +378,7 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
             if (frameFinished) {
                 //把解码后视频帧添加到filter_graph
                 if (av_buffersrc_add_frame_flags(buffersrc_ctx, pFrame, AV_BUFFERSRC_FLAG_KEEP_REF) < 0) {
-                    LOGE("Error while feeding the filter_graph\n");
+                    LOGE(TAG, "Error while feeding the filter_graph\n");
                     break;
                 }
                 //把滤波后的视频帧从filter graph取出来
@@ -440,21 +438,21 @@ JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_VideoPlayer_filter
     ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     (*env)->ReleaseStringUTFChars(env, filterDescr, filter_descr);
-    LOGE("do release...");
+    LOGE(TAG, "do release...");
     again:
     again = 0;
-    LOGE("play again...");
+    LOGE(TAG, "play again...");
     return ret;
 }
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_again(JNIEnv * env, jclass clazz) {
+VIDEO_PLAYER_FUNC(void, again) {
     again = 1;
 }
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_release(JNIEnv * env, jclass clazz) {
+VIDEO_PLAYER_FUNC(void, release) {
     release = 1;
 }
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_VideoPlayer_playAudio(JNIEnv * env, jclass clazz, jboolean play_audio) {
+VIDEO_PLAYER_FUNC(void, playAudio, jboolean play_audio) {
     playAudio = play_audio;
 }

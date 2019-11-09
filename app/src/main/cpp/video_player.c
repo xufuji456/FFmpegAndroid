@@ -19,7 +19,7 @@ float play_rate = 1;
 //视频总时长
 long duration = 0;
 
-VIDEOO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
+VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
 
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     LOGE(TAG, "open file:%s\n", file_name);
@@ -148,11 +148,11 @@ VIDEOO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
 }
 
 //设置播放速率
-VIDEOO_PLAYER_FUNC(jint, setPlayRate, jfloat playRate){
+VIDEO_PLAYER_FUNC(void, setPlayRate, jfloat playRate){
         play_rate = playRate;
 }
 
 //获取视频总时长
-VIDEOO_PLAYER_FUNC(jint, getDuration){
+VIDEO_PLAYER_FUNC(jint, getDuration){
         return duration;
 }
