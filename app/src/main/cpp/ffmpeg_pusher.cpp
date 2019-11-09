@@ -5,10 +5,9 @@
 #include <jni.h>
 #include <string>
 #include <android/log.h>
+#include "ffmpeg_jni_define.h"
 
-#define LOG_TAG "FFmpegLive"
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define TAG "FFmpegPusher"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,8 +17,7 @@ extern "C" {
 #include <libavfilter/avfilter.h>
 #include <libavutil/time.h>
 
-    JNIEXPORT jint JNICALL
-    Java_com_frank_ffmpeg_Pusher_pushStream(JNIEnv *env, jobject, jstring filePath, jstring liveUrl) {
+PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
         AVOutputFormat *output_format = NULL;
         AVFormatContext *in_format = NULL, *out_format = NULL;
@@ -33,8 +31,8 @@ extern "C" {
         file_path = env->GetStringUTFChars(filePath, NULL);
         live_url = env->GetStringUTFChars(liveUrl, NULL);
 
-        LOGI("file_path=%s", file_path);
-        LOGI("live_url=%s", live_url);
+        LOGE(TAG, "file_path=%s", file_path);
+        LOGE(TAG, "live_url=%s", live_url);
 
         //注册所有组件
         av_register_all();
@@ -42,12 +40,12 @@ extern "C" {
         avformat_network_init();
         //打开输入文件
         if((ret = avformat_open_input(&in_format, file_path, 0, 0)) < 0){
-            LOGE("could not open input file...");
+            LOGE(TAG, "could not open input file...");
             goto end;
         }
         //寻找流信息
         if((ret = avformat_find_stream_info(in_format, 0)) < 0){
-            LOGE("could not find stream info...");
+            LOGE(TAG, "could not find stream info...");
             goto end;
         }
         //
@@ -62,7 +60,7 @@ extern "C" {
         //分配输出封装格式上下文， rtmp协议支持格式为flv
         avformat_alloc_output_context2(&out_format, NULL, "flv", live_url);
         if(!out_format){
-            LOGE("could not alloc output context...");
+            LOGE(TAG, "could not alloc output context...");
             ret = AVERROR_UNKNOWN;
             goto end;
         }
@@ -71,14 +69,14 @@ extern "C" {
             AVStream *in_stream = in_format->streams[i];
             AVStream *out_stream = avformat_new_stream(out_format, in_stream->codec->codec);
             if(!out_stream){
-                LOGE("could not alloc output stream...");
+                LOGE(TAG, "could not alloc output stream...");
                 ret = AVERROR_UNKNOWN;
                 goto end;
             }
             //复制封装格式上下文
             ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
             if(ret < 0){
-                LOGE("could not copy context...");
+                LOGE(TAG, "could not copy context...");
                 goto end;
             }
             out_stream->codec->codec_tag = 0;
@@ -92,14 +90,14 @@ extern "C" {
         if(!(output_format->flags & AVFMT_NOFILE)){
             ret = avio_open(&out_format->pb, live_url, AVIO_FLAG_WRITE);
             if(ret < 0){
-                LOGE("could not open output url '%s'", live_url);
+                LOGE(TAG, "could not open output url '%s'", live_url);
                 goto end;
             }
         }
         //写文件头
         ret = avformat_write_header(out_format, NULL);
         if(ret < 0){
-            LOGE("could not write header...");
+            LOGE(TAG, "could not write header...");
             goto end;
         }
         //获取开始时间
@@ -144,12 +142,12 @@ extern "C" {
             //视频帧计数
             if(packet.stream_index == video_index){
                 frame_index ++;
-                LOGI("write frame = %d", frame_index);
+                LOGI(TAG, "write frame = %d", frame_index);
             }
             //写一帧数据
             ret = av_interleaved_write_frame(out_format, &packet);
             if(ret < 0){
-                LOGE("could not write frame...");
+                LOGE(TAG, "could not write frame...");
                 break;
             }
             //释放包数据内存
