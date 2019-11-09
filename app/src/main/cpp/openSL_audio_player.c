@@ -13,10 +13,9 @@
 #include <SLES/OpenSLES_Android.h>
 #include <android/log.h>
 #include <libavutil/opt.h>
+#include "ffmpeg_jni_define.h"
 
 #define TAG "OpenSLPlayer"
-#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT,##__VA_ARGS__);
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT,##__VA_ARGS__);
 
 //引擎接口
 SLObjectItf engineObject = NULL;
@@ -66,9 +65,9 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *contex
         SLresult result;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, buffer, bufferSize);
         if(result < 0){
-            LOGE("Enqueue error...");
+            LOGE(TAG, "Enqueue error...");
         } else{
-            LOGI("decode frame count=%d", frame_count++);
+            LOGI(TAG, "decode frame count=%d", frame_count++);
         }
     }
 }
@@ -78,27 +77,27 @@ void createEngine() {
     SLresult result;
     //创建引擎
     result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
-    LOGI("slCreateEngine=%d", result);
+    LOGI(TAG, "slCreateEngine=%d", result);
     result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
-    LOGI("engineObject->Realize=%d", result);
+    LOGI(TAG, "engineObject->Realize=%d", result);
     //获取引擎接口
     result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
-    LOGI("engineObject->GetInterface=%d", result);
+    LOGI(TAG, "engineObject->GetInterface=%d", result);
     //创建输出混音器
     result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
-    LOGI("CreateOutputMix=%d", result);
+    LOGI(TAG, "CreateOutputMix=%d", result);
     //关联输出混音器
     result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
-    LOGI("outputMixObject->Realize=%d", result);
+    LOGI(TAG, "outputMixObject->Realize=%d", result);
     //获取reverb接口
     result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
                                               &outputMixEnvironmentalReverb);
-    LOGI("outputMixObject->GetInterface=%d", result);
+    LOGI(TAG, "outputMixObject->GetInterface=%d", result);
     if (SL_RESULT_SUCCESS == result) {
         result = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
                 outputMixEnvironmentalReverb, &reverbSettings);
     }
-    LOGI("SetEnvironmentalReverbProperties=%d", result);
+    LOGI(TAG, "SetEnvironmentalReverbProperties=%d", result);
 }
 
 
@@ -130,37 +129,37 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
                                                 3, ids, req);
-    LOGI("CreateAudioPlayer=%d", result);
+    LOGI(TAG, "CreateAudioPlayer=%d", result);
 
     //关联播放器
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
-    LOGI("bqPlayerObject Realize=%d", result);
+    LOGI(TAG, "bqPlayerObject Realize=%d", result);
 
     //获取播放接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
-    LOGI("GetInterface bqPlayerPlay=%d", result);
+    LOGI(TAG, "GetInterface bqPlayerPlay=%d", result);
 
     //获取缓冲队列接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
                                              &bqPlayerBufferQueue);
-    LOGI("GetInterface bqPlayerBufferQueue=%d", result);
+    LOGI(TAG, "GetInterface bqPlayerBufferQueue=%d", result);
 
     //注册缓冲队列回调
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
-    LOGI("RegisterCallback=%d", result);
+    LOGI(TAG, "RegisterCallback=%d", result);
 
     //获取音效接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
                                              &bqPlayerEffectSend);
-    LOGI("GetInterface effect=%d", result);
+    LOGI(TAG, "GetInterface effect=%d", result);
 
     //获取音量接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
-    LOGI("GetInterface volume=%d", result);
+    LOGI(TAG, "GetInterface volume=%d", result);
 
     //开始播放音乐
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-    LOGI("SetPlayState=%d", result);
+    LOGI(TAG, "SetPlayState=%d", result);
 }
 
 int createAudioPlayer(int *rate, int *channel, const char *file_name) {
@@ -170,13 +169,13 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
 
     //打开音频文件
     if (avformat_open_input(&aFormatCtx, file_name, NULL, NULL) != 0) {
-        LOGE("Couldn't open file:%s\n", file_name);
+        LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1; // Couldn't open file
     }
 
     //寻找stream信息
     if (avformat_find_stream_info(aFormatCtx, NULL) < 0) {
-        LOGE("Couldn't find stream information.");
+        LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
 
@@ -190,7 +189,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
         }
     }
     if (audioStream == -1) {
-        LOGE("Couldn't find audio stream!");
+        LOGE(TAG, "Couldn't find audio stream!");
         return -1;
     }
     //获取解码器context
@@ -203,7 +202,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     }
     //打开解码器
     if (avcodec_open2(aCodecCtx, aCodec, NULL) < 0) {
-        LOGE("Could not open codec.");
+        LOGE(TAG, "Could not open codec.");
         return -1;
     }
     aFrame = av_frame_alloc();
@@ -270,12 +269,11 @@ int releaseAudioPlayer() {
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_playAudio
-        (JNIEnv * env, jclass jclazz, jstring filePath) {
+AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
 
     int rate, channel;
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, NULL);
-    LOGI("file_name=%s", file_name);
+    LOGI(TAG, "file_name=%s", file_name);
 
     // 创建音频解码器
     createAudioPlayer(&rate, &channel, file_name);
@@ -291,8 +289,7 @@ JNIEXPORT void JNICALL Java_com_frank_ffmpeg_AudioPlayer_playAudio
 }
 
 //停止播放，释放相关资源
-JNIEXPORT jint JNICALL Java_com_frank_ffmpeg_AudioPlayer_stop
-        (JNIEnv * env, jclass jclazz) {
+AUDIO_PLAYER_FUNC(void, stop) {
     if (bqPlayerObject != NULL) {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
         bqPlayerObject = NULL;

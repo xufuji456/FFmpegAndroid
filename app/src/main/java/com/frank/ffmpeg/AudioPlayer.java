@@ -18,7 +18,7 @@ public class AudioPlayer {
     //调用OpenSL ES播放
     public native void playAudio(String audioPath);
     //调用OpenSL ES播放
-    public native int stop();
+    public native void stop();
 
     public native static void lameInitDefault();
 
