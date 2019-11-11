@@ -6,28 +6,27 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
+import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 import java.io.File;
 
-public class VideoHandleActivity extends BaseActivity {
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
-    private static final String TAG = VideoHandleActivity.class.getSimpleName();
-    private static final int MSG_BEGIN = 101;
-    private static final int MSG_FINISH = 102;
+public class VideoHandleActivity extends BaseActivity {
 
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
 
     private ProgressBar progressVideo;
     private LinearLayout layoutVideoHandle;
     private int viewId;
+    private FFmpegHandler ffmpegHandler;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
@@ -60,6 +59,7 @@ public class VideoHandleActivity extends BaseActivity {
 
         hideActionBar();
         intView();
+        ffmpegHandler = new FFmpegHandler(mHandler);
     }
 
     private void intView() {
@@ -227,30 +227,16 @@ public class VideoHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        executeFFmpegCmd(commandLine);
+        if (ffmpegHandler != null) {
+            ffmpegHandler.executeFFmpegCmd(commandLine);
+        }
     }
 
-    /**
-     * 执行ffmpeg命令行
-     * @param commandLine commandLine
-     */
-    private void executeFFmpegCmd(final String[] commandLine) {
-        if(commandLine == null) {
-            return;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
         }
-        FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {
-            @Override
-            public void onBegin() {
-                Log.i(TAG, "handle video onBegin...");
-                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
-            }
-
-            @Override
-            public void onEnd(int result) {
-                Log.i(TAG, "handle video onEnd...");
-
-                mHandler.obtainMessage(MSG_FINISH).sendToTarget();
-            }
-        });
     }
 }

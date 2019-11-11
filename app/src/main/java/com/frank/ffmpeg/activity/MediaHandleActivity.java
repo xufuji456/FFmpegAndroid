@@ -11,12 +11,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
 import java.io.File;
+
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_CONTINUE;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
  * 使用ffmpeg进行音视频合成与分离
@@ -28,13 +32,11 @@ public class MediaHandleActivity extends BaseActivity {
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
     private String videoFile;
     private String temp = PATH + File.separator + "temp.mp4";
-    private boolean isMux;
-    private final static int MSG_MUX = 100;
-    private final static int MSG_BEGIN = 101;
-    private final static int MSG_FINISH = 102;
+
     private ProgressBar progressMedia;
     private int viewId;
     private LinearLayout layoutMediaHandle;
+    private FFmpegHandler ffmpegHandler;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
@@ -42,7 +44,7 @@ public class MediaHandleActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what){
-                case MSG_MUX:
+                case MSG_CONTINUE:
                     String audioFile = PATH + File.separator + "tiger.mp3";//tiger.mp3
                     String muxFile = PATH + File.separator + "media-mux.mp4";
 
@@ -67,8 +69,10 @@ public class MediaHandleActivity extends BaseActivity {
                         int mDuration = Math.min(audioDuration, videoDuration);
                         //使用纯视频与音频进行合成
                         String[] commandLine = FFmpegUtil.mediaMux(temp, audioFile, mDuration, muxFile);
-                        executeFFmpegCmd(commandLine);
-                        isMux = false;
+                        if (ffmpegHandler != null) {
+                            ffmpegHandler.isContinue(false);
+                            ffmpegHandler.executeFFmpegCmd(commandLine);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -98,6 +102,7 @@ public class MediaHandleActivity extends BaseActivity {
 
         hideActionBar();
         initView();
+        ffmpegHandler = new FFmpegHandler(mHandler);
     }
 
     private void initView() {
@@ -141,7 +146,9 @@ public class MediaHandleActivity extends BaseActivity {
                     //视频文件有音频,先把纯视频文件抽取出来
                     videoFile = srcFile;
                     commandLine = FFmpegUtil.extractVideo(srcFile, temp);
-                    isMux = true;
+                    if (ffmpegHandler != null) {
+                        ffmpegHandler.isContinue(true);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -157,34 +164,16 @@ public class MediaHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        executeFFmpegCmd(commandLine);
-    }
-
-    /**
-     * 执行ffmpeg命令行
-     * @param commandLine commandLine
-     */
-    private void executeFFmpegCmd(final String[] commandLine) {
-        if(commandLine == null){
-            return;
+        if (ffmpegHandler != null) {
+            ffmpegHandler.executeFFmpegCmd(commandLine);
         }
-        FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {
-            @Override
-            public void onBegin() {
-                Log.i(TAG, "handle media onBegin...");
-                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
-            }
-
-            @Override
-            public void onEnd(int result) {
-                Log.i(TAG, "handle media onEnd...");
-                if(isMux){
-                    mHandler.obtainMessage(MSG_MUX).sendToTarget();
-                }else {
-                    mHandler.obtainMessage(MSG_FINISH).sendToTarget();
-                }
-            }
-        });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
+    }
 }

@@ -1,11 +1,8 @@
 package com.frank.ffmpeg;
 
-public class FFmpegCmd {
+import com.frank.ffmpeg.listener.OnHandleListener;
 
-    public interface OnHandleListener{
-        void onBegin();
-        void onEnd(int result);
-    }
+public class FFmpegCmd {
 
     static{
         System.loadLibrary("media-handle");

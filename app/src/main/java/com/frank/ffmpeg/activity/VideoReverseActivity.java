@@ -5,15 +5,17 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.VideoView;
-import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 import java.io.File;
+
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_TOAST;
 
 /**
  * 先处理视频反序，再视频倒播
@@ -22,7 +24,6 @@ import java.io.File;
 
 public class VideoReverseActivity extends BaseActivity {
 
-    private final static String TAG = VideoReverseActivity.class.getSimpleName();
     private final static String ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
     private String VIDEO_NORMAL_PATH = "";
     private final static String VIDEO_REVERSE_PATH = ROOT_PATH + File.separator + "reverse.mp4";
@@ -30,15 +31,14 @@ public class VideoReverseActivity extends BaseActivity {
     private LinearLayout loading;
     private VideoView videoNormal;
     private VideoView videoReverse;
+    private FFmpegHandler ffmpegHandler;
 
-    private final static int MSG_PLAY = 7777;
-    private final static int MSG_TOAST = 8888;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == MSG_PLAY){
+            if (msg.what == MSG_FINISH){
                 changeVisibility();
                 startPlay();
             }else if (msg.what == MSG_TOAST) {
@@ -59,6 +59,7 @@ public class VideoReverseActivity extends BaseActivity {
         initView();
         initPlayer();
         mHandler.sendEmptyMessageDelayed(MSG_TOAST, 1000);
+        ffmpegHandler = new FFmpegHandler(mHandler);
     }
 
     private void initView() {
@@ -88,28 +89,6 @@ public class VideoReverseActivity extends BaseActivity {
     }
 
     /**
-     * 执行ffmpeg命令行
-     * @param commandLine commandLine
-     */
-    private void executeFFmpegCmd(final String[] commandLine){
-        if(commandLine == null){
-            return;
-        }
-        FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {
-            @Override
-            public void onBegin() {
-                Log.i(TAG, "handle video onBegin...");
-            }
-
-            @Override
-            public void onEnd(int result) {
-                Log.i(TAG, "handle video onEnd...");
-                mHandler.sendEmptyMessage(MSG_PLAY);
-            }
-        });
-    }
-
-    /**
      * 视频反序处理
      */
     private void videoReverse(){
@@ -117,7 +96,9 @@ public class VideoReverseActivity extends BaseActivity {
             return;
         }
         String[] commandLine = FFmpegUtil.reverseVideo(VIDEO_NORMAL_PATH, VIDEO_REVERSE_PATH);
-        executeFFmpegCmd(commandLine);
+        if (ffmpegHandler != null) {
+            ffmpegHandler.executeFFmpegCmd(commandLine);
+        }
     }
 
     @Override
@@ -130,5 +111,13 @@ public class VideoReverseActivity extends BaseActivity {
         VIDEO_NORMAL_PATH = filePath;
         loading.setVisibility(View.VISIBLE);
         videoReverse();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
     }
 }

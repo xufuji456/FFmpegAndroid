@@ -5,18 +5,20 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import java.io.File;
 
 import com.frank.ffmpeg.AudioPlayer;
-import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
+import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.mp3.Mp3Converter;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
+
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
  * 使用ffmpeg处理音频
@@ -25,14 +27,13 @@ import com.frank.ffmpeg.util.FileUtil;
 
 public class AudioHandleActivity extends BaseActivity {
 
-    private final static String TAG = AudioHandleActivity.class.getSimpleName();
     private final static String PATH = Environment.getExternalStorageDirectory().getPath();
     private String appendFile = PATH + File.separator + "test.mp3";
-    private final static int MSG_BEGIN = 311;
-    private final static int MSG_FINISH = 312;
+
     private ProgressBar progressAudio;
     private LinearLayout layoutAudioHandle;
     private int viewId;
+    private FFmpegHandler ffmpegHandler;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler(){
@@ -65,6 +66,7 @@ public class AudioHandleActivity extends BaseActivity {
 
         hideActionBar();
         initView();
+        ffmpegHandler = new FFmpegHandler(mHandler);
     }
 
     private void initView() {
@@ -175,30 +177,17 @@ public class AudioHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        executeFFmpegCmd(commandLine);
+        if (ffmpegHandler != null) {
+            ffmpegHandler.executeFFmpegCmd(commandLine);
+        }
     }
 
-    /**
-     * 执行ffmpeg命令行
-     * @param commandLine commandLine
-     */
-    private void executeFFmpegCmd(final String[] commandLine) {
-        if(commandLine == null) {
-            return;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
         }
-        FFmpegCmd.execute(commandLine, new FFmpegCmd.OnHandleListener() {
-            @Override
-            public void onBegin() {
-                Log.i(TAG, "handle audio onBegin...");
-                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
-            }
-
-            @Override
-            public void onEnd(int result) {
-                Log.i(TAG, "handle audio onEnd...");
-                mHandler.obtainMessage(MSG_FINISH).sendToTarget();
-            }
-        });
     }
 
 }
