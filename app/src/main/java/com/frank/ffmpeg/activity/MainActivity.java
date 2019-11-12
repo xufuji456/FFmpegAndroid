@@ -3,13 +3,8 @@ package com.frank.ffmpeg.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.BounceInterpolator;
 
 import com.frank.ffmpeg.R;
-import com.frank.ffmpeg.floating.FloatPlayerView;
-import com.frank.ffmpeg.floating.FloatWindow;
-import com.frank.ffmpeg.floating.MoveType;
-import com.frank.ffmpeg.floating.Screen;
 
 /**
  * 使用ffmpeg进行音视频处理入口
@@ -35,8 +30,7 @@ public class MainActivity extends BaseActivity {
                 R.id.btn_push,
                 R.id.btn_live,
                 R.id.btn_filter,
-                R.id.btn_reverse,
-                R.id.btn_floating
+                R.id.btn_reverse
         );
     }
 
@@ -68,35 +62,10 @@ public class MainActivity extends BaseActivity {
             case R.id.btn_reverse://视频倒播
                 intent.setClass(MainActivity.this, VideoReverseActivity.class);
                 break;
-            case R.id.btn_floating://悬浮窗播放
-                floatingToPlay();
-                return;
             default:
                 break;
         }
         startActivity(intent);
-    }
-
-    /**
-     * 悬浮窗播放
-     */
-    private void floatingToPlay(){
-        if (FloatWindow.get() != null) {
-            return;
-        }
-        FloatPlayerView floatPlayerView = new FloatPlayerView(getApplicationContext());
-        FloatWindow
-                .with(getApplicationContext())
-                .setView(floatPlayerView)
-                .setWidth(Screen.width, 0.4f)
-                .setHeight(Screen.width, 0.4f)
-                .setX(Screen.width, 0.8f)
-                .setY(Screen.height, 0.3f)
-                .setMoveType(MoveType.slide)
-                .setFilter(false)
-                .setMoveStyle(500, new BounceInterpolator())
-                .build();
-        FloatWindow.get().show();
     }
 
     @Override
