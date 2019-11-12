@@ -29,7 +29,6 @@ public class VideoReverseActivity extends BaseActivity {
     private final static String VIDEO_REVERSE_PATH = ROOT_PATH + File.separator + "reverse.mp4";
 
     private LinearLayout loading;
-    private VideoView videoNormal;
     private VideoView videoReverse;
     private FFmpegHandler ffmpegHandler;
 
@@ -64,27 +63,23 @@ public class VideoReverseActivity extends BaseActivity {
 
     private void initView() {
         loading = getView(R.id.layout_loading);
-        videoNormal = getView(R.id.video_normal);
         videoReverse = getView(R.id.video_reverse);
         loading.setVisibility(View.GONE);
     }
 
     private void changeVisibility(){
         loading.setVisibility(View.GONE);
-        videoNormal.setVisibility(View.VISIBLE);
         videoReverse.setVisibility(View.VISIBLE);
     }
 
     private void initPlayer(){
-        videoNormal.setVideoPath(VIDEO_NORMAL_PATH);
         videoReverse.setVideoPath(VIDEO_REVERSE_PATH);
     }
 
     /**
-     * 开始视频正序、反序播放
+     * 开始视频倒播
      */
     private void startPlay(){
-        videoNormal.start();
         videoReverse.start();
     }
 

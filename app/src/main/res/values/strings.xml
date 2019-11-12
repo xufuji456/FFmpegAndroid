@@ -68,5 +68,6 @@
     <string name="please_click_select">请点击右上角菜单选择文件</string>
     <string name="wrong_audio_format">非音频文件</string>
     <string name="wrong_video_format">非视频文件</string>
+    <string name="converting_video">正在反转视频...</string>
 
 </resources>
