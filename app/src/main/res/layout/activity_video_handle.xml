@@ -80,13 +80,6 @@
                 android:text="@string/video_from_photo"/>
 
             <Button
-                android:id="@+id/btn_play_video"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/video_play"/>
-
-            <Button
                 android:id="@+id/btn_multi_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

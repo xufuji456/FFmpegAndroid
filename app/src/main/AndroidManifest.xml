@@ -33,10 +33,6 @@
         <activity android:name=".activity.MediaHandleActivity" />
         <!-- 视频处理 -->
         <activity android:name=".activity.VideoHandleActivity" />
-        <!-- 视频解码播放 -->
-        <activity
-            android:name=".activity.VideoPlayerActivity"
-            android:screenOrientation="landscape" />
         <!-- 音视频解码播放 -->
         <activity
             android:name=".activity.MediaPlayerActivity"

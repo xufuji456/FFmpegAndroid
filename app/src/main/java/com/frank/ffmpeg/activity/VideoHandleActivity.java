@@ -1,7 +1,6 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -74,7 +73,6 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_generate_gif,
                 R.id.btn_screen_record,
                 R.id.btn_combine_video,
-                R.id.btn_play_video,
                 R.id.btn_multi_video,
                 R.id.btn_reverse_video,
                 R.id.btn_denoise_video,
@@ -175,11 +173,6 @@ public class VideoHandleActivity extends BaseActivity {
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
                 commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
                 break;
-            case R.id.btn_play_video://视频解码播放
-                Intent playIntent = new Intent(VideoHandleActivity.this, VideoPlayerActivity.class);
-                playIntent.putExtra("videoHandlePath", srcFile);
-                startActivity(playIntent);
-                return;
             case R.id.btn_multi_video://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";
