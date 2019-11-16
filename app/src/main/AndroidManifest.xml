@@ -55,10 +55,9 @@
         <!--视频倒播-->
         <activity android:name=".activity.VideoReverseActivity"
             android:screenOrientation="landscape" />
-        <!--申请悬浮窗权限-->
-        <activity android:name=".floating.FloatActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        <!--视频播放拖动预览-->
+        <activity android:name=".activity.VideoPreviewActivity"
+            android:screenOrientation="portrait" />
 
     </application>
 
