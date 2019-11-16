@@ -19,7 +19,9 @@ public class HardwareDecode {
 
     private final static long DEQUEUE_TIME = 10 * 1000;
 
-    private final static long SLEEP_TIME = 10;
+    private final static int RATIO_1080 = 1080;
+    private final static int RATIO_480 = 480;
+    private final static int RATIO_240 = 240;
 
     private Surface mSurface;
 
@@ -88,6 +90,30 @@ public class HardwareDecode {
             }
         }
 
+        private void setPreviewRatio(MediaFormat mediaFormat) {
+            if (mediaFormat == null) {
+                return;
+            }
+            int videoWidth = mediaFormat.getInteger(MediaFormat.KEY_WIDTH);
+            int videoHeight = mediaFormat.getInteger(MediaFormat.KEY_HEIGHT);
+            int previewRatio;
+            if (videoWidth >= RATIO_1080) {
+                previewRatio = 10;
+            } else if (videoWidth >= RATIO_480) {
+                previewRatio = 6;
+            } else if (videoWidth >= RATIO_240) {
+                previewRatio = 4;
+            } else {
+                previewRatio = 1;
+            }
+            int previewWidth = videoWidth / previewRatio;
+            int previewHeight = videoHeight / previewRatio;
+            Log.e(TAG, "videoWidth=" + videoWidth +"--videoHeight=" + videoHeight
+                    + "--previewWidth=" + previewWidth + "--previewHeight=" + previewHeight);
+            mediaFormat.setInteger(MediaFormat.KEY_WIDTH, previewWidth);
+            mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, previewHeight);
+        }
+
         @Override
         public void run() {
             super.run();
@@ -114,24 +140,20 @@ public class HardwareDecode {
                 if (mCallback != null) {
                     mCallback.onData(duration);
                 }
-                Log.e(TAG, "width=" + width + "--height=" + height + "--duration==" + duration);
+                Log.i(TAG, "width=" + width + "--height=" + height + "--duration==" + duration);
 
-                //TODO:重新设置分辨率
-                mediaFormat.setInteger(MediaFormat.KEY_WIDTH, width/10);
-                mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, height/10);
-                Log.e(TAG, "mediaFormat=" + mediaFormat.toString());
+                //重新设置预览分辨率
+                setPreviewRatio(mediaFormat);
+                Log.i(TAG, "mediaFormat=" + mediaFormat.toString());
 
                 //配置MediaCodec，并且start
                 mediaCodec = MediaCodec.createDecoderByType(mimeType);
                 mediaCodec.configure(mediaFormat, mSurface, null, 0);
                 mediaCodec.start();
-                long startTime = System.currentTimeMillis();
                 MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
                 ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
 
-                boolean isEof = false;
-
-                while (!isInterrupted() && !isEof) {
+                while (!isInterrupted()) {
                     //从缓冲区取出一个缓冲块，如果当前无可用缓冲块，返回inputIndex<0
                     int inputIndex = mediaCodec.dequeueInputBuffer(DEQUEUE_TIME);
                     if (inputIndex >= 0) {
@@ -139,7 +161,6 @@ public class HardwareDecode {
                         int sampleSize = mediaExtractor.readSampleData(inputBuffer, 0);
                         //入队列
                         if (sampleSize < 0) {
-                            isEof = true;
                             mediaCodec.queueInputBuffer(inputIndex,0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                         } else {
                             mediaCodec.queueInputBuffer(inputIndex, 0, sampleSize, mediaExtractor.getSampleTime(), 0);
@@ -151,31 +172,18 @@ public class HardwareDecode {
                     int outputIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, DEQUEUE_TIME);
                     switch (outputIndex) {
                         case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                            Log.e(TAG, "output format changed...");
+                            Log.i(TAG, "output format changed...");
                             break;
                         case MediaCodec.INFO_TRY_AGAIN_LATER:
                             Log.i(TAG, "try again later...");
                             break;
                         case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                            Log.e(TAG, "output buffer changed...");
+                            Log.i(TAG, "output buffer changed...");
                             break;
                         default:
-//                            while (bufferInfo.presentationTimeUs > (System.currentTimeMillis() - startTime)*1000) {
-//                                try {
-//                                    Thread.sleep(SLEEP_TIME);
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                    Log.e(TAG, "error=" + e.toString());
-//                                }
-//                            }
                             //渲染到surface
                             mediaCodec.releaseOutputBuffer(outputIndex, true);
                             break;
-                    }
-
-                    if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                        isEof = true;
-                        Log.e(TAG, "is end of stream...");
                     }
                 }
             } catch (Exception e) {
