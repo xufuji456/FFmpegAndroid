@@ -19,15 +19,6 @@
         android:layout_height="240dp"
         android:layout_centerInParent="true"/>
 
-    <SurfaceView
-        android:id="@+id/surface_view_other"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="100dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/surface_view"
-        android:visibility="gone"/>
-
     <SeekBar
         android:id="@+id/preview_bar"
         android:layout_width="match_parent"

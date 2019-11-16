@@ -6,7 +6,6 @@ import android.media.MediaFormat;
 import android.util.Log;
 import android.view.Surface;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -51,9 +50,19 @@ public class HardwareDecode {
         }
     }
 
+    public void release() {
+        if (videoDecodeThread != null && !videoDecodeThread.isInterrupted()) {
+            videoDecodeThread.interrupt();
+            videoDecodeThread.release();
+            videoDecodeThread = null;
+        }
+    }
+
     private class VideoDecodeThread extends Thread {
 
         private MediaExtractor mediaExtractor;
+
+        private MediaCodec mediaCodec;
 
         void seekTo(long seekPosition) {
             try {
@@ -62,6 +71,20 @@ public class HardwareDecode {
                 }
             } catch (IllegalStateException e) {
                 Log.e(TAG, "seekTo error=" + e.toString());
+            }
+        }
+
+        void release() {
+            try {
+                if (mediaCodec != null) {
+                    mediaCodec.stop();
+                    mediaCodec.release();
+                }
+                if (mediaExtractor != null) {
+                    mediaExtractor.release();
+                }
+            }catch (Exception e) {
+                Log.e(TAG, "release error=" + e.toString());
             }
         }
 
@@ -99,7 +122,7 @@ public class HardwareDecode {
                 Log.e(TAG, "mediaFormat=" + mediaFormat.toString());
 
                 //配置MediaCodec，并且start
-                MediaCodec mediaCodec = MediaCodec.createDecoderByType(mimeType);
+                mediaCodec = MediaCodec.createDecoderByType(mimeType);
                 mediaCodec.configure(mediaFormat, mSurface, null, 0);
                 mediaCodec.start();
                 long startTime = System.currentTimeMillis();
@@ -137,11 +160,6 @@ public class HardwareDecode {
                             Log.e(TAG, "output buffer changed...");
                             break;
                         default:
-//                            long time = (System.currentTimeMillis()-startTime);
-//                            if (time > 50) {
-//                                Log.e(TAG, "pts=" + bufferInfo.presentationTimeUs + "--time=" + time);
-//                            }
-//                            startTime = System.currentTimeMillis();
 //                            while (bufferInfo.presentationTimeUs > (System.currentTimeMillis() - startTime)*1000) {
 //                                try {
 //                                    Thread.sleep(SLEEP_TIME);
@@ -160,14 +178,9 @@ public class HardwareDecode {
                         Log.e(TAG, "is end of stream...");
                     }
                 }
-
-                mediaCodec.stop();
-                mediaCodec.release();
-                mediaExtractor.release();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "setDataSource error=" + e.toString());
             }
-
         }
     }
 
