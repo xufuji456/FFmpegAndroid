@@ -6,26 +6,16 @@
     tools:context=".activity.VideoPreviewActivity">
 
     <SurfaceView
-        android:id="@+id/surface_preview"
-        android:layout_width="64dp"
-        android:layout_height="48dp"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginEnd="50dp" />
-
-    <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="320dp"
         android:layout_height="240dp"
         android:layout_centerInParent="true"/>
 
-    <SeekBar
-        android:id="@+id/preview_bar"
+    <com.frank.ffmpeg.view.VideoPreviewBar
+        android:id="@+id/preview_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="40dp"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

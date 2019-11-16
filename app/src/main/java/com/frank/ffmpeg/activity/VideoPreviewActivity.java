@@ -9,10 +9,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.SeekBar;
 
 import com.frank.ffmpeg.R;
-import com.frank.ffmpeg.hardware.HardwareDecode;
+import com.frank.ffmpeg.view.VideoPreviewBar;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ import java.io.IOException;
  * Created by frank on 2019/11/16.
  */
 
-public class VideoPreviewActivity extends BaseActivity implements HardwareDecode.OnDataCallback {
+public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBar.PreviewBarCallback {
 
     private final static String TAG = VideoPreviewActivity.class.getSimpleName();
 
@@ -31,13 +30,8 @@ public class VideoPreviewActivity extends BaseActivity implements HardwareDecode
 //        videoPath = "https://www.apple.com/105/media/cn/mac/family/2018/46c4b917_abfd_45a3_9b51_4e3054191797" +
 //                "/films/bruce/mac-bruce-tpl-cn-2018_1280x720h.mp4";
 
-    private SeekBar previewBar;
-    private  HardwareDecode hardwareDecode;
-    private long duration;
-
     private MediaPlayer mediaPlayer;
-    private SurfaceView surfaceVideo;
-    private SurfaceView surfacePreView;
+    private VideoPreviewBar videoPreviewBar;
 
     @Override
     int getLayoutId() {
@@ -49,17 +43,13 @@ public class VideoPreviewActivity extends BaseActivity implements HardwareDecode
         super.onCreate(savedInstanceState);
 
         initView();
-        setListener();
     }
 
     private void initView() {
-        previewBar = getView(R.id.preview_bar);
-
-        surfaceVideo = getView(R.id.surface_view);
+        SurfaceView surfaceVideo = getView(R.id.surface_view);
         setPlayCallback(videoPath, surfaceVideo);
-
-        surfacePreView = getView(R.id.surface_preview);
-        setPreviewCallback(videoPath, surfacePreView);
+        videoPreviewBar = getView(R.id.preview_video);
+        videoPreviewBar.init(videoPath, this);
     }
 
     private void setPlayCallback(final String filePath, SurfaceView surfaceView) {
@@ -110,70 +100,6 @@ public class VideoPreviewActivity extends BaseActivity implements HardwareDecode
         }
     }
 
-    private void setPreviewCallback(final String filePath, SurfaceView surfaceView) {
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                doPreview(filePath, holder.getSurface());
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-
-            }
-        });
-    }
-
-    private void doPreview(String filePath, Surface surface) {
-        if (surface == null || TextUtils.isEmpty(filePath)) {
-            return;
-        }
-        releasePreviewer();
-        hardwareDecode = new HardwareDecode(surface, filePath, VideoPreviewActivity.this);
-        hardwareDecode.decode();
-    }
-
-    private void setListener() {
-        previewBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (!fromUser) {
-                    return;
-                }
-                previewBar.setProgress(progress);
-                if (hardwareDecode != null && progress < duration) {
-                    hardwareDecode.seekTo(progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //TODO
-                if (mediaPlayer != null) {
-                    Log.e(TAG, "onStop progress=" + seekBar.getProgress());
-                    mediaPlayer.seekTo(seekBar.getProgress()/1000);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onData(long duration) {
-        Log.e(TAG,"duration=" + duration);
-        this.duration = duration;
-        previewBar.setMax((int) duration);
-    }
-
     @Override
     void onViewClick(View view) {
 
@@ -181,10 +107,15 @@ public class VideoPreviewActivity extends BaseActivity implements HardwareDecode
 
     @Override
     void onSelectedFile(String filePath) {
-//        doPlay(filePath, surfaceVideo.getHolder().getSurface());
-//        doPreview(filePath, surfacePreView.getHolder().getSurface());
-        setPlayCallback(filePath, surfaceVideo);
-        setPreviewCallback(filePath, surfacePreView);
+
+    }
+
+    @Override
+    public void onStopTracking(long progress) {
+        if (mediaPlayer != null) {
+            Log.e(TAG, "onStopTracking progress=" + progress);
+            mediaPlayer.seekTo((int) (progress / 1000));
+        }
     }
 
     private void releasePlayer() {
@@ -195,18 +126,13 @@ public class VideoPreviewActivity extends BaseActivity implements HardwareDecode
         }
     }
 
-    private void releasePreviewer() {
-        if (hardwareDecode != null) {
-            hardwareDecode.release();
-            hardwareDecode = null;
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        releasePreviewer();
         releasePlayer();
+        if (videoPreviewBar != null) {
+            videoPreviewBar.release();
+        }
     }
 
 }
