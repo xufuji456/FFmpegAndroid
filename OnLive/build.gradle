@@ -39,14 +39,14 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.preference:preference:1.1.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-rc01'
+    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
+    implementation "androidx.preference:preference:$rootProject.preferenceVersion"
+    implementation "androidx.annotation:annotation:$rootProject.annotationVersion"
+    implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerviewVersion"
 
-    implementation 'com.squareup:otto:1.3.8'
+    implementation "com.squareup:otto:$rootProject.ottoVersion"
 
-    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
-    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
+    implementation "tv.danmaku.ijk.media:ijkplayer-java:$rootProject.ijkVersion"
+    implementation "tv.danmaku.ijk.media:ijkplayer-exo:$rootProject.ijkVersion"
 
 }
