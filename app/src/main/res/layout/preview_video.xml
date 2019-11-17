@@ -2,21 +2,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/txt_video_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginStart="20dp"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:id="@+id/txt_video_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:textColor="@color/colorPrimaryDark"/>
+
     <SeekBar
         android:id="@+id/preview_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="40dp"
-        android:layout_alignParentBottom="true"/>
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_above="@+id/txt_video_progress"/>
 
     <TextureView
         android:id="@+id/texture_preview"
         android:layout_width="80dp"
         android:layout_height="60dp"
         android:layout_above="@+id/preview_bar"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp" />
 

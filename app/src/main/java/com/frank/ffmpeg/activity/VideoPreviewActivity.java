@@ -1,8 +1,11 @@
 package com.frank.ffmpeg.activity;
 
+import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -32,6 +35,22 @@ public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBa
 
     private MediaPlayer mediaPlayer;
     private VideoPreviewBar videoPreviewBar;
+    private final static int TIME_UPDATE = 1000;
+    private final static int MSG_UPDATE = 1234;
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == MSG_UPDATE) {
+                if (videoPreviewBar != null && mediaPlayer != null) {
+                    videoPreviewBar.updateProgress(mediaPlayer.getCurrentPosition());
+                }
+                mHandler.sendEmptyMessageDelayed(MSG_UPDATE, TIME_UPDATE);
+            }
+        }
+    };
 
     @Override
     int getLayoutId() {
@@ -80,6 +99,7 @@ public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBa
             public void onPrepared(MediaPlayer mp) {
                 Log.e(TAG, "onPrepared...");
                 mediaPlayer.start();
+                mHandler.sendEmptyMessage(MSG_UPDATE);
             }
         });
     }
@@ -114,7 +134,7 @@ public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBa
     public void onStopTracking(long progress) {
         if (mediaPlayer != null) {
             Log.e(TAG, "onStopTracking progress=" + progress);
-            mediaPlayer.seekTo((int) (progress / 1000));
+            mediaPlayer.seekTo((int) progress);
         }
     }
 

@@ -11,9 +11,11 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.hardware.HardwareDecode;
+import com.frank.ffmpeg.util.TimeUtil;
 
 /**
  * 视频拖动实时预览的控件
@@ -30,9 +32,13 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
     private HardwareDecode hardwareDecode;
 
-    private long duration;
+    private int duration;
 
     private PreviewBarCallback mPreviewBarCallback;
+
+    private TextView txtVideoProgress;
+
+    private TextView txtVideoDuration;
 
     public VideoPreviewBar(Context context) {
         super(context);
@@ -48,6 +54,8 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
         View view = LayoutInflater.from(context).inflate(R.layout.preview_video, this);
         previewBar = view.findViewById(R.id.preview_bar);
         texturePreView = view.findViewById(R.id.texture_preview);
+        txtVideoProgress = view.findViewById(R.id.txt_video_progress);
+        txtVideoDuration = view.findViewById(R.id.txt_video_duration);
         setListener();
     }
 
@@ -93,7 +101,8 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
                 }
                 previewBar.setProgress(progress);
                 if (hardwareDecode != null && progress < duration) {
-                    hardwareDecode.seekTo(progress);
+                    // us to ms
+                    hardwareDecode.seekTo(progress * 1000);
                 }
             }
 
@@ -113,14 +122,29 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
     @Override
     public void onData(long duration) {
+        //us to ms
+        final int durationMs = (int) (duration / 1000);
         Log.i(TAG, "duration=" + duration);
-        this.duration = duration;
-        previewBar.setMax((int) duration);
+        this.duration = durationMs;
+        post(new Runnable() {
+            @Override
+            public void run() {
+                previewBar.setMax(durationMs);
+                txtVideoDuration.setText(TimeUtil.getVideoTime(durationMs));
+            }
+        });
     }
 
     public void init(String videoPath, PreviewBarCallback previewBarCallback) {
         this.mPreviewBarCallback = previewBarCallback;
         setPreviewCallback(videoPath, texturePreView);
+    }
+
+    public void updateProgress(int progress) {
+        if (progress >= 0 && progress <= duration) {
+            txtVideoProgress.setText(TimeUtil.getVideoTime(progress));
+            previewBar.setProgress(progress);
+        }
     }
 
     public void release() {
