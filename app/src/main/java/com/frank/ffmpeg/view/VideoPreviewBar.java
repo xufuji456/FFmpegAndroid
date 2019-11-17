@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.hardware.HardwareDecode;
+import com.frank.ffmpeg.util.ScreenUtil;
 import com.frank.ffmpeg.util.TimeUtil;
 
 /**
@@ -40,6 +41,14 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
     private TextView txtVideoDuration;
 
+    private boolean isShowing;
+
+    private int screenWidth;
+
+    private int moveEndPos = 0;
+
+    private int previewHalfWidth;
+
     public VideoPreviewBar(Context context) {
         super(context);
         initView(context);
@@ -57,6 +66,23 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
         txtVideoProgress = view.findViewById(R.id.txt_video_progress);
         txtVideoDuration = view.findViewById(R.id.txt_video_duration);
         setListener();
+        screenWidth = ScreenUtil.getScreenWidth(context);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (moveEndPos == 0) {
+            int previewWidth = texturePreView.getWidth();
+            previewHalfWidth = previewWidth / 2;
+            int marginEnd = 0;
+            MarginLayoutParams layoutParams = (MarginLayoutParams) texturePreView.getLayoutParams();
+            if (layoutParams != null) {
+                marginEnd = layoutParams.getMarginEnd();
+            }
+            moveEndPos = screenWidth - previewWidth - marginEnd;
+            Log.i(TAG, "previewWidth=" + previewWidth);
+        }
     }
 
     private void setPreviewCallback(final String filePath, TextureView texturePreView) {
@@ -104,15 +130,26 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
                     // us to ms
                     hardwareDecode.seekTo(progress * 1000);
                 }
+                int percent = progress * screenWidth / duration;
+                if (percent > previewHalfWidth && percent < moveEndPos && texturePreView != null) {
+                    texturePreView.setTranslationX(percent - previewHalfWidth);
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                if (!isShowing  && texturePreView != null) {
+                    isShowing = true;
+                    texturePreView.setVisibility(VISIBLE);
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (isShowing  && texturePreView != null) {
+                    isShowing = false;
+                    texturePreView.setVisibility(GONE);
+                }
                 if (mPreviewBarCallback != null) {
                     mPreviewBarCallback.onStopTracking(seekBar.getProgress());
                 }
@@ -131,6 +168,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
             public void run() {
                 previewBar.setMax(durationMs);
                 txtVideoDuration.setText(TimeUtil.getVideoTime(durationMs));
+                texturePreView.setVisibility(GONE);
             }
         });
     }

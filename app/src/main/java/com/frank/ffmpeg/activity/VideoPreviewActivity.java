@@ -97,7 +97,7 @@ public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBa
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                Log.e(TAG, "onPrepared...");
+                Log.i(TAG, "onPrepared...");
                 mediaPlayer.start();
                 mHandler.sendEmptyMessage(MSG_UPDATE);
             }
@@ -133,7 +133,7 @@ public class VideoPreviewActivity extends BaseActivity implements VideoPreviewBa
     @Override
     public void onStopTracking(long progress) {
         if (mediaPlayer != null) {
-            Log.e(TAG, "onStopTracking progress=" + progress);
+            Log.i(TAG, "onStopTracking progress=" + progress);
             mediaPlayer.seekTo((int) progress);
         }
     }
