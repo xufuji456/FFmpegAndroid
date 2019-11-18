@@ -31,17 +31,15 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
     private SeekBar previewBar;
 
-    private HardwareDecode hardwareDecode;
-
-    private int duration;
-
-    private PreviewBarCallback mPreviewBarCallback;
-
     private TextView txtVideoProgress;
 
     private TextView txtVideoDuration;
 
-    private boolean isShowing;
+    private HardwareDecode hardwareDecode;
+
+    private PreviewBarCallback mPreviewBarCallback;
+
+    private int duration;
 
     private int screenWidth;
 
@@ -138,8 +136,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (!isShowing  && texturePreView != null) {
-                    isShowing = true;
+                if (texturePreView != null) {
                     texturePreView.setVisibility(VISIBLE);
                 }
                 if (hardwareDecode != null) {
@@ -149,8 +146,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (isShowing  && texturePreView != null) {
-                    isShowing = false;
+                if (texturePreView != null) {
                     texturePreView.setVisibility(GONE);
                 }
                 if (mPreviewBarCallback != null) {
