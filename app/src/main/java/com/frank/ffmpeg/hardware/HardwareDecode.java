@@ -3,6 +3,7 @@ package com.frank.ffmpeg.hardware;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
 
@@ -18,6 +19,7 @@ public class HardwareDecode {
     private final static String TAG = HardwareDecode.class.getSimpleName();
 
     private final static long DEQUEUE_TIME = 10 * 1000;
+    private final static int SLEEP_TIME = 10;
 
     private final static int RATIO_1080 = 1080;
     private final static int RATIO_480 = 480;
@@ -52,6 +54,12 @@ public class HardwareDecode {
         }
     }
 
+    public void setPreviewing(boolean previewing) {
+        if (videoDecodeThread != null) {
+            videoDecodeThread.setPreviewing(previewing);
+        }
+    }
+
     public void release() {
         if (videoDecodeThread != null && !videoDecodeThread.isInterrupted()) {
             videoDecodeThread.interrupt();
@@ -65,6 +73,12 @@ public class HardwareDecode {
         private MediaExtractor mediaExtractor;
 
         private MediaCodec mediaCodec;
+
+        private boolean isPreviewing;
+
+        void setPreviewing(boolean previewing) {
+            this.isPreviewing = previewing;
+        }
 
         void seekTo(long seekPosition) {
             try {
@@ -90,6 +104,10 @@ public class HardwareDecode {
             }
         }
 
+        /**
+         * 根据原分辨率大小动态设置预览分辨率
+         * @param mediaFormat mediaFormat
+         */
         private void setPreviewRatio(MediaFormat mediaFormat) {
             if (mediaFormat == null) {
                 return;
@@ -154,6 +172,10 @@ public class HardwareDecode {
                 ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
 
                 while (!isInterrupted()) {
+                    if (!isPreviewing) {
+                        SystemClock.sleep(SLEEP_TIME);
+                        continue;
+                    }
                     //从缓冲区取出一个缓冲块，如果当前无可用缓冲块，返回inputIndex<0
                     int inputIndex = mediaCodec.dequeueInputBuffer(DEQUEUE_TIME);
                     if (inputIndex >= 0) {

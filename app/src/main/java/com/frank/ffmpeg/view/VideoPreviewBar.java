@@ -142,6 +142,9 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
                     isShowing = true;
                     texturePreView.setVisibility(VISIBLE);
                 }
+                if (hardwareDecode != null) {
+                    hardwareDecode.setPreviewing(true);
+                }
             }
 
             @Override
@@ -152,6 +155,9 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
                 }
                 if (mPreviewBarCallback != null) {
                     mPreviewBarCallback.onStopTracking(seekBar.getProgress());
+                }
+                if (hardwareDecode != null) {
+                    hardwareDecode.setPreviewing(false);
                 }
             }
         });
