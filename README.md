@@ -33,9 +33,9 @@ android端基于FFmpeg库的使用。<br>
 - #### IjkPlayer的RTSP超低延时直播
 - #### IjkPlayer的RTSP多路投屏直播
 
-左边是ffplay客户端拉流播放，中间是web网页播放：
+拖动进度条预览视频：
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/live.gif)
+![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/mp4/preview.mp4)
 
 视频添加文字水印（文字白色背景可以改为透明）：
 

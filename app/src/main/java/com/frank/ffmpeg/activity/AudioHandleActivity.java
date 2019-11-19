@@ -129,7 +129,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
                 break;
-            case R.id.btn_mix://混合
+            case R.id.btn_mix://混音
                 if (!FileUtil.checkFileExist(appendFile)){
                     return;
                 }
