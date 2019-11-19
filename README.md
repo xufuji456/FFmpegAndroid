@@ -29,13 +29,14 @@ android端基于FFmpeg库的使用。<br>
 - #### OpenGL+GPUImage滤镜
 - #### FFmpeg的AVFilter滤镜
 - #### 使用mp3lame库进行mp3转码
+- #### 视频拖动实时预览
 
 - #### IjkPlayer的RTSP超低延时直播
 - #### IjkPlayer的RTSP多路投屏直播
 
-拖动进度条预览视频：
+视频拖动进度条小图预览：
 
-![视频](https://github.com/xufuji456/FFmpegAndroid/blob/master/mp4/preview.mp4)
+![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
 视频添加文字水印（文字白色背景可以改为透明）：
 
