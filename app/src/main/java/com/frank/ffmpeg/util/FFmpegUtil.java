@@ -173,14 +173,17 @@ public class FFmpegUtil {
      * @param startTime 开始时间
      * @param duration 截取时长
      * @param targetFile 目标文件
+     * @param resolution 分辨率
+     * @param frameRate 帧率
      * @return Gif文件
      */
     @SuppressLint("DefaultLocale")
-    public static  String[] generateGif(String srcFile, int startTime, int duration, String targetFile){
-        //String screenShotCmd = "ffmpeg -i %s -vframes %d -f gif %s";
-        String screenShotCmd = "ffmpeg -i %s -ss %d -t %d -s 320x240 -f gif %s";
-        screenShotCmd = String.format(screenShotCmd, srcFile, startTime, duration, targetFile);
-        return screenShotCmd.split(" ");//以空格分割为字符串数组
+    public static  String[] generateGif(String srcFile, int startTime, int duration,
+                                        String resolution, int frameRate, String targetFile){
+        String generateGifCmd = "ffmpeg -i %s -ss %d -t %d -s %s -r %d -f gif %s";
+        generateGifCmd = String.format(generateGifCmd, srcFile, startTime, duration,
+                resolution, frameRate, targetFile);
+        return generateGifCmd.split(" ");//以空格分割为字符串数组
     }
 
     /**

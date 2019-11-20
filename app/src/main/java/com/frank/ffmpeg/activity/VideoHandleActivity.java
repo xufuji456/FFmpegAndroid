@@ -156,7 +156,10 @@ public class VideoHandleActivity extends BaseActivity {
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";
                 int gifStart = 30;
                 int gifDuration = 5;
-                commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration, Video2Gif);
+                String resolution = "720x1280";//240x320、480x640、1080x1920
+                int frameRate = 10;
+                commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration,
+                        resolution, frameRate, Video2Gif);
                 break;
             case R.id.btn_screen_record://屏幕录制
 //                String screenRecord = PATH + File.separator + "screenRecord.mp4";
