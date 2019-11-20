@@ -144,7 +144,9 @@ public class VideoHandleActivity extends BaseActivity {
                 //1、图片
                 String photo = PATH + File.separator + "launcher.png";
                 String photoMark = PATH + File.separator + "photoMark.mp4";
-                commandLine = FFmpegUtil.addWaterMark(srcFile, photo, photoMark);
+                String mResolution = "720x1280";
+                int bitRate = 1024;
+                commandLine = FFmpegUtil.addWaterMark(srcFile, photo, mResolution, bitRate, photoMark);
                 //2、文字
 //                String text = "Hello,FFmpeg";
 //                String textPath = PATH + File.separator + "text.jpg";

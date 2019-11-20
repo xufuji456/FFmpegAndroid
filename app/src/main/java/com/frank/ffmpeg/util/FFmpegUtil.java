@@ -162,9 +162,10 @@ public class FFmpegUtil {
      * @param targetFile 目标文件
      * @return 添加水印后的文件
      */
-    public static  String[] addWaterMark(String srcFile, String waterMark, String targetFile){
-        String waterMarkCmd = "ffmpeg -i %s -i %s -filter_complex overlay=0:0 %s";
-        waterMarkCmd = String.format(waterMarkCmd, srcFile, waterMark, targetFile);
+    public static  String[] addWaterMark(String srcFile, String waterMark, String resolution, int bitRate, String targetFile){
+        String mBitRate = String.valueOf(bitRate) + "k";
+        String waterMarkCmd = "ffmpeg -i %s -i %s -s %s -b:v %s -filter_complex overlay=0:0 %s";
+        waterMarkCmd = String.format(waterMarkCmd, srcFile, waterMark, resolution, mBitRate, targetFile);
         return waterMarkCmd.split(" ");//以空格分割为字符串数组
     }
 
