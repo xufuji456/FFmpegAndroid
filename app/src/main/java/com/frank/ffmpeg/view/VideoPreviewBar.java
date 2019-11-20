@@ -175,7 +175,23 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
         });
     }
 
+    private void checkArgument(String videoPath) {
+        if (texturePreView == null) {
+            throw new IllegalStateException("Must init TextureView first...");
+        }
+        if (videoPath == null || videoPath.isEmpty()) {
+            throw new IllegalStateException("videoPath is empty...");
+        }
+    }
+
     public void init(String videoPath, PreviewBarCallback previewBarCallback) {
+        checkArgument(videoPath);
+        this.mPreviewBarCallback = previewBarCallback;
+        doPreview(videoPath, new Surface(texturePreView.getSurfaceTexture()));
+    }
+
+    public void initDefault(String videoPath, PreviewBarCallback previewBarCallback) {
+        checkArgument(videoPath);
         this.mPreviewBarCallback = previewBarCallback;
         setPreviewCallback(videoPath, texturePreView);
     }

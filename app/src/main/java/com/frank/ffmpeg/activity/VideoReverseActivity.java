@@ -40,7 +40,7 @@ public class VideoReverseActivity extends BaseActivity {
             if (msg.what == MSG_FINISH){
                 changeVisibility();
                 startPlay();
-            }else if (msg.what == MSG_TOAST) {
+            } else if (msg.what == MSG_TOAST) {
                 showToast(getString(R.string.please_click_select));
             }
         }
@@ -57,7 +57,7 @@ public class VideoReverseActivity extends BaseActivity {
 
         initView();
         initPlayer();
-        mHandler.sendEmptyMessageDelayed(MSG_TOAST, 1000);
+        mHandler.sendEmptyMessageDelayed(MSG_TOAST, 500);
         ffmpegHandler = new FFmpegHandler(mHandler);
     }
 
