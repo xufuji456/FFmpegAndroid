@@ -136,7 +136,7 @@ public class FFmpegUtil {
      */
     @SuppressLint("DefaultLocale")
     public static  String[] cutVideo(String srcFile, int startTime, int duration, String targetFile){
-        String cutVideoCmd = "ffmpeg -i %s -ss %d -t %d %s";
+        String cutVideoCmd = "ffmpeg -i %s -ss %d -t %d -acodec copy -vcodec copy %s";
         cutVideoCmd = String.format(cutVideoCmd, srcFile, startTime, duration, targetFile);
         return cutVideoCmd.split(" ");//以空格分割为字符串数组
     }
