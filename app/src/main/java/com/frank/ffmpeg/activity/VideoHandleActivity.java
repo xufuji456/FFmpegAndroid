@@ -111,7 +111,11 @@ public class VideoHandleActivity extends BaseActivity {
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
                 break;
             case R.id.btn_video_cut://视频剪切
-                String cutVideo = PATH + File.separator + "cutVideo.mp4";
+                String suffix = FileUtil.getFileSuffix(srcFile);
+                if (suffix == null || suffix.isEmpty()) {
+                    return;
+                }
+                String cutVideo = PATH + File.separator + "cutVideo" + suffix;
                 int startTime = 0;
                 int duration = 20;
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo);

@@ -119,7 +119,11 @@ public class AudioHandleActivity extends BaseActivity {
                 mp3Converter.convertToMp3(inputFile, transformFile);
                 break;
             case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
-                String cutFile = PATH + File.separator + "cut.mp3";
+                String suffix = FileUtil.getFileSuffix(srcFile);
+                if (suffix == null || suffix.isEmpty()) {
+                    return;
+                }
+                String cutFile = PATH + File.separator + "cutAudio" + suffix;
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
             case R.id.btn_concat://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）

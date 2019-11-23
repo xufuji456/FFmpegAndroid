@@ -137,4 +137,11 @@ public class FileUtil {
                 || path.endsWith(TYPE_MOV);
     }
 
+    public static String getFileSuffix(String fileName) {
+        if (TextUtils.isEmpty(fileName) || !fileName.contains(".")) {
+            return null;
+        }
+        return fileName.substring(fileName.lastIndexOf("."));
+    }
+
 }
