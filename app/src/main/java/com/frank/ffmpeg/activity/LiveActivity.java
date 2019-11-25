@@ -1,6 +1,5 @@
 package com.frank.ffmpeg.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.hardware.Camera;
 import android.media.AudioFormat;
@@ -29,7 +28,6 @@ import com.frank.live.param.VideoParam;
 public class LiveActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, LiveStateChangeListener {
 
     private final static String TAG = LiveActivity.class.getSimpleName();
-    private final static String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
     private final static String LIVE_URL = "rtmp://192.168.1.102/live/stream";
     private final static int MSG_ERROR = 100;
     private SurfaceHolder surfaceHolder;
@@ -59,7 +57,6 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
 
         hideActionBar();
         initView();
-        requestPermission(permissions);
         initPusher();
     }
 
@@ -114,7 +111,9 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        livePusher.release();
+        if (livePusher != null) {
+            livePusher.release();
+        }
     }
 
     @Override

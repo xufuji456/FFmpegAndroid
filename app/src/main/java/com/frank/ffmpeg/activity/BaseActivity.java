@@ -2,6 +2,7 @@ package com.frank.ffmpeg.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -28,13 +29,19 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     private final static int REQUEST_CODE = 1234;
     private final static String[] permissions = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE};
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(permissions[1]) != PackageManager.PERMISSION_GRANTED ) {
+            requestPermission();
+        }
         setContentView(getLayoutId());
     }
 
