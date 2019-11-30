@@ -46,7 +46,6 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             "hue='h=60:s=-3'",
             "lutrgb='r=0:g=0'",
             "edgedetect=low=0.1:high=0.4",
-            "boxblur=2:1",
             "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
             "colorbalance=bs=0.3",
             "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
@@ -58,7 +57,6 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             "鲜明",//hue
             "暖蓝",
             "边缘",
-            "模糊",
             "九宫格",
             "均衡",
             "矩形",
@@ -123,8 +121,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
-        List<String> itemList = new ArrayList<>();
-        itemList.addAll(Arrays.asList(txtArray));
+        List<String> itemList = new ArrayList<>(Arrays.asList(txtArray));
         horizontalAdapter = new HorizontalAdapter(itemList);
         recyclerView.setAdapter(horizontalAdapter);
 
@@ -220,7 +217,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     void onSelectedFile(String filePath) {
         videoPath = filePath;
         //选择滤镜模式
-        doFilterPlay(6);
+        doFilterPlay(5);
         //默认关闭声音
         btnSound.setChecked(true);
     }
