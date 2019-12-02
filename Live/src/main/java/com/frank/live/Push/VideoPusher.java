@@ -2,7 +2,6 @@ package com.frank.live.Push;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.frank.live.LiveUtil;
@@ -116,7 +115,6 @@ public class VideoPusher extends Pusher implements SurfaceHolder.Callback, Camer
     public void onPreviewFrame(byte[] data, Camera camera) {
         camera.addCallbackBuffer(previewBuffer);
         if(isPushing){
-//            Log.i("VideoPusher", "isPushing...");
             liveUtil.pushVideoData(data);
         }
     }

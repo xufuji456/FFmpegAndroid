@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import androidx.annotation.NonNull;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.View;
@@ -81,13 +82,13 @@ public class PushActivity extends Activity implements Callback {
 
 	private void initView(){
 		//SurfaceView
-		mSmartCameraView = (SmartCameraView) findViewById(R.id.gl_surfaceview);
+		mSmartCameraView = findViewById(R.id.gl_surfaceview);
 		//美颜类型
-		beautyTypeSelector = (Spinner) findViewById(R.id.beauty_type_selctor);
+		beautyTypeSelector = findViewById(R.id.beauty_type_selctor);
         //静音
-		btnMute = (Button) findViewById(R.id.button_mute);
+		btnMute = findViewById(R.id.button_mute);
 		//拍照
-		img_photo = (ImageView) findViewById(R.id.img_photo);
+		img_photo = findViewById(R.id.img_photo);
 	}
 
 	private void initListener(){
@@ -246,16 +247,16 @@ public class PushActivity extends Activity implements Callback {
 		int rotation = activity.getWindowManager ().getDefaultDisplay ().getRotation ();
 		int degrees = 0;
 		switch (rotation) {
-			case 0:
+			case Surface.ROTATION_0:
 				degrees = 0;
 				break;
-			case 1:
+			case Surface.ROTATION_90:
 				degrees = 90;
 				break;
-			case 2:
+			case Surface.ROTATION_180:
 				degrees = 180;
 				break;
-			case 3:
+			case Surface.ROTATION_270:
 				degrees = 270;
 				break;
 		}
@@ -275,7 +276,6 @@ public class PushActivity extends Activity implements Callback {
 
 	@Override
 	protected  void onDestroy(){
-		Log.i(TAG, "activity destory!");
 
 		if ( isStart ) {
 			isStart = false;
