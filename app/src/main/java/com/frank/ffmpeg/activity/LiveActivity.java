@@ -28,7 +28,7 @@ import com.frank.live.param.VideoParam;
 public class LiveActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, LiveStateChangeListener {
 
     private final static String TAG = LiveActivity.class.getSimpleName();
-    private final static String LIVE_URL = "rtmp://192.168.1.102/live/stream";
+    private final static String LIVE_URL = "rtmp://192.168.1.3/live/stream";
     private final static int MSG_ERROR = 100;
     private SurfaceHolder surfaceHolder;
     private LivePusher livePusher;

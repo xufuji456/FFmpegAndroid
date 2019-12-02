@@ -48,9 +48,6 @@
         <activity
             android:name=".activity.FilterActivity"
             android:screenOrientation="landscape" />
-        <!--视频倒播-->
-        <activity android:name=".activity.VideoReverseActivity"
-            android:screenOrientation="landscape" />
         <!--视频播放拖动预览-->
         <activity android:name=".activity.VideoPreviewActivity"
             android:screenOrientation="portrait" />

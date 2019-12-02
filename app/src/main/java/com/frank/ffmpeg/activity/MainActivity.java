@@ -30,7 +30,6 @@ public class MainActivity extends BaseActivity {
                 R.id.btn_push,
                 R.id.btn_live,
                 R.id.btn_filter,
-                R.id.btn_reverse,
                 R.id.btn_preview
         );
     }
@@ -59,9 +58,6 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.btn_filter://滤镜特效
                 intent.setClass(MainActivity.this, FilterActivity.class);
-                break;
-            case R.id.btn_reverse://视频倒播
-                intent.setClass(MainActivity.this, VideoReverseActivity.class);
                 break;
             case R.id.btn_preview://视频拖动实时预览
                 intent.setClass(MainActivity.this, VideoPreviewActivity.class);
