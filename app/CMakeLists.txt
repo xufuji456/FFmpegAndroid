@@ -51,6 +51,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 include_directories(src/main/cpp)
 include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/include/armeabi-v7a)
 
 find_library( # Sets the name of the path variable.
               log-lib
