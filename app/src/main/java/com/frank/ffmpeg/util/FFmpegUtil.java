@@ -321,4 +321,16 @@ public class FFmpegUtil {
         return reverseVideo.split(" ");
     }
 
+    /**
+     * mp4视频的moov往mdat前面移动
+     * @param inputFile inputFile
+     * @param outputFile outputFile
+     * @return 移动moov命令行
+     */
+    public static  String[] moveMoovAhead(String inputFile, String outputFile){
+        String moovCmd = "ffmpeg -i %s -movflags faststart -acodec copy -vcodec copy %s";
+        moovCmd = String.format(Locale.CHINESE, moovCmd, inputFile, outputFile);
+        return moovCmd.split(" ");
+    }
+
 }

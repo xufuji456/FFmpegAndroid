@@ -31,6 +31,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/media_player.c
              src/main/cpp/video_filter.c
              src/main/cpp/audio_lame.c
+             src/main/cpp/fast_start.c
         )
 
 add_library( ffmpeg

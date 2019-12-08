@@ -26,7 +26,7 @@ public class FileUtil {
     private final static String TYPE_OGG = "ogg";
     private final static String TYPE_AC3 = "ac3";
 
-    private final static String TYPE_MP4 = "mp4";
+    public final static String TYPE_MP4 = "mp4";
     private final static String TYPE_MKV = "mkv";
     private final static String TYPE_WEBM = "webm";
     private final static String TYPE_AVI = "avi";
@@ -36,6 +36,7 @@ public class FileUtil {
     private final static String TYPE_M3U8 = "m3u8";
     private final static String TYPE_3GP = "3gp";
     private final static String TYPE_MOV = "mov";
+    private final static String TYPE_MPG = "mpg";
 
     public static boolean concatFile(String srcFilePath, String appendFilePath, String concatFilePath){
         if(TextUtils.isEmpty(srcFilePath)
@@ -134,7 +135,8 @@ public class FileUtil {
                 || path.endsWith(TYPE_3GP)
                 || path.endsWith(TYPE_TS)
                 || path.endsWith(TYPE_M3U8)
-                || path.endsWith(TYPE_MOV);
+                || path.endsWith(TYPE_MOV)
+                || path.endsWith(TYPE_MPG);
     }
 
     public static String getFileSuffix(String fileName) {
@@ -142,6 +144,20 @@ public class FileUtil {
             return null;
         }
         return fileName.substring(fileName.lastIndexOf("."));
+    }
+
+    public static String getFilePath(String filePath) {
+        if (TextUtils.isEmpty(filePath) || !filePath.contains("/")) {
+            return null;
+        }
+        return filePath.substring(0, filePath.lastIndexOf("/"));
+    }
+
+    public static String getFileName(String filePath) {
+        if (TextUtils.isEmpty(filePath) || !filePath.contains("/")) {
+            return null;
+        }
+        return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
 }

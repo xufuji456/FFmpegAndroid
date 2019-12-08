@@ -40,6 +40,7 @@
     <string name="video_image">视频转图片</string>
     <string name="video_pip">视频画中画</string>
     <string name="video_preview">播放预览</string>
+    <string name="video_moov">MOOV前移</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>
@@ -69,5 +70,6 @@
     <string name="wrong_audio_format">非音频文件</string>
     <string name="wrong_video_format">非视频文件</string>
     <string name="converting_video">正在反转视频&#8230;</string>
+    <string name="tip_not_mp4_video">该视频不是mp4,无法进行moov前移操作</string>
 
 </resources>

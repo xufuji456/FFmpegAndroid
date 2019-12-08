@@ -5,14 +5,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
+import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
+
 import java.io.File;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
@@ -20,19 +24,21 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 public class VideoHandleActivity extends BaseActivity {
 
+    private final static String TAG = VideoHandleActivity.class.getSimpleName();
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
 
     private ProgressBar progressVideo;
     private LinearLayout layoutVideoHandle;
     private int viewId;
     private FFmpegHandler ffmpegHandler;
+    private final static boolean useFFmpegCmd = true;
 
     @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case MSG_BEGIN:
                     progressVideo.setVisibility(View.VISIBLE);
                     layoutVideoHandle.setVisibility(View.GONE);
@@ -77,7 +83,8 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_reverse_video,
                 R.id.btn_denoise_video,
                 R.id.btn_to_image,
-                R.id.btn_pip
+                R.id.btn_pip,
+                R.id.btn_moov
         );
     }
 
@@ -94,6 +101,7 @@ public class VideoHandleActivity extends BaseActivity {
 
     /**
      * 调用ffmpeg处理视频
+     *
      * @param srcFile srcFile
      */
     private void doHandleVideo(String srcFile) {
@@ -105,7 +113,7 @@ public class VideoHandleActivity extends BaseActivity {
             showToast(getString(R.string.wrong_video_format));
             return;
         }
-        switch (viewId){
+        switch (viewId) {
             case R.id.btn_video_transform://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
                 String transformVideo = PATH + File.separator + "transformVideo.flv";
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
@@ -177,7 +185,7 @@ public class VideoHandleActivity extends BaseActivity {
             case R.id.btn_combine_video://图片合成视频
                 //图片所在路径，图片命名格式img+number.jpg
                 String picturePath = PATH + File.separator + "img/";
-                if (!FileUtil.checkFileExist(picturePath)){
+                if (!FileUtil.checkFileExist(picturePath)) {
                     return;
                 }
                 String combineVideo = PATH + File.separator + "combineVideo.mp4";
@@ -187,7 +195,7 @@ public class VideoHandleActivity extends BaseActivity {
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";
                 String outputFile = PATH + File.separator + "multi.mp4";
-                if (!FileUtil.checkFileExist(input1) || !FileUtil.checkFileExist(input2)){
+                if (!FileUtil.checkFileExist(input1) || !FileUtil.checkFileExist(input2)) {
                     return;
                 }
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputFile, VideoLayout.LAYOUT_HORIZONTAL);
@@ -203,9 +211,9 @@ public class VideoHandleActivity extends BaseActivity {
             case R.id.btn_to_image://视频转图片
                 String imagePath = PATH + File.separator + "Video2Image/";//图片保存路径
                 File imageFile = new File(imagePath);
-                if (!imageFile.exists()){
+                if (!imageFile.exists()) {
                     boolean result = imageFile.mkdir();
-                    if (!result){
+                    if (!result) {
                         return;
                     }
                 }
@@ -217,7 +225,7 @@ public class VideoHandleActivity extends BaseActivity {
             case R.id.btn_pip://两个视频合成画中画
                 String inputFile1 = PATH + File.separator + "beyond.mp4";
                 String inputFile2 = PATH + File.separator + "small_girl.mp4";
-                if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)){
+                if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)) {
                     return;
                 }
                 //x、y坐标点需要根据全屏视频与小视频大小，进行计算
@@ -226,6 +234,26 @@ public class VideoHandleActivity extends BaseActivity {
                 int y = 150;
                 String picInPic = PATH + File.separator + "PicInPic.mp4";
                 commandLine = FFmpegUtil.picInPicVideo(inputFile1, inputFile2, x, y, picInPic);
+                break;
+            case R.id.btn_moov://moov前移操作，针对mp4视频moov在mdat后面的情况
+                if (!srcFile.endsWith(FileUtil.TYPE_MP4)) {
+                    showToast(getString(R.string.tip_not_mp4_video));
+                    return;
+                }
+                String filePath = FileUtil.getFilePath(srcFile);
+                String fileName = FileUtil.getFileName(srcFile);
+                Log.e(TAG, "moov filePath=" + filePath + "--fileName=" + fileName);
+                fileName = "moov_" + fileName;
+                String moovPath = filePath + File.separator + fileName;
+                if (useFFmpegCmd) {
+                    commandLine = FFmpegUtil.moveMoovAhead(srcFile, moovPath);
+                } else {
+                    long start = System.currentTimeMillis();
+                    FFmpegCmd ffmpegCmd = new FFmpegCmd();
+                    int result = ffmpegCmd.moveMoovAhead(srcFile, moovPath);
+                    Log.e(TAG, "result=" + (result == 0));
+                    Log.e(TAG, "move moov use time=" + (System.currentTimeMillis() - start));
+                }
                 break;
             default:
                 break;
