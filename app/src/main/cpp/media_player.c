@@ -24,6 +24,9 @@
 #define MIN_SLEEP_TIME_US 1000ll
 #define AUDIO_TIME_ADJUST_US -200000ll
 
+struct timeval now;
+struct timespec timeout;
+
 typedef struct MediaPlayer{
     AVFormatContext* format_context;
     int video_stream_index;
@@ -177,9 +180,13 @@ void player_wait_for_frame(MediaPlayer *player, int64_t stream_time) {
             // and check everything again
             sleep_time = 500000ll;
         }
-        //等待指定时长
-        pthread_cond_timeout_np(&player->cond, &player->mutex,
-                                                  (unsigned int) (sleep_time / 1000ll));
+        //TODO:等待指定时长
+//        pthread_cond_timeout_np(&player->cond, &player->mutex,
+//                                                  (unsigned int) (sleep_time / 1000ll));
+//        gettimeofday(&now, NULL);
+//        timeout.tv_sec = now.tv_sec;
+//        timeout.tv_nsec = (now.tv_usec + sleep_time) * 1000;
+//        pthread_cond_timedwait(&player->cond, &player->mutex, &timeout);
     }
     pthread_mutex_unlock(&player->mutex);
 }
@@ -254,14 +261,11 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
 
         ANativeWindow_unlockAndPost(player->native_window);
     }
-//    //延迟等待
-//    usleep(1000 * 16);
     return 0;
 }
 
 //音频解码初始化
 void audio_decoder_prepare(MediaPlayer* player) {
-    //frame->16bit 44100 PCM 统一音频采样格式与采样率
     player->swrContext = swr_alloc();
 
     //输入的采样格式
@@ -354,7 +358,6 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
                                   audio_sample_array,0,out_buffer_size);
             //释放局部引用
             (*env)->DeleteLocalRef(env,audio_sample_array);
-//        usleep(1000 * 16);
         }
     }
     if(javaVM != NULL){

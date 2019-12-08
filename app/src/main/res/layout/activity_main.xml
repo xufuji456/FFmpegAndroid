@@ -36,7 +36,8 @@
         android:text="@string/media_play"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/btn_media"/>
+        android:layout_below="@+id/btn_media"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn_push"
