@@ -38,20 +38,19 @@ add_library( ffmpeg
              IMPORTED )
 set_target_properties( ffmpeg
                        PROPERTIES IMPORTED_LOCATION
-                       ../../../../libs/armeabi-v7a/libffmpeg.so )
+                       ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libffmpeg.so )
 
 add_library( mp3lame
         SHARED
             IMPORTED )
 set_target_properties( mp3lame
             PROPERTIES IMPORTED_LOCATION
-            ../../../../libs/armeabi-v7a/libmp3lame.so )
+            ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libmp3lame.so )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 include_directories(src/main/cpp)
 include_directories(src/main/cpp/include)
-include_directories(src/main/cpp/include/armeabi-v7a)
 
 find_library( # Sets the name of the path variable.
               log-lib

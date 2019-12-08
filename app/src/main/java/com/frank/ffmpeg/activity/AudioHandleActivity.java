@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
 import java.io.File;
 
 import com.frank.ffmpeg.AudioPlayer;
@@ -35,8 +36,10 @@ public class AudioHandleActivity extends BaseActivity {
     private int viewId;
     private FFmpegHandler ffmpegHandler;
 
+    private final static boolean useFFmpeg = true;
+
     @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -97,6 +100,7 @@ public class AudioHandleActivity extends BaseActivity {
 
     /**
      * 调用ffmpeg处理音频
+     *
      * @param srcFile srcFile
      */
     private void doHandleAudio(final String srcFile) {
@@ -110,13 +114,15 @@ public class AudioHandleActivity extends BaseActivity {
         }
         switch (viewId) {
             case R.id.btn_transform://转码
-//                String transformFile = PATH + File.separator + "transform.aac";
-//                commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
-                //使用mp3lame进行转码
-                String inputFile = PATH + File.separator + "hello.aac";
-                String transformFile = PATH + File.separator + "transform.mp3";
-                Mp3Converter mp3Converter = new Mp3Converter();
-                mp3Converter.convertToMp3(inputFile, transformFile);
+                String transformFile;
+                if (useFFmpeg) { //使用FFmpeg转码
+                    transformFile = PATH + File.separator + "transformAudio.mp3";
+                    commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
+                } else { //使用MediaCodec与mp3lame转mp3
+                    transformFile = PATH + File.separator + "transformAudio.mp3";
+                    Mp3Converter mp3Converter = new Mp3Converter();
+                    mp3Converter.convertToMp3(srcFile, transformFile);
+                }
                 break;
             case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
                 String suffix = FileUtil.getFileSuffix(srcFile);
@@ -127,17 +133,21 @@ public class AudioHandleActivity extends BaseActivity {
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
             case R.id.btn_concat://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
-                if (!FileUtil.checkFileExist(appendFile)){
+                if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
                 break;
             case R.id.btn_mix://混音
-                if (!FileUtil.checkFileExist(appendFile)){
+                if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
-                String mixFile = PATH + File.separator + "mix.aac";
+                String mixSuffix = FileUtil.getFileSuffix(srcFile);
+                if (mixSuffix == null || mixSuffix.isEmpty()) {
+                    return;
+                }
+                String mixFile = PATH + File.separator + "mix" + mixSuffix;
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
             case R.id.btn_play_audio://解码播放（AudioTrack）
@@ -170,7 +180,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
                 String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
                 String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
-                if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)){
+                if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)) {
                     return;
                 }
 
