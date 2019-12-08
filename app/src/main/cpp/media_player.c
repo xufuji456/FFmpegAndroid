@@ -183,10 +183,10 @@ void player_wait_for_frame(MediaPlayer *player, int64_t stream_time) {
         //TODO:等待指定时长
 //        pthread_cond_timeout_np(&player->cond, &player->mutex,
 //                                                  (unsigned int) (sleep_time / 1000ll));
-//        gettimeofday(&now, NULL);
-//        timeout.tv_sec = now.tv_sec;
-//        timeout.tv_nsec = (now.tv_usec + sleep_time) * 1000;
-//        pthread_cond_timedwait(&player->cond, &player->mutex, &timeout);
+        gettimeofday(&now, NULL);
+        timeout.tv_sec = now.tv_sec;
+        timeout.tv_nsec = (now.tv_usec + sleep_time) * 1000;
+        pthread_cond_timedwait(&player->cond, &player->mutex, &timeout);
     }
     pthread_mutex_unlock(&player->mutex);
 }
