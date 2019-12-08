@@ -21,7 +21,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        hideActionBar();
         initViewsWithClick(
                 R.id.btn_audio,
                 R.id.btn_video,
