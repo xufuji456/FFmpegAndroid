@@ -91,6 +91,10 @@ public class VideoHandleActivity extends BaseActivity {
     @Override
     public void onViewClick(View view) {
         viewId = view.getId();
+        if (viewId == R.id.btn_combine_video) {
+            handlePhoto();
+            return;
+        }
         selectFile();
     }
 
@@ -182,15 +186,6 @@ public class VideoHandleActivity extends BaseActivity {
 //                int recordTime = 10;
 //                commandLine = FFmpegUtil.screenRecord(screenSize, recordTime, screenRecord);
                 break;
-            case R.id.btn_combine_video://图片合成视频
-                //图片所在路径，图片命名格式img+number.jpg
-                String picturePath = PATH + File.separator + "img/";
-                if (!FileUtil.checkFileExist(picturePath)) {
-                    return;
-                }
-                String combineVideo = PATH + File.separator + "combineVideo.mp4";
-                commandLine = FFmpegUtil.pictureToVideo(picturePath, combineVideo);
-                break;
             case R.id.btn_multi_video://视频画面拼接:分辨率、时长、封装格式不一致时，先把视频源转为一致
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";
@@ -258,6 +253,24 @@ public class VideoHandleActivity extends BaseActivity {
             default:
                 break;
         }
+        if (ffmpegHandler != null) {
+            ffmpegHandler.executeFFmpegCmd(commandLine);
+        }
+    }
+
+    /**
+     * 图片合成视频
+     */
+    private void handlePhoto() {
+        // 图片所在路径，图片命名格式img+number.jpg
+        // 这里指定目录为根目录下img文件夹
+        String picturePath = PATH + "/frame/";
+        if (!FileUtil.checkFileExist(picturePath)) {
+            return;
+        }
+        String combineVideo = PATH + File.separator + "combineVideo.mp4";
+        int frameRate = 2;// 合成视频帧率建议:1-10  普通视频帧率一般为25
+        String[] commandLine = FFmpegUtil.pictureToVideo(picturePath, frameRate, combineVideo);
         if (ffmpegHandler != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
