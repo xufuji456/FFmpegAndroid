@@ -52,6 +52,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 include_directories(src/main/cpp)
 include_directories(src/main/cpp/include)
+if(${CMAKE_ANDROID_ARCH_ABI} MATCHES "armeabi-v7a")
+    include_directories(src/main/cpp/include/armeabi-v7a)
+    message("This is armeabi-v7a")
+elseif(${CMAKE_ANDROID_ARCH_ABI} MATCHES "arm64-v8a")
+    include_directories(src/main/cpp/include/arm64-v8a)
+    message("This is arm64-v8a")
+endif()
 
 find_library( # Sets the name of the path variable.
               log-lib

@@ -35,17 +35,19 @@ extern const uint8_t ff_crop_tab[256 + 2 * MAX_NEG_CROP];
 extern const uint8_t ff_zigzag_direct[64];
 extern const uint8_t ff_zigzag_scan[16+1];
 
-#if   ARCH_ARM
-#   include "arm/mathops.h"
-#elif ARCH_AVR32
-#   include "avr32/mathops.h"
-#elif ARCH_MIPS
-#   include "mips/mathops.h"
-#elif ARCH_PPC
-#   include "ppc/mathops.h"
-#elif ARCH_X86
-#   include "x86/mathops.h"
-#endif
+//TODO
+#include "libavcodec/arm/mathops.h"
+//#if   ARCH_ARM
+//#   include "arm/mathops.h"
+//#elif ARCH_AVR32
+//#   include "avr32/mathops.h"
+//#elif ARCH_MIPS
+//#   include "mips/mathops.h"
+//#elif ARCH_PPC
+//#   include "ppc/mathops.h"
+//#elif ARCH_X86
+//#   include "x86/mathops.h"
+//#endif
 
 /* generic implementation */
 
