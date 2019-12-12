@@ -253,7 +253,7 @@ public class VideoHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        if (ffmpegHandler != null) {
+        if (ffmpegHandler != null && commandLine != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
     }
@@ -264,7 +264,7 @@ public class VideoHandleActivity extends BaseActivity {
     private void handlePhoto() {
         // 图片所在路径，图片命名格式img+number.jpg
         // 这里指定目录为根目录下img文件夹
-        String picturePath = PATH + "/frame/";
+        String picturePath = PATH + "/img/";
         if (!FileUtil.checkFileExist(picturePath)) {
             return;
         }

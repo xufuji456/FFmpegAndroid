@@ -114,14 +114,18 @@ public class AudioHandleActivity extends BaseActivity {
         }
         switch (viewId) {
             case R.id.btn_transform://转码
-                String transformFile;
                 if (useFFmpeg) { //使用FFmpeg转码
-                    transformFile = PATH + File.separator + "transformAudio.mp3";
+                    String transformFile = PATH + File.separator + "transformAudio.mp3";
                     commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
                 } else { //使用MediaCodec与mp3lame转mp3
-                    transformFile = PATH + File.separator + "transformAudio.mp3";
-                    Mp3Converter mp3Converter = new Mp3Converter();
-                    mp3Converter.convertToMp3(srcFile, transformFile);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String transformInput = PATH + File.separator + "transformAudio.mp3";
+                            Mp3Converter mp3Converter = new Mp3Converter();
+                            mp3Converter.convertToMp3(srcFile, transformInput);
+                        }
+                    }).start();
                 }
                 break;
             case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
@@ -191,7 +195,7 @@ public class AudioHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        if (ffmpegHandler != null) {
+        if (ffmpegHandler != null  && commandLine != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
     }
