@@ -16,8 +16,8 @@ public class LiveUtil {
     private native int native_start(String url);
     private native void setVideoParam(int width, int height, int bitRate, int frameRate);
     private native void setAudioParam(int sampleRate, int numChannels);
-    private native void pushVideo(byte data[]);
-    private native void pushAudio(byte data[], int length);
+    private native void pushVideo(byte[] data);
+    private native void pushAudio(byte[] data, int length);
     private native void native_stop();
     private native void native_release();
 
