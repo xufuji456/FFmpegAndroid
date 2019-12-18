@@ -201,7 +201,8 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     protected void onDestroy() {
         super.onDestroy();
         isPlaying = false;
-        videoPlayer.release();
+        //暂时注释
+//        videoPlayer.release();
         videoPlayer = null;
         horizontalAdapter = null;
     }
