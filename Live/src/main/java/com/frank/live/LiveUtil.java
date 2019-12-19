@@ -14,11 +14,17 @@ public class LiveUtil {
     }
 
     private native int native_start(String url);
+
     private native void setVideoParam(int width, int height, int bitRate, int frameRate);
+
     private native void setAudioParam(int sampleRate, int numChannels);
-    private native void pushVideo(byte[] data);
+
+    private native void pushVideoNew(byte[] yPlane, byte[] uPlane, byte[] vPlane);
+
     private native void pushAudio(byte[] data, int length);
+
     private native void native_stop();
+
     private native void native_release();
 
     //视频编码器打开失败
@@ -38,50 +44,52 @@ public class LiveUtil {
 
     private LiveStateChangeListener liveStateChangeListener;
 
-    public LiveUtil(){}
+    public LiveUtil() {
+    }
 
-    public int startPush(String url){
+    public int startPush(String url) {
         return native_start(url);
     }
 
-    public void setVideoParams(int width, int height, int bitRate, int frameRate){
+    public void setVideoParams(int width, int height, int bitRate, int frameRate) {
         setVideoParam(width, height, bitRate, frameRate);
     }
 
-    public void setAudioParams(int sampleRate, int numChannels){
+    public void setAudioParams(int sampleRate, int numChannels) {
         setAudioParam(sampleRate, numChannels);
     }
 
-    public void pushVideoData(byte[] data){
-        pushVideo(data);
+    public void pushVideoData(byte[] yPlane, byte[] uPlane, byte[] vPlane) {
+        pushVideoNew(yPlane, uPlane, vPlane);
     }
 
-    public void pushAudioData(byte[] data, int length){
+    public void pushAudioData(byte[] data, int length) {
         pushAudio(data, length);
     }
 
-    public void stopPush(){
+    public void stopPush() {
         native_stop();
     }
 
-    public void release(){
+    public void release() {
         native_release();
     }
 
-    public void setOnLiveStateChangeListener(LiveStateChangeListener liveStateChangeListener){
+    public void setOnLiveStateChangeListener(LiveStateChangeListener liveStateChangeListener) {
         this.liveStateChangeListener = liveStateChangeListener;
     }
 
     /**
      * 当native报错时，回调这个方法
+     *
      * @param errCode errCode
      */
-    public void errorFromNative(int errCode){
+    public void errorFromNative(int errCode) {
         //直播出错了，应该停止推流
         stopPush();
-        if(liveStateChangeListener != null){
+        if (liveStateChangeListener != null) {
             String msg = "";
-            switch (errCode){
+            switch (errCode) {
                 case ERROR_VIDEO_ENCODER_OPEN:
                     msg = "视频编码器打开失败...";
                     break;

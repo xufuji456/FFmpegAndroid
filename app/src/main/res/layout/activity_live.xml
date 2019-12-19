@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.frank.ffmpeg.activity.LiveActivity">
 
-    <SurfaceView
+    <TextureView
         android:id="@+id/surface_camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

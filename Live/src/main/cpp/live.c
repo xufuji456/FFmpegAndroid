@@ -14,7 +14,6 @@
 
 x264_picture_t picture_in;
 x264_picture_t picture_out;
-int y_len, uv_len;
 x264_t *video_encode_handle;
 faacEncHandle *audio_encode_handle;
 uint32_t start_time;
@@ -25,7 +24,7 @@ int is_pushing = FALSE;
 unsigned long inputSamples;
 unsigned long maxOutputBytes;
 //子线程回调给Java需要用到JavaVM
-JavaVM* javaVM;
+JavaVM *javaVM;
 //调用类
 jobject jobject_error;
 
@@ -44,23 +43,28 @@ const int ERROR_RTMP_CONNECT = 0x05;
 const int ERROR_RTMP_CONNECT_STREAM = 0x06;
 //RTMP发送数据包失败
 const int ERROR_RTMP_SEND_PACKAT = 0x07;
+
 /***************与Java层对应**************/
 
 void add_rtmp_packet(RTMPPacket *pPacket);
+
 void add_x264_body(uint8_t *buf, int len);
+
 void add_x264_key_header(unsigned char sps[100], unsigned char pps[100], int len, int pps_len);
+
 void add_aac_body(unsigned char *buf, int len);
+
 void add_aac_header();
 
 //当调用System.loadLibrary时，会回调这个方法
-jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved){
+jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
     return JNI_VERSION_1_6;
 }
 
 //回调异常给java
-void throw_error_to_java(int error_code){
-    JNIEnv* env;
+void throw_error_to_java(int error_code) {
+    JNIEnv *env;
     (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
     jclass jclazz = (*env)->GetObjectClass(env, jobject_error);
     jmethodID jmethod = (*env)->GetMethodID(env, jclazz, "errorFromNative", "(I)V");
@@ -69,10 +73,10 @@ void throw_error_to_java(int error_code){
 }
 
 //推流线程
-void *push_thread(void * args){
+void *push_thread(void *args) {
     //建立RTMP连接
-    RTMP* rtmp = RTMP_Alloc();
-    if(!rtmp){
+    RTMP *rtmp = RTMP_Alloc();
+    if (!rtmp) {
         LOGE("RTMP_Alloc fail...");
         goto end;
     }
@@ -81,13 +85,13 @@ void *push_thread(void * args){
     LOGI("url_path=%s", url_path);
     RTMP_EnableWrite(rtmp);
     rtmp->Link.timeout = 10;
-    if(!RTMP_Connect(rtmp, NULL)){
+    if (!RTMP_Connect(rtmp, NULL)) {
         LOGE("RTMP_Connect fail...");
         throw_error_to_java(ERROR_RTMP_CONNECT);
         goto end;
     }
     LOGI("RTMP_Connect success...");
-    if(!RTMP_ConnectStream(rtmp, 0)){
+    if (!RTMP_ConnectStream(rtmp, 0)) {
         LOGE("RTMP_ConnectStream fail...");
         throw_error_to_java(ERROR_RTMP_CONNECT_STREAM);
         goto end;
@@ -100,16 +104,16 @@ void *push_thread(void * args){
     //发送一个ACC HEADER
     add_aac_header();
     //循环推流
-    while(is_pushing) {
+    while (is_pushing) {
         pthread_mutex_lock(&mutex);
         pthread_cond_wait(&cond, &mutex);
         //从队头去一个RTMP包出来
         RTMPPacket *packet = queue_get_first();
-        if(packet){
+        if (packet) {
             queue_delete_first();
             //发送rtmp包，true代表rtmp内部有缓存
             int ret = RTMP_SendPacket(rtmp, packet, TRUE);
-            if(!ret){
+            if (!ret) {
                 LOGE("RTMP_SendPacket fail...");
                 RTMPPacket_Free(packet);
                 pthread_mutex_unlock(&mutex);
@@ -144,7 +148,7 @@ Java_com_frank_live_LiveUtil_native_1start(JNIEnv *env, jobject instance, jstrin
     pthread_create(&push_thread_id, NULL, push_thread, NULL);
     (*env)->ReleaseStringUTFChars(env, url_, url);
 
-    jobject_error= (*env)->NewGlobalRef(env, instance);
+    jobject_error = (*env)->NewGlobalRef(env, instance);
     return 0;
 }
 
@@ -152,8 +156,6 @@ Java_com_frank_live_LiveUtil_native_1start(JNIEnv *env, jobject instance, jstrin
 JNIEXPORT void JNICALL
 Java_com_frank_live_LiveUtil_setVideoParam(JNIEnv *env, jobject instance, jint width, jint height,
                                            jint bitRate, jint frameRate) {
-    y_len = width * height;
-    uv_len = y_len/4;
 
     x264_param_t param;
     //默认设置
@@ -178,9 +180,9 @@ Java_com_frank_live_LiveUtil_setVideoParam(JNIEnv *env, jobject instance, jint w
     x264_picture_alloc(&picture_in, param.i_csp, param.i_width, param.i_height);
     //打开编码器
     video_encode_handle = x264_encoder_open(&param);
-    if(video_encode_handle){
+    if (video_encode_handle) {
         LOGI("x264_encoder_open success...");
-    } else{
+    } else {
         LOGE("x264_encoder_open fail...");
         throw_error_to_java(ERROR_VIDEO_ENCODER_OPEN);
     }
@@ -188,12 +190,13 @@ Java_com_frank_live_LiveUtil_setVideoParam(JNIEnv *env, jobject instance, jint w
 
 //音频编码器FAAC参数配置
 JNIEXPORT void JNICALL
-Java_com_frank_live_LiveUtil_setAudioParam(JNIEnv *env, jobject instance, jint sampleRate, jint numChannels) {
+Java_com_frank_live_LiveUtil_setAudioParam(JNIEnv *env, jobject instance, jint sampleRate,
+                                           jint numChannels) {
     inputSamples;
     maxOutputBytes;
     audio_encode_handle = faacEncOpen((unsigned long) sampleRate,
                                       (unsigned int) numChannels, &inputSamples, &maxOutputBytes);
-    if(!audio_encode_handle){
+    if (!audio_encode_handle) {
         LOGE("faacEncOpen fail...");
         throw_error_to_java(ERROR_AUDIO_ENCODER_OPEN);
         return;
@@ -210,9 +213,9 @@ Java_com_frank_live_LiveUtil_setAudioParam(JNIEnv *env, jobject instance, jint s
     configPtr->quantqual = 100;//量化
     configPtr->shortctl = SHORTCTL_NORMAL;
     int result = faacEncSetConfiguration(audio_encode_handle, configPtr);
-    if(result){
+    if (result) {
         LOGI("faacEncSetConfiguration success...");
-    } else{
+    } else {
         LOGE("faacEncSetConfiguration fail...");
         throw_error_to_java(ERROR_AUDIO_ENCODER_OPEN);
     }
@@ -221,7 +224,7 @@ Java_com_frank_live_LiveUtil_setAudioParam(JNIEnv *env, jobject instance, jint s
 //添加RTMPPacket包到队列中
 void add_rtmp_packet(RTMPPacket *pPacket) {
     pthread_mutex_lock(&mutex);
-    if(is_pushing){
+    if (is_pushing) {
         queue_append_last(pPacket);
     }
     pthread_cond_signal(&cond);
@@ -234,7 +237,7 @@ void add_x264_key_header(unsigned char sps[100], unsigned char pps[100], int sps
     RTMPPacket *packet = malloc(sizeof(RTMPPacket));
     RTMPPacket_Alloc(packet, body_size);
     RTMPPacket_Reset(packet);
-    unsigned char* body = (unsigned char *) packet->m_body;
+    unsigned char *body = (unsigned char *) packet->m_body;
     int i = 0;
     body[i++] = 0x17;//VideoHeadType 0-3:FrameType(KeyFrame=1);4-7:CodecId(AVC=7)
     body[i++] = 0x00;//AVC PacketType
@@ -274,10 +277,10 @@ void add_x264_key_header(unsigned char sps[100], unsigned char pps[100], int sps
 
 //添加x264的body
 void add_x264_body(uint8_t *buf, int len) {
-    if(buf[2] == 0x01){//00 00 01
+    if (buf[2] == 0x01) {//00 00 01
         buf += 3;
         len -= 3;
-    } else if (buf[3] == 0x01){//00 00 00 01
+    } else if (buf[3] == 0x01) {//00 00 00 01
         buf += 4;
         len -= 4;
     }
@@ -287,9 +290,9 @@ void add_x264_body(uint8_t *buf, int len) {
     RTMPPacket_Reset(packet);
     unsigned char *body = (unsigned char *) packet->m_body;
     int type = buf[0] & 0x1F;
-    if(type == NAL_SLICE_IDR){//关键帧
+    if (type == NAL_SLICE_IDR) {//关键帧
         body[0] = 0x17;
-    } else{
+    } else {
         body[0] = 0x27;
     }
     body[1] = 0x01;
@@ -313,66 +316,16 @@ void add_x264_body(uint8_t *buf, int len) {
     add_rtmp_packet(packet);
 }
 
-//推送视频流
-JNIEXPORT void JNICALL
-Java_com_frank_live_LiveUtil_pushVideo(JNIEnv *env, jobject instance, jbyteArray data_) {
-    //NV21转成YUV420P
-    jbyte *nv21_buffer = (*env)->GetByteArrayElements(env, data_, NULL);
-    //Y相同，直接拷贝
-    memcpy(picture_in.img.plane[0], nv21_buffer, (size_t) y_len);
-    jbyte *v_buffer = (jbyte *) picture_in.img.plane[2];
-    jbyte *u_buffer = (jbyte *) picture_in.img.plane[1];
-    int i;
-    //U和V交换
-    for(i=0; i<uv_len; i++){
-        *(u_buffer+i) = *(nv21_buffer + y_len + 2*i + 1);
-        *(v_buffer+i) = *(nv21_buffer + y_len + 2*i);
-    }
-    x264_nal_t *nal = NULL;
-    int nal_num = -1;//NAL unit个数
-    //调用h264编码
-    if(x264_encoder_encode(video_encode_handle, &nal, &nal_num, &picture_in, & picture_out) < 0){
-        LOGE("x264_encoder_encode fail");
-        throw_error_to_java(ERROR_VIDEO_ENCODE);
-        goto end;
-    }
-    if(nal_num <= 0){
-        LOGE("nal_num <= 0");
-        goto end;
-    }
-    //使用RTMP推流
-    //关键帧（I帧）加上SPS和PPS
-    int sps_len = 0, pps_len = 0;
-    unsigned char sps[100];
-    unsigned char pps[100];
-    memset(sps, 0, 100);
-    memset(pps, 0, 100);
-    for (i = 0; i < nal_num; ++i) {
-        if(nal[i].i_type == NAL_SPS){//sps
-            sps_len = nal[i].i_payload - 4;
-            memcpy(sps, nal[i].p_payload + 4, (size_t) sps_len);
-        } else if(nal[i].i_type == NAL_PPS){//pps
-            pps_len = nal[i].i_payload - 4;
-            memcpy(pps, nal[i].p_payload + 4, (size_t) pps_len);
-            add_x264_key_header(sps, pps, sps_len, pps_len);
-        } else{
-            add_x264_body(nal[i].p_payload, nal[i].i_payload);
-        }
-    }
-    end:
-    (*env)->ReleaseByteArrayElements(env, data_, nv21_buffer, 0);
-}
-
 //添加AAC header
 void add_aac_header() {
     unsigned char *ppBuffer;
     unsigned long pSize;
     faacEncGetDecoderSpecificInfo(audio_encode_handle, &ppBuffer, &pSize);
     int body_size = (int) (2 + pSize);
-    RTMPPacket* packet = malloc(sizeof(RTMPPacket));
+    RTMPPacket *packet = malloc(sizeof(RTMPPacket));
     RTMPPacket_Alloc(packet, body_size);
     RTMPPacket_Reset(packet);
-    unsigned char* body = (unsigned char *) packet->m_body;
+    unsigned char *body = (unsigned char *) packet->m_body;
     //两字节头
     //soundFormat(4bits):10->aac;soundRate(2bits):3->44kHz;soundSize(1bit):1->pcm_16bit;soundType(1bit):1->stereo
     body[0] = 0xAF;
@@ -393,10 +346,10 @@ void add_aac_header() {
 //添加AAC body
 void add_aac_body(unsigned char *buf, int len) {
     int body_size = 2 + len;
-    RTMPPacket* packet = malloc(sizeof(RTMPPacket));
+    RTMPPacket *packet = malloc(sizeof(RTMPPacket));
     RTMPPacket_Alloc(packet, body_size);
     RTMPPacket_Reset(packet);
-    unsigned char* body = (unsigned char *) packet->m_body;
+    unsigned char *body = (unsigned char *) packet->m_body;
     //两字节头
     //soundFormat(4bits):10->aac;soundRate(2bits):3->44kHz;soundSize(1bit):1->pcm_16bit;soundType(1bit):1->stereo
     body[0] = 0xAF;
@@ -416,31 +369,33 @@ void add_aac_body(unsigned char *buf, int len) {
 
 //推送音频流
 JNIEXPORT void JNICALL
-Java_com_frank_live_LiveUtil_pushAudio(JNIEnv *env, jobject instance, jbyteArray data_, jint length) {
+Java_com_frank_live_LiveUtil_pushAudio(JNIEnv *env, jobject instance, jbyteArray data_,
+                                       jint length) {
     jbyte *data = (*env)->GetByteArrayElements(env, data_, NULL);
-    int* pcm_buf;
-    unsigned char* aac_buf;
+    int *pcm_buf;
+    unsigned char *aac_buf;
     pcm_buf = malloc(inputSamples * sizeof(int));
     aac_buf = malloc(maxOutputBytes * sizeof(unsigned char));
     int count = 0;
     unsigned int buffer_size = (unsigned int) (length / 2);
-    unsigned short* buf = (unsigned short*) data;
-    while (count < buffer_size){
+    unsigned short *buf = (unsigned short *) data;
+    while (count < buffer_size) {
         int audio_length = (int) inputSamples;
-        if((count + audio_length) >= buffer_size){
+        if ((count + audio_length) >= buffer_size) {
             audio_length = buffer_size - count;
         }
         int i;
-        for(i=0; i<audio_length; i++){
+        for (i = 0; i < audio_length; i++) {
             //每次从实时的pcm音频队列中读出量化位数为8的pcm数据
-            int sample_byte = ((int16_t *)buf + count)[i];
+            int sample_byte = ((int16_t *) buf + count)[i];
             //用8个二进制位来表示一个采样量化点（模数转换）
             pcm_buf[i] = sample_byte << 8;
         }
         count += inputSamples;
         //调用FAAC编码，返回编码字节数
-        int bytes_len = faacEncEncode(audio_encode_handle, pcm_buf, (unsigned int) audio_length, aac_buf, maxOutputBytes);
-        if(bytes_len <= 0){
+        int bytes_len = faacEncEncode(audio_encode_handle, pcm_buf, (unsigned int) audio_length,
+                                      aac_buf, maxOutputBytes);
+        if (bytes_len <= 0) {
 //            throw_error_to_java(ERROR_AUDIO_ENCODE);
             LOGE("音频编码失败...");
             continue;
@@ -448,9 +403,63 @@ Java_com_frank_live_LiveUtil_pushAudio(JNIEnv *env, jobject instance, jbyteArray
         add_aac_body(aac_buf, bytes_len);
     }
     (*env)->ReleaseByteArrayElements(env, data_, data, 0);
-    if(pcm_buf != NULL){
+    if (pcm_buf != NULL) {
         free(pcm_buf);
     }
+}
+
+//推送视频流
+JNIEXPORT void JNICALL
+Java_com_frank_live_LiveUtil_pushVideoNew(JNIEnv *env, jobject instance, jbyteArray yPlane,
+                                          jbyteArray uPlane, jbyteArray vPlane) {
+    jbyte *y_plane = (*env)->GetByteArrayElements(env, yPlane, NULL);
+    jbyte *u_plane = (*env)->GetByteArrayElements(env, uPlane, NULL);
+    jbyte *v_plane = (*env)->GetByteArrayElements(env, vPlane, NULL);
+    jsize y_length = (*env)->GetArrayLength(env, yPlane);
+    jsize u_length = (*env)->GetArrayLength(env, uPlane);
+    jsize v_length = (*env)->GetArrayLength(env, vPlane);
+
+    //直接拷贝
+    memcpy(picture_in.img.plane[0], y_plane, (size_t) y_length);
+    memcpy(picture_in.img.plane[1], u_plane, (size_t) u_length);
+    memcpy(picture_in.img.plane[2], v_plane, (size_t) v_length);
+
+    int i;
+    x264_nal_t *nal = NULL;
+    int nal_num = -1;//NAL unit个数
+    //调用h264编码
+    if (x264_encoder_encode(video_encode_handle, &nal, &nal_num, &picture_in, &picture_out) < 0) {
+        LOGE("x264_encoder_encode fail");
+        throw_error_to_java(ERROR_VIDEO_ENCODE);
+        goto end;
+    }
+    if (nal_num <= 0) {
+        LOGE("nal_num <= 0");
+        goto end;
+    }
+    //使用RTMP推流
+    //关键帧（I帧）加上SPS和PPS
+    int sps_len = 0, pps_len = 0;
+    unsigned char sps[100];
+    unsigned char pps[100];
+    memset(sps, 0, 100);
+    memset(pps, 0, 100);
+    for (i = 0; i < nal_num; ++i) {
+        if (nal[i].i_type == NAL_SPS) {//sps
+            sps_len = nal[i].i_payload - 4;
+            memcpy(sps, nal[i].p_payload + 4, (size_t) sps_len);
+        } else if (nal[i].i_type == NAL_PPS) {//pps
+            pps_len = nal[i].i_payload - 4;
+            memcpy(pps, nal[i].p_payload + 4, (size_t) pps_len);
+            add_x264_key_header(sps, pps, sps_len, pps_len);
+        } else {
+            add_x264_body(nal[i].p_payload, nal[i].i_payload);
+        }
+    }
+    end:
+    (*env)->ReleaseByteArrayElements(env, yPlane, y_plane, 0);
+    (*env)->ReleaseByteArrayElements(env, uPlane, u_plane, 0);
+    (*env)->ReleaseByteArrayElements(env, vPlane, v_plane, 0);
 }
 
 //停止推流

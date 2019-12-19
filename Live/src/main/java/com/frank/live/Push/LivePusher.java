@@ -1,7 +1,9 @@
 package com.frank.live.Push;
 
+import android.content.Context;
 import android.util.Log;
-import android.view.SurfaceHolder;
+import android.view.TextureView;
+
 import com.frank.live.LiveUtil;
 import com.frank.live.listener.LiveStateChangeListener;
 import com.frank.live.param.AudioParam;
@@ -14,20 +16,20 @@ import com.frank.live.param.VideoParam;
 
 public class LivePusher {
 
-    private VideoPusher videoPusher;
+    private VideoPusherNew videoPusher;
     private AudioPusher audioPusher;
     private LiveUtil liveUtil;
 
-    public LivePusher(SurfaceHolder surfaceHolder, VideoParam videoParam, AudioParam audioParam){
+    public LivePusher(TextureView textureView, VideoParam videoParam, AudioParam audioParam, Context context) {
         liveUtil = new LiveUtil();
-        videoPusher = new VideoPusher(surfaceHolder, videoParam, liveUtil);
+        videoPusher = new VideoPusherNew(textureView, videoParam, liveUtil, context);
         audioPusher = new AudioPusher(audioParam, liveUtil);
     }
 
     /**
      * 开始推流
      */
-    public void startPush(String liveUrl, LiveStateChangeListener liveStateChangeListener){
+    public void startPush(String liveUrl, LiveStateChangeListener liveStateChangeListener) {
         videoPusher.startPush();
         audioPusher.startPush();
         liveUtil.setOnLiveStateChangeListener(liveStateChangeListener);
@@ -38,7 +40,7 @@ public class LivePusher {
     /**
      * 停止推流
      */
-    public void stopPush(){
+    public void stopPush() {
         videoPusher.stopPush();
         audioPusher.stopPush();
         liveUtil.stopPush();
@@ -47,14 +49,14 @@ public class LivePusher {
     /**
      * 切换摄像头
      */
-    public void switchCamera(){
+    public void switchCamera() {
         videoPusher.switchCamera();
     }
 
     /**
      * 释放资源
      */
-    public void release(){
+    public void release() {
         videoPusher.release();
         audioPusher.release();
         liveUtil.release();
@@ -62,9 +64,10 @@ public class LivePusher {
 
     /**
      * 设置静音
+     *
      * @param isMute 是否静音
      */
-    public void setMute(boolean isMute){
+    public void setMute(boolean isMute) {
         audioPusher.setMute(isMute);
     }
 
