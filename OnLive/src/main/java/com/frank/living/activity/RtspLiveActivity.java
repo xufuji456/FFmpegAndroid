@@ -1,17 +1,22 @@
 package com.frank.living.activity;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
+
 import com.frank.living.R;
 import com.frank.living.listener.IjkPlayerListener;
+
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+
 import com.frank.living.widget.IjkVideoView;
 
-public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerListener, View.OnClickListener{
+public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerListener, View.OnClickListener {
 
     private final static String TAG = RtspLiveActivity.class.getSimpleName();
 
@@ -22,7 +27,8 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
     private boolean isPause;
     private boolean isSilence;
 
-    private final static String url = "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov";
+    //    private final static String url = "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov";
+    private final static String url = "rtmp://58.200.131.2:1935/livetv/hunantv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,25 +39,25 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
 
     }
 
-    private void init(){
+    private void init() {
         IjkMediaPlayer.loadLibrariesOnce(null);
         IjkMediaPlayer.native_profileBegin("libijkplayer.so");
 
-        TableLayout mHudView = (TableLayout) findViewById(R.id.hud_view);
-        mVideoView = (IjkVideoView) findViewById(R.id.video_view);
+        TableLayout mHudView = findViewById(R.id.hud_view);
+        mVideoView = findViewById(R.id.video_view);
         mVideoView.setHudView(mHudView);
         mVideoView.setIjkPlayerListener(this);
         mVideoView.setVideoPath(url);
         mVideoView.start();
 
-        btnPlay = (ImageButton) findViewById(R.id.btn_play);
+        btnPlay = findViewById(R.id.btn_play);
         btnPlay.setOnClickListener(this);
-        btnSound = (ImageButton) findViewById(R.id.btn_sound);
+        btnSound = findViewById(R.id.btn_sound);
         btnSound.setOnClickListener(this);
 
     }
 
-    private void initOptions(){
+    private void initOptions() {
         if (ijkMediaPlayer == null)
             return;
         Log.e(TAG, "initOptions");
@@ -82,13 +88,13 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_play:
                 isPause = !isPause;
-                if (isPause){//直播暂停
+                if (isPause) {//直播暂停
                     mVideoView.pause();
                     btnPlay.setBackgroundResource(R.drawable.ic_play);
-                }else {//直播继续
+                } else {//直播继续
                     mVideoView.start();
                     btnPlay.setBackgroundResource(R.drawable.ic_pause);
                 }
@@ -97,10 +103,10 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
                 isSilence = !isSilence;
                 if (ijkMediaPlayer == null)
                     return;
-                if (isSilence){
+                if (isSilence) {
                     ijkMediaPlayer.setVolume(0, 0);
                     btnSound.setBackgroundResource(R.drawable.ic_sound);
-                }else {
+                } else {
                     ijkMediaPlayer.setVolume(50, 50);
                     btnSound.setBackgroundResource(R.drawable.ic_silence);
                 }

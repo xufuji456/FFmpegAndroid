@@ -6,18 +6,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.os.Process;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+
 import com.frank.living.R;
 import com.frank.living.constant.Constants;
 import com.frank.living.listener.OnDoubleClickListener;
 import com.frank.living.listener.IjkPlayerListener;
 import com.frank.living.widget.IjkVideoView;
+
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
@@ -25,7 +30,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
  * 多路投屏直播
  * Created by xufulong on 2019/01/04
  */
-public class MultiScreenActivity extends AppCompatActivity{
+public class MultiScreenActivity extends AppCompatActivity {
 
     private static final String TAG = MultiScreenActivity.class.getSimpleName();
 
@@ -65,17 +70,17 @@ public class MultiScreenActivity extends AppCompatActivity{
 
     }
 
-    private void initView(){
-        mVideoView1 = (IjkVideoView) findViewById(R.id.video_view1);
-        mVideoView2 = (IjkVideoView) findViewById(R.id.video_view2);
-        mVideoView3 = (IjkVideoView) findViewById(R.id.video_view3);
-        mVideoView4 = (IjkVideoView) findViewById(R.id.video_view4);
+    private void initView() {
+        mVideoView1 = findViewById(R.id.video_view1);
+        mVideoView2 = findViewById(R.id.video_view2);
+        mVideoView3 = findViewById(R.id.video_view3);
+        mVideoView4 = findViewById(R.id.video_view4);
 
         divider1 = findViewById(R.id.divider1);
         divider2 = findViewById(R.id.divider2);
     }
 
-    private void initListener(){
+    private void initListener() {
         mVideoView1.setOnTouchListener(new OnDoubleClickListener(new OnDoubleClickListener.OnDoubleClick() {
             @Override
             public void onDouble() {
@@ -102,7 +107,7 @@ public class MultiScreenActivity extends AppCompatActivity{
         }));
     }
 
-    private void setupView(){
+    private void setupView() {
         //第一路投屏默认全屏
         enterFullScreen(1);
         mVideoView1.setVideoPath(url);
@@ -126,8 +131,8 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 外部传进来的数据:URL
      */
-    private void parseIntent(){
-        for (int i=1; i<=4; i++){
+    private void parseIntent() {
+        for (int i = 1; i <= 4; i++) {
             channelMap.put(i, false);
         }
         clientMap.put(ipAddress, 1);
@@ -135,31 +140,30 @@ public class MultiScreenActivity extends AppCompatActivity{
 
         Intent intent = getIntent();
         String url = intent.getStringExtra("url");
-        if(!TextUtils.isEmpty(url)){
+        if (!TextUtils.isEmpty(url)) {
             this.url = url;
         }
         String ip = intent.getStringExtra("ip");
-        if (!TextUtils.isEmpty(ip)){
+        if (!TextUtils.isEmpty(ip)) {
             ipAddress = ip;
         }
     }
 
     //唤醒屏幕
-    private void wakeUp(){
+    private void wakeUp() {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager == null)
             return;
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
-                |PowerManager.ACQUIRE_CAUSES_WAKEUP, TAG);
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP, TAG);
         wakeLock.acquire(1000);
         wakeLock.release();
     }
 
     /**
      * 配置播放器参数项
-     *
      */
-    private void setOptions(IjkMediaPlayer ijkPlayer){
+    private void setOptions(IjkMediaPlayer ijkPlayer) {
         if (ijkPlayer == null)
             return;
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "fast", 1);//不额外优化
@@ -185,7 +189,7 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 注册广播
      */
-    private void registerBroadcast(){
+    private void registerBroadcast() {
         customReceiver = new CustomReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_CLIENT_REMOVE);
@@ -196,8 +200,8 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 注销广播
      */
-    private void unregisterBroadcast(){
-        if(customReceiver != null){
+    private void unregisterBroadcast() {
+        if (customReceiver != null) {
             unregisterReceiver(customReceiver);
             customReceiver = null;
         }
@@ -210,22 +214,22 @@ public class MultiScreenActivity extends AppCompatActivity{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action == null)
+            if (action == null)
                 return;
             Log.e(TAG, "onReceive=" + action);
-            switch (action){
+            switch (action) {
                 case Constants.ACTION_CLIENT_REMOVE: //移除投屏
                     int num = intent.getIntExtra("clientNum", 0);
-                    if (num == 0){
+                    if (num == 0) {
                         Process.killProcess(Process.myPid());
-                    }else if (num > 0){
+                    } else if (num > 0) {
                         String ipAddress = intent.getStringExtra("ipAddress");
                         int target = clientMap.get(ipAddress);
                         removeClient(target);
                         clientMap.remove(ipAddress);
                         channelMap.put(target, false);
                         //多屏变为单屏时，自动切换为全屏
-                        if (num == 1){
+                        if (num == 1) {
                             int castingChannel = getCastingChannel();
                             enterFullScreen(castingChannel);
                         }
@@ -241,7 +245,7 @@ public class MultiScreenActivity extends AppCompatActivity{
                     channelMap.put(channel, true);
                     addClient(channel, otherUrl);
                     //单屏变为两路投屏时，自动切换为多屏模式
-                    if (clientNum == 2){
+                    if (clientNum == 2) {
                         exitFullScreen();
                     }
                     break;
@@ -253,12 +257,13 @@ public class MultiScreenActivity extends AppCompatActivity{
 
     /**
      * 选择空闲通道
+     *
      * @param clientNum clientNum
      * @return idleChannel
      */
-    private int selectIdleChannel(int clientNum){
-        for (int channel = 1; channel < clientNum; channel++){
-            if (!channelMap.get(channel)){
+    private int selectIdleChannel(int clientNum) {
+        for (int channel = 1; channel < clientNum; channel++) {
+            if (!channelMap.get(channel)) {
                 return channel;
             }
         }
@@ -267,11 +272,12 @@ public class MultiScreenActivity extends AppCompatActivity{
 
     /**
      * 获取当前投屏通道
+     *
      * @return idleChannel
      */
-    private int getCastingChannel(){
-        for (int channel = 1; channel <= 4; channel++){
-            if (channelMap.get(channel)){
+    private int getCastingChannel() {
+        for (int channel = 1; channel <= 4; channel++) {
+            if (channelMap.get(channel)) {
                 return channel;
             }
         }
@@ -280,11 +286,12 @@ public class MultiScreenActivity extends AppCompatActivity{
 
     /**
      * 添加客户端
-     * @param target target
+     *
+     * @param target    target
      * @param clientUrl clientUrl
      */
-    private void addClient(int target, String clientUrl){
-        switch (target){
+    private void addClient(int target, String clientUrl) {
+        switch (target) {
             case 1:
                 mVideoView1.setVisibility(View.VISIBLE);
                 mVideoView1.setVideoPath(clientUrl);
@@ -312,10 +319,11 @@ public class MultiScreenActivity extends AppCompatActivity{
 
     /**
      * 移除客户端
+     *
      * @param target target
      */
-    private void removeClient(int target){
-        switch (target){
+    private void removeClient(int target) {
+        switch (target) {
             case 1:
                 mVideoView1.stopPlayback();
                 mVideoView1.setVisibility(View.GONE);
@@ -340,7 +348,7 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 隐藏分割线
      */
-    private void hideDivider(){
+    private void hideDivider() {
         divider1.setVisibility(View.GONE);
         divider2.setVisibility(View.GONE);
     }
@@ -348,18 +356,19 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 显示分割线
      */
-    private void showDivider(){
+    private void showDivider() {
         divider1.setVisibility(View.VISIBLE);
         divider2.setVisibility(View.VISIBLE);
     }
 
     /**
      * 进入全屏模式
+     *
      * @param channel channel
      */
-    private void enterFullScreen(int channel){
+    private void enterFullScreen(int channel) {
         hideDivider();
-        switch (channel){
+        switch (channel) {
             case 1:
                 mVideoView1.setRenderViewVisible();
                 mVideoView2.setRenderViewGone();
@@ -412,7 +421,7 @@ public class MultiScreenActivity extends AppCompatActivity{
     /**
      * 退出全屏模式
      */
-    private void exitFullScreen(){
+    private void exitFullScreen() {
         mVideoView1.setRenderViewVisible();
         mVideoView2.setRenderViewVisible();
         mVideoView3.setRenderViewVisible();
@@ -425,18 +434,19 @@ public class MultiScreenActivity extends AppCompatActivity{
         mVideoView4.setVisibility(View.VISIBLE);
     }
 
-/**
- * 切换分屏模式
- * @param channel channel
- */
-private void changeScreenMode(int channel){
-    isMultiScreen = !isMultiScreen;
-    if (isMultiScreen){
-        enterFullScreen(channel);
-    }else {
-        exitFullScreen();
+    /**
+     * 切换分屏模式
+     *
+     * @param channel channel
+     */
+    private void changeScreenMode(int channel) {
+        isMultiScreen = !isMultiScreen;
+        if (isMultiScreen) {
+            enterFullScreen(channel);
+        } else {
+            exitFullScreen();
+        }
     }
-}
 
     @Override
     protected void onDestroy() {
