@@ -1,6 +1,6 @@
 # FFmpegAndroid
 android端基于FFmpeg库的使用。<br>
-添加编译ffmpeg、shine、mp3lame源码的参考脚本<br>
+添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 目前音视频相关处理：<br>
 
 - #### 音频剪切、拼接
@@ -30,6 +30,7 @@ android端基于FFmpeg库的使用。<br>
 - #### FFmpeg的AVFilter滤镜
 - #### 使用mp3lame库进行mp3转码
 - #### 视频拖动实时预览
+- #### moov往前移动
 
 - #### IjkPlayer的RTSP超低延时直播
 - #### IjkPlayer的RTSP多路投屏直播

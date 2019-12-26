@@ -28,8 +28,8 @@ NATIVE_CPU='armv8-a'
 OPTIMIZE_CFLAGS=""
 fi
 
-#export NDK=/Users/xufulong/Library/Android/sdk/ndk-bundle
-export NDK=/Users/xufulong/Library/Android/android-ndk-r10e
+#export NDK=/Users/frank/Library/Android/sdk/ndk-bundle
+export NDK=/Users/frank/Library/Android/android-ndk-r10e
 export PREBUILT=$NDK/toolchains/$CPU-linux-$ANDROID-4.9/prebuilt
 export PLATFORM=$NDK/platforms/android-21/arch-$ARCH
 export TOOLCHAIN=$PREBUILT/darwin-x86_64
