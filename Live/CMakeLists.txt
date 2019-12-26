@@ -11,21 +11,21 @@ add_library(faac
              IMPORTED)
 set_target_properties(faac
                        PROPERTIES IMPORTED_LOCATION
-                       ../../../../libs/armeabi-v7a/libfaac.a)
+                       ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libfaac.a)
 
 add_library(rtmp
              STATIC
              IMPORTED)
 set_target_properties(rtmp
                        PROPERTIES IMPORTED_LOCATION
-                       ../../../../libs/armeabi-v7a/librtmp.a)
+                       ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/librtmp.a)
 
 add_library(x264
             STATIC
             IMPORTED)
 set_target_properties(x264
                       PROPERTIES IMPORTED_LOCATION
-                      ../../../../libs/armeabi-v7a/libx264.a)
+                      ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libx264.a)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
