@@ -111,6 +111,7 @@ public class FileUtil {
         if (TextUtils.isEmpty(path)) {
             return false;
         }
+        path = path.toLowerCase();
         return path.endsWith(TYPE_MP3)
                 || path.endsWith(TYPE_AAC)
                 || path.endsWith(TYPE_AMR)
@@ -126,6 +127,7 @@ public class FileUtil {
         if (TextUtils.isEmpty(path)) {
             return false;
         }
+        path = path.toLowerCase();
         return path.endsWith(TYPE_MP4)
                 || path.endsWith(TYPE_MKV)
                 || path.endsWith(TYPE_WEBM)

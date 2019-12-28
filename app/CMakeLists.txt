@@ -41,12 +41,12 @@ set_target_properties( ffmpeg
                        PROPERTIES IMPORTED_LOCATION
                        ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libffmpeg.so )
 
-add_library( mp3lame
-        SHARED
-            IMPORTED )
-set_target_properties( mp3lame
-            PROPERTIES IMPORTED_LOCATION
-            ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libmp3lame.so )
+#add_library( mp3lame
+#             SHARED
+#             IMPORTED )
+#set_target_properties( mp3lame
+#            PROPERTIES IMPORTED_LOCATION
+#            ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libmp3lame.so )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
@@ -66,7 +66,7 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        media-handle
-                       mp3lame
+#                       mp3lame
                        ffmpeg
                        -landroid #native_window
                        -ljnigraphics #bitmap
