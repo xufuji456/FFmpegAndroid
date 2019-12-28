@@ -5,7 +5,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -68,9 +67,7 @@ public class FileUtil {
                 outputStream.write(data, 0, len);
             }
             outputStream.flush();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }catch (IOException e){
+        } catch (IOException e){
             e.printStackTrace();
         }finally {
             try {
