@@ -34,8 +34,8 @@ public class VideoPusherNew extends Pusher implements TextureView.SurfaceTexture
         this.mLiveUtil = liveUtil;
         this.mContext = context;
         mTextureView.setSurfaceTextureListener(this);
-        liveUtil.setVideoParams(videoParam.getWidth(), videoParam.getHeight(),
-                videoParam.getBitRate(), videoParam.getFrameRate());
+//        liveUtil.setVideoParams(videoParam.getWidth(), videoParam.getHeight(),
+//                videoParam.getBitRate(), videoParam.getFrameRate());
     }
 
 
@@ -66,8 +66,6 @@ public class VideoPusherNew extends Pusher implements TextureView.SurfaceTexture
         Log.e(TAG, "preview width=" + mTextureView.getWidth() + "--height=" + mTextureView.getHeight());
         camera2Helper = new Camera2Helper.Builder()
                 .cameraListener(this)
-                .maxPreviewSize(new Point(1080, 720))
-                .minPreviewSize(new Point(mVideoParam.getWidth(), mVideoParam.getHeight()))
                 .specificCameraId(Camera2Helper.CAMERA_ID_BACK)
                 .context(mContext.getApplicationContext())
                 .previewOn(mTextureView)
@@ -140,6 +138,10 @@ public class VideoPusherNew extends Pusher implements TextureView.SurfaceTexture
     @Override
     public void onCameraOpened(Size previewSize, int displayOrientation) {
         Log.e(TAG, "onCameraOpened previewSize=" + previewSize.toString());
+        if (mLiveUtil != null && mVideoParam != null) {
+            mLiveUtil.setVideoParams(previewSize.getWidth(), previewSize.getHeight(),
+                    mVideoParam.getBitRate(), mVideoParam.getFrameRate());
+        }
     }
 
     @Override

@@ -28,7 +28,7 @@ import android.view.TextureView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -45,9 +45,6 @@ public class Camera2Helper {
 
     private static final String TAG = Camera2Helper.class.getSimpleName();
 
-    private Point maxPreviewSize;
-    private Point minPreviewSize;
-
     public static final String CAMERA_ID_FRONT = "1";
     public static final String CAMERA_ID_BACK = "0";
 
@@ -58,7 +55,6 @@ public class Camera2Helper {
     private TextureView mTextureView;
     private int rotation;
     private Point previewViewSize;
-    private Point specificPreviewSize;
     private Context context;
     /**
      * A {@link CameraCaptureSession } for camera preview.
@@ -78,9 +74,6 @@ public class Camera2Helper {
         camera2Listener = builder.camera2Listener;
         rotation = builder.rotation;
         previewViewSize = builder.previewViewSize;
-        specificPreviewSize = builder.previewSize;
-        maxPreviewSize = builder.maxPreviewSize;
-        minPreviewSize = builder.minPreviewSize;
         context = builder.context;
     }
 
@@ -250,62 +243,20 @@ public class Camera2Helper {
 
     private Size getBestSupportedSize(List<Size> sizes) {
         Size defaultSize = sizes.get(0);
-        Size[] tempSizes = sizes.toArray(new Size[0]);
-        Arrays.sort(tempSizes, new Comparator<Size>() {
-            @Override
-            public int compare(Size o1, Size o2) {
-                if (o1.getWidth() > o2.getWidth()) {
-                    return -1;
-                } else if (o1.getWidth() == o2.getWidth()) {
-                    return o1.getHeight() > o2.getHeight() ? -1 : 1;
-                } else {
-                    return 1;
-                }
-            }
-        });
-        sizes = new ArrayList<>(Arrays.asList(tempSizes));
-        for (int i = sizes.size() - 1; i >= 0; i--) {
-            if (maxPreviewSize != null) {
-                if (sizes.get(i).getWidth() > maxPreviewSize.x || sizes.get(i).getHeight() > maxPreviewSize.y) {
-                    sizes.remove(i);
-                    continue;
-                }
-            }
-            if (minPreviewSize != null) {
-                if (sizes.get(i).getWidth() < minPreviewSize.x || sizes.get(i).getHeight() < minPreviewSize.y) {
-                    sizes.remove(i);
-                }
+        Log.e(TAG, "default width=" + defaultSize.getWidth() + "--height=" + defaultSize.getHeight());
+        int defaultDelta = Math.abs(defaultSize.getWidth() * defaultSize.getHeight() - previewViewSize.x * previewViewSize.y);
+        Iterator supportIterator = sizes.iterator();
+        while (supportIterator.hasNext()) {
+            Size size = (Size) supportIterator.next();
+            Log.e(TAG, "current width=" + defaultSize.getWidth() + "--height=" + defaultSize.getHeight());
+            int currentDelta = Math.abs(size.getWidth() * size.getHeight() - previewViewSize.x * previewViewSize.y);
+            if (currentDelta < defaultDelta) {
+                defaultDelta = currentDelta;
+                defaultSize = size;
             }
         }
-        if (sizes.size() == 0) {
-            String msg = "can not find suitable previewSize, now using default";
-            if (camera2Listener != null) {
-                Log.e(TAG, msg);
-                camera2Listener.onCameraError(new Exception(msg));
-            }
-            return defaultSize;
-        }
-        Size bestSize = sizes.get(0);
-        float previewViewRatio;
-        if (previewViewSize != null) {
-            previewViewRatio = (float) previewViewSize.x / (float) previewViewSize.y;
-        } else {
-            previewViewRatio = (float) bestSize.getWidth() / (float) bestSize.getHeight();
-        }
-
-        if (previewViewRatio > 1) {
-            previewViewRatio = 1 / previewViewRatio;
-        }
-
-        for (Size s : sizes) {
-            if (specificPreviewSize != null && specificPreviewSize.x == s.getWidth() && specificPreviewSize.y == s.getHeight()) {
-                return s;
-            }
-            if (Math.abs((s.getHeight() / (float) s.getWidth()) - previewViewRatio) < Math.abs(bestSize.getHeight() / (float) bestSize.getWidth() - previewViewRatio)) {
-                bestSize = s;
-            }
-        }
-        return bestSize;
+        Log.e(TAG, "final width=" + defaultSize.getWidth() + "--height=" + defaultSize.getHeight());
+        return defaultSize;
     }
 
     public synchronized void start() {
@@ -396,11 +347,7 @@ public class Camera2Helper {
             }
 
             cameraManager.openCamera(mCameraId, mDeviceStateCallback, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            if (camera2Listener != null) {
-                camera2Listener.onCameraError(e);
-            }
-        } catch (InterruptedException e) {
+        } catch (CameraAccessException | InterruptedException e) {
             if (camera2Listener != null) {
                 camera2Listener.onCameraError(e);
             }
@@ -537,12 +484,6 @@ public class Camera2Helper {
 
         private int rotation;
 
-        private Point previewSize;
-
-        private Point maxPreviewSize;
-
-        private Point minPreviewSize;
-
         private Context context;
 
         public Builder() {
@@ -551,21 +492,6 @@ public class Camera2Helper {
 
         public Builder previewOn(TextureView val) {
             previewDisplayView = val;
-            return this;
-        }
-
-        public Builder previewSize(Point val) {
-            previewSize = val;
-            return this;
-        }
-
-        public Builder maxPreviewSize(Point val) {
-            maxPreviewSize = val;
-            return this;
-        }
-
-        public Builder minPreviewSize(Point val) {
-            minPreviewSize = val;
             return this;
         }
 
@@ -598,11 +524,6 @@ public class Camera2Helper {
         public Camera2Helper build() {
             if (previewDisplayView == null) {
                 throw new NullPointerException("must preview on a textureView or a surfaceView");
-            }
-            if (maxPreviewSize != null && minPreviewSize != null) {
-                if (maxPreviewSize.x < minPreviewSize.x || maxPreviewSize.y < minPreviewSize.y) {
-                    throw new IllegalArgumentException("maxPreviewSize must greater than minPreviewSize");
-                }
             }
             return new Camera2Helper(this);
         }
