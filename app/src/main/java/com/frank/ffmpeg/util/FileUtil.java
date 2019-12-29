@@ -159,4 +159,50 @@ public class FileUtil {
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
+    public static String createListFile(String listPath, String[] fileArray) {
+        if ((TextUtils.isEmpty(listPath) || fileArray == null || fileArray.length == 0)) {
+            return null;
+        }
+        FileOutputStream outputStream = null;
+        try {
+            File listFile = new File(listPath);
+            if (!listFile.getParentFile().exists()) {
+                if (!listFile.mkdirs()) {
+                    return null;
+                }
+            }
+            if (!listFile.exists()) {
+                if (!listFile.createNewFile()) {
+                    return null;
+                }
+            }
+            outputStream = new FileOutputStream(listFile);
+            StringBuilder fileBuilder = new StringBuilder();
+            for (String file:fileArray) {
+                fileBuilder
+                        .append("file")
+                        .append(" ")
+                        .append("'")
+                        .append(file)
+                        .append("'")
+                        .append("\n");
+            }
+            byte[] fileData = fileBuilder.toString().getBytes();
+            outputStream.write(fileData, 0, fileData.length);
+            outputStream.flush();
+            return listFile.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+
 }
