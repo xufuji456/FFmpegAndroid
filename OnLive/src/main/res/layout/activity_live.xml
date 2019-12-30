@@ -32,11 +32,21 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"/>
 
+    <ImageButton
+        android:id="@+id/btn_screenshot"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_screen_shot"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/btn_sound"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="10dp"/>
+
     <TableLayout
         android:id="@+id/hud_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
+        android:layout_gravity="end|center_vertical"
         android:background="@color/ijk_transparent_dark"
         android:padding="8dp"
         android:visibility="gone"/>

@@ -1,9 +1,13 @@
 package com.frank.living.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -12,9 +16,13 @@ import android.widget.TableLayout;
 import com.frank.living.R;
 import com.frank.living.listener.IjkPlayerListener;
 
+import androidx.core.app.ActivityCompat;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
+import com.frank.living.util.PhotoUtil;
 import com.frank.living.widget.IjkVideoView;
+
+import java.io.File;
 
 public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerListener, View.OnClickListener {
 
@@ -26,6 +34,7 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
     private ImageButton btnSound;
     private boolean isPause;
     private boolean isSilence;
+    private String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     //    private final static String url = "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov";
     private final static String url = "rtmp://58.200.131.2:1935/livetv/hunantv";
@@ -35,6 +44,7 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live);
 
+        requestPermission();
         init();
 
     }
@@ -54,7 +64,14 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
         btnPlay.setOnClickListener(this);
         btnSound = findViewById(R.id.btn_sound);
         btnSound.setOnClickListener(this);
+        ImageButton btnScreenShot = findViewById(R.id.btn_screenshot);
+        btnScreenShot.setOnClickListener(this);
+    }
 
+    private void requestPermission() {
+        if (ActivityCompat.checkSelfPermission(this, permissions[0]) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, permissions, 1234);
+        }
     }
 
     private void initOptions() {
@@ -109,6 +126,16 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
                 } else {
                     ijkMediaPlayer.setVolume(50, 50);
                     btnSound.setBackgroundResource(R.drawable.ic_silence);
+                }
+                break;
+            case R.id.btn_screenshot:
+                if (mVideoView != null) {
+                    Bitmap currentFrame = mVideoView.getCurrentFrame();
+                    if (currentFrame != null) {
+                        String photoName = "img_" + System.currentTimeMillis() + ".jpg";
+                        String photoPath = Environment.getExternalStorageDirectory().getPath() + File.separator + photoName;
+                        PhotoUtil.savePhoto(currentFrame, photoPath, this);
+                    }
                 }
                 break;
             default:

@@ -21,6 +21,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -335,12 +336,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             // target state that was there before.
             mCurrentState = STATE_PREPARING;
             attachMediaController();
-        } catch (IOException ex) {
-            Log.w(TAG, "Unable to open content: " + mUri, ex);
-            mCurrentState = STATE_ERROR;
-            mTargetState = STATE_ERROR;
-            mErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
-        } catch (IllegalArgumentException ex) {
+        } catch (IOException | IllegalArgumentException ex) {
             Log.w(TAG, "Unable to open content: " + mUri, ex);
             mCurrentState = STATE_ERROR;
             mTargetState = STATE_ERROR;
@@ -905,7 +901,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public static final int RENDER_SURFACE_VIEW = 1;
     public static final int RENDER_TEXTURE_VIEW = 2;
 
-    private List<Integer> mAllRenders = new ArrayList<Integer>();
+    private List<Integer> mAllRenders = new ArrayList<>();
     private int mCurrentRenderIndex = 0;
     private int mCurrentRender = RENDER_NONE;
 
@@ -1197,6 +1193,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mRenderView != null){
             mRenderView.getView().setVisibility(GONE);
         }
+    }
+
+    public Bitmap getCurrentFrame() {
+        if (mRenderView instanceof TextureRenderView) {
+            return ((TextureRenderView) mRenderView).getBitmap();
+        }
+        return null;
     }
 
 }
