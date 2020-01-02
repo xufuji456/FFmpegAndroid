@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.frank.ffmpeg.AudioPlayer;
 import com.frank.ffmpeg.R;
@@ -140,8 +142,11 @@ public class AudioHandleActivity extends BaseActivity {
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
+                List<String> fileList = new ArrayList<>();
+                fileList.add(srcFile);
+                fileList.add(appendFile);
                 String concatFile = PATH + File.separator + "concat.mp3";
-                commandLine = FFmpegUtil.concatAudio(srcFile, appendFile, concatFile);
+                commandLine = FFmpegUtil.concatAudio(fileList, concatFile);
                 break;
             case R.id.btn_mix://混音
                 if (!FileUtil.checkFileExist(appendFile)) {

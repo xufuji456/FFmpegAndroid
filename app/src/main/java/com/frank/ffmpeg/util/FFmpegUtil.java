@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.frank.ffmpeg.format.VideoLayout;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -46,14 +47,23 @@ public class FFmpegUtil {
     /**
      * 使用ffmpeg命令行进行音频合并
      *
-     * @param srcFile    源文件
-     * @param appendFile 待追加的文件
+     * @param fileList   合并列表
      * @param targetFile 目标文件
      * @return 合并后的文件
      */
-    public static String[] concatAudio(String srcFile, String appendFile, String targetFile) {
-        String concatAudioCmd = "ffmpeg -i concat:%s|%s -acodec copy %s";
-        concatAudioCmd = String.format(concatAudioCmd, srcFile, appendFile, targetFile);
+    public static String[] concatAudio(List<String> fileList, String targetFile) {
+//        ffmpeg -i concat:%s|%s -acodec copy %s
+        if (fileList == null || fileList.size() == 0) {
+            return null;
+        }
+        StringBuilder concatBuilder = new StringBuilder();
+        concatBuilder.append("concat:");
+        for (String file : fileList) {
+            concatBuilder.append(file).append("|");
+        }
+        String concatStr = concatBuilder.substring(0, concatBuilder.length() - 1);
+        String concatAudioCmd = "ffmpeg -i %s -acodec libmp3lame -ab 128k -ac 2 -ar 44100 %s";
+        concatAudioCmd = String.format(concatAudioCmd, concatStr, targetFile);
         return concatAudioCmd.split(" ");//以空格分割为字符串数组
     }
 
@@ -66,6 +76,7 @@ public class FFmpegUtil {
      * @return 混合后的文件
      */
     public static String[] mixAudio(String srcFile, String mixFile, String targetFile) {
+        //调节音量:使用-vol 50, 其中vol为0-100
         String mixAudioCmd = "ffmpeg -i %s -i %s -filter_complex amix=inputs=2:duration=first -strict -2 %s";
         mixAudioCmd = String.format(mixAudioCmd, srcFile, mixFile, targetFile);
         return mixAudioCmd.split(" ");//以空格分割为字符串数组
