@@ -18,21 +18,22 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
 
-             src/main/cpp/ffmpeg/cmdutils.c
-             src/main/cpp/ffmpeg/ffmpeg.c
-             src/main/cpp/ffmpeg/ffmpeg_filter.c
-             src/main/cpp/ffmpeg/ffmpeg_opt.c
-             src/main/cpp/ffmpeg_cmd.c
-             src/main/cpp/ffmpeg/ffprobe.c
-             src/main/cpp/audio_player.c
-             src/main/cpp/openSL_audio_player.c
-             src/main/cpp/video_player.c
-             src/main/cpp/ffmpeg_pusher.cpp
-             src/main/cpp/AVpacket_queue.c
-             src/main/cpp/media_player.c
-             src/main/cpp/video_filter.c
-             src/main/cpp/audio_lame.c
-             src/main/cpp/fast_start.c
+            src/main/cpp/ffmpeg/cmdutils.c
+            src/main/cpp/ffmpeg/ffmpeg.c
+            src/main/cpp/ffmpeg/ffmpeg_filter.c
+            src/main/cpp/ffmpeg/ffmpeg_opt.c
+            src/main/cpp/ffmpeg_cmd.c
+            src/main/cpp/ffmpeg/ffprobe.c
+            src/main/cpp/audio_player.c
+            src/main/cpp/openSL_audio_player.c
+            src/main/cpp/video_player.c
+            src/main/cpp/ffmpeg_pusher.cpp
+            src/main/cpp/AVpacket_queue.c
+            src/main/cpp/media_player.c
+            src/main/cpp/video_filter.c
+            src/main/cpp/audio_lame.c
+            src/main/cpp/fast_start.c
+            src/main/cpp/ffprobe_cmd.c
         )
 
 add_library( ffmpeg
