@@ -50,8 +50,35 @@ public class FFmpegHandler {
             }
 
             @Override
-            public void onEnd(int result) {
+            public void onEnd(int resultCode, String resultMsg) {
                 Log.i(TAG, "handle onEnd...");
+                if(isContinue) {
+                    mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
+                }else {
+                    mHandler.obtainMessage(MSG_FINISH).sendToTarget();
+                }
+            }
+        });
+    }
+
+    /**
+     * execute probe cmd
+     * @param commandLine commandLine
+     */
+    public void executeFFprobeCmd(final String[] commandLine) {
+        if(commandLine == null) {
+            return;
+        }
+        FFmpegCmd.executeProbe(commandLine, new OnHandleListener() {
+            @Override
+            public void onBegin() {
+                Log.i(TAG, "handle ffprobe onBegin...");
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+            }
+
+            @Override
+            public void onEnd(int resultCode, String resultMsg) {
+                Log.i(TAG, "handle ffprobe onEnd result=" + resultMsg);
                 if(isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 }else {
