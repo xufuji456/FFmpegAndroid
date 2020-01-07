@@ -51,7 +51,9 @@
         <!--视频播放拖动预览-->
         <activity android:name=".activity.VideoPreviewActivity"
             android:screenOrientation="portrait" />
-
+        <!--检测多媒体格式数据-->
+        <activity android:name=".activity.ProbeFormatActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

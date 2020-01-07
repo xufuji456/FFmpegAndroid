@@ -358,8 +358,22 @@ public class FFmpegUtil {
      */
     public static String[] moveMoovAhead(String inputFile, String outputFile) {
         String moovCmd = "ffmpeg -i %s -movflags faststart -acodec copy -vcodec copy %s";
-        moovCmd = String.format(Locale.CHINESE, moovCmd, inputFile, outputFile);
+        moovCmd = String.format(Locale.getDefault(), moovCmd, inputFile, outputFile);
         return moovCmd.split(" ");
+    }
+
+    /**
+     * 使用ffprobe探测多媒体格式
+     *
+     * @param inputFile  inputFile
+     * @return 多媒体格式数据
+     */
+    public static String[] probeFormat(String inputFile) {
+        //show format:ffprobe -i %s -show_format -print_format json
+        //show stream:ffprobe -i %s -show_streams
+        String ffprobeCmd = "ffprobe -i %s -show_streams -show_format -print_format json";
+        ffprobeCmd = String.format(Locale.getDefault(), ffprobeCmd, inputFile);
+        return ffprobeCmd.split(" ");
     }
 
 }

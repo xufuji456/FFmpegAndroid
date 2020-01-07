@@ -19,6 +19,7 @@
     <string name="media_extra_audio">提取音频</string>
     <string name="media_extract_video">提取视频</string>
     <string name="media_play">音视频播放</string>
+    <string name="media_probe">解析多媒体格式</string>
 
     <string name="video_cut">视频剪切</string>
     <string name="video_concat">视频拼接</string>

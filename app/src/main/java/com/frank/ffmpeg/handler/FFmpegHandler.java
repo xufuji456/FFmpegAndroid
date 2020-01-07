@@ -78,7 +78,7 @@ public class FFmpegHandler {
 
             @Override
             public void onEnd(int resultCode, String resultMsg) {
-                Log.i(TAG, "handle ffprobe onEnd result=" + resultMsg);
+                Log.e(TAG, "handle ffprobe onEnd result=" + resultMsg);
                 if(isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 }else {

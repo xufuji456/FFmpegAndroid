@@ -29,7 +29,8 @@ public class MainActivity extends BaseActivity {
                 R.id.btn_push,
                 R.id.btn_live,
                 R.id.btn_filter,
-                R.id.btn_preview
+                R.id.btn_preview,
+                R.id.btn_probe
         );
     }
 
@@ -60,6 +61,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.btn_preview://视频拖动实时预览
                 intent.setClass(MainActivity.this, VideoPreviewActivity.class);
+                break;
+            case R.id.btn_probe://解析音视频多媒体格式
+                intent.setClass(MainActivity.this, ProbeFormatActivity.class);
                 break;
             default:
                 break;
