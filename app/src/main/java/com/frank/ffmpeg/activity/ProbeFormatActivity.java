@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -43,6 +44,10 @@ public class ProbeFormatActivity extends BaseActivity {
                 case MSG_FINISH:
                     progressProbe.setVisibility(View.GONE);
                     layoutProbe.setVisibility(View.VISIBLE);
+                    String result = (String) msg.obj;
+                    if (!TextUtils.isEmpty(result) && txtProbeFormat != null) {
+                        txtProbeFormat.setText(result);
+                    }
                     break;
                 default:
                     break;
@@ -59,7 +64,6 @@ public class ProbeFormatActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        hideActionBar();
         initView();
         ffmpegHandler = new FFmpegHandler(mHandler);
     }

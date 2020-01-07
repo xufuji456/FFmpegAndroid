@@ -82,7 +82,7 @@ public class FFmpegHandler {
                 if(isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 }else {
-                    mHandler.obtainMessage(MSG_FINISH).sendToTarget();
+                    mHandler.obtainMessage(MSG_FINISH, resultMsg).sendToTarget();
                 }
             }
         });
