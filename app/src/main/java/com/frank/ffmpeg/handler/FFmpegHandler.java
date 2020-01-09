@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.listener.OnHandleListener;
+import com.frank.ffmpeg.model.MediaBean;
+import com.frank.ffmpeg.tool.JsonParseTool;
 
 /**
  * Handler消息处理器
@@ -78,12 +80,12 @@ public class FFmpegHandler {
 
             @Override
             public void onEnd(int resultCode, String resultMsg) {
-                Log.e(TAG, "handle ffprobe onEnd result=" + resultMsg);
-                if(isContinue) {
-                    mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
-                }else {
-                    mHandler.obtainMessage(MSG_FINISH, resultMsg).sendToTarget();
+                Log.i(TAG, "handle ffprobe onEnd result=" + resultMsg);
+                MediaBean mediaBean = null;
+                if(resultMsg != null && !resultMsg.isEmpty()) {
+                    mediaBean = JsonParseTool.parseMediaFormat(resultMsg);
                 }
+                mHandler.obtainMessage(MSG_FINISH, mediaBean).sendToTarget();
             }
         });
     }

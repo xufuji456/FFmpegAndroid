@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.handler.FFmpegHandler;
 
+import com.frank.ffmpeg.model.MediaBean;
+import com.frank.ffmpeg.tool.JsonParseTool;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
@@ -44,9 +46,10 @@ public class ProbeFormatActivity extends BaseActivity {
                 case MSG_FINISH:
                     progressProbe.setVisibility(View.GONE);
                     layoutProbe.setVisibility(View.VISIBLE);
-                    String result = (String) msg.obj;
-                    if (!TextUtils.isEmpty(result) && txtProbeFormat != null) {
-                        txtProbeFormat.setText(result);
+                    MediaBean result = (MediaBean) msg.obj;
+                    String resultFormat = JsonParseTool.stringFormat(result);
+                    if (!TextUtils.isEmpty(resultFormat) && txtProbeFormat != null) {
+                        txtProbeFormat.setText(resultFormat);
                     }
                     break;
                 default:
