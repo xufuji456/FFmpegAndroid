@@ -31,6 +31,7 @@ android端基于FFmpeg库的使用。<br>
 - #### 使用mp3lame库进行mp3转码
 - #### 视频拖动实时预览
 - #### moov往前移动
+- #### ffprobe检测多媒体格式
 
 - #### IjkPlayer的RTSP超低延时直播
 - #### IjkPlayer的RTSP多路投屏直播
@@ -60,6 +61,10 @@ android端基于FFmpeg库的使用。<br>
 视频画中画：
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/picture_in_picture.png)
+
+检测多媒体格式：
+
+![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/probe_format.png)
 
 视频画面拼接：
 
