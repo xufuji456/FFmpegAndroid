@@ -54,10 +54,6 @@ android端基于FFmpeg库的使用。<br>
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.png)
 
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_edge.png)
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_grid.png)
-
 视频画中画：
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/picture_in_picture.png)
@@ -69,10 +65,6 @@ android端基于FFmpeg库的使用。<br>
 视频画面拼接：
 
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/horizontal.gif)
-
-视频倒播：
-
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/reverse.gif)
 
 ***
 <br><br>
