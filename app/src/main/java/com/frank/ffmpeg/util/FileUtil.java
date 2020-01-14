@@ -205,4 +205,15 @@ public class FileUtil {
         return null;
     }
 
+    public static boolean ensureDir(String fileDir) {
+        if (TextUtils.isEmpty(fileDir)) {
+            return false;
+        }
+        File listFile = new File(fileDir);
+        if (!listFile.exists()) {
+            return listFile.mkdirs();
+        }
+        return true;
+    }
+
 }
