@@ -152,9 +152,8 @@ public class VideoHandleActivity extends BaseActivity {
                 break;
             case R.id.btn_screen_shot://视频截图
                 String screenShot = PATH + File.separator + "screenShot.jpg";
-                String size = "1080x720";
                 int time = 18;
-                commandLine = FFmpegUtil.screenShot(srcFile, time, size, screenShot);
+                commandLine = FFmpegUtil.screenShot(srcFile, time, screenShot);
                 break;
             case R.id.btn_water_mark://视频添加水印
                 //1、图片

@@ -166,13 +166,12 @@ public class FFmpegUtil {
      *
      * @param srcFile    源文件
      * @param time       截图开始时间
-     * @param size       图片尺寸大小
      * @param targetFile 目标文件
      * @return 截图后的文件
      */
-    public static String[] screenShot(String srcFile, int time, String size, String targetFile) {
-        String screenShotCmd = "ffmpeg -i %s -f image2 -ss %d -s %s %s";
-        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, srcFile, time, size, targetFile);
+    public static String[] screenShot(String srcFile, int time, String targetFile) {
+        String screenShotCmd = "ffmpeg -i %s -f image2 -ss %d -vframes 1 -an %s";
+        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, srcFile, time, targetFile);
         return screenShotCmd.split(" ");
     }
 
