@@ -137,8 +137,10 @@ public class FFmpegUtil {
      * @return 转码后的文件
      */
     public static String[] transformVideo(String srcFile, String targetFile) {
-        //指定目标视频的帧率、码率、分辨率
+        // 指定视频的帧率、码率、分辨率
 //        String transformVideoCmd = "ffmpeg -i %s -r 25 -b 200 -s 1080x720 %s";
+        // 指定视频编码器:解决有旋转角度的视频，转码后发生旋转的问题
+//        String transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec copy %s";
         String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy %s";
         transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
         return transformVideoCmd.split(" ");

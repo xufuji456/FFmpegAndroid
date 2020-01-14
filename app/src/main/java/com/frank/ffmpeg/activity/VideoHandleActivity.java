@@ -119,7 +119,7 @@ public class VideoHandleActivity extends BaseActivity {
         }
         switch (viewId) {
             case R.id.btn_video_transform://视频转码:mp4转flv、wmv, 或者flv、wmv转Mp4
-                String transformVideo = PATH + File.separator + "transformVideo.flv";
+                String transformVideo = PATH + File.separator + "transformVideo.mp4";
                 commandLine = FFmpegUtil.transformVideo(srcFile, transformVideo);
                 break;
             case R.id.btn_video_cut://视频剪切
