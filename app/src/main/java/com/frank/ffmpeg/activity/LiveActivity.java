@@ -71,7 +71,7 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
         int width = 640;//分辨率设置
         int height = 480;
         int videoBitRate = 400;//kb/s
-        int videoFrameRate = 20;//fps
+        int videoFrameRate = 10;//fps
         VideoParam videoParam = new VideoParam(width, height,
                 Integer.valueOf(Camera2Helper.CAMERA_ID_BACK), videoBitRate, videoFrameRate);
         int sampleRate = 44100;//采样率：Hz
@@ -82,7 +82,6 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
         livePusher = new LivePusher(textureView, videoParam, audioParam, this);
         //TODO:暂时去掉音频推流
         livePusher.setMute(true);
-        findViewById(R.id.btn_mute).setVisibility(View.INVISIBLE);
     }
 
     @Override
