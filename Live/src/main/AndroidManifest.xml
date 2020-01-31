@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <!--<activity android:name="com.frank.live.RtmpLiveActivityvity"-->
+        <!--<activity android:name="com.frank.live.PushActivity"-->
             <!--android:screenOrientation="landscape">-->
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->

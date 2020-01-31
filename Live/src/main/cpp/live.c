@@ -42,7 +42,7 @@ const int ERROR_RTMP_CONNECT = 0x05;
 //RTMP连接流失败
 const int ERROR_RTMP_CONNECT_STREAM = 0x06;
 //RTMP发送数据包失败
-const int ERROR_RTMP_SEND_PACKAT = 0x07;
+const int ERROR_RTMP_SEND_PACKET = 0x07;
 
 /***************与Java层对应**************/
 
@@ -57,10 +57,10 @@ void add_aac_body(unsigned char *buf, int len);
 void add_aac_header();
 
 //当调用System.loadLibrary时，会回调这个方法
-jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    javaVM = vm;
-    return JNI_VERSION_1_6;
-}
+//jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+//    javaVM = vm;
+//    return JNI_VERSION_1_6;
+//}
 
 //回调异常给java
 void throw_error_to_java(int error_code) {
@@ -117,7 +117,7 @@ void *push_thread(void *args) {
                 LOGE("RTMP_SendPacket fail...");
                 RTMPPacket_Free(packet);
                 pthread_mutex_unlock(&mutex);
-                throw_error_to_java(ERROR_RTMP_SEND_PACKAT);
+                throw_error_to_java(ERROR_RTMP_SEND_PACKET);
                 goto end;
             }
             RTMPPacket_Free(packet);

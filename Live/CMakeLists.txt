@@ -34,7 +34,10 @@ include_directories(main/cpp/include)
 add_library(live
              SHARED
              src/main/cpp/live.c
-             src/main/cpp/queue.c)
+             src/main/cpp/queue.c
+        src/main/cpp/AudioStream.cpp
+        src/main/cpp/VideoStream.cpp
+            src/main/cpp/RtmpPusher.cpp)
 
 find_library( log-lib
               log )

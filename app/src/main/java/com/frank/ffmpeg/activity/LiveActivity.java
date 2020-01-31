@@ -7,18 +7,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.TextureView;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.frank.ffmpeg.R;
-import com.frank.live.Push.LivePusher;
 import com.frank.live.camera2.Camera2Helper;
 import com.frank.live.listener.LiveStateChangeListener;
 import com.frank.live.param.AudioParam;
 import com.frank.live.param.VideoParam;
+import com.frank.live.LivePusherNew;
 
 /**
  * h264与rtmp实时推流直播
@@ -30,8 +30,8 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     private final static String TAG = LiveActivity.class.getSimpleName();
     private final static String LIVE_URL = "rtmp://192.168.1.3/live/stream";
     private final static int MSG_ERROR = 100;
-    private TextureView textureView;
-    private LivePusher livePusher;
+    private SurfaceView textureView;
+    private LivePusherNew livePusher;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -70,7 +70,7 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     private void initPusher() {
         int width = 640;//分辨率设置
         int height = 480;
-        int videoBitRate = 400;//kb/s
+        int videoBitRate = 800_000;//kb/s
         int videoFrameRate = 10;//fps
         VideoParam videoParam = new VideoParam(width, height,
                 Integer.valueOf(Camera2Helper.CAMERA_ID_BACK), videoBitRate, videoFrameRate);
@@ -79,9 +79,8 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;//pcm16位
         int numChannels = 2;//声道数
         AudioParam audioParam = new AudioParam(sampleRate, channelConfig, audioFormat, numChannels);
-        livePusher = new LivePusher(textureView, videoParam, audioParam, this);
-        //TODO:暂时去掉音频推流
-        livePusher.setMute(true);
+        livePusher = new LivePusherNew(this, videoParam, audioParam);
+        livePusher.setPreviewDisplay(textureView.getHolder());
     }
 
     @Override
@@ -112,9 +111,9 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (livePusher != null) {
-//            livePusher.release();
-//        }
+        if (livePusher != null) {
+            livePusher.release();
+        }
     }
 
     @Override
