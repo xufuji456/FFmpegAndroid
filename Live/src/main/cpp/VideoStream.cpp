@@ -1,4 +1,5 @@
 
+#include <cstring>
 #include "VideoStream.h"
 #include "include/rtmp/rtmp.h"
 #include "PushGeneric.h"

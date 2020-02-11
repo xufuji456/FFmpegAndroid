@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include "queue.h"
 #include <stdint.h>
+#include <malloc.h>
 
 #define TAG "FrankLive"
 #define LOGI(format, ...) __android_log_print(ANDROID_LOG_INFO, TAG, format, ##__VA_ARGS__)
