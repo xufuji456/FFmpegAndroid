@@ -2,12 +2,14 @@ package com.frank.live;
 
 import android.app.Activity;
 import android.view.SurfaceHolder;
+import android.view.TextureView;
 
 import com.frank.live.listener.LiveStateChangeListener;
 import com.frank.live.param.AudioParam;
 import com.frank.live.param.VideoParam;
 import com.frank.live.stream.AudioStream;
 import com.frank.live.stream.VideoStream;
+import com.frank.live.stream.VideoStreamNew;
 
 public class LivePusherNew {
 
@@ -32,6 +34,7 @@ public class LivePusherNew {
 
     private AudioStream audioStream;
     private VideoStream videoStream;
+//    private VideoStreamNew videoStream;
 
     private LiveStateChangeListener liveStateChangeListener;
 
@@ -39,6 +42,12 @@ public class LivePusherNew {
         native_init();
         videoStream = new VideoStream(this, activity, videoParam.getWidth(), videoParam.getHeight(),
                 videoParam.getBitRate(), videoParam.getFrameRate(), videoParam.getCameraId());
+        audioStream = new AudioStream(this, audioParam);
+    }
+
+    public LivePusherNew(Activity activity, VideoParam videoParam, AudioParam audioParam, TextureView textureView) {
+        native_init();
+//        videoStream = new VideoStreamNew(this, textureView, videoParam, activity);
         audioStream = new AudioStream(this, audioParam);
     }
 
@@ -141,6 +150,10 @@ public class LivePusherNew {
         native_pushVideo(data);
     }
 
+    public void pushVideo(byte[] y, byte[] u, byte[] v) {
+        native_pushVideoNew(y, u, v);
+    }
+
     private native void native_init();
 
     private native void native_start(String path);
@@ -154,6 +167,8 @@ public class LivePusherNew {
     private native void native_pushAudio(byte[] data);
 
     private native void native_pushVideo(byte[] data);
+
+    private native void native_pushVideoNew(byte[] y, byte[] u, byte[] v);
 
     private native void native_stop();
 

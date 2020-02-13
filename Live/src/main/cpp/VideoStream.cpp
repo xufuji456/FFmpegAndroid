@@ -1,5 +1,6 @@
 
 #include <cstring>
+#include <jni.h>
 #include "VideoStream.h"
 #include "include/rtmp/rtmp.h"
 #include "PushGeneric.h"
@@ -116,11 +117,40 @@ void VideoStream::encodeData(int8_t *data) {
     pthread_mutex_unlock(&mutex);
 }
 
+void VideoStream::encodeDataNew(int8_t *y_plane, int8_t *u_plane, int8_t *v_plane) {
+    pthread_mutex_lock(&mutex);
+
+    //直接拷贝
+    memcpy(pic_in->img.plane[0], y_plane, (size_t) ySize);
+    memcpy(pic_in->img.plane[1], u_plane, (size_t) ySize/4);
+    memcpy(pic_in->img.plane[2], v_plane, (size_t) ySize/4);
+
+    x264_nal_t *pp_nal;
+    int pi_nal;
+    x264_picture_t pic_out;
+    x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
+    int sps_len = 0;
+    int pps_len = 0;
+    uint8_t sps[100];
+    uint8_t pps[100];
+    for (int i = 0; i < pi_nal; ++i) {
+        if (pp_nal[i].i_type == NAL_SPS) {
+            sps_len = pp_nal[i].i_payload - 4;
+            memcpy(sps, pp_nal[i].p_payload + 4, static_cast<size_t>(sps_len));
+        } else if (pp_nal[i].i_type == NAL_PPS) {
+            pps_len = pp_nal[i].i_payload - 4;
+            memcpy(pps, pp_nal[i].p_payload + 4, static_cast<size_t>(pps_len));
+            sendSpsPps(sps, pps, sps_len, pps_len);
+        } else {
+            sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
+        }
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
 void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len) {
-    //看表
     int bodySize = 13 + sps_len + 3 + pps_len;
     RTMPPacket *packet = new RTMPPacket;
-    //
     RTMPPacket_Alloc(packet, bodySize);
     int i = 0;
     //固定头
@@ -139,7 +169,7 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
     packet->m_body[i++] = sps[3];
     packet->m_body[i++] = 0xFF;
 
-    //整个sps
+    //sps
     packet->m_body[i++] = 0xE1;
     //sps长度
     packet->m_body[i++] = (sps_len >> 8) & 0xff;
@@ -156,7 +186,6 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
     //视频
     packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
     packet->m_nBodySize = bodySize;
-    //随意分配一个管道（尽量避开rtmp.c中使用的）
     packet->m_nChannel = 10;
     //sps pps没有时间戳
     packet->m_nTimeStamp = 0;

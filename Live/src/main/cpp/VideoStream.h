@@ -19,6 +19,8 @@ public:
 
     void encodeData(int8_t *data);
 
+    void encodeDataNew(int8_t *y_plane, int8_t *u_plane, int8_t *v_plane);
+
     void setVideoCallback(VideoCallback videoCallback);
 
 private:
@@ -37,6 +39,5 @@ private:
 
     void sendFrame(int type, uint8_t *payload, int i_payload);
 };
-
 
 #endif
