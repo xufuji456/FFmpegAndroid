@@ -189,6 +189,22 @@ Java_com_frank_live_LivePusherNew_native_1pushVideo(JNIEnv *env, jobject instanc
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_frank_live_LivePusherNew_native_1pushVideoNew(JNIEnv *env, jobject instance,
+                                                          jbyteArray y, jbyteArray u, jbyteArray v) {
+    if (!videoStream || !readyPushing) {
+        return;
+    }
+    jbyte *y_plane = env->GetByteArrayElements(y, NULL);
+    jbyte *u_plane = env->GetByteArrayElements(u, NULL);
+    jbyte *v_plane = env->GetByteArrayElements(v, NULL);
+    videoStream->encodeDataNew(y_plane, u_plane, v_plane);
+    env->ReleaseByteArrayElements(y, y_plane, 0);
+    env->ReleaseByteArrayElements(u, u_plane, 0);
+    env->ReleaseByteArrayElements(v, v_plane, 0);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_frank_live_LivePusherNew_native_1setAudioCodecInfo(JNIEnv *env, jobject instance,
                                                                 jint sampleRateInHz,
                                                                 jint channels) {
