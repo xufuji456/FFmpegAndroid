@@ -32,12 +32,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 include_directories(main/cpp/include)
 
 add_library(live
-             SHARED
-             src/main/cpp/live.c
-             src/main/cpp/queue.c
+        SHARED
         src/main/cpp/AudioStream.cpp
         src/main/cpp/VideoStream.cpp
-            src/main/cpp/RtmpPusher.cpp)
+        src/main/cpp/RtmpPusher.cpp)
 
 find_library( log-lib
               log )
