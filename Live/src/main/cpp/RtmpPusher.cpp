@@ -2,7 +2,7 @@
 #include <string>
 #include "include/rtmp/rtmp.h"
 #include "safe_queue.h"
-#include "PushGeneric.h"
+#include "PushInterface.h"
 #include "VideoStream.h"
 #include "AudioStream.h"
 

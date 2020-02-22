@@ -1,7 +1,7 @@
 
 #include <cstring>
 #include "AudioStream.h"
-#include "PushGeneric.h"
+#include "PushInterface.h"
 
 AudioStream::AudioStream() {
 

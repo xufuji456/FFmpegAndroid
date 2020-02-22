@@ -1,6 +1,6 @@
 
-#ifndef PUSHGENERIC_H
-#define PUSHGENERIC_H
+#ifndef PUSHINTERFACE_H
+#define PUSHINTERFACE_H
 
 #include <android/log.h>
 

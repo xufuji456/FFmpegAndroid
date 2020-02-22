@@ -3,7 +3,7 @@
 #include <jni.h>
 #include "VideoStream.h"
 #include "include/rtmp/rtmp.h"
-#include "PushGeneric.h"
+#include "PushInterface.h"
 
 VideoStream::VideoStream() {
     pthread_mutex_init(&mutex, 0);
