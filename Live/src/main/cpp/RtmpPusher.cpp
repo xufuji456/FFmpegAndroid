@@ -6,6 +6,11 @@
 #include "VideoStream.h"
 #include "AudioStream.h"
 
+#define RTMP_PUSHER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+    extern "C" \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_live_LivePusherNew_ ## FUNC_NAME \
+    (JNIEnv *env, jobject instance, ##__VA_ARGS__)\
+
 SafeQueue<RTMPPacket *> packets;
 VideoStream *videoStream = 0;
 int isStart = 0;
@@ -55,14 +60,6 @@ void throwErrToJava(int error_code) {
     javaVM->DetachCurrentThread();
 }
 
-void releasePackets(RTMPPacket *&packet) {
-    if (packet) {
-        RTMPPacket_Free(packet);
-        delete packet;
-        packet = 0;
-    }
-}
-
 void callback(RTMPPacket *packet) {
     if (packet) {
         packet->m_nTimeStamp = RTMP_GetTime() - start_time;
@@ -70,24 +67,11 @@ void callback(RTMPPacket *packet) {
     }
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1init(JNIEnv *env, jobject instance) {
-    videoStream = new VideoStream;
-    videoStream->setVideoCallback(callback);
-    audioStream = new AudioStream;
-    audioStream->setAudioCallback(callback);
-    packets.setReleaseCallback(releasePackets);
-    jobject_error = env->NewGlobalRef(instance);
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1setVideoCodecInfo(JNIEnv *env, jobject instance,
-                                                                jint width, jint height, jint fps,
-                                                                jint bitrate) {
-    if (videoStream) {
-        videoStream->setVideoEncInfo(width, height, fps, bitrate);
+void releasePackets(RTMPPacket *&packet) {
+    if (packet) {
+        RTMPPacket_Free(packet);
+        delete packet;
+        packet = 0;
     }
 }
 
@@ -160,10 +144,23 @@ void *start(void *args) {
     return 0;
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1start(JNIEnv *env, jobject instance,
-                                                      jstring path_) {
+RTMP_PUSHER_FUNC(void, native_1init) {
+    videoStream = new VideoStream;
+    videoStream->setVideoCallback(callback);
+    audioStream = new AudioStream;
+    audioStream->setAudioCallback(callback);
+    packets.setReleaseCallback(releasePackets);
+    jobject_error = env->NewGlobalRef(instance);
+}
+
+RTMP_PUSHER_FUNC(void, native_1setVideoCodecInfo,
+        jint width, jint height, jint fps, jint bitrate) {
+    if (videoStream) {
+        videoStream->setVideoEncInfo(width, height, fps, bitrate);
+    }
+}
+
+RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
     if (isStart) {
         return;
     }
@@ -175,10 +172,7 @@ Java_com_frank_live_LivePusherNew_native_1start(JNIEnv *env, jobject instance,
     env->ReleaseStringUTFChars(path_, path);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1pushVideo(JNIEnv *env, jobject instance,
-                                                          jbyteArray data_) {
+RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray data_) {
     if (!videoStream || !readyPushing) {
         return;
     }
@@ -187,10 +181,7 @@ Java_com_frank_live_LivePusherNew_native_1pushVideo(JNIEnv *env, jobject instanc
     env->ReleaseByteArrayElements(data_, data, 0);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1pushVideoNew(JNIEnv *env, jobject instance,
-                                                          jbyteArray y, jbyteArray u, jbyteArray v) {
+RTMP_PUSHER_FUNC(void, native_1pushVideoNew, jbyteArray y, jbyteArray u, jbyteArray v) {
     if (!videoStream || !readyPushing) {
         return;
     }
@@ -203,52 +194,35 @@ Java_com_frank_live_LivePusherNew_native_1pushVideoNew(JNIEnv *env, jobject inst
     env->ReleaseByteArrayElements(v, v_plane, 0);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1setAudioCodecInfo(JNIEnv *env, jobject instance,
-                                                                jint sampleRateInHz,
-                                                                jint channels) {
+RTMP_PUSHER_FUNC(void, native_1setAudioCodecInfo, jint sampleRateInHz, jint channels) {
     if (audioStream) {
         audioStream->setAudioEncInfo(sampleRateInHz, channels);
     }
-
 }
 
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_frank_live_LivePusherNew_getInputSamples(JNIEnv *env, jobject instance) {
-
+RTMP_PUSHER_FUNC(jint, getInputSamples) {
     if (audioStream) {
         return audioStream->getInputSamples();
     }
     return -1;
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1pushAudio(JNIEnv *env, jobject instance,
-                                                          jbyteArray data_) {
-
+RTMP_PUSHER_FUNC(void, native_1pushAudio, jbyteArray data_) {
     if (!audioStream || !readyPushing) {
         return;
     }
     jbyte *data = env->GetByteArrayElements(data_, NULL);
     audioStream->encodeData(data);
     env->ReleaseByteArrayElements(data_, data, 0);
-
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1stop(JNIEnv *env, jobject instance) {
+RTMP_PUSHER_FUNC(void, native_1stop) {
     readyPushing = 0;
     packets.setWork(0);
     pthread_join(pid, 0);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_frank_live_LivePusherNew_native_1release(JNIEnv *env, jobject instance) {
+RTMP_PUSHER_FUNC(void, native_1release) {
     env->DeleteGlobalRef(jobject_error);
     DELETE(videoStream);
     DELETE(audioStream);
