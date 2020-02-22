@@ -145,6 +145,7 @@ void *start(void *args) {
 }
 
 RTMP_PUSHER_FUNC(void, native_1init) {
+    LOGI("native init...");
     videoStream = new VideoStream;
     videoStream->setVideoCallback(callback);
     audioStream = new AudioStream;
@@ -161,6 +162,7 @@ RTMP_PUSHER_FUNC(void, native_1setVideoCodecInfo,
 }
 
 RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
+    LOGI("native start...");
     if (isStart) {
         return;
     }
@@ -217,12 +219,14 @@ RTMP_PUSHER_FUNC(void, native_1pushAudio, jbyteArray data_) {
 }
 
 RTMP_PUSHER_FUNC(void, native_1stop) {
+    LOGI("native stop...");
     readyPushing = 0;
     packets.setWork(0);
     pthread_join(pid, 0);
 }
 
 RTMP_PUSHER_FUNC(void, native_1release) {
+    LOGI("native release...");
     env->DeleteGlobalRef(jobject_error);
     DELETE(videoStream);
     DELETE(audioStream);

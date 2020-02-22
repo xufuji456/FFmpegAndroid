@@ -9,4 +9,6 @@
 
 #define DELETE(obj) if(obj){ delete obj; obj = 0; }
 
+#define DEBUG 0
+
 #endif
