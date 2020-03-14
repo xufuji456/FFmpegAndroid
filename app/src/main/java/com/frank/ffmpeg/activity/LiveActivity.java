@@ -21,7 +21,7 @@ import com.frank.live.param.VideoParam;
 import com.frank.live.LivePusherNew;
 
 /**
- * h264与rtmp实时推流直播
+ * h264 versus rtmpLive streaming live
  * Created by frank on 2018/1/28.
  */
 
@@ -93,7 +93,7 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
                     livePusher.stopPush();
                 }
                 break;
-            case R.id.btn_mute://设置静音
+            case R.id.btn_mute:// Set mute
                 Log.i(TAG, "isChecked=" + isChecked);
                 livePusher.setMute(isChecked);
                 break;

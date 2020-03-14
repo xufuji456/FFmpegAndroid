@@ -23,7 +23,7 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_CONTINUE;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
- * 使用ffmpeg进行音视频合成与分离
+ * 使用ffmpeg进行Audio and video synthesis versus 分离
  * Created by frank on 2018/1/23.
  */
 public class MediaHandleActivity extends BaseActivity {
@@ -49,7 +49,7 @@ public class MediaHandleActivity extends BaseActivity {
                     String muxFile = PATH + File.separator + "media-mux.mp4";
 
                     try {
-                        //使用MediaPlayer获取视频时长
+                        //使用MediaPlayerObtain视频时长
                         MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer.setDataSource(videoFile);
                         mediaPlayer.prepare();
@@ -57,7 +57,7 @@ public class MediaHandleActivity extends BaseActivity {
                         int videoDuration = mediaPlayer.getDuration()/1000;
                         Log.i(TAG, "videoDuration=" + videoDuration);
                         mediaPlayer.release();
-                        //使用MediaMetadataRetriever获取音频时长
+                        //使用MediaMetadataRetrieverObtain Audio时长
                         MediaMetadataRetriever mediaRetriever = new MediaMetadataRetriever();
                         mediaRetriever.setDataSource(audioFile);
                         //单位为ms
@@ -65,9 +65,9 @@ public class MediaHandleActivity extends BaseActivity {
                         int audioDuration = (int)(Long.parseLong(duration)/1000);
                         Log.i(TAG, "audioDuration=" + audioDuration);
                         mediaRetriever.release();
-                        //如果视频时长比音频长，采用音频时长，否则用视频时长
+                        //如果视频时长比 Audio长，采用 Audio时长，否则用视频时长
                         int mDuration = Math.min(audioDuration, videoDuration);
-                        //使用纯视频与音频进行合成
+                        //使用纯视频 versus  Audio进行合成
                         String[] commandLine = FFmpegUtil.mediaMux(temp, audioFile, mDuration, muxFile);
                         if (ffmpegHandler != null) {
                             ffmpegHandler.isContinue(false);
@@ -141,9 +141,9 @@ public class MediaHandleActivity extends BaseActivity {
         }
 
         switch (viewId){
-            case R.id.btn_mux://音视频合成
+            case R.id.btn_mux://Audio and video synthesis
                 try {
-                    //视频文件有音频,先把纯视频文件抽取出来
+                    //视频文件有 Audio,先把纯视频文件抽取出来
                     videoFile = srcFile;
                     commandLine = FFmpegUtil.extractVideo(srcFile, temp);
                     if (ffmpegHandler != null) {
@@ -153,7 +153,7 @@ public class MediaHandleActivity extends BaseActivity {
                     e.printStackTrace();
                 }
                 break;
-            case R.id.btn_extract_audio://提取音频
+            case R.id.btn_extract_audio://提取 Audio
                 String extractAudio = PATH + File.separator + "extractAudio.aac";
                 commandLine = FFmpegUtil.extractAudio(srcFile, extractAudio);
                 break;

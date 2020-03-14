@@ -50,7 +50,7 @@ public class PushActivity extends Activity implements Callback {
 	private Spinner beautyTypeSelector;
 
 	private ImageView img_photo;
-	//拍照
+	//Take a picture
 	private boolean takePhoto;
 
 	private final static int videoWidth = 640;
@@ -58,7 +58,7 @@ public class PushActivity extends Activity implements Callback {
 	private final static String[] permissions = new String[]{Manifest.permission.CAMERA};
 	private final static int CODE_CAMERA = 1001;
 
-	private final static String[] beautySelector = new String[]{"美颜", "冷酷", "日出","素描","白猫", "浪漫", "原图"};
+	private final static String[] beautySelector = new String[]{"Beauty", "Cold", "sunrise","sketch","White cat", "romantic", "Original image"};
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,11 +83,11 @@ public class PushActivity extends Activity implements Callback {
 	private void initView(){
 		//SurfaceView
 		mSmartCameraView = findViewById(R.id.gl_surfaceview);
-		//美颜类型
+		//Beauty类型
 		beautyTypeSelector = findViewById(R.id.beauty_type_selctor);
-        //静音
+        //Mute
 		btnMute = findViewById(R.id.button_mute);
-		//拍照
+		//Take a picture
 		img_photo = findViewById(R.id.img_photo);
 	}
 
@@ -137,13 +137,13 @@ public class PushActivity extends Activity implements Callback {
 				is_mute = !is_mute;
 
 				if ( is_mute )
-					btnMute.setText("取消静音");
+					btnMute.setText("Unmute");
 				else
-					btnMute.setText("静音");
+					btnMute.setText("Mute");
 			}
 		});
 
-    	//预览数据回调（RGBA格式）
+    	//Preview data callback （RGBA格式）
 		mSmartCameraView.setPreviewCallback(new SmartCameraView.PreviewCallback() {
 			@Override
 			public void onGetRgbaFrame(byte[] data, int width, int height) {
@@ -171,9 +171,9 @@ public class PushActivity extends Activity implements Callback {
 	}
 
 	/**
-	 * 拍照
-	 * @param data 预览数据
-	 * @param width 图片宽度
+	 * Take a picture
+	 * @param data Preview data
+	 * @param width Picture width
 	 * @param height 图片高度
 	 */
 	private void doTakePhoto(byte[] data, int width, int height){

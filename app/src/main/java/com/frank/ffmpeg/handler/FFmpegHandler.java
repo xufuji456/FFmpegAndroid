@@ -9,7 +9,7 @@ import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
 
 /**
- * Handler消息处理器
+ * Handler Message processing Device
  * Created by frank on 2019/11/11.
  */
 public class FFmpegHandler {
@@ -37,7 +37,7 @@ public class FFmpegHandler {
     }
 
     /**
-     * 执行ffmpeg命令行
+     *  carried out ffmpeg Command Line
      * @param commandLine commandLine
      */
     public void executeFFmpegCmd(final String[] commandLine) {

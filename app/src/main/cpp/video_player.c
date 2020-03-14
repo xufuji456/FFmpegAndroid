@@ -14,7 +14,7 @@
 
 #define TAG "VideoPlayer"
 
-//播放倍率
+//Play倍率
 float play_rate = 1;
 //视频总时长
 long duration = 0;
@@ -23,7 +23,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
 
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     LOGE(TAG, "open file:%s\n", file_name);
-    //注册所有组件
+    //Register all components
     av_register_all();
     //分配上下文
     AVFormatContext * pFormatCtx = avformat_alloc_context();
@@ -37,7 +37,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
-    //寻找视频流的第一帧
+    //Looking for video streaming  First frame
     int videoStream = -1, i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
         if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO
@@ -50,15 +50,15 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
         return -1;
     }
 
-    //获取视频总时长
+    //Obtain视频总时长
     if (pFormatCtx->duration != AV_NOPTS_VALUE) {
         duration  = (long) (pFormatCtx->duration / AV_TIME_BASE);
         LOGE(TAG, "duration==%ld", duration);
     }
 
-    //获取codec上下文指针
+    //Obtaincodec上下文指针
     AVCodecContext  * pCodecCtx = pFormatCtx->streams[videoStream]->codec;
-    //寻找视频流的解码器
+    //Looking for video streaming  decoding Device
     AVCodec * pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if(pCodec==NULL) {
         LOGE(TAG, "couldn't find Codec.");
@@ -68,9 +68,9 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
         LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
-    // 获取native window
+    // Obtainnative window
     ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
-    // 获取视频宽高
+    // Obtain视频宽高
     int videoWidth = pCodecCtx->width;
     int videoHeight = pCodecCtx->height;
     // 设置native window的buffer大小,可自动拉伸
@@ -94,7 +94,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
     av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, buffer, AV_PIX_FMT_RGBA,
                          pCodecCtx->width, pCodecCtx->height, 1);
 
-    // 由于解码出来的帧格式不是RGBA的,在渲染之前需要进行格式转换
+    // 由于 decoding 出来的帧格式不是RGBA的,在渲染之前需要进行Format conversion
     struct SwsContext *sws_ctx = sws_getContext(pCodecCtx->width,
                              pCodecCtx->height,
                              pCodecCtx->pix_fmt,
@@ -110,35 +110,35 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
     AVPacket packet;
 
     while(av_read_frame(pFormatCtx, &packet)>=0) {
-        //判断是否为视频流
+        //Determine if it is a video stream
         if(packet.stream_index==videoStream) {
-            //对该帧进行解码
+            //对该帧进行 decoding
             avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
             if (frameFinished) {
                 // lock native window
                 ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
-                // 格式转换
+                // Format conversion
                 sws_scale(sws_ctx, (uint8_t const * const *)pFrame->data,
                           pFrame->linesize, 0, pCodecCtx->height,
                           pFrameRGBA->data, pFrameRGBA->linesize);
-                // 获取stride
+                // Obtainstride
                 uint8_t * dst = windowBuffer.bits;
                 int dstStride = windowBuffer.stride * 4;
                 uint8_t * src = pFrameRGBA->data[0];
                 int srcStride = pFrameRGBA->linesize[0];
-                // 由于window的stride和帧的stride不同,因此需要逐行复制
+                // 由于window的stride And framed stride different , So you need to copy line by line
                 int h;
                 for (h = 0; h < videoHeight; h++) {
                     memcpy(dst + h * dstStride, src + h * srcStride, (size_t) srcStride);
                 }
                 ANativeWindow_unlockAndPost(nativeWindow);
             }
-            //延迟等待
+            //Delayed wait
             usleep((unsigned long) (1000 * 40 * play_rate));
         }
         av_packet_unref(&packet);
     }
-    //释放内存以及关闭文件
+    //Free up memory and close files
     av_free(buffer);
     av_free(pFrameRGBA);
     av_free(pFrame);
@@ -147,12 +147,12 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface){
     return 0;
 }
 
-//设置播放速率
+//设置Play速率
 VIDEO_PLAYER_FUNC(void, setPlayRate, jfloat playRate){
         play_rate = playRate;
 }
 
-//获取视频总时长
+//Obtain视频总时长
 VIDEO_PLAYER_FUNC(jint, getDuration){
         return duration;
 }

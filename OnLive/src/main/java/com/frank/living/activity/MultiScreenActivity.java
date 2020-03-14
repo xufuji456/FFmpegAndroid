@@ -48,7 +48,7 @@ public class MultiScreenActivity extends AppCompatActivity {
 
     //四分屏模式还是全屏模式
     private boolean isMultiScreen;
-    //保存客户端ip与通道数对应关系
+    //保存客户端ip versus 通道数对应关系
     private HashMap<String, Integer> clientMap = new HashMap<>();
     //记录每个通道的投屏状态
     private TreeMap<Integer, Boolean> channelMap = new TreeMap<>();
@@ -114,7 +114,7 @@ public class MultiScreenActivity extends AppCompatActivity {
         mVideoView1.setIjkPlayerListener(new IjkPlayerListener() {
             @Override
             public void onIjkPlayer(IjkMediaPlayer ijkMediaPlayer) {
-                //设置播放器option
+                //设置PlayDeviceoption
                 setOptions(ijkMediaPlayer);
             }
         });
@@ -161,7 +161,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 配置播放器参数项
+     * 配置PlayDevice参数项
      */
     private void setOptions(IjkMediaPlayer ijkPlayer) {
         if (ijkPlayer == null)
@@ -181,7 +181,7 @@ public class MultiScreenActivity extends AppCompatActivity {
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max_cached_duration", 30);//最大缓存时长
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "infbuf", 1);//是否限制输入缓存数
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "nobuffer");
-        //设置播放前的最大探测时间,分析码流时长:默认1024*1000
+        //设置Play前的最大探测时间,分析码流时长:默认1024*1000
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzedmaxduration", 100);
         //ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "rtsp_transport", "tcp");//tcp传输数据
     }
@@ -208,7 +208,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 自定义广播接收器
+     * 自定义广播接收Device
      */
     private class CustomReceiver extends BroadcastReceiver {
         @Override
@@ -271,7 +271,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 获取当前投屏通道
+     * Obtain当前投屏通道
      *
      * @return idleChannel
      */

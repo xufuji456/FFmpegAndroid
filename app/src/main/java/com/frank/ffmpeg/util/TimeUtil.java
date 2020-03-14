@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * 时间转换工具类
+ * 时间 Conversion tools
  * Created by frank on 2018/11/12.
  */
 
@@ -52,7 +52,7 @@ public class TimeUtil {
     }
 
     /**
-     * 获取视频时长
+     * Obtain视频时长
      * @param time time
      * @return 视频时长
      */

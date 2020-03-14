@@ -6,7 +6,7 @@
 #include <unistd.h>
 //封装格式
 #include "libavformat/avformat.h"
-//解码
+// decoding
 #include "libavcodec/avcodec.h"
 //缩放
 #include "libswscale/swscale.h"
@@ -25,17 +25,17 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 	//注册组件
 	av_register_all();
 	AVFormatContext *pFormatCtx = avformat_alloc_context();
-	//打开音频文件
+	//打开 Audio文件
 	if(avformat_open_input(&pFormatCtx,input_cstr,NULL,NULL) != 0){
-		LOGE(TAG, "无法打开音频文件");
+		LOGE(TAG, "无法打开 Audio文件");
 		return;
 	}
-	//获取输入文件信息
+	//Obtain输入文件信息
 	if(avformat_find_stream_info(pFormatCtx,NULL) < 0){
-		LOGE(TAG, "无法获取输入文件信息");
+		LOGE(TAG, "无法Obtain输入文件信息");
 		return;
 	}
-	//获取音频流索引位置
+	//Obtain Audio流索引位置
 	int i = 0, audio_stream_idx = -1;
 	for(; i < pFormatCtx->nb_streams;i++){
 		if(pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO){
@@ -44,32 +44,32 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 		}
 	}
 
-	//获取音频解码器
+	//Obtain Audio decoding Device
 	AVCodecContext *codecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
 	AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
 	if(codec == NULL){
-		LOGE(TAG, "无法获取解码器");
+		LOGE(TAG, "无法Obtain decoding Device");
 		return;
 	}
-	//打开解码器
+	//打开 decoding Device
 	if(avcodec_open2(codecCtx,codec,NULL) < 0){
-		LOGE(TAG, "无法打开解码器");
+		LOGE(TAG, "无法打开 decoding Device");
 		return;
 	}
 	//压缩数据
 	AVPacket *packet = (AVPacket *)av_malloc(sizeof(AVPacket));
 	//解压缩数据
 	AVFrame *frame = av_frame_alloc();
-	//frame->16bit 44100 PCM 统一音频采样格式与采样率
+	//frame->16bit 44100 PCM  Unified audio sampling format and sampling rate
 	SwrContext *swrCtx = swr_alloc();
 
-	//输入的采样格式
+	// Input sampling format
 	enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;
 	//输出采样格式16bit PCM
 	enum AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;
 	//输入采样率
 	int in_sample_rate = codecCtx->sample_rate;
-	//输出采样率
+	//Output sampling rate
 	int out_sample_rate = in_sample_rate;
 	//声道布局（2个声道，默认立体声stereo）
 	uint64_t in_ch_layout = codecCtx->channel_layout;
@@ -82,7 +82,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 		  0, NULL);
 	swr_init(swrCtx);
 
-	//输出的声道个数
+	//Number of output channels
 	int out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 
 	jclass player_class = (*env)->GetObjectClass(env,thiz);
@@ -101,40 +101,40 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 	jmethodID audio_track_play_mid = (*env)->GetMethodID(env,audio_track_class,"play","()V");
 	(*env)->CallVoidMethod(env,audio_track,audio_track_play_mid);
 
-	//获取write()方法
+	//Obtainwrite()方法
 	jmethodID audio_track_write_mid = (*env)->GetMethodID(env,audio_track_class,"write","([BII)I");
 
 	//16bit 44100 PCM 数据
 	uint8_t *out_buffer = (uint8_t *)av_malloc(MAX_AUDIO_FRAME_SIZE);
 
 	int got_frame = 0,index = 0, ret;
-	//不断读取编码数据
+	//不断读取 coding 数据
 	while(av_read_frame(pFormatCtx,packet) >= 0){
-		//解码音频类型的Packet
+		// decoding  Audio类型的Packet
 		if(packet->stream_index == audio_stream_idx){
-			//解码
+			// decoding
 			ret = avcodec_decode_audio4(codecCtx,frame,&got_frame,packet);
 			if(ret < 0){
                 break;
 			}
-			//解码一帧成功
+			//Successfully decoded a frame
 			if(got_frame > 0){
 				LOGI(TAG, "decode frame count=%d", index++);
-                //音频格式转换
+                // AudioFormat conversion
                 swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
                 int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
                         frame->nb_samples, out_sample_fmt, 1);
 
                 jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
                 jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
-                //拷贝缓冲数据
+                //Copy buffered data
                 memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
                 //释放数组
                 (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
-                //调用AudioTrack的write方法进行播放
+                //调用AudioTrack的write方法进行Play
                 (*env)->CallIntMethod(env,audio_track,audio_track_write_mid,
                         audio_sample_array,0,out_buffer_size);
-                //释放局部引用
+                //Release local references
                 (*env)->DeleteLocalRef(env,audio_sample_array);
                 usleep(1000 * 16);
 			}

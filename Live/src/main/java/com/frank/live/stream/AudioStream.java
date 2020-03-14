@@ -74,8 +74,8 @@ public class AudioStream {
     }
 
     /**
-     * 设置静音
-     * @param isMute 是否静音
+     *  Set mute
+     * @param isMute  Whether to mute
      */
     public void setMute(boolean isMute){
         this.isMute = isMute;

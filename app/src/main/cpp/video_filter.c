@@ -69,9 +69,9 @@ jboolean playAudio = JNI_TRUE;
 //const char *filter_descr = "hflip";//左右反序
 //const char *filter_descr = "rotate=90";//旋转90°
 //const char *filter_descr = "colorbalance=bs=0.3";//添加蓝色背景
-//const char *filter_descr = "drawbox=x=100:y=100:w=100:h=100:color=pink@0.5'";//绘制矩形
+//const char *filter_descr = "drawbox=x=100:y=100:w=100:h=100:color=pink@0.5'";//绘制rectangle
 //const char *filter_descr = "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5";//九宫格分割
-//const char *filter_descr = "edgedetect=low=0.1:high=0.4";//边缘检测
+//const char *filter_descr = "edgedetect=low=0.1:high=0.4";//edge检测
 //const char *filter_descr = "lutrgb='r=0:g=0'";//去掉红色、绿色分量，只保留蓝色
 //const char *filter_descr = "noise=alls=20:allf=t+u";//添加噪声
 //const char *filter_descr = "vignette='PI/4+random(1)*PI/50':eval=frame";//闪烁装饰
@@ -79,7 +79,7 @@ jboolean playAudio = JNI_TRUE;
 //const char *filter_descr = "drawtext=fontfile='arial.ttf':fontcolor=green:fontsize=30:text='Hello world'";//绘制文字
 //const char *filter_descr = "movie=my_logo.png[wm];[in][wm]overlay=5:5[out]";//添加图片水印
 
-//初始化滤波器
+//Initialize the filter
 int init_filters(const char *filters_descr) {
     char args[512];
     int ret = 0;
@@ -149,10 +149,10 @@ int init_filters(const char *filters_descr) {
     return ret;
 }
 
-//初始化视频解码器与播放器
+//初始化视频 decoding Device versus PlayDevice
 int open_input(JNIEnv * env, const char* file_name, jobject surface){
     LOGI(TAG, "open file:%s\n", file_name);
-    //注册所有组件
+    //Register all components
     av_register_all();
     //分配上下文
     pFormatCtx = avformat_alloc_context();
@@ -166,7 +166,7 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
-    //寻找视频流的第一帧
+    //Looking for video streaming  First frame
     int i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
         if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO
@@ -179,9 +179,9 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
         return -1;
     }
 
-    //获取codec上下文指针
+    //Obtaincodec上下文指针
     pCodecCtx = pFormatCtx->streams[video_stream_index]->codec;
-    //寻找视频流的解码器
+    //Looking for video streaming  decoding Device
     AVCodec * pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if(pCodec==NULL) {
         LOGE(TAG, "couldn't find Codec.");
@@ -191,7 +191,7 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
         LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
-    // 获取native window
+    // Obtainnative window
     nativeWindow = ANativeWindow_fromSurface(env, surface);
 
     // 设置native window的buffer大小,可自动拉伸
@@ -209,7 +209,7 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
     av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, buffer, AV_PIX_FMT_RGBA,
                          pCodecCtx->width, pCodecCtx->height, 1);
-    // 由于解码出来的帧格式不是RGBA的,在渲染之前需要进行格式转换
+    // 由于 decoding 出来的帧格式不是RGBA的,在渲染之前需要进行Format conversion
     sws_ctx = sws_getContext(pCodecCtx->width,
                                                 pCodecCtx->height,
                                                 pCodecCtx->pix_fmt,
@@ -224,9 +224,9 @@ int open_input(JNIEnv * env, const char* file_name, jobject surface){
     return 0;
 }
 
-//初始化音频解码器与播放器
+//Initialize the audio decoder versus PlayDevice
 int init_audio(JNIEnv * env, jclass jthiz){
-    //获取音频流索引位置
+    //Obtain Audio流索引位置
     int i;
     for(i=0; i < pFormatCtx->nb_streams;i++){
         if(pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO){
@@ -235,28 +235,28 @@ int init_audio(JNIEnv * env, jclass jthiz){
         }
     }
 
-    //获取音频解码器
+    //Obtain Audio decoding Device
     audioCodecCtx = pFormatCtx->streams[audio_stream_index]->codec;
     AVCodec *codec = avcodec_find_decoder(audioCodecCtx->codec_id);
     if(codec == NULL){
-        LOGE(TAG, "无法获取音频解码器");
+        LOGE(TAG, "无法Obtain Audio decoding Device");
         return -1;
     }
-    //打开音频解码器
+    //打开 Audio decoding Device
     if(avcodec_open2(audioCodecCtx,codec,NULL) < 0){
-        LOGE(TAG, "无法打开音频解码器");
+        LOGE(TAG, "无法打开 Audio decoding Device");
         return -1;
     }
-    //frame->16bit 44100 PCM 统一音频采样格式与采样率
+    //frame->16bit 44100 PCM  Unified audio sampling format and sampling rate
     audio_swr_ctx = swr_alloc();
 
-    //输入的采样格式
+    // Input sampling format
     enum AVSampleFormat in_sample_fmt = audioCodecCtx->sample_fmt;
     //输出采样格式16bit PCM
     out_sample_fmt = AV_SAMPLE_FMT_S16;
     //输入采样率
     int in_sample_rate = audioCodecCtx->sample_rate;
-    //输出采样率
+    //Output sampling rate
     int out_sample_rate = in_sample_rate;
     //声道布局（2个声道，默认立体声stereo）
     uint64_t in_ch_layout = audioCodecCtx->channel_layout;
@@ -269,7 +269,7 @@ int init_audio(JNIEnv * env, jclass jthiz){
                        0, NULL);
     swr_init(audio_swr_ctx);
 
-    //输出的声道个数
+    //Number of output channels
     out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 
     jclass player_class = (*env)->GetObjectClass(env,jthiz);
@@ -290,7 +290,7 @@ int init_audio(JNIEnv * env, jclass jthiz){
     jmethodID audio_track_play_mid = (*env)->GetMethodID(env,audio_track_class,"play","()V");
     (*env)->CallVoidMethod(env,audio_track,audio_track_play_mid);
 
-    //获取write()方法
+    //Obtainwrite()方法
     audio_track_write_mid = (*env)->GetMethodID(env,audio_track_class,"write","([BII)I");
 
     //16bit 44100 PCM 数据
@@ -299,28 +299,28 @@ int init_audio(JNIEnv * env, jclass jthiz){
 }
 
 int play_audio(JNIEnv * env, AVPacket* packet, AVFrame* frame){
-    //解码
+    // decoding
     int ret = avcodec_decode_audio4(audioCodecCtx, frame, &got_frame, packet);
     if(ret < 0){
         return ret;
     }
-    //解码一帧成功
+    //Successfully decoded a frame
     if(got_frame > 0){
-        //音频格式转换
+        // AudioFormat conversion
         swr_convert(audio_swr_ctx, &out_buffer, MAX_AUDIO_FRAME_SIZE,(const uint8_t **)frame->data,frame->nb_samples);
         int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
                                                          frame->nb_samples, out_sample_fmt, 1);
 
         jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
         jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
-        //拷贝缓冲数据
+        //Copy buffered data
         memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
         //释放数组
         (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
-        //调用AudioTrack的write方法进行播放
+        //调用AudioTrack的write方法进行Play
         (*env)->CallIntMethod(env,audio_track,audio_track_write_mid,
                               audio_sample_array,0,out_buffer_size);
-        //释放局部引用
+        //Release local references
         (*env)->DeleteLocalRef(env,audio_sample_array);
         usleep(1000);//1000 * 16
     }
@@ -332,14 +332,14 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
     int ret;
     const char * file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
     const char *filter_descr = (*env)->GetStringUTFChars(env, filterDescr, JNI_FALSE);
-    //打开输入文件
+    //Open input file
     if(!is_playing){
         LOGI(TAG, "open_input...");
         if((ret = open_input(env, file_name, surface)) < 0){
             LOGE(TAG, "Couldn't allocate video frame.");
             goto end;
         }
-        //注册滤波器
+        //Registration filter
         avfilter_register_all();
         filter_frame = av_frame_alloc();
         if(filter_frame == NULL) {
@@ -347,7 +347,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
             ret = -1;
             goto end;
         }
-        //初始化音频解码器
+        //Initialize the audio decoder
         if ((ret = init_audio(env, thiz)) < 0){
             LOGE(TAG, "Couldn't init_audio.");
             goto end;
@@ -355,7 +355,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
 
     }
 
-    //初始化滤波器
+    //Initialize the filter
     if ((ret = init_filters(filter_descr)) < 0){
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
@@ -366,36 +366,36 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
     AVPacket packet;
 
     while(av_read_frame(pFormatCtx, &packet)>=0 && !release) {
-        //切换滤波器，退出当初播放
+        //Switch the filter and exit the original playback
         if(again){
             goto again;
         }
-        //判断是否为视频流
+        //Determine if it is a video stream
         if(packet.stream_index == video_stream_index) {
-            //对该帧进行解码
+            //对该帧进行 decoding
             avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
 
             if (frameFinished) {
-                //把解码后视频帧添加到filter_graph
+                //Add decoded video frames to filter_graph
                 if (av_buffersrc_add_frame_flags(buffersrc_ctx, pFrame, AV_BUFFERSRC_FLAG_KEEP_REF) < 0) {
                     LOGE(TAG, "Error while feeding the filter_graph\n");
                     break;
                 }
-                //把滤波后的视频帧从filter graph取出来
+                //Take the filtered video frame from the filter graph
                 ret = av_buffersink_get_frame(buffersink_ctx, filter_frame);
                 if (ret >= 0){
                     // lock native window
                     ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
-                    // 格式转换
+                    // Format conversion
                     sws_scale(sws_ctx, (uint8_t const * const *)filter_frame->data,
                               filter_frame->linesize, 0, pCodecCtx->height,
                               pFrameRGBA->data, pFrameRGBA->linesize);
-                    // 获取stride
+                    // Obtain stride
                     uint8_t * dst = windowBuffer.bits;
                     int dstStride = windowBuffer.stride * 4;
                     uint8_t * src = pFrameRGBA->data[0];
                     int srcStride = pFrameRGBA->linesize[0];
-                    // 由于window的stride和帧的stride不同,因此需要逐行复制
+                    // because of window of stride  And framed stride different , So you need to copy line by line
                     int h;
                     for (h = 0; h < pCodecCtx->height; h++) {
                         memcpy(dst + h * dstStride, src + h * srcStride, (size_t) srcStride);
@@ -404,11 +404,11 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
                 }
                 av_frame_unref(filter_frame);
             }
-            //延迟等待
+            //Delayed wait
             if (!playAudio){
                 usleep((unsigned long) (1000 * 40));//1000 * 40
             }
-        } else if(packet.stream_index == audio_stream_index){//音频帧
+        } else if(packet.stream_index == audio_stream_index){// Audio帧
             if (playAudio){
                 play_audio(env, &packet, pFrame);
             }
@@ -417,7 +417,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
     }
     end:
     is_playing = 0;
-    //释放内存以及关闭文件
+    //Free up memory and close files
     av_free(buffer);
     av_free(pFrameRGBA);
     av_free(filter_frame);

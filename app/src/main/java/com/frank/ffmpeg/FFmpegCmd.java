@@ -14,7 +14,7 @@ public class FFmpegCmd {
 
     private final static int RESULT_ERROR = 0;
 
-    //开子线程调用native方法进行音视频处理
+    //开子线程调用native方法进行Audio and video processing
     public static void execute(final String[] commands, final OnHandleListener onHandleListener){
         new Thread(new Runnable() {
             @Override

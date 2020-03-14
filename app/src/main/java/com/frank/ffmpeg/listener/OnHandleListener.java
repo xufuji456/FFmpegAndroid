@@ -1,7 +1,7 @@
 package com.frank.ffmpeg.listener;
 
 /**
- * 流程执行监听器
+ * 流程 carried out 监听Device
  * Created by frank on 2019/11/11.
  */
 public interface OnHandleListener {

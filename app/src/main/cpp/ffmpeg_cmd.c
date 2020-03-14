@@ -14,7 +14,7 @@ FFMPEG_FUNC(jint, handle, jobjectArray commands) {
         strcpy(argv[i], temp);
         (*env)->ReleaseStringUTFChars(env, jstr, temp);
     }
-    //执行ffmpeg命令
+    // carried out ffmpeg命令
     result =  run(argc, argv);
     //释放内存
     for (i = 0; i < argc; i++) {

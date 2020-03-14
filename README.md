@@ -3,13 +3,13 @@ android端基于FFmpeg库的使用。<br>
 添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 目前音视频相关处理：<br>
 
-- #### 音频剪切、拼接
-- #### 音频混音
-- #### 音频转码
-- #### 音视频合成
-- #### 音频抽取
-- #### 音频解码播放
-- #### 音频编码
+- ####  Audio剪切、拼接
+- ####  Audio混音
+- ####  Audio转码
+- #### Audio and video synthesis
+- ####  Audio抽取
+- ####  Audio decoding Play
+- ####  Audio coding 
 - #### 视频抽取
 - #### 视频剪切
 - #### 视频转码
@@ -22,10 +22,10 @@ android端基于FFmpeg库的使用。<br>
 - #### 视频反序倒播
 - #### 视频画中画
 - #### 图片合成视频
-- #### 视频解码播放
+- #### 视频 decoding Play
 - #### 本地直播推流
 - #### 实时直播推流
-- #### 音视频解码播放
+- #### 音视频 decoding Play
 - #### OpenGL+GPUImage滤镜
 - #### FFmpeg的AVFilter滤镜
 - #### 使用mp3lame库进行mp3转码

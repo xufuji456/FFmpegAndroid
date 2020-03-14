@@ -132,7 +132,7 @@ public class VideoHandleActivity extends BaseActivity {
                 int duration = 20;
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo);
                 break;
-            case R.id.btn_video_concat://视频合并
+            case R.id.btn_video_concat://视频merge
 //                commandLine = FFmpegUtil.toTs(srcFile, ts1);
 //                concatStep ++;
 //                String concatVideo = PATH + File.separator + "concatVideo.mp4";
@@ -222,7 +222,7 @@ public class VideoHandleActivity extends BaseActivity {
                 if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)) {
                     return;
                 }
-                //x、y坐标点需要根据全屏视频与小视频大小，进行计算
+                //x、y坐标点需要根据全屏视频 versus 小视频大小，进行计算
                 //比如：全屏视频为320x240，小视频为120x90，那么x=200 y=150
                 int x = 200;
                 int y = 150;

@@ -21,11 +21,11 @@
 SLObjectItf engineObject = NULL;
 SLEngineItf engineEngine;
 
-//输出混音器接口
+//输出混音Device接口
 SLObjectItf outputMixObject = NULL;
 SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
 
-//缓冲播放器接口
+//缓冲PlayDevice接口
 SLObjectItf bqPlayerObject = NULL;
 SLPlayItf bqPlayerPlay;
 SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
@@ -53,14 +53,14 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) ;
 // 释放相关资源
 int releaseAudioPlayer();
 
-// 获取PCM数据, 自动回调获取
+// ObtainPCM数据, 自动回调Obtain
 int getPCM(void **pcm, size_t *pcmSize) ;
 
-//播放回调方法
+//Play回调方法
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) {
     bufferSize = 0;
     getPCM(&buffer, &bufferSize);
-    //如果buffer不为空，入待播放队列
+    //如果buffer不为空，入待Play队列
     if (NULL != buffer && 0 != bufferSize) {
         SLresult result;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, buffer, bufferSize);
@@ -80,16 +80,16 @@ void createEngine() {
     LOGI(TAG, "slCreateEngine=%d", result);
     result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
     LOGI(TAG, "engineObject->Realize=%d", result);
-    //获取引擎接口
+    //Obtain引擎接口
     result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
     LOGI(TAG, "engineObject->GetInterface=%d", result);
-    //创建输出混音器
+    //创建输出混音Device
     result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
     LOGI(TAG, "CreateOutputMix=%d", result);
-    //关联输出混音器
+    //关联输出混音Device
     result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
     LOGI(TAG, "outputMixObject->Realize=%d", result);
-    //获取reverb接口
+    //Obtainreverb接口
     result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
                                               &outputMixEnvironmentalReverb);
     LOGI(TAG, "outputMixObject->GetInterface=%d", result);
@@ -101,11 +101,11 @@ void createEngine() {
 }
 
 
-//创建带有缓冲队列的音频播放器
+//创建带有缓冲队列的 AudioPlayDevice
 void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     SLresult result;
 
-    //配置音频源
+    //配置 Audio源
     SLDataLocator_AndroidSimpleBufferQueue buffer_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
     SLDataFormat_PCM format_pcm;
     format_pcm.formatType = SL_DATAFORMAT_PCM;
@@ -120,26 +120,26 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     format_pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
     SLDataSource audioSrc = {&buffer_queue, &format_pcm};
 
-    //配置音频池
+    //配置 Audio池
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
     SLDataSink audioSnk = {&loc_outmix, NULL};
 
-    //创建音频播放器
+    //创建 AudioPlayDevice
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
                                                 3, ids, req);
     LOGI(TAG, "CreateAudioPlayer=%d", result);
 
-    //关联播放器
+    //关联PlayDevice
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
     LOGI(TAG, "bqPlayerObject Realize=%d", result);
 
-    //获取播放接口
+    //ObtainPlay接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
     LOGI(TAG, "GetInterface bqPlayerPlay=%d", result);
 
-    //获取缓冲队列接口
+    //Obtain缓冲队列接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
                                              &bqPlayerBufferQueue);
     LOGI(TAG, "GetInterface bqPlayerBufferQueue=%d", result);
@@ -148,16 +148,16 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
     LOGI(TAG, "RegisterCallback=%d", result);
 
-    //获取音效接口
+    //Obtain音效接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
                                              &bqPlayerEffectSend);
     LOGI(TAG, "GetInterface effect=%d", result);
 
-    //获取音量接口
+    //Obtain音量接口
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
     LOGI(TAG, "GetInterface volume=%d", result);
 
-    //开始播放音乐
+    //开始Play音乐
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
     LOGI(TAG, "SetPlayState=%d", result);
 }
@@ -167,7 +167,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     av_register_all();
     aFormatCtx = avformat_alloc_context();
 
-    //打开音频文件
+    //打开 Audio文件
     if (avformat_open_input(&aFormatCtx, file_name, NULL, NULL) != 0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1; // Couldn't open file
@@ -179,7 +179,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
         return -1;
     }
 
-    //寻找音频stream
+    //寻找 Audiostream
     int i;
     audioStream = -1;
     for (i = 0; i < aFormatCtx->nb_streams; i++) {
@@ -192,21 +192,21 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
         LOGE(TAG, "Couldn't find audio stream!");
         return -1;
     }
-    //获取解码器context
+    //Obtain decoding Devicecontext
     aCodecCtx = aFormatCtx->streams[audioStream]->codec;
-    //寻找音频解码器
+    //寻找 Audio decoding Device
     AVCodec *aCodec = avcodec_find_decoder(aCodecCtx->codec_id);
     if (!aCodec) {
         fprintf(stderr, "Unsupported codec!\n");
         return -1;
     }
-    //打开解码器
+    //打开 decoding Device
     if (avcodec_open2(aCodecCtx, aCodec, NULL) < 0) {
         LOGE(TAG, "Could not open codec.");
         return -1;
     }
     aFrame = av_frame_alloc();
-    // 设置格式转换
+    // 设置Format conversion
     swr = swr_alloc();
     av_opt_set_int(swr, "in_channel_layout",  aCodecCtx->channel_layout, 0);
     av_opt_set_int(swr, "out_channel_layout", aCodecCtx->channel_layout,  0);
@@ -225,16 +225,16 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     return 0;
 }
 
-// 获取PCM数据, 自动回调获取
+// ObtainPCM数据, 自动回调Obtain
 int getPCM(void **pcm, size_t *pcmSize) {
     while (av_read_frame(aFormatCtx, &packet) >= 0) {
         int frameFinished = 0;
-        //音频流
+        // Audio流
         if (packet.stream_index == audioStream) {
             avcodec_decode_audio4(aCodecCtx, aFrame, &frameFinished, &packet);
-            //解码完一帧数据
+            // decoding 完一帧数据
             if (frameFinished) {
-                // data_size为音频数据所占的字节数
+                // data_size为 Audio数据所占的字节数
                 int data_size = av_samples_get_buffer_size(
                         aFrame->linesize, aCodecCtx->channels,
                         aFrame->nb_samples, aCodecCtx->sample_fmt, 1);
@@ -244,7 +244,7 @@ int getPCM(void **pcm, size_t *pcmSize) {
                     outputBuffer = (uint8_t *) realloc(outputBuffer, sizeof(uint8_t) * outputBufferSize);
                 }
 
-                // 音频格式转换
+                //  AudioFormat conversion
                 swr_convert(swr, &outputBuffer, aFrame->nb_samples,
                             (uint8_t const **) (aFrame->extended_data),
                             aFrame->nb_samples);
@@ -275,20 +275,20 @@ AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, NULL);
     LOGI(TAG, "file_name=%s", file_name);
 
-    // 创建音频解码器
+    // 创建 Audio decoding Device
     createAudioPlayer(&rate, &channel, file_name);
 
-    // 创建播放引擎
+    // 创建Play引擎
     createEngine();
 
-    // 创建缓冲队列音频播放器
+    // 创建缓冲队列 AudioPlayDevice
     createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
 
-    // 启动音频播放
+    // 启动 AudioPlay
     bqPlayerCallback(bqPlayerBufferQueue, NULL);
 }
 
-//停止播放，释放相关资源
+//停止Play，释放相关资源
 AUDIO_PLAYER_FUNC(void, stop) {
     if (bqPlayerObject != NULL) {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
@@ -311,6 +311,6 @@ AUDIO_PLAYER_FUNC(void, stop) {
         engineEngine = NULL;
     }
 
-    // 释放解码器相关资源
+    // 释放 decoding Device相关资源
     releaseAudioPlayer();
 }

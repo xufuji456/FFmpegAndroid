@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 /**
- * 音视频播放器
+ * 音视频PlayDevice
  * Created by frank on 2018/2/12.
  */
 

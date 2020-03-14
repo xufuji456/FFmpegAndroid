@@ -24,7 +24,7 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
- * 使用ffmpeg处理音频
+ * 使用ffmpeg处理 Audio
  * Created by frank on 2018/1/23.
  */
 
@@ -101,7 +101,7 @@ public class AudioHandleActivity extends BaseActivity {
     }
 
     /**
-     * 调用ffmpeg处理音频
+     * 调用ffmpeg处理 Audio
      *
      * @param srcFile srcFile
      */
@@ -119,7 +119,7 @@ public class AudioHandleActivity extends BaseActivity {
                 if (useFFmpeg) { //使用FFmpeg转码
                     String transformFile = PATH + File.separator + "transformAudio.mp3";
                     commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
-                } else { //使用MediaCodec与mp3lame转mp3
+                } else { //使用MediaCodec versus mp3lame转mp3
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -130,7 +130,7 @@ public class AudioHandleActivity extends BaseActivity {
                     }).start();
                 }
                 break;
-            case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
+            case R.id.btn_cut://剪切(注意原文件 versus 剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
                 String suffix = FileUtil.getFileSuffix(srcFile);
                 if (suffix == null || suffix.isEmpty()) {
                     return;
@@ -138,7 +138,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String cutFile = PATH + File.separator + "cutAudio" + suffix;
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
-            case R.id.btn_concat://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
+            case R.id.btn_concat://merge，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加 Audio头）
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
@@ -159,7 +159,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String mixFile = PATH + File.separator + "mix" + mixSuffix;
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
-            case R.id.btn_play_audio://解码播放（AudioTrack）
+            case R.id.btn_play_audio:// decoding Play（AudioTrack）
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -167,7 +167,7 @@ public class AudioHandleActivity extends BaseActivity {
                     }
                 }).start();
                 return;
-            case R.id.btn_play_opensl://解码播放（OpenSL ES）
+            case R.id.btn_play_opensl:// decoding Play（OpenSL ES）
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -175,8 +175,8 @@ public class AudioHandleActivity extends BaseActivity {
                     }
                 }).start();
                 return;
-            case R.id.btn_audio_encode://音频编码
-                //可编码成WAV、AAC。如果需要编码成MP3，ffmpeg需要重新编译，把MP3库enable
+            case R.id.btn_audio_encode:// Audio coding
+                //可 coding 成WAV、AAC。如果需要 coding 成MP3，ffmpeg需要重新编译，把MP3库enable
                 String pcmFile = PATH + File.separator + "concat.pcm";
                 String wavFile = PATH + File.separator + "new.wav";
                 //pcm数据的采样率，一般采样率为8000、16000、44100
@@ -185,10 +185,10 @@ public class AudioHandleActivity extends BaseActivity {
                 int channel = 1;
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
-            case R.id.btn_pcm_concat://PCM裸流音频文件合并
+            case R.id.btn_pcm_concat://PCM裸流 Audio文件merge
                 String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
                 String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
-                String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
+                String concatPCM = PATH + File.separator + "concat.pcm";//merge后的文件
                 if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)) {
                     return;
                 }

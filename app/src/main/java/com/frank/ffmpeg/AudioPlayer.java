@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 /**
- * 音频播放器
+ *  AudioPlayDevice
  * Created by frank on 2018/2/1.
  */
 
@@ -13,11 +13,11 @@ public class AudioPlayer {
     static {
         System.loadLibrary("media-handle");
     }
-    //调用AudioTrack播放
+    //调用AudioTrackPlay
     public native void play(String audioPath);
-    //调用OpenSL ES播放
+    //调用OpenSL ESPlay
     public native void playAudio(String audioPath);
-    //调用OpenSL ES播放
+    //调用OpenSL ESPlay
     public native void stop();
 
     public native static void lameInitDefault();

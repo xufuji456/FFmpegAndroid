@@ -27,20 +27,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- 音频处理 -->
+        <!--  Audio处理 -->
         <activity android:name=".activity.AudioHandleActivity" />
-        <!-- 音视频处理 -->
+        <!-- Audio and video processing -->
         <activity android:name=".activity.MediaHandleActivity" />
-        <!-- 视频处理 -->
+        <!-- Video processing -->
         <activity android:name=".activity.VideoHandleActivity" />
-        <!-- 音视频解码播放 -->
+        <!-- 音视频 decoding Play -->
         <activity
             android:name=".activity.MediaPlayerActivity"
             android:screenOrientation="landscape" />
-        <!-- 本地推流直播 -->
+        <!-- Local streaming live -->
         <activity
             android:name=".activity.PushActivity" />
-        <!-- 实时推流直播 -->
+        <!-- Live streaming live -->
         <activity
             android:name=".activity.LiveActivity"
             android:screenOrientation="portrait" />
@@ -48,7 +48,7 @@
         <activity
             android:name=".activity.FilterActivity"
             android:screenOrientation="landscape" />
-        <!--视频播放拖动预览-->
+        <!--视频Play拖动预览-->
         <activity android:name=".activity.VideoPreviewActivity"
             android:screenOrientation="portrait" />
         <!--检测多媒体格式数据-->

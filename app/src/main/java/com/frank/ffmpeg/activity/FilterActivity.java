@@ -38,7 +38,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     private SurfaceHolder surfaceHolder;
     //surface是否已经创建
     private boolean surfaceCreated;
-    //是否正在播放
+    //是否正在Play
     private boolean isPlaying;
     //滤镜数组
     private String[] filters = new String[]{
@@ -53,19 +53,19 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             "unsharp"
     };
     private String[] txtArray = new String[]{
-            "素描",
-            "鲜明",//hue
-            "暖蓝",
-            "边缘",
-            "九宫格",
-            "均衡",
-            "矩形",
-            "翻转",//vflip上下翻转,hflip是左右翻转
-            "锐化"
+            "sketch",
+            "Sharp",//hue
+            "Warm blue",
+            "edge",
+            "drawgrid",
+            "balanced",
+            "rectangle",
+            "Flip",//vflip上下Flip,hflip是左右Flip
+            "Sharpen"
     };
     private HorizontalAdapter horizontalAdapter;
     private RecyclerView recyclerView;
-    //是否播放音频
+    //是否Play Audio
     private boolean playAudio = true;
     private ToggleButton btnSound;
     private Button btnSelect;
@@ -129,7 +129,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         initViewsWithClick(R.id.btn_select_file);
     }
 
-    //注册监听器
+    //注册监听Device
     private void registerLister(){
         horizontalAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -166,7 +166,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //切换播放
+                //切换Play
                 if(isPlaying){
                     videoPlayer.again();
                 }
@@ -176,7 +176,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         }).start();
     }
 
-    //设置是否静音
+    //设置 Whether to mute
     private void setPlayAudio(){
         playAudio = !playAudio;
         videoPlayer.playAudio(playAudio);

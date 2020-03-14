@@ -26,23 +26,23 @@ JavaVM *javaVM;
 //调用类
 jobject jobject_error;
 
-/***************与Java层对应**************/
-//视频编码器打开失败
+/*************** versus Java层对应**************/
+// Video encoding Device Open failed
 const int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-//视频帧编码失败
+//Video frame encoding failed
 const int ERROR_VIDEO_ENCODE = 0x02;
-//音频编码器打开失败
+// Audio coding Device Open failed
 const int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-//音频帧编码失败
+// Audio帧 coding 失败
 const int ERROR_AUDIO_ENCODE = 0x04;
-//RTMP连接失败
+//RTMP Connection failed
 const int ERROR_RTMP_CONNECT = 0x05;
-//RTMP连接流失败
+//RTMP Connection flow failed
 const int ERROR_RTMP_CONNECT_STREAM = 0x06;
-//RTMP发送数据包失败
+//RTMP Failed to send packet
 const int ERROR_RTMP_SEND_PACKET = 0x07;
 
-/***************与Java层对应**************/
+/*************** versus Java层对应**************/
 
 //当调用System.loadLibrary时，会回调这个方法
 jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {

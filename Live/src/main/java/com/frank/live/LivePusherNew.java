@@ -13,19 +13,19 @@ import com.frank.live.stream.VideoStreamNew;
 
 public class LivePusherNew {
 
-    //视频编码器打开失败
+    // Video encoding Device Open failed
     private final static int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-    //视频帧编码失败
+    //Video frame encoding failed
     private final static int ERROR_VIDEO_ENCODE = 0x02;
-    //音频编码器打开失败
+    // Audio coding Device Open failed
     private final static int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-    //音频帧编码失败
+    // Audio帧 coding 失败
     private final static int ERROR_AUDIO_ENCODE = 0x04;
-    //RTMP连接失败
+    //RTMP Connection failed
     private final static int ERROR_RTMP_CONNECT = 0x05;
-    //RTMP连接流失败
+    //RTMP Connection flow failed
     private final static int ERROR_RTMP_CONNECT_STREAM = 0x06;
-    //RTMP发送数据包失败
+    //RTMP Failed to send packet
     private final static int ERROR_RTMP_SEND_PACKET = 0x07;
 
     static {
@@ -60,9 +60,9 @@ public class LivePusherNew {
     }
 
     /**
-     * 设置静音
+     *  Set mute
      *
-     * @param isMute 是否静音
+     * @param isMute  Whether to mute
      */
     public void setMute(boolean isMute) {
         audioStream.setMute(isMute);
@@ -88,36 +88,36 @@ public class LivePusherNew {
     }
 
     /**
-     * 当native报错时，回调这个方法
+     * Call this method when native reports an error
      *
      * @param errCode errCode
      */
     public void errorFromNative(int errCode) {
-        //停止推流
+        //Stop streaming
         stopPush();
         if (liveStateChangeListener != null) {
             String msg = "";
             switch (errCode) {
                 case ERROR_VIDEO_ENCODER_OPEN:
-                    msg = "视频编码器打开失败...";
+                    msg = " Video encoding Device Open failed ...";
                     break;
                 case ERROR_VIDEO_ENCODE:
-                    msg = "视频帧编码失败...";
+                    msg = "Video frame encoding failed...";
                     break;
                 case ERROR_AUDIO_ENCODER_OPEN:
-                    msg = "音频编码器打开失败...";
+                    msg = " Audio coding Device Open failed ...";
                     break;
                 case ERROR_AUDIO_ENCODE:
-                    msg = "音频帧编码失败...";
+                    msg = " Audio帧 coding 失败...";
                     break;
                 case ERROR_RTMP_CONNECT:
-                    msg = "RTMP连接失败...";
+                    msg = "RTMP Connection failed...";
                     break;
                 case ERROR_RTMP_CONNECT_STREAM:
-                    msg = "RTMP连接流失败...";
+                    msg = "RTMP Connection flow failed ...";
                     break;
                 case ERROR_RTMP_SEND_PACKET:
-                    msg = "RTMP发送数据包失败...";
+                    msg = "RTMP Failed to send packet...";
                     break;
                 default:
                     break;

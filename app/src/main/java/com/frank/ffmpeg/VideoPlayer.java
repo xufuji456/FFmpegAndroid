@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 /**
- * 视频播放器
+ * 视频PlayDevice
  * Created by frank on 2018/2/1
  */
 public class VideoPlayer {

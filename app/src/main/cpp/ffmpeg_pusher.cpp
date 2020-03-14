@@ -34,11 +34,11 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         LOGE(TAG, "file_path=%s", file_path);
         LOGE(TAG, "live_url=%s", live_url);
 
-        //注册所有组件
+        //Register all components
         av_register_all();
         //初始化网络
         avformat_network_init();
-        //打开输入文件
+        //Open input file
         if((ret = avformat_open_input(&in_format, file_path, 0, 0)) < 0){
             LOGE(TAG, "could not open input file...");
             goto end;
@@ -100,7 +100,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
             LOGE(TAG, "could not write header...");
             goto end;
         }
-        //获取开始时间
+        //Obtain开始时间
         start_time = av_gettime();
         //开始循环读一帧数据
         while (1){

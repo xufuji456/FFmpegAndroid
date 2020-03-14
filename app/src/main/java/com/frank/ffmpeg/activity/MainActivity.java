@@ -7,7 +7,7 @@ import android.view.View;
 import com.frank.ffmpeg.R;
 
 /**
- * 使用ffmpeg进行音视频处理入口
+ * 使用ffmpeg进行Audio and video processing入口
  * Created by frank on 2018/1/23.
  */
 public class MainActivity extends BaseActivity {
@@ -38,22 +38,22 @@ public class MainActivity extends BaseActivity {
     public void onViewClick(View v) {
         Intent intent = new Intent();
         switch (v.getId()){
-            case R.id.btn_audio://音频处理
+            case R.id.btn_audio:// Audio处理
                 intent.setClass(MainActivity.this, AudioHandleActivity.class);
                 break;
-            case R.id.btn_video://视频处理
+            case R.id.btn_video://Video processing
                 intent.setClass(MainActivity.this, VideoHandleActivity.class);
                 break;
-            case R.id.btn_media://音视频处理
+            case R.id.btn_media://Audio and video processing
                 intent.setClass(MainActivity.this, MediaHandleActivity.class);
                 break;
-            case R.id.btn_play://音视频播放
+            case R.id.btn_play://音视频Play
                 intent.setClass(MainActivity.this, MediaPlayerActivity.class);
                 break;
             case R.id.btn_push://FFmpeg推流
                 intent.setClass(MainActivity.this, PushActivity.class);
                 break;
-            case R.id.btn_live://实时推流直播:AAC音频编码、H264视频编码、RTMP推流
+            case R.id.btn_live://Live streaming live:AAC Audio coding 、H264 Video encoding 、RTMP推流
                 intent.setClass(MainActivity.this, LiveActivity.class);
                 break;
             case R.id.btn_filter://滤镜特效

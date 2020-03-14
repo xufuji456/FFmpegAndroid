@@ -38,8 +38,8 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
         DELETE(pic_in);
     }
 
-    //打开x264编码器
-    //x264编码器的属性
+    //打开x264 coding Device
+    //x264 coding Device的属性
     x264_param_t param;
     x264_param_default_preset(&param, "ultrafast", "zerolatency");
     param.i_level_idc = 32;
@@ -73,7 +73,7 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     param.i_threads = 1;
 
     x264_param_apply_profile(&param, "baseline");
-    //打开编码器
+    //打开 coding Device
     videoCodec = x264_encoder_open(&param);
     pic_in = new x264_picture_t;
     x264_picture_alloc(pic_in, X264_CSP_I420, width, height);
@@ -163,7 +163,7 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
 
     //版本
     packet->m_body[i++] = 0x01;
-    //编码规格
+    // coding 规格
     packet->m_body[i++] = sps[1];
     packet->m_body[i++] = sps[2];
     packet->m_body[i++] = sps[3];

@@ -10,7 +10,7 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 
 /**
- * 使用MediaExtractor抽帧，MediaCodec解码，然后渲染到Surface
+ * 使用MediaExtractor抽帧，MediaCodec decoding ，然后渲染到Surface
  * Created by frank on 2019/11/16.
  */
 

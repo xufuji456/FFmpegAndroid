@@ -1,7 +1,7 @@
 package com.frank.live.param;
 
 /**
- * 视频相关参数
+ * 视频 Related parameters
  * Created by frank on 2018/1/28.
  */
 

@@ -2,7 +2,7 @@ package com.frank.live.param;
 
 
 /**
- * 音频相关参数
+ *  Audio Related parameters
  * Created by frank on 2018/1/28.
  */
 

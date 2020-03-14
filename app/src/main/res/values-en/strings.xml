@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FFmpegAndroid</string>
     <string name="audio_transform"> Audio transcoding</string>
@@ -9,7 +10,7 @@
     <string name="audio_encode"> Audio coding </string>
     <string name="pcm_concat">PCMmerge</string>
 
-    <string name="audio_handle">Audio processing</string>
+    <string name="audio_handle"> Audio processing</string>
     <string name="media_handle">Audio and video processing</string>
     <string name="video_handle">Video processing</string>
     <string name="video_push">Local streaming live</string>

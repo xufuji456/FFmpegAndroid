@@ -1,7 +1,7 @@
 package com.frank.live.util;
 
 /**
- * YUV与RGB转换工具类
+ * YUV versus RGB Conversion tools
  * Created by frank on 2018/7/1.
  */
 

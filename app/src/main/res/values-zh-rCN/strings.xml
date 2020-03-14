@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FFmpegAndroid</string>
+    <string name="audio_transform"> Audio转码</string>
+    <string name="audio_cut"> Audio剪切</string>
+    <string name="audio_concat"> Audio合并</string>
+    <string name="audio_mix"> Audio混合</string>
+    <string name="audio_play"> Audio decoding AudioTrack播放</string>
+    <string name="audio_opensl"> Audio decoding OpenSL播放</string>
+    <string name="audio_encode"> Audio coding </string>
+    <string name="pcm_concat">PCM合并</string>
+
+    <string name="audio_handle"> Audio处理</string>
+    <string name="media_handle">音视频处理</string>
+    <string name="video_handle">视频处理</string>
+    <string name="video_push">本地推流直播</string>
+    <string name="video_live">实时推流直播</string>
+
+    <string name="media_mux">音视频合成</string>
+    <string name="media_extra_audio">提取 Audio</string>
+    <string name="media_extract_video">提取视频</string>
+    <string name="media_play">音视频播放</string>
+    <string name="media_probe">解析多媒体格式</string>
+
+    <string name="video_cut">视频剪切</string>
+    <string name="video_concat">视频拼接</string>
+    <string name="video_water_mark">视频水印</string>
+    <string name="video_to_gif">视频转Gif</string>
+    <string name="video_transform">视频转码</string>
+    <string name="video_screen_shot">视频截图</string>
+    <string name="video_screen_record">屏幕录制</string>
+    <string name="video_from_photo">图片合成视频</string>
+    <string name="video_extract_frame">视频抽帧</string>
+    <string name="video_part_zoom">视频局部放大</string>
+    <string name="video_play">视频播放</string>
+    <string name="video_filter">滤镜特效</string>
+    <string name="video_slow">慢放</string>
+    <string name="video_fast">快进</string>
+    <string name="video_multi">画面拼接</string>
+    <string name="video_reverse">视频倒播</string>
+    <string name="video_denoise">视频降噪</string>
+    <string name="video_image">视频转图片</string>
+    <string name="video_pip">视频画中画</string>
+    <string name="video_preview">播放预览</string>
+    <string name="video_moov">MOOV前移</string>
+
+    <string name="swap">切换</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+    <string name="mute">Mute</string>
+    <string name="sound">声音</string>
+    <string name="sound_open">声音开</string>
+    <string name="sound_close">声音关</string>
+
+    <string name="video_sketch">sketch</string>
+    <string name="video_hue">hue</string>
+    <string name="video_lut">lut</string>
+    <string name="video_edge">边缘</string>
+    <string name="video_blur">模糊</string>
+    <string name="video_grid">九宫格</string>
+    <string name="video_rotate">旋转</string>
+    <string name="video_flip">翻转</string>
+    <string name="video_box">矩形</string>
+    <string name="video_flash">闪烁</string>
+    <string name="video_balance">色彩平衡</string>
+    <string name="video_sharp">锐化</string>
+
+    <string name="select_file">选择文件</string>
+    <string name="please_select">请选择正确文件</string>
+    <string name="file_not_found">文件不存在</string>
+    <string name="please_click_select">请点击右上角菜单选择文件</string>
+    <string name="wrong_audio_format">非 Audio文件</string>
+    <string name="wrong_video_format">非视频文件</string>
+    <string name="converting_video">正在反转视频&#8230;</string>
+    <string name="tip_not_mp4_video">该视频不是mp4,无法进行moov前移操作</string>
+
+</resources>

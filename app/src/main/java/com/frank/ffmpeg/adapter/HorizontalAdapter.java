@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * RecyclerView适配器
+ * RecyclerView适配Device
  * Created by frank on 2018/6/6.
  */
 

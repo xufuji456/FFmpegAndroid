@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_camera_switch"
-            android:text="拍照"
+            android:text="Take a picture"
             android:clickable="true"
             android:focusable="true"
             android:tint="@color/colorPrimary" />
@@ -32,7 +32,7 @@
             android:id="@+id/button_mute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" 静音"
+            android:text=" Mute"
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/img_photo"/>
