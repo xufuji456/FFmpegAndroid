@@ -147,6 +147,22 @@ public class FFmpegUtil {
     }
 
     /**
+     * Using FFmpeg to transform video, include the resolution
+     *
+     * @param srcFile  the source file
+     * @param width the width of video
+     * @param height the height of video
+     * @param targetFile target file
+     * @return file after transform
+     */
+    public static String[] transformVideo(String srcFile, int width, int height, String targetFile) {
+        String scale = "-vf scale=" + width + ":" + height;
+        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy " + scale + " %s";
+        transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
+        return transformVideoCmd.split(" ");
+    }
+
+    /**
      * 使用ffmpeg命令行进行视频剪切
      *
      * @param srcFile    源文件
