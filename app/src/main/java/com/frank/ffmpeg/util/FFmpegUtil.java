@@ -321,9 +321,9 @@ public class FFmpegUtil {
      * @return 视频反序的命令行
      */
     public static String[] reverseVideo(String inputFile, String targetFile) {
-        //FIXME 音频也反序
-//        String reverseVideo = "ffmpeg -i %s -filter_complex [0:v]reverse[v];[0:a]areverse[a] -map [v] -map [a] %s";
-        String reverseVideo = "ffmpeg -i %s -filter_complex [0:v]reverse[v] -map [v] %s";//单纯视频反序
+        //-vf reverse视频反序, -an去掉音频
+        //视频反序比较耗时, 建议用来处理1分钟以内的短视频
+        String reverseVideo = "ffmpeg -i %s -vf reverse -an %s";
         reverseVideo = String.format(reverseVideo, inputFile, targetFile);
         return reverseVideo.split(" ");
     }
