@@ -41,7 +41,7 @@ public class AudioPlayer {
     public native static void lameClose();
 
     /**
-     * Create an AudioTrack instance for JNI call
+     * Create an AudioTrack instance for JNI calling
      *
      * @param sampleRate sampleRate
      * @param channels   channel layout

@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 /**
- * 音视频播放器
+ * Using FFmpeg to play media
  * Created by frank on 2018/2/12.
  */
 
@@ -15,24 +15,27 @@ public class MediaPlayer {
     }
 
     public native int setup(String filePath, Object surface);
+
     public native int play();
+
     public native void release();
 
 
     /**
-     * 创建一个AudioTrack对象
-     * @param sampleRate 采样率
-     * @param channels 声道布局
+     * Create an AudioTrack instance for JNI calling
+     *
+     * @param sampleRate sampleRate
+     * @param channels   channel layout
      * @return AudioTrack
      */
-    public AudioTrack createAudioTrack(int sampleRate, int channels){
+    public AudioTrack createAudioTrack(int sampleRate, int channels) {
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         int channelConfig;
-        if(channels == 1){
+        if (channels == 1) {
             channelConfig = android.media.AudioFormat.CHANNEL_OUT_MONO;
-        }else if(channels == 2){
+        } else if (channels == 2) {
             channelConfig = android.media.AudioFormat.CHANNEL_OUT_STEREO;
-        }else{
+        } else {
             channelConfig = android.media.AudioFormat.CHANNEL_OUT_STEREO;
         }
 
