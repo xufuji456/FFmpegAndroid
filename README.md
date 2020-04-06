@@ -1,5 +1,5 @@
 # FFmpegAndroid
-android端基于FFmpeg库的使用。<br>
+android端基于FFmpeg库的使用<br>
 添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 目前音视频相关处理：<br>
 
@@ -40,14 +40,6 @@ android端基于FFmpeg库的使用。<br>
 
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
-视频添加文字水印（文字白色背景可以改为透明）：
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/water_mark.png)
-
-视频转成GIF动图：
-
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/VideoToGif.gif)
-
 滤镜效果：
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_balance.png)
@@ -61,10 +53,6 @@ android端基于FFmpeg库的使用。<br>
 检测多媒体格式：
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/probe_format.png)
-
-视频画面拼接：
-
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/horizontal.gif)
 
 ***
 <br><br>
