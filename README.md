@@ -48,7 +48,7 @@ Select video or audio file from your file explorer, and click the button.<br>
 When it finishes probing, the result of metadata will display on screen.<br>
 
 ### Preview thumbnail when seeking:
-!(https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
 ***
 <br><br>
