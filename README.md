@@ -33,21 +33,21 @@ android端基于FFmpeg库的使用<br>
 - #### ffprobe检测多媒体格式
 - #### IjkPlayer的RTSP超低延时直播
 
-###Usage:
-###(1) Transform video format:
-Select video file which you want to transform, and setting the output path.
-The simple command like this:
-ffmpeg -i %s -vcodec copy -acodec copy %s
-You could appoint the encoder, like this:
-ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s
-You could transform the video resolution, like this:
-ffmpeg -i %s -s 1080x720 %s
+### Usage:
+### (1) Transform video format:
+Select video file which you want to transform, and setting the output path.<br>
+The simple command like this:<br>
+ffmpeg -i %s -vcodec copy -acodec copy %s<br>
+You could appoint the encoder, like this:<br>
+ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s<br>
+You could transform the video resolution, like this:<br>
+ffmpeg -i %s -s 1080x720 %s<br>
 
-###(2) Probing media format:
-Select video or audio file from your file explorer, and click the button.
-When it finishes probing, the result of metadata will display on screen.
+### (2) Probing media format:
+Select video or audio file from your file explorer, and click the button.<br>
+When it finishes probing, the result of metadata will display on screen.<br>
 
-Preview thumbnail when seeking:
+### Preview thumbnail when seeking:
 !(https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
 ***
