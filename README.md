@@ -26,23 +26,29 @@ android端基于FFmpeg库的使用<br>
 - #### 本地直播推流
 - #### 实时直播推流
 - #### 音视频解码播放
-- #### OpenGL+GPUImage滤镜
 - #### FFmpeg的AVFilter滤镜
 - #### 使用mp3lame库进行mp3转码
 - #### 视频拖动实时预览
 - #### moov往前移动
 - #### ffprobe检测多媒体格式
-
 - #### IjkPlayer的RTSP超低延时直播
-- #### IjkPlayer的RTSP多路投屏直播
 
-视频拖动进度条小图预览：
+###Usage:
+###(1) Transform video format:
+Select video file which you want to transform, and setting the output path.
+The simple command like this:
+ffmpeg -i %s -vcodec copy -acodec copy %s
+You could appoint the encoder, like this:
+ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s
+You could transform the video resolution, like this:
+ffmpeg -i %s -s 1080x720 %s
 
-![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
+###(2) Probing media format:
+Select video or audio file from your file explorer, and click the button.
+When it finishes probing, the result of metadata will display on screen.
 
-检测多媒体格式：
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/probe_format.png)
+Preview thumbnail when seeking:
+!(https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
 ***
 <br><br>
