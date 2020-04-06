@@ -4,9 +4,13 @@ import android.text.TextUtils;
 
 import com.frank.ffmpeg.listener.OnHandleListener;
 
+/**
+ * The JNI interface of handling FFmpeg command
+ * Created by frank on 2018/1/23
+ */
 public class FFmpegCmd {
 
-    static{
+    static {
         System.loadLibrary("media-handle");
     }
 
@@ -14,17 +18,21 @@ public class FFmpegCmd {
 
     private final static int RESULT_ERROR = 0;
 
-    //开子线程调用native方法进行音视频处理
-    public static void execute(final String[] commands, final OnHandleListener onHandleListener){
+    /**
+     * Execute FFmpeg command
+     * @param commands the String array of command
+     * @param onHandleListener the callback for executing command
+     */
+    public static void execute(final String[] commands, final OnHandleListener onHandleListener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(onHandleListener != null){
+                if (onHandleListener != null) {
                     onHandleListener.onBegin();
                 }
-                //调用ffmpeg进行处理
+                //call JNI interface to execute FFmpeg cmd
                 int result = handle(commands);
-                if(onHandleListener != null){
+                if (onHandleListener != null) {
                     onHandleListener.onEnd(result, null);
                 }
             }
@@ -32,10 +40,12 @@ public class FFmpegCmd {
     }
 
     /**
-     * 使用FastStart把Moov移动到Mdat前面
-     * @param inputFile inputFile
+     * Using FastStart to moov box in front of mdat box
+     *
+     * @param inputFile  inputFile
      * @param outputFile outputFile
-     * @return 是否操作成功
+     * @return the result of moving moov box in front of mdat box
+     * 0 for success, -1 for fail
      */
     public int moveMoovAhead(String inputFile, String outputFile) {
         if (TextUtils.isEmpty(inputFile) || TextUtils.isEmpty(outputFile)) {
@@ -46,6 +56,7 @@ public class FFmpegCmd {
 
     /**
      * execute probe cmd internal
+     *
      * @param commands commands
      * @param onHandleListener onHandleListener
      */
@@ -53,13 +64,13 @@ public class FFmpegCmd {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(onHandleListener != null) {
+                if (onHandleListener != null) {
                     onHandleListener.onBegin();
                 }
-                //execute ffprobe
+                //call JNI interface to execute FFprobe cmd
                 String result = handleProbe(commands);
                 int resultCode = !TextUtils.isEmpty(result) ? RESULT_SUCCESS : RESULT_ERROR;
-                if(onHandleListener != null) {
+                if (onHandleListener != null) {
                     onHandleListener.onEnd(resultCode, result);
                 }
             }
