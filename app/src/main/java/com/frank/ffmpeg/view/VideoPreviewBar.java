@@ -19,7 +19,7 @@ import com.frank.ffmpeg.util.ScreenUtil;
 import com.frank.ffmpeg.util.TimeUtil;
 
 /**
- * 视频拖动实时预览的控件
+ * the custom view of preview SeekBar
  * Created by frank on 2019/11/16.
  */
 
