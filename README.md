@@ -40,16 +40,6 @@ android端基于FFmpeg库的使用<br>
 
 ![动态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
-滤镜效果：
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_balance.png)
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/filter_sketch.png)
-
-视频画中画：
-
-![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/picture_in_picture.png)
-
 检测多媒体格式：
 
 ![静态图片](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/probe_format.png)
