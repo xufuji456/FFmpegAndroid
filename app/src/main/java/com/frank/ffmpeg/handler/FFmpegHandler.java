@@ -9,7 +9,7 @@ import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
 
 /**
- * Handler消息处理器
+ * Handler of FFmpeg and FFprobe
  * Created by frank on 2019/11/11.
  */
 public class FFmpegHandler {
@@ -37,11 +37,12 @@ public class FFmpegHandler {
     }
 
     /**
-     * 执行ffmpeg命令行
+     * execute the command of FFmpeg
+     *
      * @param commandLine commandLine
      */
     public void executeFFmpegCmd(final String[] commandLine) {
-        if(commandLine == null) {
+        if (commandLine == null) {
             return;
         }
         FFmpegCmd.execute(commandLine, new OnHandleListener() {
@@ -54,9 +55,9 @@ public class FFmpegHandler {
             @Override
             public void onEnd(int resultCode, String resultMsg) {
                 Log.i(TAG, "handle onEnd...");
-                if(isContinue) {
+                if (isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
-                }else {
+                } else {
                     mHandler.obtainMessage(MSG_FINISH).sendToTarget();
                 }
             }
@@ -64,11 +65,12 @@ public class FFmpegHandler {
     }
 
     /**
-     * execute probe cmd
+     * execute the command of FFprobe
+     *
      * @param commandLine commandLine
      */
     public void executeFFprobeCmd(final String[] commandLine) {
-        if(commandLine == null) {
+        if (commandLine == null) {
             return;
         }
         FFmpegCmd.executeProbe(commandLine, new OnHandleListener() {
@@ -82,7 +84,7 @@ public class FFmpegHandler {
             public void onEnd(int resultCode, String resultMsg) {
                 Log.i(TAG, "handle ffprobe onEnd result=" + resultMsg);
                 MediaBean mediaBean = null;
-                if(resultMsg != null && !resultMsg.isEmpty()) {
+                if (resultMsg != null && !resultMsg.isEmpty()) {
                     mediaBean = JsonParseTool.parseMediaFormat(resultMsg);
                 }
                 mHandler.obtainMessage(MSG_FINISH, mediaBean).sendToTarget();
