@@ -13,7 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * bitmap工具类：文字转成图片
+ * bitmap tool
  * Created by frank on 2018/1/24.
  */
 
@@ -23,12 +23,13 @@ public class BitmapUtil {
     private final static int TEXT_COLOR = Color.RED;
 
     /**
-     * 文本转成Bitmap
-     * @param text 文本内容
-     * @param context 上下文
-     * @return 图片的bitmap
+     * convert text to bitmap
+     *
+     * @param text    text
+     * @param context context
+     * @return bitmap of teh text
      */
-    private static Bitmap textToBitmap(String text , Context context) {
+    private static Bitmap textToBitmap(String text, Context context) {
         float scale = context.getResources().getDisplayMetrics().scaledDensity;
         TextView tv = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -47,18 +48,19 @@ public class BitmapUtil {
         tv.buildDrawingCache();
         Bitmap bitmap = tv.getDrawingCache();
         int rate = bitmap.getHeight() / 20;
-        return Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/rate, 20, false);
+        return Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / rate, 20, false);
     }
 
     /**
-     * 文字生成图片
+     * convert text to picture
+     *
      * @param filePath filePath
-     * @param text text
-     * @param context context
-     * @return 生成图片是否成功
+     * @param text     text
+     * @param context  context
+     * @return result of generating picture
      */
-    public static boolean textToPicture(String filePath, String text , Context context){
-        Bitmap bitmap = textToBitmap(text , context);
+    public static boolean textToPicture(String filePath, String text, Context context) {
+        Bitmap bitmap = textToBitmap(text, context);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);
@@ -67,9 +69,9 @@ public class BitmapUtil {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             try {
-                if(outputStream != null){
+                if (outputStream != null) {
                     outputStream.close();
                 }
             } catch (IOException e) {
@@ -80,9 +82,10 @@ public class BitmapUtil {
     }
 
     /**
-     * 删除源文件
+     * delete file
+     *
      * @param filePath filePath
-     * @return 删除是否成功
+     * @return result of deletion
      */
     public static boolean deleteTextFile(String filePath) {
         File file = new File(filePath);
