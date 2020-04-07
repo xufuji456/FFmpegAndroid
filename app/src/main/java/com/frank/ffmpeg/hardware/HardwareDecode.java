@@ -10,7 +10,7 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 
 /**
- * 使用MediaExtractor抽帧，MediaCodec解码，然后渲染到Surface
+ * Extract by MediaExtractor, decode by MediaCodec, and render to Surface
  * Created by frank on 2019/11/16.
  */
 
@@ -99,13 +99,14 @@ public class HardwareDecode {
                 if (mediaExtractor != null) {
                     mediaExtractor.release();
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, "release error=" + e.toString());
             }
         }
 
         /**
-         * 根据原分辨率大小动态设置预览分辨率
+         * setting the preview resolution according to video aspect ratio
+         *
          * @param mediaFormat mediaFormat
          */
         private void setPreviewRatio(MediaFormat mediaFormat) {
@@ -126,7 +127,7 @@ public class HardwareDecode {
             }
             int previewWidth = videoWidth / previewRatio;
             int previewHeight = videoHeight / previewRatio;
-            Log.e(TAG, "videoWidth=" + videoWidth +"--videoHeight=" + videoHeight
+            Log.e(TAG, "videoWidth=" + videoWidth + "--videoHeight=" + videoHeight
                     + "--previewWidth=" + previewWidth + "--previewHeight=" + previewHeight);
             mediaFormat.setInteger(MediaFormat.KEY_WIDTH, previewWidth);
             mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, previewHeight);
@@ -141,10 +142,10 @@ public class HardwareDecode {
             String mimeType = "";
             try {
                 mediaExtractor.setDataSource(mFilePath);
-                for (int i=0; i<mediaExtractor.getTrackCount(); i++) {
+                for (int i = 0; i < mediaExtractor.getTrackCount(); i++) {
                     mediaFormat = mediaExtractor.getTrackFormat(i);
                     mimeType = mediaFormat.getString(MediaFormat.KEY_MIME);
-                    if (mimeType != null &&  mimeType.startsWith("video/")) {
+                    if (mimeType != null && mimeType.startsWith("video/")) {
                         mediaExtractor.selectTrack(i);
                         break;
                     }
@@ -160,11 +161,11 @@ public class HardwareDecode {
                 }
                 Log.i(TAG, "width=" + width + "--height=" + height + "--duration==" + duration);
 
-                //重新设置预览分辨率
+                //setting preview resolution
                 setPreviewRatio(mediaFormat);
                 Log.i(TAG, "mediaFormat=" + mediaFormat.toString());
 
-                //配置MediaCodec，并且start
+                //config MediaCodec, and start
                 mediaCodec = MediaCodec.createDecoderByType(mimeType);
                 mediaCodec.configure(mediaFormat, mSurface, null, 0);
                 mediaCodec.start();
@@ -176,21 +177,21 @@ public class HardwareDecode {
                         SystemClock.sleep(SLEEP_TIME);
                         continue;
                     }
-                    //从缓冲区取出一个缓冲块，如果当前无可用缓冲块，返回inputIndex<0
+                    //dequeue from input buffer
                     int inputIndex = mediaCodec.dequeueInputBuffer(DEQUEUE_TIME);
                     if (inputIndex >= 0) {
                         ByteBuffer inputBuffer = inputBuffers[inputIndex];
                         int sampleSize = mediaExtractor.readSampleData(inputBuffer, 0);
-                        //入队列
+                        //enqueue to input buffer
                         if (sampleSize < 0) {
-                            mediaCodec.queueInputBuffer(inputIndex,0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                            mediaCodec.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                         } else {
                             mediaCodec.queueInputBuffer(inputIndex, 0, sampleSize, mediaExtractor.getSampleTime(), 0);
                             mediaExtractor.advance();
                         }
                     }
 
-                    //出队列
+                    //dequeue from output buffer
                     int outputIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, DEQUEUE_TIME);
                     switch (outputIndex) {
                         case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
@@ -203,7 +204,7 @@ public class HardwareDecode {
                             Log.i(TAG, "output buffer changed...");
                             break;
                         default:
-                            //渲染到surface
+                            //render to surface
                             mediaCodec.releaseOutputBuffer(outputIndex, true);
                             break;
                     }
