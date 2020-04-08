@@ -20,7 +20,7 @@ import java.io.IOException;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_TOAST;
 
 /**
- * 视频拖动实时预览
+ * Preview the thumbnail of video when seeking
  * Created by frank on 2019/11/16.
  */
 

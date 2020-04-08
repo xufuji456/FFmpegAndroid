@@ -1,36 +1,41 @@
 package com.frank.ffmpeg.adapter;
 
 import android.graphics.Color;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.listener.OnItemClickListener;
-import java.util.ArrayList;
+
 import java.util.List;
 
 /**
- * RecyclerView适配器
+ * the horizontal adapter of RecyclerView
  * Created by frank on 2018/6/6.
  */
 
-public class HorizontalAdapter extends RecyclerView.Adapter{
+public class HorizontalAdapter extends RecyclerView.Adapter {
 
-    private List<String> itemList = new ArrayList<>();
+    private List<String> itemList;
     private OnItemClickListener onItemClickListener;
     private int lastClickPosition;
 
-    public HorizontalAdapter(List<String> itemList){
+    public HorizontalAdapter(List<String> itemList) {
         this.itemList = itemList;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new OkViewHolder(LayoutInflater.from(parent.getContext()).
@@ -39,10 +44,10 @@ public class HorizontalAdapter extends RecyclerView.Adapter{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final OkViewHolder okViewHolder = (OkViewHolder)holder;
+        final OkViewHolder okViewHolder = (OkViewHolder) holder;
         okViewHolder.btn_select.setText(itemList.get(position));
         okViewHolder.btn_select.setTextColor(Color.DKGRAY);
-        if(onItemClickListener != null){
+        if (onItemClickListener != null) {
             okViewHolder.btn_select.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -62,12 +67,12 @@ public class HorizontalAdapter extends RecyclerView.Adapter{
         return itemList != null ? itemList.size() : 0;
     }
 
-    private class OkViewHolder extends RecyclerView.ViewHolder{
+    private class OkViewHolder extends RecyclerView.ViewHolder {
         Button btn_select;
 
         OkViewHolder(View itemView) {
             super(itemView);
-            btn_select = (Button)itemView.findViewById(R.id.btn_select);
+            btn_select = itemView.findViewById(R.id.btn_select);
         }
     }
 
