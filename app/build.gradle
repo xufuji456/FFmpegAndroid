@@ -38,6 +38,8 @@ android {
             jni.srcDirs = []
         }
     }
+
+    useLibrary "org.apache.http.legacy"
 }
 
 dependencies {
