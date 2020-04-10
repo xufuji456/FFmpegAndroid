@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -18,7 +20,7 @@ import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.util.ContentUtil;
 
 /**
- * Activity基类
+ * base Activity
  * Created by frank on 2019/11/2.
  */
 
@@ -27,7 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     private final static String TAG = BaseActivity.class.getSimpleName();
 
     private final static int REQUEST_CODE = 1234;
-    private final static String[] permissions = new String[] {
+    private final static String[] permissions = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA,
@@ -39,7 +41,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(permissions[1]) != PackageManager.PERMISSION_GRANTED ) {
+                && checkSelfPermission(permissions[1]) != PackageManager.PERMISSION_GRANTED) {
             requestPermission();
         }
         setContentView(getLayoutId());
@@ -84,9 +86,9 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(data != null && data.getData() != null) {
-            String filePath = ContentUtil.getPath(this,data.getData());
-            Log.i(TAG,"filePath="+ filePath);
+        if (data != null && data.getData() != null) {
+            String filePath = ContentUtil.getPath(this, data.getData());
+            Log.i(TAG, "filePath=" + filePath);
             onSelectedFile(filePath);
         }
     }
