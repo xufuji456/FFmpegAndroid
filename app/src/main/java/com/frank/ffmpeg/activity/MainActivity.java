@@ -7,7 +7,7 @@ import android.view.View;
 import com.frank.ffmpeg.R;
 
 /**
- * 使用ffmpeg进行音视频处理入口
+ * The main entrance of all Activity
  * Created by frank on 2018/1/23.
  */
 public class MainActivity extends BaseActivity {
@@ -37,32 +37,32 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onViewClick(View v) {
         Intent intent = new Intent();
-        switch (v.getId()){
-            case R.id.btn_audio://音频处理
+        switch (v.getId()) {
+            case R.id.btn_audio://handle audio
                 intent.setClass(MainActivity.this, AudioHandleActivity.class);
                 break;
-            case R.id.btn_video://视频处理
+            case R.id.btn_video://handle video
                 intent.setClass(MainActivity.this, VideoHandleActivity.class);
                 break;
-            case R.id.btn_media://音视频处理
+            case R.id.btn_media://handle media
                 intent.setClass(MainActivity.this, MediaHandleActivity.class);
                 break;
-            case R.id.btn_play://音视频播放
+            case R.id.btn_play://media play
                 intent.setClass(MainActivity.this, MediaPlayerActivity.class);
                 break;
-            case R.id.btn_push://FFmpeg推流
+            case R.id.btn_push://pushing
                 intent.setClass(MainActivity.this, PushActivity.class);
                 break;
-            case R.id.btn_live://实时推流直播:AAC音频编码、H264视频编码、RTMP推流
+            case R.id.btn_live://realtime living with rtmp stream
                 intent.setClass(MainActivity.this, LiveActivity.class);
                 break;
-            case R.id.btn_filter://滤镜特效
+            case R.id.btn_filter://filter effect
                 intent.setClass(MainActivity.this, FilterActivity.class);
                 break;
-            case R.id.btn_preview://视频拖动实时预览
+            case R.id.btn_preview://preview thumbnail
                 intent.setClass(MainActivity.this, VideoPreviewActivity.class);
                 break;
-            case R.id.btn_probe://解析音视频多媒体格式
+            case R.id.btn_probe://probe media format
                 intent.setClass(MainActivity.this, ProbeFormatActivity.class);
                 break;
             default:

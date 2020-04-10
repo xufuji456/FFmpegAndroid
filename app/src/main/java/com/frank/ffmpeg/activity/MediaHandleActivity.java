@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.util.FFmpegUtil;
@@ -23,7 +24,7 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_CONTINUE;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
- * 使用ffmpeg进行音视频合成与分离
+ * using ffmpeg to handle media
  * Created by frank on 2018/1/23.
  */
 public class MediaHandleActivity extends BaseActivity {
@@ -39,35 +40,31 @@ public class MediaHandleActivity extends BaseActivity {
     private FFmpegHandler ffmpegHandler;
 
     @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case MSG_CONTINUE:
                     String audioFile = PATH + File.separator + "tiger.mp3";//tiger.mp3
                     String muxFile = PATH + File.separator + "media-mux.mp4";
 
                     try {
-                        //使用MediaPlayer获取视频时长
                         MediaPlayer mediaPlayer = new MediaPlayer();
                         mediaPlayer.setDataSource(videoFile);
                         mediaPlayer.prepare();
-                        //单位为ms
-                        int videoDuration = mediaPlayer.getDuration()/1000;
+                        //ms
+                        int videoDuration = mediaPlayer.getDuration() / 1000;
                         Log.i(TAG, "videoDuration=" + videoDuration);
                         mediaPlayer.release();
-                        //使用MediaMetadataRetriever获取音频时长
                         MediaMetadataRetriever mediaRetriever = new MediaMetadataRetriever();
                         mediaRetriever.setDataSource(audioFile);
-                        //单位为ms
                         String duration = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        int audioDuration = (int)(Long.parseLong(duration)/1000);
+                        int audioDuration = (int) (Long.parseLong(duration) / 1000);
                         Log.i(TAG, "audioDuration=" + audioDuration);
                         mediaRetriever.release();
-                        //如果视频时长比音频长，采用音频时长，否则用视频时长
                         int mDuration = Math.min(audioDuration, videoDuration);
-                        //使用纯视频与音频进行合成
+                        //mux video and audio
                         String[] commandLine = FFmpegUtil.mediaMux(temp, audioFile, mDuration, muxFile);
                         if (ffmpegHandler != null) {
                             ffmpegHandler.isContinue(false);
@@ -127,12 +124,13 @@ public class MediaHandleActivity extends BaseActivity {
     }
 
     /**
-     * 调用ffmpeg处理音视频
+     * execute ffmpeg cmd to handle media
+     *
      * @param srcFile srcFile
      */
     private void doHandleMedia(String srcFile) {
         String[] commandLine = null;
-        if (!FileUtil.checkFileExist(srcFile)){
+        if (!FileUtil.checkFileExist(srcFile)) {
             return;
         }
         if (!FileUtil.isVideo(srcFile)) {
@@ -140,10 +138,9 @@ public class MediaHandleActivity extends BaseActivity {
             return;
         }
 
-        switch (viewId){
-            case R.id.btn_mux://音视频合成
+        switch (viewId) {
+            case R.id.btn_mux://mux
                 try {
-                    //视频文件有音频,先把纯视频文件抽取出来
                     videoFile = srcFile;
                     commandLine = FFmpegUtil.extractVideo(srcFile, temp);
                     if (ffmpegHandler != null) {
@@ -153,11 +150,11 @@ public class MediaHandleActivity extends BaseActivity {
                     e.printStackTrace();
                 }
                 break;
-            case R.id.btn_extract_audio://提取音频
+            case R.id.btn_extract_audio://extract audio
                 String extractAudio = PATH + File.separator + "extractAudio.aac";
                 commandLine = FFmpegUtil.extractAudio(srcFile, extractAudio);
                 break;
-            case R.id.btn_extract_video://提取视频
+            case R.id.btn_extract_video://extract video
                 String extractVideo = PATH + File.separator + "extractVideo.mp4";
                 commandLine = FFmpegUtil.extractVideo(srcFile, extractVideo);
                 break;
