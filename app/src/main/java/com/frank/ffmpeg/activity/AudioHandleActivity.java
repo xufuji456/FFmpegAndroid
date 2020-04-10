@@ -24,7 +24,7 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 
 /**
- * 使用ffmpeg处理音频
+ * Using ffmpeg command to handle audio
  * Created by frank on 2018/1/23.
  */
 
@@ -101,7 +101,7 @@ public class AudioHandleActivity extends BaseActivity {
     }
 
     /**
-     * 调用ffmpeg处理音频
+     * Using ffmpeg cmd to handle audio
      *
      * @param srcFile srcFile
      */
@@ -115,11 +115,11 @@ public class AudioHandleActivity extends BaseActivity {
             return;
         }
         switch (viewId) {
-            case R.id.btn_transform://转码
-                if (useFFmpeg) { //使用FFmpeg转码
+            case R.id.btn_transform:
+                if (useFFmpeg) { //use FFmpeg to transform
                     String transformFile = PATH + File.separator + "transformAudio.mp3";
                     commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
-                } else { //使用MediaCodec与mp3lame转mp3
+                } else { //use MediaCodec and libmp3lame to transform
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -130,7 +130,7 @@ public class AudioHandleActivity extends BaseActivity {
                     }).start();
                 }
                 break;
-            case R.id.btn_cut://剪切(注意原文件与剪切文件格式一致，文件绝对路径最好不包含中文、特殊字符)
+            case R.id.btn_cut://cut audio, it's best not include special characters
                 String suffix = FileUtil.getFileSuffix(srcFile);
                 if (suffix == null || suffix.isEmpty()) {
                     return;
@@ -138,7 +138,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String cutFile = PATH + File.separator + "cutAudio" + suffix;
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile);
                 break;
-            case R.id.btn_concat://合并，支持MP3、AAC、AMR等，不支持PCM裸流，不支持WAV（PCM裸流加音频头）
+            case R.id.btn_concat://concat audio
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
@@ -148,7 +148,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String concatFile = PATH + File.separator + "concat.mp3";
                 commandLine = FFmpegUtil.concatAudio(fileList, concatFile);
                 break;
-            case R.id.btn_mix://混音
+            case R.id.btn_mix://mix audio
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
@@ -159,7 +159,7 @@ public class AudioHandleActivity extends BaseActivity {
                 String mixFile = PATH + File.separator + "mix" + mixSuffix;
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
-            case R.id.btn_play_audio://解码播放（AudioTrack）
+            case R.id.btn_play_audio://use AudioTrack to play audio
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -167,7 +167,7 @@ public class AudioHandleActivity extends BaseActivity {
                     }
                 }).start();
                 return;
-            case R.id.btn_play_opensl://解码播放（OpenSL ES）
+            case R.id.btn_play_opensl://use OpenSL ES to play audio
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -175,20 +175,19 @@ public class AudioHandleActivity extends BaseActivity {
                     }
                 }).start();
                 return;
-            case R.id.btn_audio_encode://音频编码
-                //可编码成WAV、AAC。如果需要编码成MP3，ffmpeg需要重新编译，把MP3库enable
+            case R.id.btn_audio_encode://audio encode
                 String pcmFile = PATH + File.separator + "concat.pcm";
                 String wavFile = PATH + File.separator + "new.wav";
-                //pcm数据的采样率，一般采样率为8000、16000、44100
+                //sample rate, normal is 8000/16000/44100
                 int sampleRate = 8000;
-                //pcm数据的声道，单声道为1，立体声道为2
+                //channel num of pcm
                 int channel = 1;
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
-            case R.id.btn_pcm_concat://PCM裸流音频文件合并
-                String srcPCM = PATH + File.separator + "audio.pcm";//第一个pcm文件
-                String appendPCM = PATH + File.separator + "audio.pcm";//第二个pcm文件
-                String concatPCM = PATH + File.separator + "concat.pcm";//合并后的文件
+            case R.id.btn_pcm_concat://concat PCM streams
+                String srcPCM = PATH + File.separator + "audio.pcm";
+                String appendPCM = PATH + File.separator + "audio.pcm";
+                String concatPCM = PATH + File.separator + "concat.pcm";
                 if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)) {
                     return;
                 }
@@ -200,7 +199,7 @@ public class AudioHandleActivity extends BaseActivity {
             default:
                 break;
         }
-        if (ffmpegHandler != null  && commandLine != null) {
+        if (ffmpegHandler != null && commandLine != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
     }

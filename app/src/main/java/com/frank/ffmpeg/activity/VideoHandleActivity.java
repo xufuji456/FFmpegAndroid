@@ -108,7 +108,7 @@ public class VideoHandleActivity extends BaseActivity {
     }
 
     /**
-     * call FFmpeg cmd to process video
+     * Using FFmpeg cmd to handle video
      *
      * @param srcFile srcFile
      */

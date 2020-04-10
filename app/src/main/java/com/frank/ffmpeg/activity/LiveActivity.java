@@ -21,7 +21,7 @@ import com.frank.live.param.VideoParam;
 import com.frank.live.LivePusherNew;
 
 /**
- * h264与rtmp实时推流直播
+ * Realtime living with rtmp stream
  * Created by frank on 2018/1/28.
  */
 
@@ -68,16 +68,16 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     }
 
     private void initPusher() {
-        int width = 640;//分辨率设置
+        int width = 640;//resolution
         int height = 480;
         int videoBitRate = 800_000;//kb/s
         int videoFrameRate = 10;//fps
         VideoParam videoParam = new VideoParam(width, height,
                 Integer.valueOf(Camera2Helper.CAMERA_ID_BACK), videoBitRate, videoFrameRate);
-        int sampleRate = 44100;//采样率：Hz
-        int channelConfig = AudioFormat.CHANNEL_IN_STEREO;//立体声道
-        int audioFormat = AudioFormat.ENCODING_PCM_16BIT;//pcm16位
-        int numChannels = 2;//声道数
+        int sampleRate = 44100;//sample rate: Hz
+        int channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+        int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        int numChannels = 2;//channel number
         AudioParam audioParam = new AudioParam(sampleRate, channelConfig, audioFormat, numChannels);
         livePusher = new LivePusherNew(this, videoParam, audioParam);
         livePusher.setPreviewDisplay(textureView.getHolder());
@@ -86,14 +86,14 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
-            case R.id.btn_live://开始/停止直播
+            case R.id.btn_live://start or stop living
                 if (isChecked) {
                     livePusher.startPush(LIVE_URL, this);
                 } else {
                     livePusher.stopPush();
                 }
                 break;
-            case R.id.btn_mute://设置静音
+            case R.id.btn_mute://mute or not
                 Log.i(TAG, "isChecked=" + isChecked);
                 livePusher.setMute(isChecked);
                 break;
@@ -118,7 +118,7 @@ public class LiveActivity extends BaseActivity implements CompoundButton.OnCheck
 
     @Override
     void onViewClick(View view) {
-        if (view.getId() == R.id.btn_swap) {//切换摄像头
+        if (view.getId() == R.id.btn_swap) {//switch camera
             livePusher.switchCamera();
         }
     }

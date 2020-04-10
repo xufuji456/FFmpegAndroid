@@ -124,7 +124,7 @@ public class MediaHandleActivity extends BaseActivity {
     }
 
     /**
-     * execute ffmpeg cmd to handle media
+     * Using ffmpeg cmd to handle media
      *
      * @param srcFile srcFile
      */
