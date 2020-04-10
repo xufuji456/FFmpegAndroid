@@ -13,6 +13,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
+        android:name=".FFmpegApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,31 +28,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- 音频处理 -->
+        <!-- audio handle -->
         <activity android:name=".activity.AudioHandleActivity" />
-        <!-- 音视频处理 -->
+        <!-- media handle -->
         <activity android:name=".activity.MediaHandleActivity" />
-        <!-- 视频处理 -->
+        <!-- video handle -->
         <activity android:name=".activity.VideoHandleActivity" />
-        <!-- 音视频解码播放 -->
+        <!-- media player -->
         <activity
             android:name=".activity.MediaPlayerActivity"
             android:screenOrientation="landscape" />
-        <!-- 本地推流直播 -->
+        <!-- local pusher -->
         <activity
             android:name=".activity.PushActivity" />
-        <!-- 实时推流直播 -->
+        <!-- real time pusher -->
         <activity
             android:name=".activity.LiveActivity"
             android:screenOrientation="portrait" />
-        <!-- 滤镜特效 -->
+        <!-- filter effect -->
         <activity
             android:name=".activity.FilterActivity"
             android:screenOrientation="landscape" />
-        <!--视频播放拖动预览-->
+        <!-- video preview -->
         <activity android:name=".activity.VideoPreviewActivity"
             android:screenOrientation="portrait" />
-        <!--检测多媒体格式数据-->
+        <!-- probe media format -->
         <activity android:name=".activity.ProbeFormatActivity"
             android:screenOrientation="portrait" />
     </application>

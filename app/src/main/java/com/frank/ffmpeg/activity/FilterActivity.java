@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
+import com.frank.ffmpeg.FFmpegApplication;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.VideoPlayer;
 import com.frank.ffmpeg.adapter.HorizontalAdapter;
@@ -24,23 +27,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 使用ffmpeg进行滤镜
+ * Using ffmpeg to filter
  * Created by frank on 2018/6/5.
  */
 
-public class FilterActivity extends BaseActivity implements SurfaceHolder.Callback{
+public class FilterActivity extends BaseActivity implements SurfaceHolder.Callback {
 
-    //本地视频路径
     private String videoPath = "";
 
     private VideoPlayer videoPlayer;
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
-    //surface是否已经创建
     private boolean surfaceCreated;
-    //是否正在播放
+    //is playing or not
     private boolean isPlaying;
-    //滤镜数组
+    //the array of filter
     private String[] filters = new String[]{
             "lutyuv='u=128:v=128'",
             "hue='h=60:s=-3'",
@@ -52,20 +53,20 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             "vflip",
             "unsharp"
     };
+    //vflip is up and down, hflip is left and right
     private String[] txtArray = new String[]{
-            "素描",
-            "鲜明",//hue
-            "暖蓝",
-            "边缘",
-            "九宫格",
-            "均衡",
-            "矩形",
-            "翻转",//vflip上下翻转,hflip是左右翻转
-            "锐化"
+            FFmpegApplication.getInstance().getString(R.string.filter_sketch),
+            FFmpegApplication.getInstance().getString(R.string.filter_distinct),
+            FFmpegApplication.getInstance().getString(R.string.filter_warming),
+            FFmpegApplication.getInstance().getString(R.string.filter_edge),
+            FFmpegApplication.getInstance().getString(R.string.filter_division),
+            FFmpegApplication.getInstance().getString(R.string.filter_equalize),
+            FFmpegApplication.getInstance().getString(R.string.filter_rectangle),
+            FFmpegApplication.getInstance().getString(R.string.filter_flip),
+            FFmpegApplication.getInstance().getString(R.string.filter_sharpening)
     };
     private HorizontalAdapter horizontalAdapter;
     private RecyclerView recyclerView;
-    //是否播放音频
     private boolean playAudio = true;
     private ToggleButton btnSound;
     private Button btnSelect;
@@ -73,11 +74,11 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     private final static int MSG_HIDE = 222;
     private final static int DELAY_TIME = 5000;
     @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == MSG_HIDE){//无操作5s后隐藏滤镜操作栏
+            if (msg.what == MSG_HIDE) { //after idle 5s, hide the controller view
                 recyclerView.setVisibility(View.GONE);
                 btnSound.setVisibility(View.GONE);
                 btnSelect.setVisibility(View.GONE);
@@ -85,12 +86,13 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         }
     };
 
-    private class HideRunnable implements Runnable{
+    private class HideRunnable implements Runnable {
         @Override
         public void run() {
             mHandler.obtainMessage(MSG_HIDE).sendToTarget();
         }
     }
+
     private HideRunnable hideRunnable;
 
     @Override
@@ -110,7 +112,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         mHandler.postDelayed(hideRunnable, DELAY_TIME);
     }
 
-    private void initView(){
+    private void initView() {
         surfaceView = getView(R.id.surface_filter);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -129,14 +131,13 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         initViewsWithClick(R.id.btn_select_file);
     }
 
-    //注册监听器
-    private void registerLister(){
+    private void registerLister() {
         horizontalAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                if(!surfaceCreated)
+                if (!surfaceCreated)
                     return;
-                if (!FileUtil.checkFileExist(videoPath)){
+                if (!FileUtil.checkFileExist(videoPath)) {
                     showSelectFile();
                     return;
                 }
@@ -149,8 +150,8 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             public void onClick(View v) {
                 btnSelect.setVisibility(View.VISIBLE);
                 btnSound.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);//按下SurfaceView，弹出滤镜操作栏
-                mHandler.postDelayed(hideRunnable, DELAY_TIME);//5s后发消息通知隐藏滤镜操作栏
+                recyclerView.setVisibility(View.VISIBLE);
+                mHandler.postDelayed(hideRunnable, DELAY_TIME);
             }
         });
 
@@ -162,12 +163,15 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         });
     }
 
+    /**
+     * switch filter
+     * @param position position in the array of filters
+     */
     private void doFilterPlay(final int position) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //切换播放
-                if(isPlaying){
+                if (isPlaying) {
                     videoPlayer.again();
                 }
                 isPlaying = true;
@@ -176,8 +180,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
         }).start();
     }
 
-    //设置是否静音
-    private void setPlayAudio(){
+    private void setPlayAudio() {
         playAudio = !playAudio;
         videoPlayer.playAudio(playAudio);
     }
@@ -201,7 +204,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     protected void onDestroy() {
         super.onDestroy();
         isPlaying = false;
-        //暂时注释
+        //FIXME
 //        videoPlayer.release();
         videoPlayer = null;
         horizontalAdapter = null;
@@ -217,9 +220,8 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     @Override
     void onSelectedFile(String filePath) {
         videoPath = filePath;
-        //选择滤镜模式
         doFilterPlay(5);
-        //默认关闭声音
+        //sound off by default
         btnSound.setChecked(true);
     }
 

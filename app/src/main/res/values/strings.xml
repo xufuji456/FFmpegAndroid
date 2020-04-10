@@ -48,8 +48,8 @@
     <string name="stop">停止</string>
     <string name="mute">静音</string>
     <string name="sound">声音</string>
-    <string name="sound_open">声音开</string>
-    <string name="sound_close">声音关</string>
+    <string name="sound_on">声音开</string>
+    <string name="sound_off">声音关</string>
 
     <string name="video_sketch">素描</string>
     <string name="video_hue">hue</string>
@@ -72,5 +72,15 @@
     <string name="wrong_video_format">非视频文件</string>
     <string name="converting_video">正在反转视频&#8230;</string>
     <string name="tip_not_mp4_video">该视频不是mp4,无法进行moov前移操作</string>
+
+    <string name="filter_sketch">素描</string>
+    <string name="filter_distinct">鲜明</string>
+    <string name="filter_warming">暖蓝</string>
+    <string name="filter_edge">边缘</string>
+    <string name="filter_division">九宫格</string>
+    <string name="filter_equalize">均衡</string>
+    <string name="filter_rectangle">矩形</string>
+    <string name="filter_flip">翻转</string>
+    <string name="filter_sharpening">锐化</string>
 
 </resources>

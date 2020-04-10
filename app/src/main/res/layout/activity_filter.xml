@@ -20,8 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:textOff="@string/sound_close"
-        android:textOn="@string/sound_open"/>
+        android:textOff="@string/sound_off"
+        android:textOn="@string/sound_on"/>
 
     <Button
         android:id="@+id/btn_select_file"
