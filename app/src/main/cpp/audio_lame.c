@@ -190,7 +190,8 @@ AUDIO_PLAYER_FUNC(void, lameInit,
                   jint inSampleRate, jint outChannel, jint outSampleRate, jint outBitrate,
                   jfloat scaleInput, jint mode, jint vbrMode, jint quality, jint vbrQuality,
                   jint abrMeanBitrate, jint lowPassFreq, jint highPassFreq, jstring id3tagTitle,
-                  jstring id3tagArtist, jstring id3tagAlbum, jstring id3tagYear, jstring id3tagComment) {
+                  jstring id3tagArtist, jstring id3tagAlbum, jstring id3tagYear,
+                  jstring id3tagComment) {
 
     glf = initialize(env, inSampleRate, outChannel, outSampleRate, outBitrate, scaleInput, mode,
                      vbrMode,
@@ -201,17 +202,17 @@ AUDIO_PLAYER_FUNC(void, lameInit,
 }
 
 AUDIO_PLAYER_FUNC(jint, lameEncode,
-        jshortArray buffer_l, jshortArray buffer_r, jint samples, jbyteArray mp3buf) {
+                  jshortArray buffer_l, jshortArray buffer_r, jint samples, jbyteArray mp3buf) {
     return encode(env, glf, buffer_l, buffer_r, samples, mp3buf);
 }
 
 AUDIO_PLAYER_FUNC(jint, encodeBufferInterleaved,
-        jshortArray pcm, jint samples, jbyteArray mp3buf) {
+                  jshortArray pcm, jint samples, jbyteArray mp3buf) {
     return encodeBufferInterleaved(env, glf, pcm, samples, mp3buf);
 }
 
 AUDIO_PLAYER_FUNC(jint, lameFlush,
-        jbyteArray mp3buf) {
+                  jbyteArray mp3buf) {
     return flush(env, glf, mp3buf);
 }
 
