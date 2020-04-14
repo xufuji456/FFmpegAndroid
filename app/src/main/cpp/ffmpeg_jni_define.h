@@ -8,7 +8,7 @@
 #include <android/log.h>
 
 #define LOGI(TAG, FORMAT, ...) __android_log_print(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
-#define LOGE(TAG, FORMAT,...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
+#define LOGE(TAG, FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
 
 #define AUDIO_PLAYER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_AudioPlayer_ ## FUNC_NAME \

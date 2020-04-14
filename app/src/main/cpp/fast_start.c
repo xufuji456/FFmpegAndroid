@@ -22,7 +22,7 @@
 #define ftello(x)       _ftelli64(x)
 #endif
 
-#define MIN(a,b) ((a) > (b) ? (b) : (a))
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 #define BE_32(x) (((uint32_t)(((uint8_t*)(x))[0]) << 24) |  \
                              (((uint8_t*)(x))[1]  << 16) |  \
@@ -105,11 +105,10 @@ typedef struct {
 typedef int (*parse_atoms_callback_t)(void *context, atom_t *atom);
 
 static int parse_atoms(
-    unsigned char *buf,
-    uint64_t size,
-    parse_atoms_callback_t callback,
-    void *context)
-{
+        unsigned char *buf,
+        uint64_t size,
+        parse_atoms_callback_t callback,
+        void *context) {
     unsigned char *pos = buf;
     unsigned char *end = pos + size;
     atom_t atom;
@@ -122,22 +121,22 @@ static int parse_atoms(
         atom.header_size = ATOM_PREAMBLE_SIZE;
 
         switch (atom.size) {
-        case 1:
-            if (end - pos < 8) {
-                fprintf(stderr, "not enough room for 64 bit atom size\n");
-                return -1;
-            }
+            case 1:
+                if (end - pos < 8) {
+                    fprintf(stderr, "not enough room for 64 bit atom size\n");
+                    return -1;
+                }
 
-            atom.size = BE_64(pos);
-            pos += 8;
-            atom.header_size = ATOM_PREAMBLE_SIZE + 8;
-            break;
+                atom.size = BE_64(pos);
+                pos += 8;
+                atom.header_size = ATOM_PREAMBLE_SIZE + 8;
+                break;
 
-        case 0:
-            atom.size = ATOM_PREAMBLE_SIZE + end - pos;
-            break;
-        default:
-            break;
+            case 0:
+                atom.size = ATOM_PREAMBLE_SIZE + end - pos;
+                break;
+            default:
+                break;
         }
 
         if (atom.size < atom.header_size) {
@@ -164,8 +163,7 @@ static int parse_atoms(
     return 0;
 }
 
-static int update_stco_offsets(update_chunk_offsets_context_t *context, atom_t *atom)
-{
+static int update_stco_offsets(update_chunk_offsets_context_t *context, atom_t *atom) {
     uint32_t current_offset;
     uint32_t offset_count;
     unsigned char *pos;
@@ -187,8 +185,8 @@ static int update_stco_offsets(update_chunk_offsets_context_t *context, atom_t *
     context->stco_data_size += atom->size - 8;
 
     for (pos = atom->data + 8, end = pos + offset_count * 4;
-        pos < end;
-        pos += 4) {
+         pos < end;
+         pos += 4) {
         current_offset = BE_32(pos);
         if (current_offset > UINT_MAX - context->moov_atom_size) {
             context->stco_overflow = 1;
@@ -200,8 +198,7 @@ static int update_stco_offsets(update_chunk_offsets_context_t *context, atom_t *
     return 0;
 }
 
-static int update_co64_offsets(update_chunk_offsets_context_t *context, atom_t *atom)
-{
+static int update_co64_offsets(update_chunk_offsets_context_t *context, atom_t *atom) {
     uint64_t current_offset;
     uint32_t offset_count;
     unsigned char *pos;
@@ -220,8 +217,8 @@ static int update_co64_offsets(update_chunk_offsets_context_t *context, atom_t *
     }
 
     for (pos = atom->data + 8, end = pos + offset_count * 8;
-        pos < end;
-        pos += 8) {
+         pos < end;
+         pos += 8) {
         current_offset = BE_64(pos);
         current_offset += context->moov_atom_size;
         AV_WB64(pos, current_offset);
@@ -230,60 +227,55 @@ static int update_co64_offsets(update_chunk_offsets_context_t *context, atom_t *
     return 0;
 }
 
-static int update_chunk_offsets_callback(void *ctx, atom_t *atom)
-{
+static int update_chunk_offsets_callback(void *ctx, atom_t *atom) {
     update_chunk_offsets_context_t *context = ctx;
     int ret;
 
     switch (atom->type) {
-    case STCO_ATOM:
-        return update_stco_offsets(context, atom);
+        case STCO_ATOM:
+            return update_stco_offsets(context, atom);
 
-    case CO64_ATOM:
-        return update_co64_offsets(context, atom);
+        case CO64_ATOM:
+            return update_co64_offsets(context, atom);
 
-    case MOOV_ATOM:
-    case TRAK_ATOM:
-    case MDIA_ATOM:
-    case MINF_ATOM:
-    case STBL_ATOM:
-        context->depth++;
-        if (context->depth > 10) {
-            fprintf(stderr, "atoms too deeply nested\n");
-            return -1;
-        }
+        case MOOV_ATOM:
+        case TRAK_ATOM:
+        case MDIA_ATOM:
+        case MINF_ATOM:
+        case STBL_ATOM:
+            context->depth++;
+            if (context->depth > 10) {
+                fprintf(stderr, "atoms too deeply nested\n");
+                return -1;
+            }
 
-        ret = parse_atoms(
-            atom->data,
-            atom->size,
-            update_chunk_offsets_callback,
-            context);
-        context->depth--;
-        return ret;
-    default:
-        break;
+            ret = parse_atoms(
+                    atom->data,
+                    atom->size,
+                    update_chunk_offsets_callback,
+                    context);
+            context->depth--;
+            return ret;
+        default:
+            break;
     }
 
     return 0;
 }
 
-static void set_atom_size(unsigned char *header, uint32_t header_size, uint64_t size)
-{
+static void set_atom_size(unsigned char *header, uint32_t header_size, uint64_t size) {
     switch (header_size) {
-    case 8:
-        AV_WB32(header, size);
-        break;
+        case 8: AV_WB32(header, size);
+            break;
 
-    case 16:
-        AV_WB64(header + 8, size);
-        break;
-    default:
-        break;
+        case 16: AV_WB64(header + 8, size);
+            break;
+        default:
+            break;
     }
 }
 
-static void upgrade_stco_atom(upgrade_stco_context_t *context, atom_t *atom)
-{
+static void upgrade_stco_atom(upgrade_stco_context_t *context, atom_t *atom) {
     unsigned char *pos;
     unsigned char *end;
     uint64_t new_offset;
@@ -302,74 +294,72 @@ static void upgrade_stco_atom(upgrade_stco_context_t *context, atom_t *atom)
 
     /* write the data */
     for (pos = atom->data + 8, end = pos + offset_count * 4;
-        pos < end;
-        pos += 4) {
+         pos < end;
+         pos += 4) {
         original_offset = BE_32(pos) - context->original_moov_size;
-        new_offset = (uint64_t)original_offset + context->new_moov_size;
+        new_offset = (uint64_t) original_offset + context->new_moov_size;
         AV_WB64(context->dest, new_offset);
         context->dest += 8;
     }
 }
 
-static int upgrade_stco_callback(void *ctx, atom_t *atom)
-{
+static int upgrade_stco_callback(void *ctx, atom_t *atom) {
     upgrade_stco_context_t *context = ctx;
     unsigned char *start_pos;
     uint64_t copy_size;
 
     switch (atom->type) {
-    case STCO_ATOM:
-        upgrade_stco_atom(context, atom);
-        break;
+        case STCO_ATOM:
+            upgrade_stco_atom(context, atom);
+            break;
 
-    case MOOV_ATOM:
-    case TRAK_ATOM:
-    case MDIA_ATOM:
-    case MINF_ATOM:
-    case STBL_ATOM:
-        /* write the atom header */
-        memcpy(context->dest, atom->data - atom->header_size, atom->header_size);
-        start_pos = context->dest;
-        context->dest += atom->header_size;
+        case MOOV_ATOM:
+        case TRAK_ATOM:
+        case MDIA_ATOM:
+        case MINF_ATOM:
+        case STBL_ATOM:
+            /* write the atom header */
+            memcpy(context->dest, atom->data - atom->header_size, atom->header_size);
+            start_pos = context->dest;
+            context->dest += atom->header_size;
 
-        /* parse internal atoms*/
-        if (parse_atoms(
-            atom->data,
-            atom->size,
-            upgrade_stco_callback,
-            context) < 0) {
-            return -1;
-        }
+            /* parse internal atoms*/
+            if (parse_atoms(
+                    atom->data,
+                    atom->size,
+                    upgrade_stco_callback,
+                    context) < 0) {
+                return -1;
+            }
 
-        /* update the atom size */
-        set_atom_size(start_pos, atom->header_size, context->dest - start_pos);
-        break;
+            /* update the atom size */
+            set_atom_size(start_pos, atom->header_size, context->dest - start_pos);
+            break;
 
-    default:
-        copy_size = atom->header_size + atom->size;
-        memcpy(context->dest, atom->data - atom->header_size, copy_size);
-        context->dest += copy_size;
-        break;
+        default:
+            copy_size = atom->header_size + atom->size;
+            memcpy(context->dest, atom->data - atom->header_size, copy_size);
+            context->dest += copy_size;
+            break;
     }
 
     return 0;
 }
 
 static int update_moov_atom(
-    unsigned char **moov_atom,
-    uint64_t *moov_atom_size)
-{
-    update_chunk_offsets_context_t update_context = { 0 };
+        unsigned char **moov_atom,
+        uint64_t *moov_atom_size) {
+    update_chunk_offsets_context_t update_context = {0};
     upgrade_stco_context_t upgrade_context;
     unsigned char *new_moov_atom;
 
     update_context.moov_atom_size = *moov_atom_size;
 
     if (parse_atoms(
-        *moov_atom,
-        *moov_atom_size,
-        update_chunk_offsets_callback,
-        &update_context) < 0) {
+            *moov_atom,
+            *moov_atom_size,
+            update_chunk_offsets_callback,
+            &update_context) < 0) {
         return -1;
     }
 
@@ -379,13 +369,13 @@ static int update_moov_atom(
 
     printf(" upgrading stco atoms to co64...\n");
     upgrade_context.new_moov_size = *moov_atom_size +
-        update_context.stco_offset_count * 8 -
-        update_context.stco_data_size;
+                                    update_context.stco_offset_count * 8 -
+                                    update_context.stco_data_size;
 
     new_moov_atom = malloc(upgrade_context.new_moov_size);
     if (new_moov_atom == NULL) {
         fprintf(stderr, "could not allocate %"PRIu64" bytes for updated moov atom\n",
-            upgrade_context.new_moov_size);
+                upgrade_context.new_moov_size);
         return -1;
     }
 
@@ -393,10 +383,10 @@ static int update_moov_atom(
     upgrade_context.dest = new_moov_atom;
 
     if (parse_atoms(
-        *moov_atom,
-        *moov_atom_size,
-        upgrade_stco_callback,
-        &upgrade_context) < 0) {
+            *moov_atom,
+            *moov_atom_size,
+            upgrade_stco_callback,
+            &upgrade_context) < 0) {
         free(new_moov_atom);
         return -1;
     }
@@ -414,11 +404,11 @@ static int update_moov_atom(
 }
 
 FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
-    FILE *infile  = NULL;
+    FILE *infile = NULL;
     FILE *outfile = NULL;
     unsigned char atom_bytes[ATOM_PREAMBLE_SIZE];
-    uint32_t atom_type   = 0;
-    uint64_t atom_size   = 0;
+    uint32_t atom_type = 0;
+    uint64_t atom_size = 0;
     uint64_t atom_offset = 0;
     int64_t last_offset;
     unsigned char *moov_atom = NULL;
@@ -457,7 +447,7 @@ FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
         if (atom_type == FTYP_ATOM) {
             if (atom_size > MAX_FTYP_ATOM_SIZE) {
                 fprintf(stderr, "ftyp atom size %"PRIu64" too big\n",
-                       atom_size);
+                        atom_size);
                 goto error_out;
             }
             ftyp_atom_size = atom_size;
@@ -465,7 +455,7 @@ FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
             ftyp_atom = malloc((size_t) ftyp_atom_size);
             if (!ftyp_atom) {
                 fprintf(stderr, "could not allocate %"PRIu64" bytes for ftyp atom\n",
-                       atom_size);
+                        atom_size);
                 goto error_out;
             }
             if (fseeko(infile, -ATOM_PREAMBLE_SIZE, SEEK_CUR) ||
@@ -494,8 +484,8 @@ FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
         printf("%c%c%c%c %10"PRIu64" %"PRIu64"\n",
                (atom_type >> 24) & 255,
                (atom_type >> 16) & 255,
-               (atom_type >>  8) & 255,
-               (atom_type >>  0) & 255,
+               (atom_type >> 8) & 255,
+               (atom_type >> 0) & 255,
                atom_offset,
                atom_size);
         if ((atom_type != FREE_ATOM) &&
@@ -547,13 +537,13 @@ FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
         perror(input_file);
         goto error_out;
     }
-    last_offset    = ftello(infile);
+    last_offset = ftello(infile);
     if (last_offset < 0) {
         perror(input_file);
         goto error_out;
     }
     moov_atom_size = atom_size;
-    moov_atom      = malloc((size_t) moov_atom_size);
+    moov_atom = malloc((size_t) moov_atom_size);
     if (!moov_atom) {
         fprintf(stderr, "could not allocate %"PRIu64" bytes for moov atom\n", atom_size);
         goto error_out;
@@ -648,7 +638,7 @@ FFMPEG_FUNC(jint, fastStart, jstring inputFile, jstring outputFile) {
 
     return 0;
 
-error_out:
+    error_out:
     if (infile)
         fclose(infile);
     if (outfile)
