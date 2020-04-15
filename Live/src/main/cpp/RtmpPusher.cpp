@@ -21,36 +21,36 @@ uint32_t start_time;
 
 AudioStream *audioStream = 0;
 
-//子线程回调给Java需要用到JavaVM
+//use to get thread's JNIEnv
 JavaVM *javaVM;
-//调用类
+//callback object
 jobject jobject_error;
 
-/***************与Java层对应**************/
-//视频编码器打开失败
+/***************relative to Java**************/
+//error code for opening video encoder
 const int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-//视频帧编码失败
+//error code for video encoding
 const int ERROR_VIDEO_ENCODE = 0x02;
-//音频编码器打开失败
+//error code for opening audio encoder
 const int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-//音频帧编码失败
+//error code for audio encoding
 const int ERROR_AUDIO_ENCODE = 0x04;
-//RTMP连接失败
+//error code for RTMP connecting
 const int ERROR_RTMP_CONNECT = 0x05;
-//RTMP连接流失败
+//error code for connecting stream
 const int ERROR_RTMP_CONNECT_STREAM = 0x06;
-//RTMP发送数据包失败
+//error code for sending packet
 const int ERROR_RTMP_SEND_PACKET = 0x07;
 
-/***************与Java层对应**************/
+/***************relative to Java**************/
 
-//当调用System.loadLibrary时，会回调这个方法
+//when calling System.loadLibrary, will callback it
 jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
     return JNI_VERSION_1_6;
 }
 
-//回调异常给java
+//callback error to java
 void throwErrToJava(int error_code) {
     JNIEnv *env;
     javaVM->AttachCurrentThread(&env, NULL);
@@ -90,7 +90,7 @@ void *start(void *args) {
             LOGE("RTMP_SetupURL:%s", url);
             break;
         }
-        //超时时间
+        //timeout
         rtmp->Link.timeout = 5;
         RTMP_EnableWrite(rtmp);
         ret = RTMP_Connect(rtmp, 0);
@@ -105,9 +105,9 @@ void *start(void *args) {
             throwErrToJava(ERROR_RTMP_CONNECT_STREAM);
             break;
         }
-        //开始时间
+        //start time
         start_time = RTMP_GetTime();
-        //开始推流
+        //start pushing
         readyPushing = 1;
         packets.setWork(1);
         callback(audioStream->getAudioTag());
@@ -155,7 +155,7 @@ RTMP_PUSHER_FUNC(void, native_1init) {
 }
 
 RTMP_PUSHER_FUNC(void, native_1setVideoCodecInfo,
-        jint width, jint height, jint fps, jint bitrate) {
+                 jint width, jint height, jint fps, jint bitrate) {
     if (videoStream) {
         videoStream->setVideoEncInfo(width, height, fps, bitrate);
     }
