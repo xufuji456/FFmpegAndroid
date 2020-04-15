@@ -8,13 +8,13 @@
 #include "include/x264/x264.h"
 
 class VideoStream {
-    typedef void (*VideoCallback)(RTMPPacket* packet);
+    typedef void (*VideoCallback)(RTMPPacket *packet);
+
 public:
     VideoStream();
 
     ~VideoStream();
 
-    //创建x264编码器
     void setVideoEncInfo(int width, int height, int fps, int bitrate);
 
     void encodeData(int8_t *data);
@@ -35,6 +35,7 @@ private:
     int ySize;
     int uvSize;
     VideoCallback videoCallback;
+
     void sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len);
 
     void sendFrame(int type, uint8_t *payload, int i_payload);

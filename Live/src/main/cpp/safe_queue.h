@@ -37,7 +37,7 @@ public:
 
     }
 
-    void push( T new_value) {
+    void push(T new_value) {
 #ifdef C11
         //锁 和智能指针原理类似，自动释放
         lock_guard<mutex> lk(mt);
@@ -50,7 +50,7 @@ public:
         if (work) {
             q.push(new_value);
             pthread_cond_signal(&cond);
-        }else{
+        } else {
             releaseCallback(new_value);
         }
         pthread_mutex_unlock(&mutex);
@@ -59,7 +59,7 @@ public:
     }
 
 
-    int pop(T& value) {
+    int pop(T &value) {
         int ret = 0;
 #ifdef C11
         //占用空间相对lock_guard 更大一点且相对更慢一点，但是配合条件必须使用它，更灵活

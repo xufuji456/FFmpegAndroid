@@ -20,28 +20,22 @@ void AudioStream::setAudioCallback(AudioCallback audioCallback) {
 }
 
 void AudioStream::setAudioEncInfo(int samplesInHZ, int channels) {
-    //打开编码器
     mChannels = channels;
-    //一次最大能输入编码器的样本数量 (一个样本是16位 2字节)
-    //编码后的最大字节数
+    //open faac encoder
     audioCodec = faacEncOpen(static_cast<unsigned long>(samplesInHZ),
                              static_cast<unsigned int>(channels),
                              &inputSamples,
                              &maxOutputBytes);
 
-    //设置编码器参数
+    //set encoder params
     faacEncConfigurationPtr config = faacEncGetCurrentConfiguration(audioCodec);
-    //指定为 mpeg4 标准
     config->mpegVersion = MPEG4;
-    //lc 标准
     config->aacObjectType = LOW;
-    //16位
     config->inputFormat = FAAC_INPUT_16BIT;
-    // 编码出原始数据
     config->outputFormat = 0;
     faacEncSetConfiguration(audioCodec, config);
 
-    //输出缓冲区 编码后的数据 用这个缓冲区来保存
+    //output buffer
     buffer = new u_char[maxOutputBytes];
 }
 
@@ -56,7 +50,7 @@ RTMPPacket *AudioStream::getAudioTag() {
     int bodySize = static_cast<int>(2 + len);
     RTMPPacket *packet = new RTMPPacket;
     RTMPPacket_Alloc(packet, bodySize);
-    //双声道
+    //channel layout: stereo
     packet->m_body[0] = 0xAF;
     if (mChannels == 1) {
         packet->m_body[0] = 0xAE;
@@ -74,7 +68,7 @@ RTMPPacket *AudioStream::getAudioTag() {
 }
 
 void AudioStream::encodeData(int8_t *data) {
-    //返回编码后数据字节的长度
+    //encode a frame, and return encoded len
     int byteLen = faacEncEncode(audioCodec, reinterpret_cast<int32_t *>(data),
                                 static_cast<unsigned int>(inputSamples),
                                 buffer,
@@ -83,7 +77,7 @@ void AudioStream::encodeData(int8_t *data) {
         int bodySize = 2 + byteLen;
         RTMPPacket *packet = new RTMPPacket;
         RTMPPacket_Alloc(packet, bodySize);
-        //双声道
+        //stereo
         packet->m_body[0] = 0xAF;
         if (mChannels == 1) {
             packet->m_body[0] = 0xAE;

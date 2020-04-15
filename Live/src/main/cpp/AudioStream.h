@@ -22,7 +22,8 @@ public:
 
     void encodeData(int8_t *data);
 
-    RTMPPacket* getAudioTag();
+    RTMPPacket *getAudioTag();
+
 private:
     AudioCallback audioCallback;
     int mChannels;
