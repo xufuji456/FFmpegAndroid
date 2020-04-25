@@ -1,7 +1,7 @@
 package com.frank.live.listener;
 
 /**
- * 直播状态监听
+ * Listener of living state
  * Created by frank on 2018/1/29.
  */
 
