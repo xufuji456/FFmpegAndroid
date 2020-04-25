@@ -31,9 +31,9 @@ public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChang
 
 
     /**
-     * nv21摄像头数据
+     * preview data
      *
-     * @param data data
+     * @param data   data
      * @param camera camera
      */
     @Override
