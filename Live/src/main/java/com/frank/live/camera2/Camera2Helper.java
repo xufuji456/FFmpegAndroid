@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import androidx.annotation.NonNull;
 
 /**
- * Camera2操作
+ * Camera2: open, preview and close
  * Created by frank on 2019/12/18.
  */
 @TargetApi(21)
