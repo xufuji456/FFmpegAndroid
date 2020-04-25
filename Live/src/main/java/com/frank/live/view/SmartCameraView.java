@@ -156,9 +156,9 @@ public class SmartCameraView extends GLSurfaceView implements GLSurfaceView.Rend
         mGLPreviewBuffer = ByteBuffer.allocate(mPreviewWidth * mPreviewHeight * 4);
 
         mInputAspectRatio = mPreviewWidth > mPreviewHeight ?
-            (float) mPreviewWidth / mPreviewHeight : (float) mPreviewHeight / mPreviewWidth;
+                (float) mPreviewWidth / mPreviewHeight : (float) mPreviewHeight / mPreviewWidth;
 
-        return new int[] { mPreviewWidth, mPreviewHeight };
+        return new int[]{mPreviewWidth, mPreviewHeight};
     }
 
     public boolean setFilter(final MagicFilterType type) {
@@ -189,7 +189,7 @@ public class SmartCameraView extends GLSurfaceView implements GLSurfaceView.Rend
             queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    GLES20.glDeleteTextures(1, new int[]{ mOESTextureId }, 0);
+                    GLES20.glDeleteTextures(1, new int[]{mOESTextureId}, 0);
                     mOESTextureId = OpenGLUtils.NO_TEXTURE;
                 }
             });
@@ -311,11 +311,11 @@ public class SmartCameraView extends GLSurfaceView implements GLSurfaceView.Rend
         Camera.Size psize;
         for (int i = 0; i < pictureSizes.size(); i++) {
             psize = pictureSizes.get(i);
-            Log.i(TAG,psize.width+" x "+psize.height);
+            Log.i(TAG, psize.width + " x " + psize.height);
         }
         for (int i = 0; i < previewSizes.size(); i++) {
             psize = previewSizes.get(i);
-            Log.i(TAG,psize.width+" x "+psize.height);
+            Log.i(TAG, psize.width + " x " + psize.height);
         }
     }
 

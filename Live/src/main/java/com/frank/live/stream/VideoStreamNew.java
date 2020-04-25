@@ -15,7 +15,7 @@ import com.frank.live.camera2.Camera2Listener;
 import com.frank.live.param.VideoParam;
 
 /**
- * 视频推流:使用Camera2
+ * Pushing video stream: using Camera2
  * Created by frank on 2020/02/12.
  */
 public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camera2Listener {
@@ -42,7 +42,7 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
     }
 
     /**
-     * 开始预览
+     * start previewing
      */
     private void startPreview() {
         int rotateDegree = 0;
@@ -85,7 +85,7 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
     }
 
     /**
-     * 停止预览
+     * stop previewing
      */
     private void stopPreview() {
         if (camera2Helper != null) {
@@ -117,7 +117,8 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
     }
 
     /**
-     * nv21摄像头数据
+     * camere preview frame data
+     *
      * @param y plane of y
      * @param u plane of u
      * @param v plane of v

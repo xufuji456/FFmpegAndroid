@@ -41,11 +41,8 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
 
     private void stopPreview() {
         if (mCamera != null) {
-            //预览数据回调接口
             mCamera.setPreviewCallback(null);
-            //停止预览
             mCamera.stopPreview();
-            //释放摄像头
             mCamera.release();
             mCamera = null;
         }
@@ -102,7 +99,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
     private void setPreviewSize(Camera.Parameters parameters) {
         List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
         Camera.Size size = supportedPreviewSizes.get(0);
-        //选择最合适的camera支持分辨率
+        //select the best resolution of camera
         int m = Math.abs(size.height * size.width - mWidth * mHeight);
         supportedPreviewSizes.remove(0);
         for (Camera.Size next : supportedPreviewSizes) {
@@ -151,8 +148,8 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
                 rotation90(data);
                 break;
             case Surface.ROTATION_90:
-                break;
             case Surface.ROTATION_270:
+            default:
                 break;
         }
         mPreviewCallback.onPreviewFrame(bytes, camera);
@@ -163,7 +160,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
         int index = 0;
         int ySize = mWidth * mHeight;
         int uvHeight = mHeight / 2;
-        //后置摄像头顺时针旋转90度
+        //back camera rotate 90 deree
         if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
 
             for (int i = 0; i < mWidth; i++) {
@@ -181,7 +178,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
                 }
             }
         } else {
-            //逆时针旋转90度
+            //rotate 90 degree
             for (int i = 0; i < mWidth; i++) {
                 int nPos = mWidth - 1;
                 for (int j = 0; j < mHeight; j++) {
