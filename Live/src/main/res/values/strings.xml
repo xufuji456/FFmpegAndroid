@@ -3,4 +3,14 @@
     <string name="swap">切换</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>
+    <string name="mute">静音</string>
+    <string name="voice">取消静音</string>
+
+    <string name="effect_beauty">美颜</string>
+    <string name="effect_cool">冷酷</string>
+    <string name="effect_sunrise">日出</string>
+    <string name="effect_sketch">素描</string>
+    <string name="effect_white">纯白</string>
+    <string name="effect_romantic">浪漫</string>
+    <string name="effect_raw">原图</string>
 </resources>
