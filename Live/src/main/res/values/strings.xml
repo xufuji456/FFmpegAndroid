@@ -13,4 +13,12 @@
     <string name="effect_white">纯白</string>
     <string name="effect_romantic">浪漫</string>
     <string name="effect_raw">原图</string>
+
+    <string name="error_video_encoder">打开视频编码器失败</string>
+    <string name="error_video_encode">视频编码失败</string>
+    <string name="error_audio_encoder">打开音频编码器失败</string>
+    <string name="error_audio_encode">音频编码失败</string>
+    <string name="error_rtmp_connect">RTMP连接服务器失败</string>
+    <string name="error_rtmp_connect_strem">RTMP连接流失败</string>
+    <string name="error_rtmp_send_packet">RTMP发送数据包失败</string>
 </resources>

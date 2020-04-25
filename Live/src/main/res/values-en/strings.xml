@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">live</string>
+    <string name="swap">swap</string>
+    <string name="start">start</string>
+    <string name="stop">stop</string>
+    <string name="mute">mute</string>
+    <string name="voice">voice</string>
+
+    <string name="effect_beauty">beauty</string>
+    <string name="effect_cool">cool</string>
+    <string name="effect_sunrise">sunrise</string>
+    <string name="effect_sketch">sketch</string>
+    <string name="effect_white">white</string>
+    <string name="effect_romantic">romantic</string>
+    <string name="effect_raw">raw</string>
+
+    <string name="error_video_encoder">error of opening video encoder</string>
+    <string name="error_video_encode">error of video encoding</string>
+    <string name="error_audio_encoder">error of opening audio encoder</string>
+    <string name="error_audio_encode">error of audio encoding</string>
+    <string name="error_rtmp_connect">error of RTMP connecting server</string>
+    <string name="error_rtmp_connect_strem">error of RTMP connecting stream</string>
+    <string name="error_rtmp_send_packet">error of RTMP sending packet</string>
+</resources>

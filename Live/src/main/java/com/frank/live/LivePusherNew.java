@@ -13,19 +13,19 @@ import com.frank.live.stream.VideoStreamNew;
 
 public class LivePusherNew {
 
-    //视频编码器打开失败
+    //error of opening video encoder
     private final static int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-    //视频帧编码失败
+    //error of video encoding
     private final static int ERROR_VIDEO_ENCODE = 0x02;
-    //音频编码器打开失败
+    //error of opening audio encoder
     private final static int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-    //音频帧编码失败
+    //error of audio encoding
     private final static int ERROR_AUDIO_ENCODE = 0x04;
-    //RTMP连接失败
+    //error of RTMP connecting server
     private final static int ERROR_RTMP_CONNECT = 0x05;
-    //RTMP连接流失败
+    //error of RTMP connecting stream
     private final static int ERROR_RTMP_CONNECT_STREAM = 0x06;
-    //RTMP发送数据包失败
+    //error of RTMP sending packet
     private final static int ERROR_RTMP_SEND_PACKET = 0x07;
 
     static {
@@ -38,7 +38,10 @@ public class LivePusherNew {
 
     private LiveStateChangeListener liveStateChangeListener;
 
+    private Activity activity;
+
     public LivePusherNew(Activity activity, VideoParam videoParam, AudioParam audioParam) {
+        this.activity = activity;
         native_init();
         videoStream = new VideoStream(this, activity, videoParam.getWidth(), videoParam.getHeight(),
                 videoParam.getBitRate(), videoParam.getFrameRate(), videoParam.getCameraId());
@@ -60,9 +63,9 @@ public class LivePusherNew {
     }
 
     /**
-     * 设置静音
+     * setting mute
      *
-     * @param isMute 是否静音
+     * @param isMute is mute or not
      */
     public void setMute(boolean isMute) {
         audioStream.setMute(isMute);
@@ -88,36 +91,36 @@ public class LivePusherNew {
     }
 
     /**
-     * 当native报错时，回调这个方法
+     * Callback this method, when native occurring error
      *
      * @param errCode errCode
      */
     public void errorFromNative(int errCode) {
-        //停止推流
+        //stop pushing stream
         stopPush();
-        if (liveStateChangeListener != null) {
+        if (liveStateChangeListener != null && activity != null) {
             String msg = "";
             switch (errCode) {
                 case ERROR_VIDEO_ENCODER_OPEN:
-                    msg = "视频编码器打开失败...";
+                    msg = activity.getString(R.string.error_video_encoder);
                     break;
                 case ERROR_VIDEO_ENCODE:
-                    msg = "视频帧编码失败...";
+                    msg = activity.getString(R.string.error_video_encode);
                     break;
                 case ERROR_AUDIO_ENCODER_OPEN:
-                    msg = "音频编码器打开失败...";
+                    msg = activity.getString(R.string.error_audio_encoder);
                     break;
                 case ERROR_AUDIO_ENCODE:
-                    msg = "音频帧编码失败...";
+                    msg = activity.getString(R.string.error_audio_encode);
                     break;
                 case ERROR_RTMP_CONNECT:
-                    msg = "RTMP连接失败...";
+                    msg = activity.getString(R.string.error_rtmp_connect);
                     break;
                 case ERROR_RTMP_CONNECT_STREAM:
-                    msg = "RTMP连接流失败...";
+                    msg = activity.getString(R.string.error_rtmp_connect_strem);
                     break;
                 case ERROR_RTMP_SEND_PACKET:
-                    msg = "RTMP发送数据包失败...";
+                    msg = activity.getString(R.string.error_rtmp_send_packet);
                     break;
                 default:
                     break;
