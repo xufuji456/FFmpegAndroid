@@ -27,7 +27,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
- * 多路投屏直播
+ * multi screen living
  * Created by xufulong on 2019/01/04
  */
 public class MultiScreenActivity extends AppCompatActivity {
@@ -46,11 +46,11 @@ public class MultiScreenActivity extends AppCompatActivity {
     private CustomReceiver customReceiver;
     private String ipAddress;
 
-    //四分屏模式还是全屏模式
+    //is multi-screen mode or full-screen mode
     private boolean isMultiScreen;
-    //保存客户端ip与通道数对应关系
+    //relationship of between client id and channel number
     private HashMap<String, Integer> clientMap = new HashMap<>();
-    //记录每个通道的投屏状态
+    //record each channel state
     private TreeMap<Integer, Boolean> channelMap = new TreeMap<>();
 
     private String url = "";
@@ -108,13 +108,13 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     private void setupView() {
-        //第一路投屏默认全屏
+        //default full screen
         enterFullScreen(1);
         mVideoView1.setVideoPath(url);
         mVideoView1.setIjkPlayerListener(new IjkPlayerListener() {
             @Override
             public void onIjkPlayer(IjkMediaPlayer ijkMediaPlayer) {
-                //设置播放器option
+                //setting ijkPlayer option
                 setOptions(ijkMediaPlayer);
             }
         });
@@ -129,7 +129,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 外部传进来的数据:URL
+     * parse params
      */
     private void parseIntent() {
         for (int i = 1; i <= 4; i++) {
@@ -149,7 +149,7 @@ public class MultiScreenActivity extends AppCompatActivity {
         }
     }
 
-    //唤醒屏幕
+    //wake up the screen
     private void wakeUp() {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager == null)
@@ -161,33 +161,33 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 配置播放器参数项
+     * config the options of ijkPlayer
      */
     private void setOptions(IjkMediaPlayer ijkPlayer) {
         if (ijkPlayer == null)
             return;
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "fast", 1);//不额外优化
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probesize", 200);
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "fast", 1);//no extra optimize
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probesize", 200);//size of probe data
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "flush_packets", 1);
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);//是否开启缓冲
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);//enable cache or not
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1);
-        //0:代表关闭，1:代表开启
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 0);//开启硬解
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 0);//自动旋屏
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 0);//处理分辨率变化
+        //0:disable 1:enable
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 0);//enable hardware decode or not
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 0);//auto rotate
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 0);
 
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max-buffer-size", 0);//最大缓存数
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "min-frames", 2);//默认最小帧数2
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max_cached_duration", 30);//最大缓存时长
-        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "infbuf", 1);//是否限制输入缓存数
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max-buffer-size", 0);//max buffer size
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "min-frames", 2);//minimum frame size
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max_cached_duration", 30);//maximum cached duration
+        ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "infbuf", 1);
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "nobuffer");
-        //设置播放前的最大探测时间,分析码流时长:默认1024*1000
+        //max analyzed duration
         ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzedmaxduration", 100);
-        //ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "rtsp_transport", "tcp");//tcp传输数据
+        //ijkPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "rtsp_transport", "tcp");//using tcp or udp
     }
 
     /**
-     * 注册广播
+     * register broadcast
      */
     private void registerBroadcast() {
         customReceiver = new CustomReceiver();
@@ -198,7 +198,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 注销广播
+     * unregister broadcast
      */
     private void unregisterBroadcast() {
         if (customReceiver != null) {
@@ -208,7 +208,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 自定义广播接收器
+     * custom broadcast receiver
      */
     private class CustomReceiver extends BroadcastReceiver {
         @Override
@@ -218,7 +218,7 @@ public class MultiScreenActivity extends AppCompatActivity {
                 return;
             Log.e(TAG, "onReceive=" + action);
             switch (action) {
-                case Constants.ACTION_CLIENT_REMOVE: //移除投屏
+                case Constants.ACTION_CLIENT_REMOVE://remove client
                     int num = intent.getIntExtra("clientNum", 0);
                     if (num == 0) {
                         Process.killProcess(Process.myPid());
@@ -228,23 +228,22 @@ public class MultiScreenActivity extends AppCompatActivity {
                         removeClient(target);
                         clientMap.remove(ipAddress);
                         channelMap.put(target, false);
-                        //多屏变为单屏时，自动切换为全屏
                         if (num == 1) {
                             int castingChannel = getCastingChannel();
                             enterFullScreen(castingChannel);
                         }
                     }
                     break;
-                case Constants.ACTION_CLIENT_ADD://增加投屏
+                case Constants.ACTION_CLIENT_ADD://add client
                     int clientNum = intent.getIntExtra("clientNum", 0);
                     String otherUrl = intent.getStringExtra("url");
                     String ipAddress = intent.getStringExtra("ip");
-                    //选择空闲通道
+                    //select the idle channel
                     int channel = selectIdleChannel(clientNum);
                     clientMap.put(ipAddress, channel);
                     channelMap.put(channel, true);
                     addClient(channel, otherUrl);
-                    //单屏变为两路投屏时，自动切换为多屏模式
+                    //switch multi-screen mode
                     if (clientNum == 2) {
                         exitFullScreen();
                     }
@@ -256,7 +255,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 选择空闲通道
+     * select the first idle channel
      *
      * @param clientNum clientNum
      * @return idleChannel
@@ -271,7 +270,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 获取当前投屏通道
+     * get current casting channel
      *
      * @return idleChannel
      */
@@ -285,7 +284,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 添加客户端
+     * add client to casting
      *
      * @param target    target
      * @param clientUrl clientUrl
@@ -318,7 +317,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 移除客户端
+     * remove client
      *
      * @param target target
      */
@@ -346,7 +345,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 隐藏分割线
+     * hide divider in multi-screen mode
      */
     private void hideDivider() {
         divider1.setVisibility(View.GONE);
@@ -354,7 +353,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 显示分割线
+     * show divider in multi-screen mode
      */
     private void showDivider() {
         divider1.setVisibility(View.VISIBLE);
@@ -362,7 +361,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 进入全屏模式
+     * enter full-screen mode
      *
      * @param channel channel
      */
@@ -419,7 +418,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 退出全屏模式
+     * exit full-screen mode
      */
     private void exitFullScreen() {
         mVideoView1.setRenderViewVisible();
@@ -435,7 +434,7 @@ public class MultiScreenActivity extends AppCompatActivity {
     }
 
     /**
-     * 切换分屏模式
+     * switch screen mode
      *
      * @param channel channel
      */

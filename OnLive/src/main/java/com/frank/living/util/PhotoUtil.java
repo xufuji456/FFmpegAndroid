@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * 图片工具类
+ * the tool of photo
  * Created by frank on 2019/12/31
  */
 

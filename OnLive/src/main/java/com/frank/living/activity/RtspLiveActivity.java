@@ -83,7 +83,7 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "flush_packets", 1);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1);
-        //0：代表关闭  1：代表开启
+        //0:disable 1:enable
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 0);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 0);
         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 0);
@@ -108,10 +108,10 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
         switch (v.getId()) {
             case R.id.btn_play:
                 isPause = !isPause;
-                if (isPause) {//直播暂停
+                if (isPause) {//pause
                     mVideoView.pause();
                     btnPlay.setBackgroundResource(R.drawable.ic_play);
-                } else {//直播继续
+                } else {//resume
                     mVideoView.start();
                     btnPlay.setBackgroundResource(R.drawable.ic_pause);
                 }
