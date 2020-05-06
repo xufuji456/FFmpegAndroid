@@ -85,7 +85,7 @@ public class ProbeFormatActivity extends BaseActivity {
 
     @Override
     void onSelectedFile(String filePath) {
-        doHandleAudio(filePath);
+        doHandleProbe(filePath);
     }
 
     /**
@@ -93,7 +93,7 @@ public class ProbeFormatActivity extends BaseActivity {
      *
      * @param srcFile srcFile
      */
-    private void doHandleAudio(final String srcFile) {
+    private void doHandleProbe(final String srcFile) {
         if (!FileUtil.checkFileExist(srcFile)) {
             return;
         }
