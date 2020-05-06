@@ -1,8 +1,11 @@
 package com.frank.ffmpeg;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.frank.ffmpeg.listener.OnHandleListener;
+
+import java.util.List;
 
 /**
  * The JNI interface of handling FFmpeg command
@@ -32,6 +35,33 @@ public class FFmpegCmd {
                 }
                 //call JNI interface to execute FFmpeg cmd
                 int result = handle(commands);
+                if (onHandleListener != null) {
+                    onHandleListener.onEnd(result, null);
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * Execute FFmpeg multi commands
+     * @param commands the String array of command
+     * @param onHandleListener the callback for executing command
+     */
+    public static void execute(final List<String[]> commands, final OnHandleListener onHandleListener) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (onHandleListener != null) {
+                    onHandleListener.onBegin();
+                }
+                //call JNI interface to execute FFmpeg cmd
+                int result = 0;
+                int count = 0;
+                for (String[] command : commands) {
+                    result = handle(command);
+                    count ++;
+                    Log.i("FFmpegCmd", count + " result=" + result);
+                }
                 if (onHandleListener != null) {
                     onHandleListener.onEnd(result, null);
                 }

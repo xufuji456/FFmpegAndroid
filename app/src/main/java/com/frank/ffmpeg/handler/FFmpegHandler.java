@@ -8,6 +8,8 @@ import com.frank.ffmpeg.listener.OnHandleListener;
 import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
 
+import java.util.List;
+
 /**
  * Handler of FFmpeg and FFprobe
  * Created by frank on 2019/11/11.
@@ -46,6 +48,34 @@ public class FFmpegHandler {
             return;
         }
         FFmpegCmd.execute(commandLine, new OnHandleListener() {
+            @Override
+            public void onBegin() {
+                Log.i(TAG, "handle onBegin...");
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+            }
+
+            @Override
+            public void onEnd(int resultCode, String resultMsg) {
+                Log.i(TAG, "handle onEnd...");
+                if (isContinue) {
+                    mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
+                } else {
+                    mHandler.obtainMessage(MSG_FINISH).sendToTarget();
+                }
+            }
+        });
+    }
+
+    /**
+     * execute multi commands of FFmpeg
+     *
+     * @param commandList the list of command
+     */
+    public void executeFFmpegCmds(final List<String[]> commandList) {
+        if (commandList == null) {
+            return;
+        }
+        FFmpegCmd.execute(commandList, new OnHandleListener() {
             @Override
             public void onBegin() {
                 Log.i(TAG, "handle onBegin...");
