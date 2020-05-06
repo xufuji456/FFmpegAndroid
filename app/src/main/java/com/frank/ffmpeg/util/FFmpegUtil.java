@@ -146,7 +146,18 @@ public class FFmpegUtil {
     }
 
     /**
-     * Using FFmpeg to transform video, include the resolution
+     * Using FFmpeg to transform video, with re-encode
+     *
+     * @param srcFile the source file
+     * @param targetFile target file
+     * @return transform video success or not
+     */
+    public static String[] transformVideoWithEncode(String srcFile, String targetFile) {
+        return transformVideoWithEncode(srcFile, 0, 0, targetFile);
+    }
+
+    /**
+     * Using FFmpeg to transform video, with re-encode and specific resolution
      *
      * @param srcFile  the source file
      * @param width the width of video
@@ -154,11 +165,28 @@ public class FFmpegUtil {
      * @param targetFile target file
      * @return transform video success or not
      */
-    public static String[] transformVideo(String srcFile, int width, int height, String targetFile) {
-        String scale = "-vf scale=" + width + ":" + height;
-        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy " + scale + " %s";
+    public static String[] transformVideoWithEncode(String srcFile, int width, int height, String targetFile) {
+        String transformVideoCmd;
+        if (width > 0 && height > 0) {
+            String scale = "-vf scale=" + width + ":" + height;
+            transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec aac " + scale + " %s";
+        } else {
+            transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec aac " + "%s";
+        }
         transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
         return transformVideoCmd.split(" ");
+    }
+
+    /**
+     * joint every single video together
+     * @param fileListPath the path file list
+     * @param targetPath output path
+     * @return joint video success or not
+     */
+    public static String[] jointVideo(String fileListPath, String targetPath) {
+        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i %s -c copy %s";
+        jointVideoCmd = String.format(jointVideoCmd, fileListPath, targetPath);
+        return jointVideoCmd.split(" ");
     }
 
     /**
