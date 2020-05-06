@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * file tool
@@ -160,8 +161,8 @@ public class FileUtil {
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
-    public static String createListFile(String listPath, String[] fileArray) {
-        if ((TextUtils.isEmpty(listPath) || fileArray == null || fileArray.length == 0)) {
+    public static String createListFile(String listPath, List<String> fileList) {
+        if ((TextUtils.isEmpty(listPath) || fileList == null || fileList.size() == 0)) {
             return null;
         }
         FileOutputStream outputStream = null;
@@ -179,7 +180,7 @@ public class FileUtil {
             }
             outputStream = new FileOutputStream(listFile);
             StringBuilder fileBuilder = new StringBuilder();
-            for (String file : fileArray) {
+            for (String file : fileList) {
                 fileBuilder
                         .append("file")
                         .append(" ")
