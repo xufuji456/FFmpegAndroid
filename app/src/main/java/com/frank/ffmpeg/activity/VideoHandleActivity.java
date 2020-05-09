@@ -14,10 +14,14 @@ import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.handler.FFmpegHandler;
+import com.frank.ffmpeg.model.MediaBean;
+import com.frank.ffmpeg.tool.JsonParseTool;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
@@ -88,7 +92,8 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_denoise_video,
                 R.id.btn_to_image,
                 R.id.btn_pip,
-                R.id.btn_moov
+                R.id.btn_moov,
+                R.id.btn_joint
         );
     }
 
@@ -253,12 +258,53 @@ public class VideoHandleActivity extends BaseActivity {
                     Log.e(TAG, "move moov use time=" + (System.currentTimeMillis() - start));
                 }
                 break;
+            case R.id.btn_joint:// joint two videos together
+                jointVideo(srcFile);
+                break;
             default:
                 break;
         }
         if (ffmpegHandler != null && commandLine != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
+    }
+
+    /**
+     * joint two videos together
+     * It's recommended to convert to the same resolution and encoding
+     * @param selectedPath the path which is selected
+     */
+    private void jointVideo(String selectedPath) {
+        if (ffmpegHandler == null || selectedPath.isEmpty()) {
+            return;
+        }
+        String appendPath = PATH + File.separator + "snow.mp4";
+        String outputPath1 = PATH + File.separator + "output1.ts";
+        String outputPath2 = PATH + File.separator + "output2.ts";
+        String listPath = PATH + File.separator + "listFile.txt";
+        String targetPath = PATH + File.separator + "jointVideo.mp4";
+        String[] transformCmd1 = FFmpegUtil.transformVideoWithEncode(selectedPath, outputPath1);
+        int width = 0;
+        int height = 0;
+        //probe width and height of the selected video
+        String probeResult = FFmpegCmd.executeProbeSynchronize(FFmpegUtil.probeFormat(selectedPath));
+        MediaBean mediaBean = JsonParseTool.parseMediaFormat(probeResult);
+        if (mediaBean != null && mediaBean.getVideoBean() != null) {
+            width = mediaBean.getVideoBean().getWidth();
+            height = mediaBean.getVideoBean().getHeight();
+            Log.e(TAG, "width=" + width + "--height=" + height);
+        }
+        String[] transformCmd2 = FFmpegUtil.transformVideoWithEncode(appendPath, width, height, outputPath2);
+        List<String> fileList = new ArrayList<>();
+        fileList.add(outputPath1);
+        fileList.add(outputPath2);
+        FileUtil.createListFile(listPath, fileList);
+        String[] jointVideoCmd = FFmpegUtil.jointVideo(listPath, targetPath);
+        List<String[]> commandList = new ArrayList<>();
+        commandList.add(transformCmd1);
+        commandList.add(transformCmd2);
+        commandList.add(jointVideoCmd);
+        ffmpegHandler.executeFFmpegCmds(commandList);
     }
 
     /**
