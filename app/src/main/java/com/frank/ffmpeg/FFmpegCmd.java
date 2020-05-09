@@ -107,6 +107,15 @@ public class FFmpegCmd {
         }).start();
     }
 
+    /**
+     * execute probe cmd with synchronization
+     *
+     * @param commands commands
+     */
+    public static String executeProbeSynchronize(final String[] commands) {
+        return handleProbe(commands);
+    }
+
     private native static int handle(String[] commands);
 
     private native static int fastStart(String inputFile, String outputFile);
