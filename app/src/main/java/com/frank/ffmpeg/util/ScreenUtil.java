@@ -32,4 +32,22 @@ public class ScreenUtil {
         return displayMetrics != null ? displayMetrics.heightPixels : 0;
     }
 
+    public static int dp2px(Context context, int dpValue) {
+        if (context == null) {
+            return 0;
+        }
+        DisplayMetrics displayMetrics = getDisplayMetrics(context);
+        float density = displayMetrics != null ? displayMetrics.density : 0;
+        return (int) (dpValue * density + 0.5f);
+    }
+
+    public static int px2dp(Context context, int pxValue) {
+        if (context == null) {
+            return 0;
+        }
+        DisplayMetrics displayMetrics = getDisplayMetrics(context);
+        float density = displayMetrics != null ? displayMetrics.density : 0;
+        return (int) (pxValue / density + 0.5f);
+    }
+
 }

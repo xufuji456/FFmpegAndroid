@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -16,6 +17,7 @@ import com.frank.ffmpeg.format.VideoLayout;
 import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
+import com.frank.ffmpeg.util.BitmapUtil;
 import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
@@ -40,6 +42,10 @@ public class VideoHandleActivity extends BaseActivity {
     private int viewId;
     private FFmpegHandler ffmpegHandler;
     private final static boolean useFFmpegCmd = true;
+
+    private final static int TYPE_IMAGE = 1;
+    private final static int TYPE_GIF   = 2;
+    private final static int TYPE_TEXT  = 3;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -165,19 +171,41 @@ public class VideoHandleActivity extends BaseActivity {
                 commandLine = FFmpegUtil.screenShot(srcFile, time, screenShot);
                 break;
             case R.id.btn_water_mark://add watermark to video
-                // picture
-                String photo = PATH + File.separator + "launcher.png";
-                String photoMark = PATH + File.separator + "photoMark.mp4";
-                String mResolution = "720x1280";
-                int bitRate = 1024;
-                commandLine = FFmpegUtil.addWaterMark(srcFile, photo, mResolution, bitRate, photoMark);
-                // text
-//                String text = "Hello,FFmpeg";
-//                String textPath = PATH + File.separator + "text.jpg";
-//                boolean result = BitmapUtil.textToPicture(textPath, text, this);
-//                Log.i(TAG, "text to pitcture result=" + result);
-//                String textMark = PATH + File.separator + "textMark.mp4";
-//                commandLine = FFmpegUtil.addWaterMark(srcFile, textPath, textMark);
+                // the unit of bitRate is kb
+                int bitRate = 500;
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(srcFile);
+                String mBitRate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
+                if (mBitRate != null && !mBitRate.isEmpty()) {
+                    int probeBitrate = Integer.valueOf(mBitRate);
+                    bitRate = (probeBitrate/1000/100) * 100;
+                }
+                //1:top left 2:top right 3:bottom left 4:bottom right
+                int location = 2;
+                int offsetXY = 5;
+                int waterMarkType = 1;
+                switch (waterMarkType) {
+                    case TYPE_IMAGE:// image
+                        String photo = PATH + File.separator + "launcher.png";
+                        String photoMark = PATH + File.separator + "photoMark.mp4";
+                        commandLine = FFmpegUtil.addWaterMarkImg(srcFile, photo, location, bitRate, offsetXY, photoMark);
+                        break;
+                    case TYPE_GIF:// gif
+                        String gifPath = PATH + File.separator + "ok.gif";
+                        String gifWaterMark = PATH + File.separator + "gifWaterMark.mp4";
+                        commandLine = FFmpegUtil.addWaterMarkGif(srcFile, gifPath, location, bitRate, offsetXY, gifWaterMark);
+                        break;
+                    case TYPE_TEXT:// text
+                        String text = "Hello,FFmpeg";
+                        String textPath = PATH + File.separator + "text.jpg";
+                        boolean result = BitmapUtil.textToPicture(textPath, text, this);
+                        Log.i(TAG, "text to picture result=" + result);
+                        String textMark = PATH + File.separator + "textMark.mp4";
+                        commandLine = FFmpegUtil.addWaterMarkImg(srcFile, textPath, location, bitRate, offsetXY, textMark);
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case R.id.btn_generate_gif://convert video into gif
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";

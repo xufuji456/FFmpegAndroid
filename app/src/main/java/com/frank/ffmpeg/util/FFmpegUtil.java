@@ -2,6 +2,7 @@ package com.frank.ffmpeg.util;
 
 import android.annotation.SuppressLint;
 
+import com.frank.ffmpeg.FFmpegApplication;
 import com.frank.ffmpeg.format.VideoLayout;
 
 import java.util.List;
@@ -221,17 +222,64 @@ public class FFmpegUtil {
     }
 
     /**
-     * add watermark to video, you could assign the resolution and bitRate
+     * add watermark with image to video, you could assign the location and bitRate
      *
      * @param srcFile    input file
-     * @param waterMark  the path of the watermark
+     * @param imgPath    the path of the image
+     * @param location   the location in the video(1:top left 2:top right 3:bottom left 4:bottom right)
+     * @param bitRate    bitRate
+     * @param offsetXY     the offset of x and y in the video
      * @param targetFile output file
      * @return add watermark success or not
      */
-    public static String[] addWaterMark(String srcFile, String waterMark, String resolution, int bitRate, String targetFile) {
+    public static String[] addWaterMarkImg(String srcFile, String imgPath, int location, int bitRate, int offsetXY, String targetFile) {
         String mBitRate = bitRate + "k";
-        String waterMarkCmd = "ffmpeg -i %s -i %s -s %s -b:v %s -filter_complex overlay=0:0 %s";
-        waterMarkCmd = String.format(waterMarkCmd, srcFile, waterMark, resolution, mBitRate, targetFile);
+        String overlay;
+        int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
+        if (location == 1) {
+            overlay = "overlay='" + offset + ":" + offset + "'";
+        } else if (location == 2) {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + "'";
+        } else if (location == 3) {
+            overlay = "overlay='" + offset + ":(main_h-overlay_h)-" + offset + "'";
+        } else if (location == 4) {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":(main_h-overlay_h)-" + offset + "'";
+        } else {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + "'";
+        }
+        String waterMarkCmd = "ffmpeg -i %s -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
+        waterMarkCmd = String.format(waterMarkCmd, srcFile, imgPath, mBitRate, overlay, targetFile);
+        return waterMarkCmd.split(" ");
+    }
+
+    /**
+     * add watermark with gif to video, you could assign the location and bitRate
+     *
+     * @param srcFile    input file
+     * @param imgPath    the path of the gif
+     * @param location   the location in the video(1:top left 2:top right 3:bottom left 4:bottom right)
+     * @param bitRate    bitRate
+     * @param offsetXY   the offset of x and y in the video
+     * @param targetFile output file
+     * @return add watermark success or not
+     */
+    public static String[] addWaterMarkGif(String srcFile, String imgPath, int location, int bitRate, int offsetXY, String targetFile) {
+        String mBitRate = bitRate + "k";
+        String overlay;
+        int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
+        if (location == 1) {
+            overlay = "overlay='" + offset + ":" + offset + ":shortest=1'";
+        } else if (location == 2) {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + ":shortest=1'";
+        } else if (location == 3) {
+            overlay = "overlay='" + offset + ":(main_h-overlay_h)-" + offset + ":shortest=1'";
+        } else if (location == 4) {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":(main_h-overlay_h)-" + offset + ":shortest=1'";
+        } else {
+            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + ":shortest=1'";
+        }
+        String waterMarkCmd = "ffmpeg -i %s -ignore_loop 0 -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
+        waterMarkCmd = String.format(waterMarkCmd, srcFile, imgPath, mBitRate, overlay, targetFile);
         return waterMarkCmd.split(" ");
     }
 
