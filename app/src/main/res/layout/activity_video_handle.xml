@@ -41,8 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/video_concat"
-                android:visibility="gone"/>
+                android:text="@string/video_concat" />
 
             <Button
                 android:id="@+id/btn_screen_shot"
@@ -115,13 +114,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/video_pip"/>
-
-            <Button
-                android:id="@+id/btn_joint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/video_joint"/>
 
             <Button
                 android:id="@+id/btn_moov"

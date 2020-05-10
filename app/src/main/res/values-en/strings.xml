@@ -42,7 +42,6 @@
     <string name="video_pip">Video Pip</string>
     <string name="video_preview">Video preview</string>
     <string name="video_moov">MOOV move ahead</string>
-    <string name="video_joint">Video joint</string>
 
     <string name="swap">Swap</string>
     <string name="start">Start</string>

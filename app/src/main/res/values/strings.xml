@@ -42,7 +42,6 @@
     <string name="video_pip">视频画中画</string>
     <string name="video_preview">播放预览</string>
     <string name="video_moov">MOOV前移</string>
-    <string name="video_joint">视频拼接</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>

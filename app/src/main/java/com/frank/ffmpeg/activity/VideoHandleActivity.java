@@ -98,8 +98,7 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_denoise_video,
                 R.id.btn_to_image,
                 R.id.btn_pip,
-                R.id.btn_moov,
-                R.id.btn_joint
+                R.id.btn_moov
         );
     }
 
@@ -147,23 +146,8 @@ public class VideoHandleActivity extends BaseActivity {
                 int duration = 20;
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo);
                 break;
-            case R.id.btn_video_concat://concat video
-//                commandLine = FFmpegUtil.toTs(srcFile, ts1);
-//                concatStep ++;
-//                String concatVideo = PATH + File.separator + "concatVideo.mp4";
-//                String appendVideo = PATH + File.separator + "test.mp4";
-//                File concatFile = new File(PATH + File.separator + "fileList.txt");
-//                try {
-//                    FileOutputStream fileOutputStream = new FileOutputStream(concatFile);
-//                    fileOutputStream.write(("file \'" + srcFile + "\'").getBytes());
-//                    fileOutputStream.write("\n".getBytes());
-//                    fileOutputStream.write(("file \'" + appendVideo + "\'").getBytes());
-//                    fileOutputStream.flush();
-//                    fileOutputStream.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                commandLine = FFmpegUtil.concatVideo(srcFile, concatFile.getAbsolutePath(), concatVideo);
+            case R.id.btn_video_concat://concat video together
+                concatVideo(srcFile);
                 break;
             case R.id.btn_screen_shot://video snapshot
                 String screenShot = PATH + File.separator + "screenShot.jpg";
@@ -286,9 +270,6 @@ public class VideoHandleActivity extends BaseActivity {
                     Log.e(TAG, "move moov use time=" + (System.currentTimeMillis() - start));
                 }
                 break;
-            case R.id.btn_joint:// joint two videos together
-                jointVideo(srcFile);
-                break;
             default:
                 break;
         }
@@ -298,11 +279,11 @@ public class VideoHandleActivity extends BaseActivity {
     }
 
     /**
-     * joint two videos together
+     * concat/joint two videos together
      * It's recommended to convert to the same resolution and encoding
      * @param selectedPath the path which is selected
      */
-    private void jointVideo(String selectedPath) {
+    private void concatVideo(String selectedPath) {
         if (ffmpegHandler == null || selectedPath.isEmpty()) {
             return;
         }
