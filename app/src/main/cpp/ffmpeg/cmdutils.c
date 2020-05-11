@@ -58,6 +58,10 @@
 #include <sys/resource.h>
 #endif
 
+#include <setjmp.h>
+
+extern jmp_buf jump_buf;
+
 static int init_report(const char *env);
 
 AVDictionary *sws_dict;
@@ -112,6 +116,10 @@ void register_exit(void (*cb)(int ret))
 
 int exit_program(int ret)
 {
+    if (program_exit)
+        program_exit(ret);
+
+    longjmp(jump_buf, 1);
     return ret;
 }
 

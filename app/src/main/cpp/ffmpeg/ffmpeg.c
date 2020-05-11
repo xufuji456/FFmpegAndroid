@@ -104,6 +104,9 @@
 #include "cmdutils.h"
 
 #include "libavutil/avassert.h"
+#include <setjmp.h>
+
+jmp_buf jump_buf;
 
 const char program_name[] = "ffmpeg";
 const int program_birth_year = 2000;
@@ -4276,6 +4279,7 @@ int run(int argc, char **argv)
 {
     int ret;
     int64_t ti;
+    main_return_code = 0;
 
     register_exit(ffmpeg_cleanup);
 
@@ -4283,6 +4287,11 @@ int run(int argc, char **argv)
 
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
     parse_loglevel(argc, argv, options);
+
+    if (setjmp(jump_buf)) {
+        main_return_code = 1;
+        goto end;
+    }
 
     if(argc>1 && !strcmp(argv[1], "-d")){
         run_as_daemon=1;
@@ -4332,7 +4341,9 @@ int run(int argc, char **argv)
     if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
         exit_program(69);
 
-    exit_program(received_nb_signals ? 255 : main_return_code);
+//    exit_program(received_nb_signals ? 255 : main_return_code);
+end:
+    av_log(NULL, AV_LOG_ERROR, "FFmpeg result=%d\n", main_return_code);
     ffmpeg_cleanup(0);
     return main_return_code;
 }
