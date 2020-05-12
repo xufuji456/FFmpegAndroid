@@ -2,11 +2,9 @@ package com.frank.ffmpeg.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.graphics.Paint;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,30 +23,25 @@ public class BitmapUtil {
     /**
      * convert text to bitmap
      *
-     * @param text    text
-     * @param context context
+     * @param text text
      * @return bitmap of teh text
      */
-    private static Bitmap textToBitmap(String text, Context context) {
-        float scale = context.getResources().getDisplayMetrics().scaledDensity;
-        TextView tv = new TextView(context);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        tv.setLayoutParams(layoutParams);
-        tv.setText(text);
-        tv.setTextSize(scale * TEXT_SIZE);
-        tv.setGravity(Gravity.CENTER_HORIZONTAL);
-        tv.setDrawingCacheEnabled(true);
-        tv.setTextColor(TEXT_COLOR);
-        tv.setBackgroundColor(Color.WHITE);
-        tv.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
-        tv.buildDrawingCache();
-        Bitmap bitmap = tv.getDrawingCache();
-        int rate = bitmap.getHeight() / 20;
-        return Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / rate, 20, false);
+    private static Bitmap textToBitmap(String text) {
+        Paint paint = new Paint();
+        paint.setTextSize(TEXT_SIZE);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setColor(TEXT_COLOR);
+        paint.setDither(true);
+        paint.setAntiAlias(true);
+        Paint.FontMetricsInt fm = paint.getFontMetricsInt();
+        int width = (int)paint.measureText(text);
+        int height = fm.descent - fm.ascent;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawText(text, 0, fm.leading - fm.ascent, paint);
+        canvas.save();
+        return bitmap;
     }
 
     /**
@@ -56,15 +49,14 @@ public class BitmapUtil {
      *
      * @param filePath filePath
      * @param text     text
-     * @param context  context
      * @return result of generating picture
      */
-    public static boolean textToPicture(String filePath, String text, Context context) {
-        Bitmap bitmap = textToBitmap(text, context);
+    public static boolean textToPicture(String filePath, String text) {
+        Bitmap bitmap = textToBitmap(text);
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();

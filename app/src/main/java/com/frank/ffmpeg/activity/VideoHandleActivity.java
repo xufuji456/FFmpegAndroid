@@ -182,7 +182,7 @@ public class VideoHandleActivity extends BaseActivity {
                     case TYPE_TEXT:// text
                         String text = "Hello,FFmpeg";
                         String textPath = PATH + File.separator + "text.jpg";
-                        boolean result = BitmapUtil.textToPicture(textPath, text, this);
+                        boolean result = BitmapUtil.textToPicture(textPath, text);
                         Log.i(TAG, "text to picture result=" + result);
                         String textMark = PATH + File.separator + "textMark.mp4";
                         commandLine = FFmpegUtil.addWaterMarkImg(srcFile, textPath, location, bitRate, offsetXY, textMark);
