@@ -321,16 +321,33 @@ public class VideoHandleActivity extends BaseActivity {
      */
     private void handlePhoto() {
         // The path of pictures, naming format: img+number.jpg
-        // Here assigns the directory is img under the root path
         String picturePath = PATH + "/img/";
         if (!FileUtil.checkFileExist(picturePath)) {
             return;
         }
+        String tempPath = PATH + "/temp/";
+        File tempFile = new File(tempPath);
+        if (tempFile.exists()) {
+            tempFile.delete();
+        }
+        tempFile.mkdirs();
+        File photoFile = new File(picturePath);
+        File[] files = photoFile.listFiles();
+        List<String[]> cmdList = new ArrayList<>();
+        //the resolution of photo which you want to convert
+        String resolution = "640x320";
+        for (File file : files) {
+            String inputPath = file.getAbsolutePath();
+            String outputPath = tempPath + file.getName();
+            String[] convertCmd = FFmpegUtil.convertResolution(inputPath, resolution, outputPath);
+            cmdList.add(convertCmd);
+        }
         String combineVideo = PATH + File.separator + "combineVideo.mp4";
         int frameRate = 2;// suggested synthetic frameRate:1-10
-        String[] commandLine = FFmpegUtil.pictureToVideo(picturePath, frameRate, combineVideo);
+        String[] commandLine = FFmpegUtil.pictureToVideo(tempPath, frameRate, combineVideo);
+        cmdList.add(commandLine);
         if (ffmpegHandler != null) {
-            ffmpegHandler.executeFFmpegCmd(commandLine);
+            ffmpegHandler.executeFFmpegCmds(cmdList);
         }
     }
 

@@ -228,7 +228,7 @@ public class FFmpegUtil {
      * @param imgPath    the path of the image
      * @param location   the location in the video(1:top left 2:top right 3:bottom left 4:bottom right)
      * @param bitRate    bitRate
-     * @param offsetXY     the offset of x and y in the video
+     * @param offsetXY   the offset of x and y in the video
      * @param targetFile output file
      * @return add watermark success or not
      */
@@ -345,7 +345,7 @@ public class FFmpegUtil {
      */
     @SuppressLint("DefaultLocale")
     public static String[] convertResolution(String srcFile, String resolution, String targetFile) {
-        String convertCmd = "ffmpeg -i %s -s %s %s";
+        String convertCmd = "ffmpeg -i %s -s %s -pix_fmt yuv420p %s";
         convertCmd = String.format(convertCmd, srcFile, resolution, targetFile);
         return convertCmd.split(" ");
     }

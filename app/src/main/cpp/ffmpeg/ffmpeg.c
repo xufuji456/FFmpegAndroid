@@ -4343,7 +4343,7 @@ int run(int argc, char **argv)
 
 //    exit_program(received_nb_signals ? 255 : main_return_code);
 end:
-    av_log(NULL, AV_LOG_ERROR, "FFmpeg result=%d\n", main_return_code);
+    av_log(NULL, AV_LOG_INFO, "FFmpeg result=%d\n", main_return_code);
     ffmpeg_cleanup(0);
     return main_return_code;
 }
