@@ -1,10 +1,9 @@
 package com.frank.ffmpeg.util;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,20 +16,20 @@ import java.io.IOException;
 
 public class BitmapUtil {
 
-    private final static int TEXT_SIZE = 16;
-    private final static int TEXT_COLOR = Color.RED;
-
     /**
      * convert text to bitmap
      *
      * @param text text
      * @return bitmap of teh text
      */
-    private static Bitmap textToBitmap(String text) {
+    private static Bitmap textToBitmap(String text, int textColor, int textSize) {
+        if (TextUtils.isEmpty(text) || textSize <= 0) {
+            return null;
+        }
         Paint paint = new Paint();
-        paint.setTextSize(TEXT_SIZE);
+        paint.setTextSize(textSize);
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setColor(TEXT_COLOR);
+        paint.setColor(textColor);
         paint.setDither(true);
         paint.setAntiAlias(true);
         Paint.FontMetricsInt fm = paint.getFontMetricsInt();
@@ -51,8 +50,11 @@ public class BitmapUtil {
      * @param text     text
      * @return result of generating picture
      */
-    public static boolean textToPicture(String filePath, String text) {
-        Bitmap bitmap = textToBitmap(text);
+    public static boolean textToPicture(String filePath, String text, int textColor, int textSize) {
+        Bitmap bitmap = textToBitmap(text, textColor, textSize);
+        if (bitmap == null || TextUtils.isEmpty(filePath)) {
+            return false;
+        }
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(filePath);

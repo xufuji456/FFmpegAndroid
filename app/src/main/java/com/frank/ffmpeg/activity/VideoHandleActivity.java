@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
@@ -181,8 +182,8 @@ public class VideoHandleActivity extends BaseActivity {
                         break;
                     case TYPE_TEXT:// text
                         String text = "Hello,FFmpeg";
-                        String textPath = PATH + File.separator + "text.jpg";
-                        boolean result = BitmapUtil.textToPicture(textPath, text);
+                        String textPath = PATH + File.separator + "text.png";
+                        boolean result = BitmapUtil.textToPicture(textPath, text, Color.BLUE, 20);
                         Log.i(TAG, "text to picture result=" + result);
                         String textMark = PATH + File.separator + "textMark.mp4";
                         commandLine = FFmpegUtil.addWaterMarkImg(srcFile, textPath, location, bitRate, offsetXY, textMark);
