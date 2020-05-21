@@ -28,8 +28,7 @@ NATIVE_CPU='armv8-a'
 OPTIMIZE_CFLAGS=""
 fi
 
-#export NDK=/Users/frank/Library/Android/sdk/ndk-bundle
-export NDK=/Users/frank/Library/Android/android-ndk-r10e
+export NDK=/Users/frank/Library/Android/android-ndk-r15c
 export PREBUILT=$NDK/toolchains/$CPU-linux-$ANDROID-4.9/prebuilt
 export PLATFORM=$NDK/platforms/android-21/arch-$ARCH
 export TOOLCHAIN=$PREBUILT/darwin-x86_64
@@ -76,17 +75,19 @@ build_one(){
 --enable-filters \
 --enable-encoders \
 --disable-decoders \
---enable-decoder=mpeg4,h264,flv,gif,hevc,vp9,wmv3,png,ljpeg,jpeg2000,mjpeg,\
-aac,m4a,amrnb,amrwb,ape,dolby_e,dst,flac,opus,vorbis,wavesynth,wavpack,wmav2,\
-mp3float,mp3,mp3_at,mp3adufloat,mp3adu,mp3on4float,mp3on4,aac_fixed,aac_at,aac_latm,pcm_s16be,pcm_s16le \
+--enable-decoder=mpeg4,h263,h264,flv,gif,hevc,vp9,wmv3,png,jpeg2000,mjpeg,mpeg2video,msmpeg4v2,msmpeg4v3,msvideo1,\
+aac,aac_fixed,aac_latm,ac3,ac3_fixed,eac3,m4a,amrnb,amrwb,ape,dolby_e,vc1,flac,opus,vorbis,wmav2,mp3float,mp3,mp3adufloat,\
+mp3adu,mp3on4float,mp3on4,pcm_alaw,pcm_dvd,pcm_f16le,pcm_f24le,pcm_f32be,pcm_f32le,pcm_f64be,pcm_f64le,pcm_s16be,pcm_s16le,\
+pcm_s24be,pcm_s24le,pcm_s32be,pcm_s32le,pcm_s64be,pcm_s64le,pcm_mulaw,alac,adpcm_ms,pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,\
+pcm_u32be,pcm_u32le,pcm_vidc,pcm_zork,adpcm_ima_qt,adpcm_ima_wav \
 --enable-muxers \
 --enable-parsers \
 --enable-protocols \
 --disable-demuxers \
---enable-demuxer=aac,ac3,amr,amrnb,amrwb,ape,asf,asf_o,ast,avi,caf,cavsvideo,codec2,concat,data,dnxhd,flac,flv,g722,g729,\
-gif,gif_pipe,h264,hevc,hls,image2,image2pipe,ingenient,jpeg_pipe,lavfi,lrc,m4v,matroska,webm,mjpeg,mov,mp4,m4a,3gp,mp3,mpeg,\
-mpegts,mv,ogg,png_pipe,realtext,rm,rtp,rtsp,s16be,s16le,s24be,s24le,s32be,s32le,sdp,srt,swf,u16be,u16le,u24be,u24le,u32be,u32le,\
-vc1,wav,webm_dash,manifest,xmv,f32be,f32le,f64be,f64le \
+--enable-demuxer=aac,ac3,alaw,amr,amrnb,amrwb,ape,asf,asf_o,avi,cavsvideo,codec2,concat,dnxhd,eac3,flac,flv,gif,gif_pipe,\
+h263,h264,hevc,hls,image2,image2pipe,jpeg_pipe,lrc,m4v,matroska,webm,mjpeg,mov,mp4,m4a,3gp,mp3,mpeg,mpegts,mv,ogg,png_pipe,\
+realtext,rm,rtp,rtsp,s16be,s16le,s24be,s24le,s32be,s32le,sdp,srt,swf,u16be,u16le,u24be,u24le,u32be,u32le,vc1,wav,webm_dash,\
+manifest,xmv,f32be,f32le,f64be,f64le,mpegvideo,mulaw,sami,srt \
 $ADDITIONAL_CONFIGURE_FLAG
 make
 make install
@@ -100,7 +101,7 @@ $PREFIX/lib/libswresample.a \
 $PREFIX/lib/libavformat.a \
 $PREFIX/lib/libavutil.a \
 $PREFIX/lib/libswscale.a \
--lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker $TOOLCHAIN/lib/gcc/$CPU-linux-$ANDROID/4.9/libgcc.a
+-lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker $TOOLCHAIN/lib/gcc/$CPU-linux-$ANDROID/4.9.x/libgcc.a
 }
 
 build_one
