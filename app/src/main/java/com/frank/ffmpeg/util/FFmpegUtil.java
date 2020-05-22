@@ -478,4 +478,12 @@ public class FFmpegUtil {
         return ffprobeCmd.split(" ");
     }
 
+    public static String[] changeSpeed(String inputFile, String outputFile, float speed) {
+        //audio atempo: 0.5--2
+        float ptsFactor = 1/speed;
+        String speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] %s";
+        speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, speed, outputFile);
+        return speedCmd.split(" ");
+    }
+
 }
