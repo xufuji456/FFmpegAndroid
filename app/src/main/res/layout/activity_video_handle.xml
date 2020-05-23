@@ -122,6 +122,13 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/video_moov"/>
 
+            <Button
+                android:id="@+id/btn_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/video_speed"/>
+
         </LinearLayout>
     </ScrollView>
 

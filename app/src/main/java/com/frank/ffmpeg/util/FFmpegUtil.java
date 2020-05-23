@@ -478,11 +478,36 @@ public class FFmpegUtil {
         return ffprobeCmd.split(" ");
     }
 
-    public static String[] changeSpeed(String inputFile, String outputFile, float speed) {
+    /**
+     * Changing the speed of playing, speed range at 0.5-2 in audio-video mode.
+     * However, in pure video mode, the speed range at 0.25-4
+     * @param inputFile the inputFile of normal speed
+     * @param outputFile the outputFile which you want to change speed
+     * @param speed speed of playing
+     * @param pureVideo whether pure video or not, default false
+     * @return change speed success or not
+     */
+    public static String[] changeSpeed(String inputFile, String outputFile, float speed, boolean pureVideo) {
         //audio atempo: 0.5--2
+        //video pts:0.25--4
+        if (pureVideo) {
+            if (speed > 4 || speed < 0.25) {
+                throw new IllegalArgumentException("speed range is 0.25--4");
+            }
+        } else {
+            if (speed > 2 || speed < 0.5) {
+                throw new IllegalArgumentException("speed range is 0.5--2");
+            }
+        }
         float ptsFactor = 1/speed;
-        String speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] %s";
-        speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, speed, outputFile);
+        String speedCmd;
+        if (pureVideo) {
+            speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v] -map [v] %s";
+            speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, outputFile);
+        } else {
+            speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] %s";
+            speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, speed, outputFile);
+        }
         return speedCmd.split(" ");
     }
 

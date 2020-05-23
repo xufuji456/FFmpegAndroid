@@ -99,7 +99,8 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_denoise_video,
                 R.id.btn_to_image,
                 R.id.btn_pip,
-                R.id.btn_moov
+                R.id.btn_moov,
+                R.id.btn_speed
         );
     }
 
@@ -270,6 +271,10 @@ public class VideoHandleActivity extends BaseActivity {
                     Log.e(TAG, "result=" + (result == 0));
                     Log.e(TAG, "move moov use time=" + (System.currentTimeMillis() - start));
                 }
+                break;
+            case R.id.btn_speed://playing speed of video
+                String speed = PATH + File.separator + "speed.mp4";
+                commandLine = FFmpegUtil.changeSpeed(srcFile, speed, 2f, false);
                 break;
             default:
                 break;
