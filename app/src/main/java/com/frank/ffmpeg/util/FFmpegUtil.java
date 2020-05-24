@@ -28,6 +28,12 @@ public class FFmpegUtil {
         return transformAudioCmd.split(" ");
     }
 
+    public static String[] transformAudio(String srcFile, String acodec, String targetFile) {
+        String transformAudioCmd = "ffmpeg -i %s -acodec %s -ac 2 -ar 44100 %s";
+        transformAudioCmd = String.format(transformAudioCmd, srcFile, acodec, targetFile);
+        return transformAudioCmd.split(" ");
+    }
+
     /**
      * cut audio, you could assign the startTime and duration which you want to
      *
@@ -62,7 +68,7 @@ public class FFmpegUtil {
             concatBuilder.append(file).append("|");
         }
         String concatStr = concatBuilder.substring(0, concatBuilder.length() - 1);
-        String concatAudioCmd = "ffmpeg -i %s -acodec libmp3lame -ab 128k -ac 2 -ar 44100 %s";
+        String concatAudioCmd = "ffmpeg -i %s -acodec copy %s";
         concatAudioCmd = String.format(concatAudioCmd, concatStr, targetFile);
         return concatAudioCmd.split(" ");
     }

@@ -31,7 +31,7 @@ import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
 public class AudioHandleActivity extends BaseActivity {
 
     private final static String PATH = Environment.getExternalStorageDirectory().getPath();
-    private String appendFile = PATH + File.separator + "test.mp3";
+    private String appendFile = PATH + File.separator + "heart.m4a";
 
     private ProgressBar progressAudio;
     private LinearLayout layoutAudioHandle;
@@ -142,12 +142,14 @@ public class AudioHandleActivity extends BaseActivity {
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
-                List<String> fileList = new ArrayList<>();
-                fileList.add(srcFile);
-                fileList.add(appendFile);
-                String concatFile = PATH + File.separator + "concat.mp3";
-                commandLine = FFmpegUtil.concatAudio(fileList, concatFile);
-                break;
+//                List<String> fileList = new ArrayList<>();
+//                fileList.add(srcFile);
+//                fileList.add(appendFile);
+//                String concatFile = PATH + File.separator + "concat.mp3";
+//                commandLine = FFmpegUtil.concatAudio(fileList, concatFile);
+//                break;
+                concatAudio(srcFile);
+                return;
             case R.id.btn_mix://mix audio
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
@@ -202,6 +204,26 @@ public class AudioHandleActivity extends BaseActivity {
         if (ffmpegHandler != null && commandLine != null) {
             ffmpegHandler.executeFFmpegCmd(commandLine);
         }
+    }
+
+    private void concatAudio(String selectedPath) {
+        if (ffmpegHandler == null || selectedPath.isEmpty() || appendFile.isEmpty()) {
+            return;
+        }
+        String outputPath1 = PATH + File.separator + "output1.mp3";
+        String outputPath2 = PATH + File.separator + "output2.mp3";
+        String targetPath = PATH + File.separator + "concatAudio.mp3";
+        String[] transformCmd1 = FFmpegUtil.transformAudio(selectedPath, "libmp3lame", outputPath1);
+        String[] transformCmd2 = FFmpegUtil.transformAudio(appendFile, "libmp3lame", outputPath2);
+        List<String> fileList = new ArrayList<>();
+        fileList.add(outputPath1);
+        fileList.add(outputPath2);
+        String[] jointVideoCmd = FFmpegUtil.concatAudio(fileList, targetPath);
+        List<String[]> commandList = new ArrayList<>();
+        commandList.add(transformCmd1);
+        commandList.add(transformCmd2);
+        commandList.add(jointVideoCmd);
+        ffmpegHandler.executeFFmpegCmds(commandList);
     }
 
     @Override
