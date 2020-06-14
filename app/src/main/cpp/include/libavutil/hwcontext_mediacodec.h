@@ -16,37 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-
-#ifndef AVUTIL_HWCONTEXT_CUDA_H
-#define AVUTIL_HWCONTEXT_CUDA_H
-
-#ifndef CUDA_VERSION
-#include <cuda.h>
-#endif
-
-#include "pixfmt.h"
+#ifndef AVUTIL_HWCONTEXT_MEDIACODEC_H
+#define AVUTIL_HWCONTEXT_MEDIACODEC_H
 
 /**
- * @file
- * An API-specific header for AV_HWDEVICE_TYPE_CUDA.
+ * MediaCodec details.
  *
- * This API supports dynamic frame pools. AVHWFramesContext.pool must return
- * AVBufferRefs whose data pointer is a CUdeviceptr.
+ * Allocated as AVHWDeviceContext.hwctx
  */
+typedef struct AVMediaCodecDeviceContext {
+    /**
+     * android/view/Surface handle, to be filled by the user.
+     *
+     * This is the default surface used by decoders on this device.
+     */
+    void *surface;
+} AVMediaCodecDeviceContext;
 
-typedef struct AVCUDADeviceContextInternal AVCUDADeviceContextInternal;
-
-/**
- * This struct is allocated as AVHWDeviceContext.hwctx
- */
-typedef struct AVCUDADeviceContext {
-    CUcontext cuda_ctx;
-    CUstream stream;
-    AVCUDADeviceContextInternal *internal;
-} AVCUDADeviceContext;
-
-/**
- * AVHWFramesContext.hwctx is currently not used
- */
-
-#endif /* AVUTIL_HWCONTEXT_CUDA_H */
+#endif /* AVUTIL_HWCONTEXT_MEDIACODEC_H */

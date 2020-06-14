@@ -16,37 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef AVCODEC_ADTS_PARSER_H
+#define AVCODEC_ADTS_PARSER_H
 
-#ifndef AVUTIL_HWCONTEXT_CUDA_H
-#define AVUTIL_HWCONTEXT_CUDA_H
+#include <stddef.h>
+#include <stdint.h>
 
-#ifndef CUDA_VERSION
-#include <cuda.h>
-#endif
-
-#include "pixfmt.h"
+#define AV_AAC_ADTS_HEADER_SIZE 7
 
 /**
- * @file
- * An API-specific header for AV_HWDEVICE_TYPE_CUDA.
- *
- * This API supports dynamic frame pools. AVHWFramesContext.pool must return
- * AVBufferRefs whose data pointer is a CUdeviceptr.
+ * Extract the number of samples and frames from AAC data.
+ * @param[in]  buf     pointer to AAC data buffer
+ * @param[out] samples Pointer to where number of samples is written
+ * @param[out] frames  Pointer to where number of frames is written
+ * @return Returns 0 on success, error code on failure.
  */
+int av_adts_header_parse(const uint8_t *buf, uint32_t *samples,
+                         uint8_t *frames);
 
-typedef struct AVCUDADeviceContextInternal AVCUDADeviceContextInternal;
-
-/**
- * This struct is allocated as AVHWDeviceContext.hwctx
- */
-typedef struct AVCUDADeviceContext {
-    CUcontext cuda_ctx;
-    CUstream stream;
-    AVCUDADeviceContextInternal *internal;
-} AVCUDADeviceContext;
-
-/**
- * AVHWFramesContext.hwctx is currently not used
- */
-
-#endif /* AVUTIL_HWCONTEXT_CUDA_H */
+#endif /* AVCODEC_ADTS_PARSER_H */

@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,37 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifndef AVUTIL_REVERSE_H
+#define AVUTIL_REVERSE_H
 
-#ifndef AVUTIL_HWCONTEXT_CUDA_H
-#define AVUTIL_HWCONTEXT_CUDA_H
+#include <stdint.h>
 
-#ifndef CUDA_VERSION
-#include <cuda.h>
-#endif
+extern const uint8_t ff_reverse[256];
 
-#include "pixfmt.h"
-
-/**
- * @file
- * An API-specific header for AV_HWDEVICE_TYPE_CUDA.
- *
- * This API supports dynamic frame pools. AVHWFramesContext.pool must return
- * AVBufferRefs whose data pointer is a CUdeviceptr.
- */
-
-typedef struct AVCUDADeviceContextInternal AVCUDADeviceContextInternal;
-
-/**
- * This struct is allocated as AVHWDeviceContext.hwctx
- */
-typedef struct AVCUDADeviceContext {
-    CUcontext cuda_ctx;
-    CUstream stream;
-    AVCUDADeviceContextInternal *internal;
-} AVCUDADeviceContext;
-
-/**
- * AVHWFramesContext.hwctx is currently not used
- */
-
-#endif /* AVUTIL_HWCONTEXT_CUDA_H */
+#endif /* AVUTIL_REVERSE_H */
