@@ -26,7 +26,7 @@
 #ifndef AVUTIL_TIMER_H
 #define AVUTIL_TIMER_H
 
-#include "config.h"
+#include "ffmpeg/config.h"
 
 #if CONFIG_LINUX_PERF
 # ifndef _GNU_SOURCE
@@ -48,15 +48,17 @@
 
 #include "log.h"
 
-#if   ARCH_AARCH64
-#   include "aarch64/timer.h"
-#elif ARCH_ARM
-#   include "arm/timer.h"
-#elif ARCH_PPC
-#   include "ppc/timer.h"
-#elif ARCH_X86
-#   include "x86/timer.h"
-#endif
+//TODO
+#include "libavutil/arm/timer.h"
+//#if   ARCH_AARCH64
+//#   include "aarch64/timer.h"
+//#elif ARCH_ARM
+//#   include "arm/timer.h"
+//#elif ARCH_PPC
+//#   include "ppc/timer.h"
+//#elif ARCH_X86
+//#   include "x86/timer.h"
+//#endif
 
 #if !defined(AV_READ_TIME)
 #   if HAVE_GETHRTIME
