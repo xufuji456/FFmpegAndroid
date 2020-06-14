@@ -74,7 +74,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         }
         out_stream->codec->codec_tag = 0;
         if (out_format->oformat->flags & AVFMT_GLOBALHEADER) {
-            out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+//            out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
         }
     }
     output_format = out_format->oformat;
