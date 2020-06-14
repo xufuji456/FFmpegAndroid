@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef CMDUTILS_H
-#define CMDUTILS_H
+#ifndef FFTOOLS_CMDUTILS_H
+#define FFTOOLS_CMDUTILS_H
 
 #include <stdint.h>
 
@@ -59,7 +59,12 @@ void register_exit(void (*cb)(int ret));
 /**
  * Wraps exit with a program-specific cleanup routine.
  */
-int exit_program(int ret);
+void exit_program(int ret) av_noreturn;
+
+/**
+ * Initialize dynamic library loading
+ */
+void init_dynload(void);
 
 /**
  * Initialize the cmdutils option system, in particular
@@ -99,12 +104,6 @@ int opt_report(const char *opt);
 int opt_max_alloc(void *optctx, const char *opt, const char *arg);
 
 int opt_codec_debug(void *optctx, const char *opt, const char *arg);
-
-#if CONFIG_OPENCL
-int opt_opencl(void *optctx, const char *opt, const char *arg);
-
-int opt_opencl_bench(void *optctx, const char *opt, const char *arg);
-#endif
 
 /**
  * Limit the execution time.
@@ -150,6 +149,7 @@ typedef struct SpecifierOpt {
         uint8_t *str;
         int        i;
         int64_t  i64;
+        uint64_t ui64;
         float      f;
         double   dbl;
     } u;
@@ -200,6 +200,47 @@ typedef struct OptionDef {
  */
 void show_help_options(const OptionDef *options, const char *msg, int req_flags,
                        int rej_flags, int alt_flags);
+
+#if CONFIG_AVDEVICE
+#define CMDUTILS_COMMON_OPTIONS_AVDEVICE                                                                                \
+    { "sources"    , OPT_EXIT | HAS_ARG, { .func_arg = show_sources },                                                  \
+      "list sources of the input device", "device" },                                                                   \
+    { "sinks"      , OPT_EXIT | HAS_ARG, { .func_arg = show_sinks },                                                    \
+      "list sinks of the output device", "device" },                                                                    \
+
+#else
+#define CMDUTILS_COMMON_OPTIONS_AVDEVICE
+#endif
+
+#define CMDUTILS_COMMON_OPTIONS                                                                                         \
+    { "L",           OPT_EXIT,             { .func_arg = show_license },     "show license" },                          \
+    { "h",           OPT_EXIT,             { .func_arg = show_help },        "show help", "topic" },                    \
+    { "?",           OPT_EXIT,             { .func_arg = show_help },        "show help", "topic" },                    \
+    { "help",        OPT_EXIT,             { .func_arg = show_help },        "show help", "topic" },                    \
+    { "-help",       OPT_EXIT,             { .func_arg = show_help },        "show help", "topic" },                    \
+    { "version",     OPT_EXIT,             { .func_arg = show_version },     "show version" },                          \
+    { "buildconf",   OPT_EXIT,             { .func_arg = show_buildconf },   "show build configuration" },              \
+    { "formats",     OPT_EXIT,             { .func_arg = show_formats },     "show available formats" },                \
+    { "muxers",      OPT_EXIT,             { .func_arg = show_muxers },      "show available muxers" },                 \
+    { "demuxers",    OPT_EXIT,             { .func_arg = show_demuxers },    "show available demuxers" },               \
+    { "devices",     OPT_EXIT,             { .func_arg = show_devices },     "show available devices" },                \
+    { "codecs",      OPT_EXIT,             { .func_arg = show_codecs },      "show available codecs" },                 \
+    { "decoders",    OPT_EXIT,             { .func_arg = show_decoders },    "show available decoders" },               \
+    { "encoders",    OPT_EXIT,             { .func_arg = show_encoders },    "show available encoders" },               \
+    { "bsfs",        OPT_EXIT,             { .func_arg = show_bsfs },        "show available bit stream filters" },     \
+    { "protocols",   OPT_EXIT,             { .func_arg = show_protocols },   "show available protocols" },              \
+    { "filters",     OPT_EXIT,             { .func_arg = show_filters },     "show available filters" },                \
+    { "pix_fmts",    OPT_EXIT,             { .func_arg = show_pix_fmts },    "show available pixel formats" },          \
+    { "layouts",     OPT_EXIT,             { .func_arg = show_layouts },     "show standard channel layouts" },         \
+    { "sample_fmts", OPT_EXIT,             { .func_arg = show_sample_fmts }, "show available audio sample formats" },   \
+    { "colors",      OPT_EXIT,             { .func_arg = show_colors },      "show available color names" },            \
+    { "loglevel",    HAS_ARG,              { .func_arg = opt_loglevel },     "set logging level", "loglevel" },         \
+    { "v",           HAS_ARG,              { .func_arg = opt_loglevel },     "set logging level", "loglevel" },         \
+    { "report",      0,                    { (void*)opt_report },            "generate a report" },                     \
+    { "max_alloc",   HAS_ARG,              { .func_arg = opt_max_alloc },    "set maximum size of a single allocated block", "bytes" }, \
+    { "cpuflags",    HAS_ARG | OPT_EXPERT, { .func_arg = opt_cpuflags },     "force specific cpu flags", "flags" },     \
+    { "hide_banner", OPT_BOOL | OPT_EXPERT, {&hide_banner},     "do not show program banner", "hide_banner" },          \
+    CMDUTILS_COMMON_OPTIONS_AVDEVICE                                                                                    \
 
 /**
  * Show help for all options with given flags in class and all its
@@ -437,6 +478,20 @@ int show_license(void *optctx, const char *opt, const char *arg);
 int show_formats(void *optctx, const char *opt, const char *arg);
 
 /**
+ * Print a listing containing all the muxers supported by the
+ * program (including devices).
+ * This option processing function does not utilize the arguments.
+ */
+int show_muxers(void *optctx, const char *opt, const char *arg);
+
+/**
+ * Print a listing containing all the demuxer supported by the
+ * program (including devices).
+ * This option processing function does not utilize the arguments.
+ */
+int show_demuxers(void *optctx, const char *opt, const char *arg);
+
+/**
  * Print a listing containing all the devices supported by the
  * program.
  * This option processing function does not utilize the arguments.
@@ -445,13 +500,13 @@ int show_devices(void *optctx, const char *opt, const char *arg);
 
 #if CONFIG_AVDEVICE
 /**
- * Print a listing containing audodetected sinks of the output device.
+ * Print a listing containing autodetected sinks of the output device.
  * Device name with options may be passed as an argument to limit results.
  */
 int show_sinks(void *optctx, const char *opt, const char *arg);
 
 /**
- * Print a listing containing audodetected sources of the input device.
+ * Print a listing containing autodetected sources of the input device.
  * Device name with options may be passed as an argument to limit results.
  */
 int show_sources(void *optctx, const char *opt, const char *arg);
@@ -570,6 +625,9 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
 #define GET_PIX_FMT_NAME(pix_fmt)\
     const char *name = av_get_pix_fmt_name(pix_fmt);
 
+#define GET_CODEC_NAME(id)\
+    const char *name = avcodec_descriptor_get(id)->name;
+
 #define GET_SAMPLE_FMT_NAME(sample_fmt)\
     const char *name = av_get_sample_fmt_name(sample_fmt)
 
@@ -587,4 +645,4 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
 
 double get_rotation(AVStream *st);
 
-#endif /* CMDUTILS_H */
+#endif /* FFTOOLS_CMDUTILS_H */
