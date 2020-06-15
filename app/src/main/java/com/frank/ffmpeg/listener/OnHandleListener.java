@@ -6,5 +6,6 @@ package com.frank.ffmpeg.listener;
  */
 public interface OnHandleListener {
     void onBegin();
+    default void onProgress(int progress, int duration){}
     void onEnd(int resultCode, String resultMsg);
 }
