@@ -9,9 +9,20 @@
 #define ALOGW(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_WARN, TAG, FORMAT, ##__VA_ARGS__);
 #define ALOGD(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_DEBUG, TAG, FORMAT, ##__VA_ARGS__);
 
+JNIEnv *ff_env;
+jclass ff_class;
+jmethodID ff_method;
+
 void log_callback(void*, int, const char*, va_list);
 
+void init(JNIEnv *env) {
+    ff_env = env;
+    ff_class = (*env)->FindClass(env, "com/frank/ffmpeg/FFmpegCmd");
+    ff_method = (*env)->GetStaticMethodID(env, ff_class, "onProgressCallback", "(III)V");
+}
+
 FFMPEG_FUNC(jint, handle, jobjectArray commands) {
+    init(env);
     // set the level of log
     av_log_set_level(AV_LOG_INFO);
     // set the callback of log, and redirect to print android log
@@ -55,5 +66,11 @@ void log_callback(void* ptr, int level, const char* format, va_list args) {
         default:
             ALOGI(FFMPEG_TAG, format, args);
             break;
+    }
+}
+
+void progress_callback(int position, int duration, int state) {
+    if (ff_env && ff_class && ff_method) {
+        (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, ff_method, position, duration, state);
     }
 }

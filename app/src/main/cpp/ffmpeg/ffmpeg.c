@@ -1849,6 +1849,13 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
         }
     }
 
+    int64_t report_position = FFABS(pts) / AV_TIME_BASE;
+    int64_t report_duration = 0;
+    if(input_files) {
+        report_duration = input_files[0]->ctx->duration / AV_TIME_BASE;
+    }
+    progress_callback((int) report_position, (int) report_duration, STATE_RUNNING);
+
     if (is_last_report)
         print_final_stats(total_size);
 }
@@ -4929,6 +4936,7 @@ int run(int argc, char **argv)
 //    exit_program(received_nb_signals ? 255 : main_return_code);
 end:
     av_log(NULL, AV_LOG_INFO, "FFmpeg result=%d\n", main_return_code);
+    progress_callback(100, 100, main_return_code == 0 ? STATE_FINISH : STATE_ERROR);
     ffmpeg_cleanup(0);
     return main_return_code;
 }

@@ -667,4 +667,13 @@ int hwaccel_decode_init(AVCodecContext *avctx);
 
 int run(int argc, char **argv);
 
+enum ProgressState {
+    STATE_INIT,
+    STATE_RUNNING,
+    STATE_FINISH,
+    STATE_ERROR,
+};
+
+void progress_callback(int position, int duration, int state);
+
 #endif /* FFTOOLS_FFMPEG_H */
