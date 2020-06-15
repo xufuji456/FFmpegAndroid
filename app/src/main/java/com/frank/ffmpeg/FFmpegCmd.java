@@ -5,7 +5,12 @@ import android.util.Log;
 
 import com.frank.ffmpeg.listener.OnHandleListener;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+
+import androidx.annotation.IntDef;
 
 /**
  * The JNI interface of handling FFmpeg command
@@ -21,12 +26,28 @@ public class FFmpegCmd {
 
     private final static int RESULT_ERROR = 0;
 
+    private static OnHandleListener mProgressListener;
+
+    private static final int STATE_INIT = 0;
+
+    private static final int STATE_RUNNING = 1;
+
+    private static final int STATE_FINISH = 2;
+
+    private static final int STATE_ERROR = 3;
+
+    @Documented
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({STATE_INIT, STATE_RUNNING, STATE_FINISH, STATE_ERROR})
+    public @interface FFmpegState {}
+
     /**
      * Execute FFmpeg command
      * @param commands the String array of command
      * @param onHandleListener the callback for executing command
      */
     public static void execute(final String[] commands, final OnHandleListener onHandleListener) {
+        mProgressListener = onHandleListener;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -38,6 +59,7 @@ public class FFmpegCmd {
                 if (onHandleListener != null) {
                     onHandleListener.onEnd(result, null);
                 }
+                mProgressListener = null;
             }
         }).start();
     }
@@ -122,8 +144,18 @@ public class FFmpegCmd {
 
     private native static String handleProbe(String[] commands);
 
-    public static void onProgressCallback(int position, int duration, int state) {
-        Log.e("FFmpegCmd", "onProgress position=" + position + "--duration=" + duration);
-
+    public static void onProgressCallback(int position, int duration, @FFmpegState int state) {
+        Log.e("FFmpegCmd", "onProgress position=" + position
+                + "--duration=" + duration + "--state=" + state);
+        if (mProgressListener != null) {
+            if (position > 0 && duration > 0) {
+                int progress = position * 100 / duration;
+                if (progress < 100 || state == STATE_FINISH || state == STATE_ERROR) {
+                    mProgressListener.onProgress(progress, duration);
+                }
+            } else {
+                mProgressListener.onProgress(position, duration);
+            }
+        }
     }
 }

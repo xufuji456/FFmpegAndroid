@@ -20,6 +20,8 @@ public class FFmpegHandler {
 
     public final static int MSG_BEGIN = 9012;
 
+    public final static int MSG_PROGRESS = 1002;
+
     public final static int MSG_FINISH = 1112;
 
     public final static int MSG_CONTINUE = 2012;
@@ -52,6 +54,11 @@ public class FFmpegHandler {
             public void onBegin() {
                 Log.i(TAG, "handle onBegin...");
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+            }
+
+            @Override
+            public void onProgress(int progress, int duration) {
+                mHandler.obtainMessage(MSG_PROGRESS, progress, duration).sendToTarget();
             }
 
             @Override
