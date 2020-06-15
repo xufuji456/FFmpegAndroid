@@ -64,10 +64,6 @@
 #include <windows.h>
 #endif
 
-#include <setjmp.h>
-
-extern jmp_buf jump_buf;
-
 static int init_report(const char *env);
 
 AVDictionary *sws_dict;
