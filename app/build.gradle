@@ -40,6 +40,10 @@ android {
     }
 
     useLibrary "org.apache.http.legacy"
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
 
 dependencies {
