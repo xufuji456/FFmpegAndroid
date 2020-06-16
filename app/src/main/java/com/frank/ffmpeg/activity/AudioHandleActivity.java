@@ -41,6 +41,10 @@ public class AudioHandleActivity extends BaseActivity {
     private int viewId;
     private FFmpegHandler ffmpegHandler;
 
+    private String outputPath1 = PATH + File.separator + "output1.mp3";
+    private String outputPath2 = PATH + File.separator + "output2.mp3";
+    private boolean isJointing = false;
+
     private final static boolean useFFmpeg = true;
 
     @SuppressLint("HandlerLeak")
@@ -56,6 +60,11 @@ public class AudioHandleActivity extends BaseActivity {
                 case MSG_FINISH:
                     layoutProgress.setVisibility(View.GONE);
                     layoutAudioHandle.setVisibility(View.VISIBLE);
+                    if (isJointing) {
+                        isJointing = false;
+                        FileUtil.deleteFile(outputPath1);
+                        FileUtil.deleteFile(outputPath2);
+                    }
                     break;
                 case MSG_PROGRESS:
                     int progress = msg.arg1;
@@ -134,13 +143,10 @@ public class AudioHandleActivity extends BaseActivity {
                     String transformFile = PATH + File.separator + "transformAudio.mp3";
                     commandLine = FFmpegUtil.transformAudio(srcFile, transformFile);
                 } else { //use MediaCodec and libmp3lame to transform
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String transformInput = PATH + File.separator + "transformAudio.mp3";
-                            Mp3Converter mp3Converter = new Mp3Converter();
-                            mp3Converter.convertToMp3(srcFile, transformInput);
-                        }
+                    new Thread(() -> {
+                        String transformInput = PATH + File.separator + "transformAudio.mp3";
+                        Mp3Converter mp3Converter = new Mp3Converter();
+                        mp3Converter.convertToMp3(srcFile, transformInput);
                     }).start();
                 }
                 break;
@@ -176,20 +182,10 @@ public class AudioHandleActivity extends BaseActivity {
                 commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile);
                 break;
             case R.id.btn_play_audio://use AudioTrack to play audio
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new AudioPlayer().play(srcFile);
-                    }
-                }).start();
+                new Thread(() -> new AudioPlayer().play(srcFile)).start();
                 return;
             case R.id.btn_play_opensl://use OpenSL ES to play audio
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new AudioPlayer().playAudio(srcFile);
-                    }
-                }).start();
+                new Thread(() -> new AudioPlayer().playAudio(srcFile)).start();
                 return;
             case R.id.btn_audio_encode://audio encode
                 String pcmFile = PATH + File.separator + "concat.pcm";
@@ -224,8 +220,7 @@ public class AudioHandleActivity extends BaseActivity {
         if (ffmpegHandler == null || selectedPath.isEmpty() || appendFile.isEmpty()) {
             return;
         }
-        String outputPath1 = PATH + File.separator + "output1.mp3";
-        String outputPath2 = PATH + File.separator + "output2.mp3";
+        isJointing = true;
         String targetPath = PATH + File.separator + "concatAudio.mp3";
         String[] transformCmd1 = FFmpegUtil.transformAudio(selectedPath, "libmp3lame", outputPath1);
         String[] transformCmd2 = FFmpegUtil.transformAudio(appendFile, "libmp3lame", outputPath2);

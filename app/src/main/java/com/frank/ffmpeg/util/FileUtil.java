@@ -218,4 +218,12 @@ public class FileUtil {
         return true;
     }
 
+    public static boolean deleteFile(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+        File file = new File(path);
+        return file.exists() && file.delete();
+    }
+
 }
