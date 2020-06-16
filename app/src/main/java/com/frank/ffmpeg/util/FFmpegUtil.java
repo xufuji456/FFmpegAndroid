@@ -45,7 +45,7 @@ public class FFmpegUtil {
      */
     @SuppressLint("DefaultLocale")
     public static String[] cutAudio(String srcFile, int startTime, int duration, String targetFile) {
-        String cutAudioCmd = "ffmpeg -i %s -acodec copy -ss %d -t %d %s";
+        String cutAudioCmd = "ffmpeg -i %s -acodec copy -vn -ss %d -t %d %s";
         cutAudioCmd = String.format(cutAudioCmd, srcFile, startTime, duration, targetFile);
         return cutAudioCmd.split(" ");
     }
