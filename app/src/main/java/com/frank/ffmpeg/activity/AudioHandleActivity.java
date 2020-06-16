@@ -7,11 +7,12 @@ import android.os.Message;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.frank.ffmpeg.AudioPlayer;
 import com.frank.ffmpeg.R;
@@ -22,6 +23,7 @@ import com.frank.ffmpeg.util.FileUtil;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS;
 
 /**
  * Using ffmpeg command to handle audio
@@ -33,8 +35,9 @@ public class AudioHandleActivity extends BaseActivity {
     private final static String PATH = Environment.getExternalStorageDirectory().getPath();
     private String appendFile = PATH + File.separator + "heart.m4a";
 
-    private ProgressBar progressAudio;
     private LinearLayout layoutAudioHandle;
+    private LinearLayout layoutProgress;
+    private TextView txtProgress;
     private int viewId;
     private FFmpegHandler ffmpegHandler;
 
@@ -47,12 +50,22 @@ public class AudioHandleActivity extends BaseActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_BEGIN:
-                    progressAudio.setVisibility(View.VISIBLE);
+                    layoutProgress.setVisibility(View.VISIBLE);
                     layoutAudioHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
-                    progressAudio.setVisibility(View.GONE);
+                    layoutProgress.setVisibility(View.GONE);
                     layoutAudioHandle.setVisibility(View.VISIBLE);
+                    break;
+                case MSG_PROGRESS:
+                    int progress = msg.arg1;
+                    int duration = msg.arg2;
+                    if (progress > 0) {
+                        txtProgress.setVisibility(View.VISIBLE);
+                        txtProgress.setText(String.format(Locale.getDefault(), "%d%%", progress));
+                    } else {
+                        txtProgress.setVisibility(View.INVISIBLE);
+                    }
                     break;
                 default:
                     break;
@@ -75,7 +88,8 @@ public class AudioHandleActivity extends BaseActivity {
     }
 
     private void initView() {
-        progressAudio = getView(R.id.progress_audio);
+        layoutProgress = getView(R.id.layout_progress);
+        txtProgress = getView(R.id.txt_progress);
         layoutAudioHandle = getView(R.id.layout_audio_handle);
         initViewsWithClick(
                 R.id.btn_transform,
