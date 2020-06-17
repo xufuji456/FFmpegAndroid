@@ -10,7 +10,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
@@ -25,9 +25,11 @@ import com.frank.ffmpeg.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS;
 
 /**
  * video process by FFmpeg command
@@ -38,8 +40,9 @@ public class VideoHandleActivity extends BaseActivity {
     private final static String TAG = VideoHandleActivity.class.getSimpleName();
     private static final String PATH = Environment.getExternalStorageDirectory().getPath();
 
-    private ProgressBar progressVideo;
     private LinearLayout layoutVideoHandle;
+    private LinearLayout layoutProgress;
+    private TextView txtProgress;
     private int viewId;
     private FFmpegHandler ffmpegHandler;
     private final static boolean useFFmpegCmd = true;
@@ -55,12 +58,22 @@ public class VideoHandleActivity extends BaseActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_BEGIN:
-                    progressVideo.setVisibility(View.VISIBLE);
+                    layoutProgress.setVisibility(View.VISIBLE);
                     layoutVideoHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
-                    progressVideo.setVisibility(View.GONE);
+                    layoutProgress.setVisibility(View.GONE);
                     layoutVideoHandle.setVisibility(View.VISIBLE);
+                    break;
+                case MSG_PROGRESS:
+                    int progress = msg.arg1;
+                    int duration = msg.arg2;
+                    if (progress > 0) {
+                        txtProgress.setVisibility(View.VISIBLE);
+                        txtProgress.setText(String.format(Locale.getDefault(), "%d%%", progress));
+                    } else {
+                        txtProgress.setVisibility(View.INVISIBLE);
+                    }
                     break;
                 default:
                     break;
@@ -83,7 +96,8 @@ public class VideoHandleActivity extends BaseActivity {
     }
 
     private void intView() {
-        progressVideo = getView(R.id.progress_video);
+        layoutProgress = getView(R.id.layout_progress);
+        txtProgress = getView(R.id.txt_progress);
         layoutVideoHandle = getView(R.id.layout_video_handle);
         initViewsWithClick(
                 R.id.btn_video_transform,

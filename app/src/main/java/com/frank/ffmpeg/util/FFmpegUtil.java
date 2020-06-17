@@ -143,11 +143,12 @@ public class FFmpegUtil {
      * @return transform video success or not
      */
     public static String[] transformVideo(String srcFile, String targetFile) {
+        //just copy codec
+//        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy %s";
         // assign the frameRate, bitRate and resolution
 //        String transformVideoCmd = "ffmpeg -i %s -r 25 -b 200 -s 1080x720 %s";
         // assign the encoder
-//        String transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec copy %s";
-        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy %s";
+        String transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s";
         transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
         return transformVideoCmd.split(" ");
     }
