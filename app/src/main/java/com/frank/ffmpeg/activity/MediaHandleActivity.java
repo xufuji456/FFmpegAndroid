@@ -10,7 +10,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.handler.FFmpegHandler;
@@ -18,10 +18,12 @@ import com.frank.ffmpeg.util.FFmpegUtil;
 import com.frank.ffmpeg.util.FileUtil;
 
 import java.io.File;
+import java.util.Locale;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_CONTINUE;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
+import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS;
 
 /**
  * using ffmpeg to handle media
@@ -34,7 +36,8 @@ public class MediaHandleActivity extends BaseActivity {
     private String videoFile;
     private String temp = PATH + File.separator + "temp.mp4";
 
-    private ProgressBar progressMedia;
+    private LinearLayout layoutProgress;
+    private TextView txtProgress;
     private int viewId;
     private LinearLayout layoutMediaHandle;
     private FFmpegHandler ffmpegHandler;
@@ -46,7 +49,7 @@ public class MediaHandleActivity extends BaseActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_CONTINUE:
-                    String audioFile = PATH + File.separator + "tiger.mp3";//tiger.mp3
+                    String audioFile = PATH + File.separator + "tiger.mp3";
                     String muxFile = PATH + File.separator + "media-mux.mp4";
 
                     try {
@@ -75,12 +78,21 @@ public class MediaHandleActivity extends BaseActivity {
                     }
                     break;
                 case MSG_BEGIN:
-                    progressMedia.setVisibility(View.VISIBLE);
+                    layoutProgress.setVisibility(View.VISIBLE);
                     layoutMediaHandle.setVisibility(View.GONE);
                     break;
                 case MSG_FINISH:
-                    progressMedia.setVisibility(View.GONE);
+                    layoutProgress.setVisibility(View.GONE);
                     layoutMediaHandle.setVisibility(View.VISIBLE);
+                    break;
+                case MSG_PROGRESS:
+                    int progress = msg.arg1;
+                    if (progress > 0) {
+                        txtProgress.setVisibility(View.VISIBLE);
+                        txtProgress.setText(String.format(Locale.getDefault(), "%d%%", progress));
+                    } else {
+                        txtProgress.setVisibility(View.INVISIBLE);
+                    }
                     break;
                 default:
                     break;
@@ -103,7 +115,8 @@ public class MediaHandleActivity extends BaseActivity {
     }
 
     private void initView() {
-        progressMedia = getView(R.id.progress_media);
+        layoutProgress = getView(R.id.layout_progress);
+        txtProgress = getView(R.id.txt_progress);
         layoutMediaHandle = getView(R.id.layout_media_handle);
         initViewsWithClick(
                 R.id.btn_mux,

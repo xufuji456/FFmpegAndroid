@@ -33,11 +33,10 @@
                     android:layout_marginTop="10dp" />
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progress_media"
+        <include
+            layout="@layout/item_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone"/>
+            android:layout_centerInParent="true"/>
 
 </RelativeLayout>
