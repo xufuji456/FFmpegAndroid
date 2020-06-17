@@ -3649,6 +3649,11 @@ char* ffprobe_run(int argc, char **argv)
     }
     memset(print_buffer, '\0', (size_t) buffer_size);
 
+    if (setjmp(jump_buf)) {
+        ret = 1;
+        goto end;
+    }
+
     init_dynload();
 
 #if HAVE_THREADS
