@@ -70,6 +70,7 @@ public class FFmpegCmd {
      * @param onHandleListener the callback for executing command
      */
     public static void execute(final List<String[]> commands, final OnHandleListener onHandleListener) {
+        mProgressListener = onHandleListener;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -87,6 +88,7 @@ public class FFmpegCmd {
                 if (onHandleListener != null) {
                     onHandleListener.onEnd(result, null);
                 }
+                mProgressListener = null;
             }
         }).start();
     }

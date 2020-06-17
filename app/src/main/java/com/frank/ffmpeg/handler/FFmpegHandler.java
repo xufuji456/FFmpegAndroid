@@ -90,6 +90,11 @@ public class FFmpegHandler {
             }
 
             @Override
+            public void onProgress(int progress, int duration) {
+                mHandler.obtainMessage(MSG_PROGRESS, progress, duration).sendToTarget();
+            }
+
+            @Override
             public void onEnd(int resultCode, String resultMsg) {
                 Log.i(TAG, "handle onEnd...");
                 if (isContinue) {
