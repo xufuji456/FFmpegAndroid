@@ -51,6 +51,13 @@ public class VideoHandleActivity extends BaseActivity {
     private final static int TYPE_GIF   = 2;
     private final static int TYPE_TEXT  = 3;
 
+    private String appendPath = PATH + File.separator + "snow.mp4";
+    private String outputPath1 = PATH + File.separator + "output1.ts";
+    private String outputPath2 = PATH + File.separator + "output2.ts";
+    private String listPath = PATH + File.separator + "listFile.txt";
+
+    private boolean isJointing = false;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -64,6 +71,12 @@ public class VideoHandleActivity extends BaseActivity {
                 case MSG_FINISH:
                     layoutProgress.setVisibility(View.GONE);
                     layoutVideoHandle.setVisibility(View.VISIBLE);
+                    if (isJointing) {
+                        isJointing = false;
+                        FileUtil.deleteFile(outputPath1);
+                        FileUtil.deleteFile(outputPath2);
+                        FileUtil.deleteFile(listPath);
+                    }
                     break;
                 case MSG_PROGRESS:
                     int progress = msg.arg1;
@@ -307,10 +320,7 @@ public class VideoHandleActivity extends BaseActivity {
         if (ffmpegHandler == null || selectedPath.isEmpty()) {
             return;
         }
-        String appendPath = PATH + File.separator + "snow.mp4";
-        String outputPath1 = PATH + File.separator + "output1.ts";
-        String outputPath2 = PATH + File.separator + "output2.ts";
-        String listPath = PATH + File.separator + "listFile.txt";
+        isJointing = true;
         String targetPath = PATH + File.separator + "jointVideo.mp4";
         String[] transformCmd1 = FFmpegUtil.transformVideoWithEncode(selectedPath, outputPath1);
         int width = 0;
