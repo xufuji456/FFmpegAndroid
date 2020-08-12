@@ -675,5 +675,6 @@ enum ProgressState {
 };
 
 void progress_callback(int position, int duration, int state);
+void cancel_task(int cancel);
 
 #endif /* FFTOOLS_FFMPEG_H */

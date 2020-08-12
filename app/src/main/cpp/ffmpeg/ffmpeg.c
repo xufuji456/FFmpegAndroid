@@ -159,6 +159,7 @@ int         nb_output_files   = 0;
 FilterGraph **filtergraphs;
 int        nb_filtergraphs;
 
+int cancel_execute = 0;
 #if HAVE_TERMIOS_H
 
 /* init terminal so that we can grab keys */
@@ -4709,6 +4710,11 @@ static int transcode(void)
             break;
         }
 
+        if (cancel_execute) {
+            av_log(NULL, AV_LOG_ERROR, "cancel task by user...");
+            break;
+        }
+
         ret = transcode_step();
         if (ret < 0 && ret != AVERROR_EOF) {
             av_log(NULL, AV_LOG_ERROR, "Error while filtering: %s\n", av_err2str(ret));
@@ -4939,4 +4945,8 @@ end:
     progress_callback(100, 100, main_return_code == 0 ? STATE_FINISH : STATE_ERROR);
     ffmpeg_cleanup(0);
     return main_return_code;
+}
+
+void cancel_task(int cancel) {
+    cancel_execute = cancel;
 }

@@ -49,6 +49,10 @@ FFMPEG_FUNC(jint, handle, jobjectArray commands) {
     return result;
 }
 
+FFMPEG_FUNC(void, cancelTaskJni, jint cancel) {
+    cancel_task(cancel);
+}
+
 void log_callback(void* ptr, int level, const char* format, va_list args) {
     switch (level) {
         case AV_LOG_DEBUG:

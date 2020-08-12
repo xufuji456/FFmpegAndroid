@@ -93,6 +93,10 @@ public class FFmpegCmd {
         }).start();
     }
 
+    public static void cancelTask(boolean cancel) {
+        cancelTaskJni(cancel ? 1 : 0);
+    }
+
     /**
      * Using FastStart to moov box in front of mdat box
      *
@@ -141,6 +145,8 @@ public class FFmpegCmd {
     }
 
     private native static int handle(String[] commands);
+
+    private native static void cancelTaskJni(int cancel);
 
     private native static int fastStart(String inputFile, String outputFile);
 

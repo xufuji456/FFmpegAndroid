@@ -74,6 +74,14 @@ public class FFmpegHandler {
     }
 
     /**
+     * cancel the running task, and exit quietly
+     * @param cancel cancel the task when flag is true
+     */
+    public void cancelExecute(boolean cancel) {
+        FFmpegCmd.cancelTask(cancel);
+    }
+
+    /**
      * execute multi commands of FFmpeg
      *
      * @param commandList the list of command
