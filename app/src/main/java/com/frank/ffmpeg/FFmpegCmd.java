@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.frank.ffmpeg.listener.OnHandleListener;
+import com.frank.ffmpeg.util.ThreadPoolUtil;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -48,7 +49,7 @@ public class FFmpegCmd {
      */
     public static void execute(final String[] commands, final OnHandleListener onHandleListener) {
         mProgressListener = onHandleListener;
-        new Thread(new Runnable() {
+        ThreadPoolUtil.executeSingleThreadPool(new Runnable() {
             @Override
             public void run() {
                 if (onHandleListener != null) {
@@ -61,7 +62,7 @@ public class FFmpegCmd {
                 }
                 mProgressListener = null;
             }
-        }).start();
+        });
     }
 
     /**
@@ -71,7 +72,7 @@ public class FFmpegCmd {
      */
     public static void execute(final List<String[]> commands, final OnHandleListener onHandleListener) {
         mProgressListener = onHandleListener;
-        new Thread(new Runnable() {
+        ThreadPoolUtil.executeSingleThreadPool(new Runnable() {
             @Override
             public void run() {
                 if (onHandleListener != null) {
@@ -90,7 +91,7 @@ public class FFmpegCmd {
                 }
                 mProgressListener = null;
             }
-        }).start();
+        });
     }
 
     public static void cancelTask(boolean cancel) {
@@ -119,7 +120,7 @@ public class FFmpegCmd {
      * @param onHandleListener onHandleListener
      */
     public static void executeProbe(final String[] commands, final OnHandleListener onHandleListener) {
-        new Thread(new Runnable() {
+        ThreadPoolUtil.executeSingleThreadPool(new Runnable() {
             @Override
             public void run() {
                 if (onHandleListener != null) {
@@ -132,7 +133,7 @@ public class FFmpegCmd {
                     onHandleListener.onEnd(resultCode, result);
                 }
             }
-        }).start();
+        });
     }
 
     /**
