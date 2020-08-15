@@ -165,9 +165,9 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
 
     int i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO
-            && video_stream_index < 0) {
+        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             video_stream_index = i;
+            break;
         }
     }
     if (video_stream_index == -1) {
