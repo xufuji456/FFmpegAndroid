@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity;
 
 import android.annotation.SuppressLint;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.frank.ffmpeg.FFmpegApplication;
@@ -33,7 +35,7 @@ import java.util.List;
 
 public class FilterActivity extends BaseActivity implements SurfaceHolder.Callback {
 
-    private String videoPath = "";
+    private String videoPath = Environment.getExternalStorageDirectory().getPath() + "/beyond.mp4";
 
     private VideoPlayer videoPlayer;
     private SurfaceView surfaceView;
@@ -45,24 +47,24 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     private String[] filters = new String[]{
             "lutyuv='u=128:v=128'",
             "hue='h=60:s=-3'",
-            "lutrgb='r=0:g=0'",
             "edgedetect=low=0.1:high=0.4",
             "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
             "colorbalance=bs=0.3",
             "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
-            "vflip",
+            "hflip",
+            "rotate=180*PI/180",
             "unsharp"
     };
     //vflip is up and down, hflip is left and right
     private String[] txtArray = new String[]{
             FFmpegApplication.getInstance().getString(R.string.filter_sketch),
             FFmpegApplication.getInstance().getString(R.string.filter_distinct),
-            FFmpegApplication.getInstance().getString(R.string.filter_warming),
             FFmpegApplication.getInstance().getString(R.string.filter_edge),
             FFmpegApplication.getInstance().getString(R.string.filter_division),
             FFmpegApplication.getInstance().getString(R.string.filter_equalize),
             FFmpegApplication.getInstance().getString(R.string.filter_rectangle),
             FFmpegApplication.getInstance().getString(R.string.filter_flip),
+            FFmpegApplication.getInstance().getString(R.string.filter_rotate),
             FFmpegApplication.getInstance().getString(R.string.filter_sharpening)
     };
     private HorizontalAdapter horizontalAdapter;
@@ -188,6 +190,12 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         surfaceCreated = true;
+        if (FileUtil.checkFileExist(videoPath)) {
+            doFilterPlay(4);
+            btnSound.setChecked(true);
+        } else {
+            Toast.makeText(FilterActivity.this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -220,7 +228,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
     @Override
     void onSelectedFile(String filePath) {
         videoPath = filePath;
-        doFilterPlay(5);
+        doFilterPlay(4);
         //sound off by default
         btnSound.setChecked(true);
     }

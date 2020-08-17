@@ -76,12 +76,12 @@
 
     <string name="filter_sketch">sketch</string>
     <string name="filter_distinct">distinct</string>
-    <string name="filter_warming">warming</string>
     <string name="filter_edge">edge</string>
     <string name="filter_division">division</string>
     <string name="filter_equalize">equalize</string>
     <string name="filter_rectangle">rectangle</string>
     <string name="filter_flip">flip</string>
+    <string name="filter_rotate">rotate</string>
     <string name="filter_sharpening">sharpen</string>
 
 </resources>
