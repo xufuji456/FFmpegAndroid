@@ -187,6 +187,10 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
     }
 
     nativeWindow = ANativeWindow_fromSurface(env, surface);
+    if (!nativeWindow) {
+        LOGE(TAG, "nativeWindow is null...");
+        return -1;
+    }
     ANativeWindow_setBuffersGeometry(nativeWindow, pCodecCtx->width, pCodecCtx->height,
                                      WINDOW_FORMAT_RGBA_8888);
     pFrame = av_frame_alloc();
