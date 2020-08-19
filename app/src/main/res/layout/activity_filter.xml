@@ -5,8 +5,8 @@
 
     <SurfaceView
         android:id="@+id/surface_filter"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

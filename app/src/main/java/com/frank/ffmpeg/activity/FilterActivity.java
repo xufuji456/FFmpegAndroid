@@ -52,6 +52,8 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             "colorbalance=bs=0.3",
             "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
             "hflip",
+            //adjust the coefficient of sigma to control the blur
+            "gblur=sigma=2:steps=1:planes=1:sigmaV=1",
             "rotate=180*PI/180",
             "unsharp"
     };
@@ -64,6 +66,7 @@ public class FilterActivity extends BaseActivity implements SurfaceHolder.Callba
             FFmpegApplication.getInstance().getString(R.string.filter_equalize),
             FFmpegApplication.getInstance().getString(R.string.filter_rectangle),
             FFmpegApplication.getInstance().getString(R.string.filter_flip),
+            FFmpegApplication.getInstance().getString(R.string.filter_blur),
             FFmpegApplication.getInstance().getString(R.string.filter_rotate),
             FFmpegApplication.getInstance().getString(R.string.filter_sharpening)
     };

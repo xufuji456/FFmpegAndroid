@@ -81,6 +81,7 @@
     <string name="filter_equalize">equalize</string>
     <string name="filter_rectangle">rectangle</string>
     <string name="filter_flip">flip</string>
+    <string name="filter_blur">blur</string>
     <string name="filter_rotate">rotate</string>
     <string name="filter_sharpening">sharpen</string>
 

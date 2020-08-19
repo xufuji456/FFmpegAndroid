@@ -81,6 +81,7 @@
     <string name="filter_equalize">均衡</string>
     <string name="filter_rectangle">矩形</string>
     <string name="filter_flip">镜像</string>
+    <string name="filter_blur">模糊</string>
     <string name="filter_rotate">旋转</string>
     <string name="filter_sharpening">锐化</string>
 
