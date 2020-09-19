@@ -7,7 +7,6 @@
 #define ALOGI(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__);
 #define ALOGE(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
 #define ALOGW(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_WARN, TAG, FORMAT, ##__VA_ARGS__);
-#define ALOGD(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_DEBUG, TAG, FORMAT, ##__VA_ARGS__);
 
 JNIEnv *ff_env;
 jclass ff_class;
@@ -55,9 +54,6 @@ FFMPEG_FUNC(void, cancelTaskJni, jint cancel) {
 
 void log_callback(void* ptr, int level, const char* format, va_list args) {
     switch (level) {
-        case AV_LOG_DEBUG:
-            ALOGD(FFMPEG_TAG, format, args);
-            break;
         case AV_LOG_WARNING:
             ALOGW(FFMPEG_TAG, format, args);
             break;
