@@ -1,7 +1,5 @@
 package com.frank.ffmpeg.util;
 
-import android.annotation.SuppressLint;
-
 import com.frank.ffmpeg.FFmpegApplication;
 import com.frank.ffmpeg.format.VideoLayout;
 
@@ -43,10 +41,9 @@ public class FFmpegUtil {
      * @param targetFile output file
      * @return cut success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] cutAudio(String srcFile, int startTime, int duration, String targetFile) {
         String cutAudioCmd = "ffmpeg -i %s -acodec copy -vn -ss %d -t %d %s";
-        cutAudioCmd = String.format(cutAudioCmd, srcFile, startTime, duration, targetFile);
+        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, srcFile, startTime, duration, targetFile);
         return cutAudioCmd.split(" ");
     }
 
@@ -89,7 +86,6 @@ public class FFmpegUtil {
     }
     //mixing formula: value = sample1 + sample2 - (sample1 * sample2 / (pow(2, 16-1) - 1))
 
-
     /**
      * mux audio and video together
      *
@@ -99,10 +95,9 @@ public class FFmpegUtil {
      * @param muxFile   output file
      * @return mux success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] mediaMux(String videoFile, String audioFile, int duration, String muxFile) {
         String mixAudioCmd = "ffmpeg -i %s -i %s -t %d %s";
-        mixAudioCmd = String.format(mixAudioCmd, videoFile, audioFile, duration, muxFile);
+        mixAudioCmd = String.format(Locale.getDefault(), mixAudioCmd, videoFile, audioFile, duration, muxFile);
         return mixAudioCmd.split(" ");
     }
 
@@ -133,7 +128,6 @@ public class FFmpegUtil {
         mixAudioCmd = String.format(mixAudioCmd, srcFile, targetFile);
         return mixAudioCmd.split(" ");
     }
-
 
     /**
      * transform video, according to your assigning the output format
@@ -206,11 +200,10 @@ public class FFmpegUtil {
      * @param targetFile output file
      * @return cut video success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] cutVideo(String srcFile, int startTime, int duration, String targetFile) {
         //assign encoders: ffmpeg -i %s -ss %d -t %d -acodec libmp3lame -vcodec libx264 %s
         String cutVideoCmd = "ffmpeg -i %s -ss %d -t %d -acodec copy -vcodec copy %s";
-        cutVideoCmd = String.format(cutVideoCmd, srcFile, startTime, duration, targetFile);
+        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, srcFile, startTime, duration, targetFile);
         return cutVideoCmd.split(" ");
     }
 
@@ -301,11 +294,10 @@ public class FFmpegUtil {
      * @param frameRate  frameRate of the gif
      * @return convert gif success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] generateGif(String srcFile, int startTime, int duration,
                                        String resolution, int frameRate, String targetFile) {
         String generateGifCmd = "ffmpeg -i %s -ss %d -t %d -s %s -r %d -f gif %s";
-        generateGifCmd = String.format(generateGifCmd, srcFile, startTime, duration,
+        generateGifCmd = String.format(Locale.getDefault(), generateGifCmd, srcFile, startTime, duration,
                 resolution, frameRate, targetFile);
         return generateGifCmd.split(" ");
     }
@@ -318,10 +310,9 @@ public class FFmpegUtil {
      * @param targetFile output file
      * @return record success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] screenRecord(String size, int recordTime, String targetFile) {
         String screenRecordCmd = "ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -vd x11:0,0 -s %s -t %d %s";
-        screenRecordCmd = String.format(screenRecordCmd, size, recordTime, targetFile);
+        screenRecordCmd = String.format(Locale.getDefault(), screenRecordCmd, size, recordTime, targetFile);
         return screenRecordCmd.split(" ");
     }
 
@@ -333,11 +324,10 @@ public class FFmpegUtil {
      * @param targetFile output file
      * @return convert success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] pictureToVideo(String srcFile, int frameRate, String targetFile) {
         //-f: stand for format
         String combineVideo = "ffmpeg -f image2 -r %d -i %simg#d.jpg -vcodec mpeg4 %s";
-        combineVideo = String.format(combineVideo, frameRate, srcFile, targetFile);
+        combineVideo = String.format(Locale.getDefault(), combineVideo, frameRate, srcFile, targetFile);
         combineVideo = combineVideo.replace("#", "%");
         return combineVideo.split(" ");
     }
@@ -350,10 +340,9 @@ public class FFmpegUtil {
      * @param targetFile output file
      * @return convert success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] convertResolution(String srcFile, String resolution, String targetFile) {
         String convertCmd = "ffmpeg -i %s -s %s -pix_fmt yuv420p %s";
-        convertCmd = String.format(convertCmd, srcFile, resolution, targetFile);
+        convertCmd = String.format(Locale.getDefault(), convertCmd, srcFile, resolution, targetFile);
         return convertCmd.split(" ");
     }
 
@@ -366,10 +355,9 @@ public class FFmpegUtil {
      * @param channel    sound channel: mono channel is 1, stereo channel is 2
      * @return encode audio success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] encodeAudio(String srcFile, String targetFile, int sampleRate, int channel) {
         String combineVideo = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
-        combineVideo = String.format(combineVideo, sampleRate, channel, srcFile, targetFile);
+        combineVideo = String.format(Locale.getDefault(), combineVideo, sampleRate, channel, srcFile, targetFile);
         return combineVideo.split(" ");
     }
 
@@ -451,10 +439,9 @@ public class FFmpegUtil {
      * @param y          y coordinate point
      * @return convert success or not
      */
-    @SuppressLint("DefaultLocale")
     public static String[] picInPicVideo(String inputFile1, String inputFile2, int x, int y, String targetFile) {
         String pipVideo = "ffmpeg -i %s -i %s -filter_complex overlay=%d:%d %s";
-        pipVideo = String.format(pipVideo, inputFile1, inputFile2, x, y, targetFile);
+        pipVideo = String.format(Locale.getDefault(), pipVideo, inputFile1, inputFile2, x, y, targetFile);
         return pipVideo.split(" ");
     }
 
