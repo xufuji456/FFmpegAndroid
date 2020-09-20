@@ -223,11 +223,18 @@ public class VideoHandleActivity extends BaseActivity {
             case R.id.btn_generate_gif://convert video into gif
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";
                 int gifStart = 30;
-                int gifDuration = 5;
-                String resolution = "720x1280";//240x320、480x640、1080x1920
+                int gifDuration = 10;
+                int width = 320;
                 int frameRate = 10;
-                commandLine = FFmpegUtil.generateGif(srcFile, gifStart, gifDuration,
-                        resolution, frameRate, Video2Gif);
+                String palettePath = PATH + "/palette.png";
+                FileUtil.deleteFile(palettePath);
+                String[] paletteCmd = FFmpegUtil.generatePalette(srcFile, frameRate, width, palettePath);
+                String[] gifCmd = FFmpegUtil.generateGifByPalette(srcFile, palettePath, gifStart, gifDuration,
+                        frameRate, width, Video2Gif);
+                List<String[]> cmdList = new ArrayList<>();
+                cmdList.add(paletteCmd);
+                cmdList.add(gifCmd);
+                ffmpegHandler.executeFFmpegCmds(cmdList);
                 break;
             case R.id.btn_screen_record://screen recording
 //                String screenRecord = PATH + File.separator + "screenRecord.mp4";

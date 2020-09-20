@@ -284,22 +284,39 @@ public class FFmpegUtil {
     }
 
     /**
-     * convert video into gif
+     * generate a palette for gif
      *
      * @param srcFile    input file
+     * @param frameRate  frameRate of the gif
+     * @param width      width
+     * @param targetFile output file
+     * @return generate palette success or not
+     */
+    public static String[] generatePalette(String srcFile, int frameRate, int width, String targetFile) {
+        String paletteCmd = "ffmpeg -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
+        paletteCmd = String.format(Locale.getDefault(), paletteCmd, srcFile, frameRate, width, targetFile);
+        return paletteCmd.split(" ");
+    }
+
+    /**
+     * convert video into gif with palette
+     *
+     * @param srcFile    input file
+     * @param palette    the palette which will apply to gif
      * @param startTime  startTime in the video
      * @param duration   duration, how long you want to
-     * @param targetFile output file
-     * @param resolution resolution of the gif
      * @param frameRate  frameRate of the gif
+     * @param width      width
+     * @param targetFile output gif
      * @return convert gif success or not
      */
-    public static String[] generateGif(String srcFile, int startTime, int duration,
-                                       String resolution, int frameRate, String targetFile) {
-        String generateGifCmd = "ffmpeg -i %s -ss %d -t %d -s %s -r %d -f gif %s";
-        generateGifCmd = String.format(Locale.getDefault(), generateGifCmd, srcFile, startTime, duration,
-                resolution, frameRate, targetFile);
-        return generateGifCmd.split(" ");
+    public static String[] generateGifByPalette(String srcFile, String palette, int startTime, int duration,
+                                           int frameRate, int width, String targetFile) {
+        String paletteGifCmd = "ffmpeg -i %s -i %s -ss %d -t %d -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
+                "paletteuse=dither=bayer:bayer_scale=3 %s";
+        paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, srcFile, palette, startTime,
+                duration, frameRate, width, targetFile);
+        return paletteGifCmd.split(" ");
     }
 
     /**
