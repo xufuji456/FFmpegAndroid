@@ -156,6 +156,9 @@ public class FFmpegCmd {
     public static void onProgressCallback(int position, int duration, @FFmpegState int state) {
         Log.e("FFmpegCmd", "onProgress position=" + position
                 + "--duration=" + duration + "--state=" + state);
+        if (position > duration && duration > 0) {
+            return;
+        }
         if (mProgressListener != null) {
             if (position > 0 && duration > 0) {
                 int progress = position * 100 / duration;

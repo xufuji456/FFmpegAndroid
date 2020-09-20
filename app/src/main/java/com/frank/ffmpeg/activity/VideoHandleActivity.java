@@ -222,8 +222,8 @@ public class VideoHandleActivity extends BaseActivity {
                 break;
             case R.id.btn_generate_gif://convert video into gif
                 String Video2Gif = PATH + File.separator + "Video2Gif.gif";
-                int gifStart = 30;
-                int gifDuration = 10;
+                int gifStart = 10;
+                int gifDuration = 6;
                 int width = 320;
                 int frameRate = 10;
                 String palettePath = PATH + "/palette.png";
