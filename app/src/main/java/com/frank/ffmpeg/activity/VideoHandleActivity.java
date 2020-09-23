@@ -237,12 +237,6 @@ public class VideoHandleActivity extends BaseActivity {
                 cmdList.add(gifCmd);
                 ffmpegHandler.executeFFmpegCmds(cmdList);
                 break;
-            case R.id.btn_screen_record://screen recording
-//                String screenRecord = PATH + File.separator + "screenRecord.mp4";
-//                String screenSize = "320x240";
-//                int recordTime = 10;
-//                commandLine = FFmpegUtil.screenRecord(screenSize, recordTime, screenRecord);
-                break;
             case R.id.btn_multi_video://combine video which layout could be horizontal of vertical
                 String input1 = PATH + File.separator + "input1.mp4";
                 String input2 = PATH + File.separator + "input2.mp4";

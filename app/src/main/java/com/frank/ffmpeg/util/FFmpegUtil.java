@@ -324,20 +324,6 @@ public class FFmpegUtil {
     }
 
     /**
-     * screen record
-     *
-     * @param size       size of video
-     * @param recordTime startTime in the video
-     * @param targetFile output file
-     * @return record success or not
-     */
-    public static String[] screenRecord(String size, int recordTime, String targetFile) {
-        String screenRecordCmd = "ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -vd x11:0,0 -s %s -t %d %s";
-        screenRecordCmd = String.format(Locale.getDefault(), screenRecordCmd, size, recordTime, targetFile);
-        return screenRecordCmd.split(" ");
-    }
-
-    /**
      * convert s series of pictures into video
      *
      * @param srcFile    input file
