@@ -288,13 +288,17 @@ public class FFmpegUtil {
      *
      * @param srcFile    input file
      * @param frameRate  frameRate of the gif
+     * @param startTime  startTime in the video
+     * @param duration   duration, how long you want to
      * @param width      width
      * @param targetFile output file
      * @return generate palette success or not
      */
-    public static String[] generatePalette(String srcFile, int frameRate, int width, String targetFile) {
-        String paletteCmd = "ffmpeg -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
-        paletteCmd = String.format(Locale.getDefault(), paletteCmd, srcFile, frameRate, width, targetFile);
+    public static String[] generatePalette(String srcFile, int startTime, int duration,
+                                           int frameRate, int width, String targetFile) {
+        String paletteCmd = "ffmpeg -i %s -ss %d -t %d -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
+        paletteCmd = String.format(Locale.getDefault(), paletteCmd, srcFile, startTime,
+                duration, frameRate, width, targetFile);
         return paletteCmd.split(" ");
     }
 

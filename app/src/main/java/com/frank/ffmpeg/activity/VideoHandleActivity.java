@@ -228,7 +228,8 @@ public class VideoHandleActivity extends BaseActivity {
                 int frameRate = 10;
                 String palettePath = PATH + "/palette.png";
                 FileUtil.deleteFile(palettePath);
-                String[] paletteCmd = FFmpegUtil.generatePalette(srcFile, frameRate, width, palettePath);
+                String[] paletteCmd = FFmpegUtil.generatePalette(srcFile, gifStart, gifDuration,
+                        frameRate, width, palettePath);
                 String[] gifCmd = FFmpegUtil.generateGifByPalette(srcFile, palettePath, gifStart, gifDuration,
                         frameRate, width, Video2Gif);
                 List<String[]> cmdList = new ArrayList<>();
