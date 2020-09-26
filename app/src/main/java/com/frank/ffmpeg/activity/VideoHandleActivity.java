@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.frank.ffmpeg.FFmpegCmd;
 import com.frank.ffmpeg.R;
 import com.frank.ffmpeg.format.VideoLayout;
+import com.frank.ffmpeg.gif.HighQualityGif;
 import com.frank.ffmpeg.handler.FFmpegHandler;
 import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
@@ -57,6 +58,7 @@ public class VideoHandleActivity extends BaseActivity {
     private String listPath = PATH + File.separator + "listFile.txt";
 
     private boolean isJointing = false;
+    private final static boolean convertGifWithFFmpeg = false;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -80,7 +82,6 @@ public class VideoHandleActivity extends BaseActivity {
                     break;
                 case MSG_PROGRESS:
                     int progress = msg.arg1;
-                    int duration = msg.arg2;
                     if (progress > 0) {
                         txtProgress.setVisibility(View.VISIBLE);
                         txtProgress.setText(String.format(Locale.getDefault(), "%d%%", progress));
@@ -221,21 +222,26 @@ public class VideoHandleActivity extends BaseActivity {
                 }
                 break;
             case R.id.btn_generate_gif://convert video into gif
-                String Video2Gif = PATH + File.separator + "Video2Gif.gif";
+                String video2Gif = PATH + File.separator + "video2Gif.gif";
                 int gifStart = 10;
-                int gifDuration = 6;
+                int gifDuration = 3;
                 int width = 320;
                 int frameRate = 10;
-                String palettePath = PATH + "/palette.png";
-                FileUtil.deleteFile(palettePath);
-                String[] paletteCmd = FFmpegUtil.generatePalette(srcFile, gifStart, gifDuration,
-                        frameRate, width, palettePath);
-                String[] gifCmd = FFmpegUtil.generateGifByPalette(srcFile, palettePath, gifStart, gifDuration,
-                        frameRate, width, Video2Gif);
-                List<String[]> cmdList = new ArrayList<>();
-                cmdList.add(paletteCmd);
-                cmdList.add(gifCmd);
-                ffmpegHandler.executeFFmpegCmds(cmdList);
+
+                if (convertGifWithFFmpeg) {
+                    String palettePath = PATH + "/palette.png";
+                    FileUtil.deleteFile(palettePath);
+                    String[] paletteCmd = FFmpegUtil.generatePalette(srcFile, gifStart, gifDuration,
+                            frameRate, width, palettePath);
+                    String[] gifCmd = FFmpegUtil.generateGifByPalette(srcFile, palettePath, gifStart, gifDuration,
+                            frameRate, width, video2Gif);
+                    List<String[]> cmdList = new ArrayList<>();
+                    cmdList.add(paletteCmd);
+                    cmdList.add(gifCmd);
+                    ffmpegHandler.executeFFmpegCmds(cmdList);
+                } else {
+                    convertGifInHighQuality(video2Gif, srcFile, gifStart, gifDuration, frameRate);
+                }
                 break;
             case R.id.btn_multi_video://combine video which layout could be horizontal of vertical
                 String input1 = PATH + File.separator + "input1.mp4";
@@ -258,15 +264,14 @@ public class VideoHandleActivity extends BaseActivity {
                 String imagePath = PATH + File.separator + "Video2Image/";
                 File imageFile = new File(imagePath);
                 if (!imageFile.exists()) {
-                    boolean result = imageFile.mkdir();
-                    if (!result) {
+                    if (!imageFile.mkdir()) {
                         return;
                     }
                 }
                 int mStartTime = 10;//start time
                 int mDuration = 5;//duration
                 int mFrameRate = 10;//frameRate
-                commandLine = FFmpegUtil.videoToImageWithScale(srcFile, mStartTime, mDuration, mFrameRate, 320, imagePath);
+                commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, imagePath);
                 break;
             case R.id.btn_pip://combine into picture-in-picture video
                 String inputFile1 = PATH + File.separator + "beyond.mp4";
@@ -358,11 +363,7 @@ public class VideoHandleActivity extends BaseActivity {
             return;
         }
         String tempPath = PATH + "/temp/";
-        File tempFile = new File(tempPath);
-        if (tempFile.exists()) {
-            tempFile.delete();
-        }
-        tempFile.mkdirs();
+        FileUtil.deleteFolder(tempPath);
         File photoFile = new File(picturePath);
         File[] files = photoFile.listFiles();
         List<String[]> cmdList = new ArrayList<>();
@@ -381,6 +382,17 @@ public class VideoHandleActivity extends BaseActivity {
         if (ffmpegHandler != null) {
             ffmpegHandler.executeFFmpegCmds(cmdList);
         }
+    }
+
+    private void convertGifInHighQuality(String gifPath, String videoPath, int startTime, int duration, int frameRate) {
+        new Thread(() -> {
+            mHandler.sendEmptyMessage(MSG_BEGIN);
+            long start = System.currentTimeMillis();
+            HighQualityGif highQualityGif = new HighQualityGif();
+            boolean result = highQualityGif.convertGIF(gifPath, videoPath, startTime, duration, frameRate);
+            Log.e(TAG, "convert gif result=" + result + "--time=" + (System.currentTimeMillis()-start));
+            mHandler.sendEmptyMessage(MSG_FINISH);
+        }).start();
     }
 
     @Override

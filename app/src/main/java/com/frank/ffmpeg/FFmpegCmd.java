@@ -65,6 +65,10 @@ public class FFmpegCmd {
         });
     }
 
+    public static int executeSync(final String[] commands) {
+        return handle(commands);
+    }
+
     /**
      * Execute FFmpeg multi commands
      * @param commands the String array of command
