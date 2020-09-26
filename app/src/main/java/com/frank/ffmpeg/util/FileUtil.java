@@ -226,4 +226,22 @@ public class FileUtil {
         return file.exists() && file.delete();
     }
 
+    public static boolean deleteFolder(String path) {
+        if (TextUtils.isEmpty(path)) {
+            return false;
+        }
+        boolean result = true;
+        File tempFile = new File(path);
+        if (!tempFile.exists()) {
+            return tempFile.mkdir();
+        }
+        if (tempFile.isDirectory() && tempFile.listFiles() != null) {
+            File[] files = tempFile.listFiles();
+            for (File file : files) {
+                result &= file.delete();
+            }
+        }
+        return result;
+    }
+
 }
