@@ -440,7 +440,7 @@ public class FFmpegUtil {
             toImage = "ffmpeg -i %s -ss %d -t %d -an -r %d %s";
             toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, targetFile);
         }
-        toImage = toImage + "%3d.jpg";
+        toImage = toImage + "%3d.png";
         return toImage.split(" ");
     }
 
