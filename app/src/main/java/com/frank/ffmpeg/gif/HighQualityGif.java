@@ -29,13 +29,45 @@ public class HighQualityGif {
 
     private final static int TARGET_HEIGHT = 180;
 
+    private int mWidth;
+    private int mHeight;
+    private int mRotateDegree;
+
+    public HighQualityGif(int width, int height, int rotateDegree) {
+        mWidth = width;
+        mHeight = height;
+        mRotateDegree = rotateDegree;
+    }
+
+    private int chooseWidth(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return TARGET_WIDTH;
+        }
+        int target;
+        if (mRotateDegree == 0 || mRotateDegree == 180) {//landscape
+            if (width > TARGET_WIDTH) {
+                target = TARGET_WIDTH;
+            } else {
+                target = width;
+            }
+        } else {//portrait
+            if (height > TARGET_HEIGHT) {
+                target = TARGET_HEIGHT;
+            } else {
+                target = height;
+            }
+        }
+        return target;
+    }
+
     private byte[] generateGif(String filePath, int startTime, int duration, int frameRate) throws IllegalArgumentException {
         if (TextUtils.isEmpty(filePath)) {
             return null;
         }
         String folderPath = Environment.getExternalStorageDirectory() + "/gif_frames/";
         FileUtil.deleteFolder(folderPath);
-        String[] commandLine = FFmpegUtil.videoToImageWithScale(filePath, startTime, duration, frameRate, TARGET_WIDTH, folderPath);
+        int targetWidth = chooseWidth(mWidth, mHeight);
+        String[] commandLine = FFmpegUtil.videoToImageWithScale(filePath, startTime, duration, frameRate, targetWidth, folderPath);
         FFmpegCmd.executeSync(commandLine);
         File fileFolder = new File(folderPath);
         if (!fileFolder.exists() || fileFolder.listFiles() == null) {

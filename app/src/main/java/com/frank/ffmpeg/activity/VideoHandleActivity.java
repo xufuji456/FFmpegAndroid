@@ -387,8 +387,24 @@ public class VideoHandleActivity extends BaseActivity {
     private void convertGifInHighQuality(String gifPath, String videoPath, int startTime, int duration, int frameRate) {
         new Thread(() -> {
             mHandler.sendEmptyMessage(MSG_BEGIN);
+            int width=0, height=0;
+            int rotateDegree = 0;
+            try {
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(videoPath);
+                String mWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+                String mHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+                width = Integer.valueOf(mWidth);
+                height = Integer.valueOf(mHeight);
+                String rotate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
+                rotateDegree = Integer.valueOf(rotate);
+                retriever.release();
+                Log.e(TAG, "retrieve width=" + width + "--height=" + height + "--rotate=" + rotate);
+            } catch (Exception e) {
+                Log.e(TAG, "retrieve error=" + e.toString());
+            }
             long start = System.currentTimeMillis();
-            HighQualityGif highQualityGif = new HighQualityGif();
+            HighQualityGif highQualityGif = new HighQualityGif(width, height, rotateDegree);
             boolean result = highQualityGif.convertGIF(gifPath, videoPath, startTime, duration, frameRate);
             Log.e(TAG, "convert gif result=" + result + "--time=" + (System.currentTimeMillis()-start));
             mHandler.sendEmptyMessage(MSG_FINISH);
