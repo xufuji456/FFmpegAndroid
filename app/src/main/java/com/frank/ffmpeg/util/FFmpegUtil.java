@@ -427,11 +427,19 @@ public class FFmpegUtil {
      * @return convert success or not
      */
     public static String[] videoToImage(String inputFile, int startTime, int duration, int frameRate, String targetFile) {
-        //-ss：start time
-        //-t：duration
-        //-r：frame rate
-        String toImage = "ffmpeg -i %s -ss %s -t %s -r %s %s";
-        toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, targetFile);
+        return videoToImageWithScale(inputFile, startTime, duration, frameRate, 0, targetFile);
+    }
+
+    public static String[] videoToImageWithScale(String inputFile, int startTime, int duration,
+                                                 int frameRate, int width, String targetFile) {
+        String toImage;
+        if (width > 0) {
+            toImage = "ffmpeg -i %s -ss %d -t %d -an -vf fps=%d,scale=%d:-1 %s";
+            toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, width, targetFile);
+        } else {
+            toImage = "ffmpeg -i %s -ss %d -t %d -an -r %d %s";
+            toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, targetFile);
+        }
         toImage = toImage + "%3d.jpg";
         return toImage.split(" ");
     }

@@ -264,9 +264,9 @@ public class VideoHandleActivity extends BaseActivity {
                     }
                 }
                 int mStartTime = 10;//start time
-                int mDuration = 20;//duration
+                int mDuration = 5;//duration
                 int mFrameRate = 10;//frameRate
-                commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, imagePath);
+                commandLine = FFmpegUtil.videoToImageWithScale(srcFile, mStartTime, mDuration, mFrameRate, 320, imagePath);
                 break;
             case R.id.btn_pip://combine into picture-in-picture video
                 String inputFile1 = PATH + File.separator + "beyond.mp4";
