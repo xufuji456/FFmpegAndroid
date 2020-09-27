@@ -42,8 +42,8 @@ public class FFmpegUtil {
      * @return cut success or not
      */
     public static String[] cutAudio(String srcFile, int startTime, int duration, String targetFile) {
-        String cutAudioCmd = "ffmpeg -i %s -acodec copy -vn -ss %d -t %d %s";
-        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, srcFile, startTime, duration, targetFile);
+        String cutAudioCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vn %s";
+        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration, srcFile, targetFile);
         return cutAudioCmd.split(" ");
     }
 
@@ -201,9 +201,9 @@ public class FFmpegUtil {
      * @return cut video success or not
      */
     public static String[] cutVideo(String srcFile, int startTime, int duration, String targetFile) {
-        //assign encoders: ffmpeg -i %s -ss %d -t %d -acodec libmp3lame -vcodec libx264 %s
-        String cutVideoCmd = "ffmpeg -i %s -ss %d -t %d -acodec copy -vcodec copy %s";
-        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, srcFile, startTime, duration, targetFile);
+        //assign encoders: ffmpeg -ss %d -t %d -i %s -acodec libmp3lame -vcodec libx264 %s
+        String cutVideoCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vcodec copy %s";
+        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, srcFile, targetFile);
         return cutVideoCmd.split(" ");
     }
 
@@ -216,8 +216,8 @@ public class FFmpegUtil {
      * @return screenshot success or not
      */
     public static String[] screenShot(String srcFile, int time, String targetFile) {
-        String screenShotCmd = "ffmpeg -i %s -f image2 -ss %d -vframes 1 -an %s";
-        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, srcFile, time, targetFile);
+        String screenShotCmd = "ffmpeg -ss %d -i %s -f image2 -vframes 1 -an %s";
+        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, time, srcFile, targetFile);
         return screenShotCmd.split(" ");
     }
 
@@ -296,9 +296,9 @@ public class FFmpegUtil {
      */
     public static String[] generatePalette(String srcFile, int startTime, int duration,
                                            int frameRate, int width, String targetFile) {
-        String paletteCmd = "ffmpeg -i %s -ss %d -t %d -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
-        paletteCmd = String.format(Locale.getDefault(), paletteCmd, srcFile, startTime,
-                duration, frameRate, width, targetFile);
+        String paletteCmd = "ffmpeg -ss %d -t %d -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
+        paletteCmd = String.format(Locale.getDefault(), paletteCmd, startTime,
+                duration, srcFile, frameRate, width, targetFile);
         return paletteCmd.split(" ");
     }
 
@@ -316,10 +316,10 @@ public class FFmpegUtil {
      */
     public static String[] generateGifByPalette(String srcFile, String palette, int startTime, int duration,
                                            int frameRate, int width, String targetFile) {
-        String paletteGifCmd = "ffmpeg -i %s -i %s -ss %d -t %d -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
+        String paletteGifCmd = "ffmpeg -ss %d -t %d -i %s -i %s -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
                 "paletteuse=dither=bayer:bayer_scale=3 %s";
-        paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, srcFile, palette, startTime,
-                duration, frameRate, width, targetFile);
+        paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, startTime,
+                duration, srcFile, palette, frameRate, width, targetFile);
         return paletteGifCmd.split(" ");
     }
 
@@ -434,11 +434,11 @@ public class FFmpegUtil {
                                                  int frameRate, int width, String targetFile) {
         String toImage;
         if (width > 0) {
-            toImage = "ffmpeg -i %s -ss %d -t %d -an -vf fps=%d,scale=%d:-1 %s";
-            toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, width, targetFile);
+            toImage = "ffmpeg -ss %d -t %d -i %s -an -vf fps=%d,scale=%d:-1 %s";
+            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputFile, frameRate, width, targetFile);
         } else {
-            toImage = "ffmpeg -i %s -ss %d -t %d -an -r %d %s";
-            toImage = String.format(Locale.CHINESE, toImage, inputFile, startTime, duration, frameRate, targetFile);
+            toImage = "ffmpeg -ss %d -t %d -i %s -an -r %d %s";
+            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputFile, frameRate, targetFile);
         }
         toImage = toImage + "%3d.png";
         return toImage.split(" ");
