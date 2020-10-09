@@ -43,6 +43,7 @@
     <string name="video_preview">播放预览</string>
     <string name="video_moov">MOOV前移</string>
     <string name="video_speed">播放倍率</string>
+    <string name="video_flv">FLV索引</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>

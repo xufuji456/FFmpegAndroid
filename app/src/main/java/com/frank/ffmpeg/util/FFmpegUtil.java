@@ -520,4 +520,16 @@ public class FFmpegUtil {
         return speedCmd.split(" ");
     }
 
+    /**
+     * Rebuild the keyframe index of FLV, make it seekable
+     * @param inputFile inputFile
+     * @param targetFile targetFile
+     * @return command of build flv index
+     */
+    public static String[] buildFlvIndex(String inputFile, String targetFile) {
+        String denoiseVideo = "ffmpeg -i %s -flvflags add_keyframe_index %s";
+        denoiseVideo = String.format(denoiseVideo, inputFile, targetFile);
+        return denoiseVideo.split(" ");
+    }
+
 }

@@ -128,7 +128,8 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_to_image,
                 R.id.btn_pip,
                 R.id.btn_moov,
-                R.id.btn_speed
+                R.id.btn_speed,
+                R.id.btn_flv
         );
     }
 
@@ -309,6 +310,14 @@ public class VideoHandleActivity extends BaseActivity {
             case R.id.btn_speed://playing speed of video
                 String speed = PATH + File.separator + "speed.mp4";
                 commandLine = FFmpegUtil.changeSpeed(srcFile, speed, 2f, false);
+                break;
+            case R.id.btn_flv://rebuild the keyframe index of flv
+                if (!".flv".equalsIgnoreCase(FileUtil.getFileSuffix(srcFile))) {
+                    Log.e(TAG, "It's not flv file, suffix=" + FileUtil.getFileSuffix(srcFile));
+                    return;
+                }
+                String outputPath = PATH + File.separator + "frame_index.flv";
+                commandLine = FFmpegUtil.buildFlvIndex(srcFile, outputPath);
                 break;
             default:
                 break;
