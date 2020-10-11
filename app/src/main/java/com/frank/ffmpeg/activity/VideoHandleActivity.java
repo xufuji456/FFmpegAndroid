@@ -82,9 +82,12 @@ public class VideoHandleActivity extends BaseActivity {
                     break;
                 case MSG_PROGRESS:
                     int progress = msg.arg1;
+                    int duration = msg.arg2;
                     if (progress > 0) {
                         txtProgress.setVisibility(View.VISIBLE);
-                        txtProgress.setText(String.format(Locale.getDefault(), "%d%%", progress));
+                        String percent = duration > 0 ? "%" : "";
+                        String strProgress = progress + percent;
+                        txtProgress.setText(strProgress);
                     } else {
                         txtProgress.setVisibility(View.INVISIBLE);
                     }
