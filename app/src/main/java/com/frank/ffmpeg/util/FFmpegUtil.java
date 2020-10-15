@@ -527,9 +527,34 @@ public class FFmpegUtil {
      * @return command of build flv index
      */
     public static String[] buildFlvIndex(String inputFile, String targetFile) {
-        String denoiseVideo = "ffmpeg -i %s -flvflags add_keyframe_index %s";
-        denoiseVideo = String.format(denoiseVideo, inputFile, targetFile);
-        return denoiseVideo.split(" ");
+        String buildIndex = "ffmpeg -i %s -flvflags add_keyframe_index %s";
+        buildIndex = String.format(buildIndex, inputFile, targetFile);
+        return buildIndex.split(" ");
+    }
+
+    /**
+     * Using one input file to push multi streams.
+     * After publish the streams, you could use VLC to play it
+     * Note: if stream is rtmp protocol, need to start your rtmp server
+     * Note: if stream is http protocol, need to start your http server
+     * @param inputFile inputFile
+     * @param duration how long of inputFile you want to publish
+     * @param streamUrl1 the url of stream1
+     * @param streamUrl2 the url of stream2
+     * @return command of build flv index
+     */
+    public static String[] pushMultiStreams(String inputFile, int duration, String streamUrl1, String streamUrl2) {
+        //ffmpeg -i what.mp4 -vcodec libx264 -acodec aac -t 60 -f flv
+        //"tee:rtmp://192.168.1.102/live/stream1|rtmp://192.168.1.102/live/stream2"
+        String format = "flv";
+        if (streamUrl1.startsWith("rtmp://")) {//rtmp protocol
+            format = "flv";
+        } else if (streamUrl1.startsWith("http://")) {//http protocol
+            format = "mpegts";
+        }
+        String pushStreams = "ffmpeg -i %s -vcodec libx264 -acodec aac -t %d -f %s \"tee:%s|%s\"";
+        pushStreams = String.format(Locale.getDefault(), pushStreams, inputFile, duration, format, streamUrl1, streamUrl2);
+        return pushStreams.split(" ");
     }
 
 }
