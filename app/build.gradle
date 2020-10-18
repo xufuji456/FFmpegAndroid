@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -41,8 +43,12 @@ android {
 
     useLibrary "org.apache.http.legacy"
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/proguard/coroutines.pro'
     }
 }
 
@@ -52,4 +58,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerviewVersion"
     testImplementation 'junit:junit:4.12'
     implementation project(':Live')
+    implementation "androidx.core:core-ktx:$rootProject.core_ktx"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycle_ktx"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
