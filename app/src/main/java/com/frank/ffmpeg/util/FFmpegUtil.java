@@ -16,34 +16,34 @@ public class FFmpegUtil {
     /**
      * transform audio, according to your assigning the output format
      *
-     * @param srcFile    input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return transform success or not
      */
-    public static String[] transformAudio(String srcFile, String targetFile) {
+    public static String[] transformAudio(String inputPath, String outputPath) {
         String transformAudioCmd = "ffmpeg -i %s %s";
-        transformAudioCmd = String.format(transformAudioCmd, srcFile, targetFile);
+        transformAudioCmd = String.format(transformAudioCmd, inputPath, outputPath);
         return transformAudioCmd.split(" ");
     }
 
-    public static String[] transformAudio(String srcFile, String acodec, String targetFile) {
+    public static String[] transformAudio(String inputPath, String acodec, String outputPath) {
         String transformAudioCmd = "ffmpeg -i %s -acodec %s -ac 2 -ar 44100 %s";
-        transformAudioCmd = String.format(transformAudioCmd, srcFile, acodec, targetFile);
+        transformAudioCmd = String.format(transformAudioCmd, inputPath, acodec, outputPath);
         return transformAudioCmd.split(" ");
     }
 
     /**
      * cut audio, you could assign the startTime and duration which you want to
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param startTime  start time in the audio(unit is second)
      * @param duration   start time(unit is second)
-     * @param targetFile output file
+     * @param outputPath output file
      * @return cut success or not
      */
-    public static String[] cutAudio(String srcFile, int startTime, int duration, String targetFile) {
+    public static String[] cutAudio(String inputPath, int startTime, int duration, String outputPath) {
         String cutAudioCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vn %s";
-        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration, srcFile, targetFile);
+        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration, inputPath, outputPath);
         return cutAudioCmd.split(" ");
     }
 
@@ -51,11 +51,10 @@ public class FFmpegUtil {
      * concat all the audio together
      *
      * @param fileList   list of files
-     * @param targetFile output file
+     * @param outputPath output file
      * @return concat success or not
      */
-    public static String[] concatAudio(List<String> fileList, String targetFile) {
-//        ffmpeg -i concat:%s|%s -acodec copy %s
+    public static String[] concatAudio(List<String> fileList, String outputPath) {
         if (fileList == null || fileList.size() == 0) {
             return null;
         }
@@ -66,22 +65,22 @@ public class FFmpegUtil {
         }
         String concatStr = concatBuilder.substring(0, concatBuilder.length() - 1);
         String concatAudioCmd = "ffmpeg -i %s -acodec copy %s";
-        concatAudioCmd = String.format(concatAudioCmd, concatStr, targetFile);
+        concatAudioCmd = String.format(concatAudioCmd, concatStr, outputPath);
         return concatAudioCmd.split(" ");
     }
 
     /**
      * mix one and another audio
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param mixFile    background music
-     * @param targetFile output file
+     * @param outputPath output file
      * @return mix success or not
      */
-    public static String[] mixAudio(String srcFile, String mixFile, String targetFile) {
+    public static String[] mixAudio(String inputPath, String mixFile, String outputPath) {
         //adjust volume:using '-vol 50', which is form 0 to 100
         String mixAudioCmd = "ffmpeg -i %s -i %s -filter_complex amix=inputs=2:duration=first -strict -2 %s";
-        mixAudioCmd = String.format(mixAudioCmd, srcFile, mixFile, targetFile);
+        mixAudioCmd = String.format(mixAudioCmd, inputPath, mixFile, outputPath);
         return mixAudioCmd.split(" ");
     }
     //mixing formula: value = sample1 + sample2 - (sample1 * sample2 / (pow(2, 16-1) - 1))
@@ -104,70 +103,70 @@ public class FFmpegUtil {
     /**
      * extract audio from media file
      *
-     * @param srcFile    input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return demux audio success or not
      */
-    public static String[] extractAudio(String srcFile, String targetFile) {
+    public static String[] extractAudio(String inputPath, String outputPath) {
         //-vn: disable video
         String mixAudioCmd = "ffmpeg -i %s -acodec copy -vn %s";
-        mixAudioCmd = String.format(mixAudioCmd, srcFile, targetFile);
+        mixAudioCmd = String.format(mixAudioCmd, inputPath, outputPath);
         return mixAudioCmd.split(" ");
     }
 
     /**
      * extract pure video from media file
      *
-     * @param srcFile    input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return demux video success or not
      */
-    public static String[] extractVideo(String srcFile, String targetFile) {
+    public static String[] extractVideo(String inputPath, String outputPath) {
         //-an: disable audio
         String mixAudioCmd = "ffmpeg -i %s -vcodec copy -an %s";
-        mixAudioCmd = String.format(mixAudioCmd, srcFile, targetFile);
+        mixAudioCmd = String.format(mixAudioCmd, inputPath, outputPath);
         return mixAudioCmd.split(" ");
     }
 
     /**
      * transform video, according to your assigning the output format
      *
-     * @param srcFile    input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return transform video success or not
      */
-    public static String[] transformVideo(String srcFile, String targetFile) {
+    public static String[] transformVideo(String inputPath, String outputPath) {
         //just copy codec
 //        String transformVideoCmd = "ffmpeg -i %s -vcodec copy -acodec copy %s";
         // assign the frameRate, bitRate and resolution
 //        String transformVideoCmd = "ffmpeg -i %s -r 25 -b 200 -s 1080x720 %s";
         // assign the encoder
         String transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s";
-        transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
+        transformVideoCmd = String.format(transformVideoCmd, inputPath, outputPath);
         return transformVideoCmd.split(" ");
     }
 
     /**
      * Using FFmpeg to transform video, with re-encode
      *
-     * @param srcFile the source file
-     * @param targetFile target file
+     * @param inputPath  the source file
+     * @param outputPath target file
      * @return transform video success or not
      */
-    public static String[] transformVideoWithEncode(String srcFile, String targetFile) {
-        return transformVideoWithEncode(srcFile, 0, 0, targetFile);
+    public static String[] transformVideoWithEncode(String inputPath, String outputPath) {
+        return transformVideoWithEncode(inputPath, 0, 0, outputPath);
     }
 
     /**
      * Using FFmpeg to transform video, with re-encode and specific resolution
      *
-     * @param srcFile  the source file
-     * @param width the width of video
-     * @param height the height of video
-     * @param targetFile target file
+     * @param inputPath  the source file
+     * @param width      the width of video
+     * @param height     the height of video
+     * @param outputPath target file
      * @return transform video success or not
      */
-    public static String[] transformVideoWithEncode(String srcFile, int width, int height, String targetFile) {
+    public static String[] transformVideoWithEncode(String inputPath, int width, int height, String outputPath) {
         String transformVideoCmd;
         if (width > 0 && height > 0) {
             String scale = "-vf scale=" + width + ":" + height;
@@ -175,64 +174,63 @@ public class FFmpegUtil {
         } else {
             transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec aac " + "%s";
         }
-        transformVideoCmd = String.format(transformVideoCmd, srcFile, targetFile);
+        transformVideoCmd = String.format(transformVideoCmd, inputPath, outputPath);
         return transformVideoCmd.split(" ");
     }
 
     /**
      * joint every single video together
      * @param fileListPath the path file list
-     * @param targetPath output path
+     * @param outputPath   output path
      * @return joint video success or not
      */
-    public static String[] jointVideo(String fileListPath, String targetPath) {
+    public static String[] jointVideo(String fileListPath, String outputPath) {
         String jointVideoCmd = "ffmpeg -f concat -safe 0 -i %s -c copy %s";
-        jointVideoCmd = String.format(jointVideoCmd, fileListPath, targetPath);
+        jointVideoCmd = String.format(jointVideoCmd, fileListPath, outputPath);
         return jointVideoCmd.split(" ");
     }
 
     /**
      * cut video, you could assign the startTime and duration which you want to
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param startTime  startTime in the video(unit is second)
      * @param duration   duration
-     * @param targetFile output file
+     * @param outputPath output file
      * @return cut video success or not
      */
-    public static String[] cutVideo(String srcFile, int startTime, int duration, String targetFile) {
-        //assign encoders: ffmpeg -ss %d -t %d -i %s -acodec libmp3lame -vcodec libx264 %s
+    public static String[] cutVideo(String inputPath, int startTime, int duration, String outputPath) {
         String cutVideoCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vcodec copy %s";
-        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, srcFile, targetFile);
+        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
         return cutVideoCmd.split(" ");
     }
 
     /**
      * screenshot from video, you could assign the specific time
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param time       which time you want to shot
-     * @param targetFile output file
+     * @param outputPath output file
      * @return screenshot success or not
      */
-    public static String[] screenShot(String srcFile, int time, String targetFile) {
+    public static String[] screenShot(String inputPath, int time, String outputPath) {
         String screenShotCmd = "ffmpeg -ss %d -i %s -f image2 -vframes 1 -an %s";
-        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, time, srcFile, targetFile);
+        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, time, inputPath, outputPath);
         return screenShotCmd.split(" ");
     }
 
     /**
      * add watermark with image to video, you could assign the location and bitRate
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param imgPath    the path of the image
      * @param location   the location in the video(1:top left 2:top right 3:bottom left 4:bottom right)
      * @param bitRate    bitRate
      * @param offsetXY   the offset of x and y in the video
-     * @param targetFile output file
+     * @param outputPath output file
      * @return add watermark success or not
      */
-    public static String[] addWaterMarkImg(String srcFile, String imgPath, int location, int bitRate, int offsetXY, String targetFile) {
+    public static String[] addWaterMarkImg(String inputPath, String imgPath, int location, int bitRate, int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
         String overlay;
         int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
@@ -248,22 +246,22 @@ public class FFmpegUtil {
             overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + "'";
         }
         String waterMarkCmd = "ffmpeg -i %s -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
-        waterMarkCmd = String.format(waterMarkCmd, srcFile, imgPath, mBitRate, overlay, targetFile);
+        waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
         return waterMarkCmd.split(" ");
     }
 
     /**
      * add watermark with gif to video, you could assign the location and bitRate
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param imgPath    the path of the gif
      * @param location   the location in the video(1:top left 2:top right 3:bottom left 4:bottom right)
      * @param bitRate    bitRate
      * @param offsetXY   the offset of x and y in the video
-     * @param targetFile output file
+     * @param outputPath output file
      * @return add watermark success or not
      */
-    public static String[] addWaterMarkGif(String srcFile, String imgPath, int location, int bitRate, int offsetXY, String targetFile) {
+    public static String[] addWaterMarkGif(String inputPath, String imgPath, int location, int bitRate, int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
         String overlay;
         int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
@@ -279,62 +277,62 @@ public class FFmpegUtil {
             overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + ":shortest=1'";
         }
         String waterMarkCmd = "ffmpeg -i %s -ignore_loop 0 -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
-        waterMarkCmd = String.format(waterMarkCmd, srcFile, imgPath, mBitRate, overlay, targetFile);
+        waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
         return waterMarkCmd.split(" ");
     }
 
     /**
      * generate a palette for gif
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param frameRate  frameRate of the gif
      * @param startTime  startTime in the video
      * @param duration   duration, how long you want to
      * @param width      width
-     * @param targetFile output file
+     * @param outputPath output file
      * @return generate palette success or not
      */
-    public static String[] generatePalette(String srcFile, int startTime, int duration,
-                                           int frameRate, int width, String targetFile) {
+    public static String[] generatePalette(String inputPath, int startTime, int duration,
+                                           int frameRate, int width, String outputPath) {
         String paletteCmd = "ffmpeg -ss %d -t %d -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
         paletteCmd = String.format(Locale.getDefault(), paletteCmd, startTime,
-                duration, srcFile, frameRate, width, targetFile);
+                duration, inputPath, frameRate, width, outputPath);
         return paletteCmd.split(" ");
     }
 
     /**
      * convert video into gif with palette
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param palette    the palette which will apply to gif
      * @param startTime  startTime in the video
      * @param duration   duration, how long you want to
      * @param frameRate  frameRate of the gif
      * @param width      width
-     * @param targetFile output gif
+     * @param outputPath output gif
      * @return convert gif success or not
      */
-    public static String[] generateGifByPalette(String srcFile, String palette, int startTime, int duration,
-                                           int frameRate, int width, String targetFile) {
+    public static String[] generateGifByPalette(String inputPath, String palette, int startTime, int duration,
+                                           int frameRate, int width, String outputPath) {
         String paletteGifCmd = "ffmpeg -ss %d -t %d -i %s -i %s -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
                 "paletteuse=dither=bayer:bayer_scale=3 %s";
         paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, startTime,
-                duration, srcFile, palette, frameRate, width, targetFile);
+                duration, inputPath, palette, frameRate, width, outputPath);
         return paletteGifCmd.split(" ");
     }
 
     /**
      * convert s series of pictures into video
      *
-     * @param srcFile    input file
+     * @param inputPath  input file
      * @param frameRate  frameRate
-     * @param targetFile output file
+     * @param outputPath output file
      * @return convert success or not
      */
-    public static String[] pictureToVideo(String srcFile, int frameRate, String targetFile) {
+    public static String[] pictureToVideo(String inputPath, int frameRate, String outputPath) {
         //-f: stand for format
         String combineVideo = "ffmpeg -f image2 -r %d -i %simg#d.jpg -vcodec mpeg4 %s";
-        combineVideo = String.format(Locale.getDefault(), combineVideo, frameRate, srcFile, targetFile);
+        combineVideo = String.format(Locale.getDefault(), combineVideo, frameRate, inputPath, outputPath);
         combineVideo = combineVideo.replace("#", "%");
         return combineVideo.split(" ");
     }
@@ -342,29 +340,29 @@ public class FFmpegUtil {
     /**
      * convert resolution
      *
-     * @param srcFile    input file
+     * @param inputPath   input file
      * @param resolution  resolution
-     * @param targetFile output file
+     * @param outputPath  output file
      * @return convert success or not
      */
-    public static String[] convertResolution(String srcFile, String resolution, String targetFile) {
+    public static String[] convertResolution(String inputPath, String resolution, String outputPath) {
         String convertCmd = "ffmpeg -i %s -s %s -pix_fmt yuv420p %s";
-        convertCmd = String.format(Locale.getDefault(), convertCmd, srcFile, resolution, targetFile);
+        convertCmd = String.format(Locale.getDefault(), convertCmd, inputPath, resolution, outputPath);
         return convertCmd.split(" ");
     }
 
     /**
      * encode audio, you could assign the sampleRate and channel
      *
-     * @param srcFile    pcm raw audio
-     * @param targetFile output file
+     * @param inputPath  pcm raw audio
+     * @param outputPath output file
      * @param sampleRate sampleRate
      * @param channel    sound channel: mono channel is 1, stereo channel is 2
      * @return encode audio success or not
      */
-    public static String[] encodeAudio(String srcFile, String targetFile, int sampleRate, int channel) {
+    public static String[] encodeAudio(String inputPath, String outputPath, int sampleRate, int channel) {
         String combineVideo = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
-        combineVideo = String.format(Locale.getDefault(), combineVideo, sampleRate, channel, srcFile, targetFile);
+        combineVideo = String.format(Locale.getDefault(), combineVideo, sampleRate, channel, inputPath, outputPath);
         return combineVideo.split(" ");
     }
 
@@ -374,71 +372,69 @@ public class FFmpegUtil {
      * @param input1      input one
      * @param input2      input two
      * @param videoLayout the layout of video, which could be horizontal or vertical
-     * @param targetFile  output file
+     * @param outputPath  output file
      * @return join success or not
      */
-    public static String[] multiVideo(String input1, String input2, String targetFile, int videoLayout) {
-//        String multiVideo = "ffmpeg -i %s -i %s -i %s -i %s -filter_complex " +
-//                "\"[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h\" %s";
+    public static String[] multiVideo(String input1, String input2, String outputPath, int videoLayout) {
         String multiVideo = "ffmpeg -i %s -i %s -filter_complex hstack %s";//hstack: horizontal
         if (videoLayout == VideoLayout.LAYOUT_VERTICAL) {//vstack: vertical
             multiVideo = multiVideo.replace("hstack", "vstack");
         }
-        multiVideo = String.format(multiVideo, input1, input2, targetFile);
+        multiVideo = String.format(multiVideo, input1, input2, outputPath);
         return multiVideo.split(" ");
     }
 
     /**
      * reverse video
      *
-     * @param inputFile  input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return reverse success or not
      */
-    public static String[] reverseVideo(String inputFile, String targetFile) {
+    public static String[] reverseVideo(String inputPath, String outputPath) {
         //-vf reverse: only video reverse, -an: disable audio
         //tip: reverse will cost a lot of time, only short video are recommended
         String reverseVideo = "ffmpeg -i %s -vf reverse -an %s";
-        reverseVideo = String.format(reverseVideo, inputFile, targetFile);
+        reverseVideo = String.format(reverseVideo, inputPath, outputPath);
         return reverseVideo.split(" ");
     }
 
     /**
      * noise reduction with video
      *
-     * @param inputFile  input file
-     * @param targetFile output file
+     * @param inputPath  input file
+     * @param outputPath output file
      * @return noise reduction success or not
      */
-    public static String[] denoiseVideo(String inputFile, String targetFile) {
+    public static String[] denoiseVideo(String inputPath, String outputPath) {
         String denoiseVideo = "ffmpeg -i %s -nr 500 %s";
-        denoiseVideo = String.format(denoiseVideo, inputFile, targetFile);
+        denoiseVideo = String.format(denoiseVideo, inputPath, outputPath);
         return denoiseVideo.split(" ");
     }
 
     /**
      * covert video into a series of pictures
      *
-     * @param inputFile  input file
+     * @param inputPath  input file
      * @param startTime  startTime in the video
      * @param duration   duration, how long you want
      * @param frameRate  frameRate
-     * @param targetFile output file
+     * @param outputPath output file
      * @return convert success or not
      */
-    public static String[] videoToImage(String inputFile, int startTime, int duration, int frameRate, String targetFile) {
-        return videoToImageWithScale(inputFile, startTime, duration, frameRate, 0, targetFile);
+    public static String[] videoToImage(String inputPath, int startTime, int duration, int frameRate, String outputPath) {
+        return videoToImageWithScale(inputPath, startTime, duration, frameRate, 0, outputPath);
     }
 
-    public static String[] videoToImageWithScale(String inputFile, int startTime, int duration,
-                                                 int frameRate, int width, String targetFile) {
+    public static String[] videoToImageWithScale(String inputPath, int startTime, int duration,
+                                                 int frameRate, int width, String outputPath) {
         String toImage;
         if (width > 0) {
             toImage = "ffmpeg -ss %d -t %d -i %s -an -vf fps=%d,scale=%d:-1 %s";
-            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputFile, frameRate, width, targetFile);
+            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputPath, frameRate, width, outputPath);
         } else {
             toImage = "ffmpeg -ss %d -t %d -i %s -an -r %d %s";
-            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputFile, frameRate, targetFile);
+            toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputPath, frameRate, outputPath);
         }
         toImage = toImage + "%3d.png";
         return toImage.split(" ");
@@ -449,54 +445,54 @@ public class FFmpegUtil {
      *
      * @param inputFile1 input one
      * @param inputFile2 input two
-     * @param targetFile output file
+     * @param outputPath output file
      * @param x          x coordinate point
      * @param y          y coordinate point
      * @return convert success or not
      */
-    public static String[] picInPicVideo(String inputFile1, String inputFile2, int x, int y, String targetFile) {
+    public static String[] picInPicVideo(String inputFile1, String inputFile2, int x, int y, String outputPath) {
         String pipVideo = "ffmpeg -i %s -i %s -filter_complex overlay=%d:%d %s";
-        pipVideo = String.format(Locale.getDefault(), pipVideo, inputFile1, inputFile2, x, y, targetFile);
+        pipVideo = String.format(Locale.getDefault(), pipVideo, inputFile1, inputFile2, x, y, outputPath);
         return pipVideo.split(" ");
     }
 
     /**
      * move moov box in the front of mdat box, when moox box is behind mdat box(only mp4)
      *
-     * @param inputFile  inputFile
-     * @param outputFile outputFile
+     * @param inputPath  inputFile
+     * @param outputPath outputFile
      * @return move success or not
      */
-    public static String[] moveMoovAhead(String inputFile, String outputFile) {
+    public static String[] moveMoovAhead(String inputPath, String outputPath) {
         String moovCmd = "ffmpeg -i %s -movflags faststart -acodec copy -vcodec copy %s";
-        moovCmd = String.format(Locale.getDefault(), moovCmd, inputFile, outputFile);
+        moovCmd = String.format(Locale.getDefault(), moovCmd, inputPath, outputPath);
         return moovCmd.split(" ");
     }
 
     /**
      * using FFprobe to parse the media format
      *
-     * @param inputFile  inputFile
+     * @param inputPath  inputFile
      * @return probe success or not
      */
-    public static String[] probeFormat(String inputFile) {
+    public static String[] probeFormat(String inputPath) {
         //show format:ffprobe -i %s -show_format -print_format json
         //show stream:ffprobe -i %s -show_streams
         String ffprobeCmd = "ffprobe -i %s -show_streams -show_format -print_format json";
-        ffprobeCmd = String.format(Locale.getDefault(), ffprobeCmd, inputFile);
+        ffprobeCmd = String.format(Locale.getDefault(), ffprobeCmd, inputPath);
         return ffprobeCmd.split(" ");
     }
 
     /**
      * Changing the speed of playing, speed range at 0.5-2 in audio-video mode.
      * However, in pure video mode, the speed range at 0.25-4
-     * @param inputFile the inputFile of normal speed
-     * @param outputFile the outputFile which you want to change speed
-     * @param speed speed of playing
-     * @param pureVideo whether pure video or not, default false
+     * @param inputPath  the inputFile of normal speed
+     * @param outputPath the outputFile which you want to change speed
+     * @param speed      speed of playing
+     * @param pureVideo  whether pure video or not, default false
      * @return change speed success or not
      */
-    public static String[] changeSpeed(String inputFile, String outputFile, float speed, boolean pureVideo) {
+    public static String[] changeSpeed(String inputPath, String outputPath, float speed, boolean pureVideo) {
         //audio atempo: 0.5--2
         //video pts:0.25--4
         if (pureVideo) {
@@ -512,39 +508,39 @@ public class FFmpegUtil {
         String speedCmd;
         if (pureVideo) {
             speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v] -map [v] %s";
-            speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, outputFile);
+            speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, ptsFactor, outputPath);
         } else {
             speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] %s";
-            speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, ptsFactor, speed, outputFile);
+            speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, ptsFactor, speed, outputPath);
         }
         return speedCmd.split(" ");
     }
 
     /**
      * Changing the speed of playing, speed range at 0.5-2 in audio.
-     * @param inputFile the inputFile of normal speed
-     * @param outputFile the outputFile which you want to change speed
+     * @param inputPath the inputFile of normal speed
+     * @param outputPath the outputFile which you want to change speed
      * @param speed speed of playing
      * @return change speed success or not
      */
-    public static String[] changeAudioSpeed(String inputFile, String outputFile, float speed) {
+    public static String[] changeAudioSpeed(String inputPath, String outputPath, float speed) {
         if (speed > 2 || speed < 0.5) {
             throw new IllegalArgumentException("audio speed range is from 0.5 to 2");
         }
         String speedCmd = "ffmpeg -i %s -filter_complex atempo=%.2f %s";
-        speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, speed, outputFile);
+        speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, speed, outputPath);
         return speedCmd.split(" ");
     }
 
     /**
      * Rebuild the keyframe index of FLV, make it seekable
-     * @param inputFile inputFile
-     * @param targetFile targetFile
+     * @param inputPath inputFile
+     * @param outputPath targetFile
      * @return command of build flv index
      */
-    public static String[] buildFlvIndex(String inputFile, String targetFile) {
+    public static String[] buildFlvIndex(String inputPath, String outputPath) {
         String buildIndex = "ffmpeg -i %s -flvflags add_keyframe_index %s";
-        buildIndex = String.format(buildIndex, inputFile, targetFile);
+        buildIndex = String.format(buildIndex, inputPath, outputPath);
         return buildIndex.split(" ");
     }
 
@@ -553,13 +549,13 @@ public class FFmpegUtil {
      * After publish the streams, you could use VLC to play it
      * Note: if stream is rtmp protocol, need to start your rtmp server
      * Note: if stream is http protocol, need to start your http server
-     * @param inputFile inputFile
+     * @param inputPath inputFile
      * @param duration how long of inputFile you want to publish
      * @param streamUrl1 the url of stream1
      * @param streamUrl2 the url of stream2
      * @return command of build flv index
      */
-    public static String[] pushMultiStreams(String inputFile, int duration, String streamUrl1, String streamUrl2) {
+    public static String[] pushMultiStreams(String inputPath, int duration, String streamUrl1, String streamUrl2) {
         //ffmpeg -i what.mp4 -vcodec libx264 -acodec aac -t 60 -f flv
         //"tee:rtmp://192.168.1.102/live/stream1|rtmp://192.168.1.102/live/stream2"
         String format = "flv";
@@ -569,7 +565,7 @@ public class FFmpegUtil {
             format = "mpegts";
         }
         String pushStreams = "ffmpeg -i %s -vcodec libx264 -acodec aac -t %d -f %s \"tee:%s|%s\"";
-        pushStreams = String.format(Locale.getDefault(), pushStreams, inputFile, duration, format, streamUrl1, streamUrl2);
+        pushStreams = String.format(Locale.getDefault(), pushStreams, inputPath, duration, format, streamUrl1, streamUrl2);
         return pushStreams.split(" ");
     }
 
