@@ -8,6 +8,7 @@
     <string name="audio_opensl">OpenSL play</string>
     <string name="audio_encode">Audio encode</string>
     <string name="pcm_concat">PCM concat</string>
+    <string name="audio_speed">Audio speed</string>
 
     <string name="audio_handle">Audio handle</string>
     <string name="media_handle">Media handle</string>

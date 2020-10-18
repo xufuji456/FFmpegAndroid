@@ -108,7 +108,8 @@ public class AudioHandleActivity extends BaseActivity {
                 R.id.btn_play_audio,
                 R.id.btn_play_opensl,
                 R.id.btn_audio_encode,
-                R.id.btn_pcm_concat
+                R.id.btn_pcm_concat,
+                R.id.btn_audio_speed
         );
     }
 
@@ -208,6 +209,11 @@ public class AudioHandleActivity extends BaseActivity {
                 FileUtil.concatFile(srcPCM, appendPCM, concatPCM);
                 mHandler.obtainMessage(MSG_FINISH).sendToTarget();
                 return;
+            case R.id.btn_audio_speed://change audio speed
+                float speed = 2.0f;//from 0.5 to 2.0
+                String speedPath = PATH + File.separator + "speed.mp3";
+                commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed);
+                break;
             default:
                 break;
         }

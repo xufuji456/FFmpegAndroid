@@ -521,6 +521,22 @@ public class FFmpegUtil {
     }
 
     /**
+     * Changing the speed of playing, speed range at 0.5-2 in audio.
+     * @param inputFile the inputFile of normal speed
+     * @param outputFile the outputFile which you want to change speed
+     * @param speed speed of playing
+     * @return change speed success or not
+     */
+    public static String[] changeAudioSpeed(String inputFile, String outputFile, float speed) {
+        if (speed > 2 || speed < 0.5) {
+            throw new IllegalArgumentException("audio speed range is from 0.5 to 2");
+        }
+        String speedCmd = "ffmpeg -i %s -filter_complex atempo=%.2f %s";
+        speedCmd = String.format(Locale.getDefault(), speedCmd, inputFile, speed, outputFile);
+        return speedCmd.split(" ");
+    }
+
+    /**
      * Rebuild the keyframe index of FLV, make it seekable
      * @param inputFile inputFile
      * @param targetFile targetFile
