@@ -9,6 +9,12 @@
     <string name="audio_encode">Audio encode</string>
     <string name="pcm_concat">PCM concat</string>
     <string name="audio_speed">Audio speed</string>
+    <string name="audio_effect">Audio effect</string>
+    <string name="audio_equalizer">Audio equalizer:</string>
+    <string name="audio_style">Audio style:</string>
+    <string name="audio_reverb">Audio reverb:</string>
+    <string name="audio_bass_boost">Bass boost:</string>
+    <string name="audio_voice_enhancer">Voice enhancer:</string>
 
     <string name="audio_handle">Audio handle</string>
     <string name="media_handle">Media handle</string>

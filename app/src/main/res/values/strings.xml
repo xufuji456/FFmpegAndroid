@@ -9,6 +9,12 @@
     <string name="audio_encode">音频编码</string>
     <string name="pcm_concat">PCM合并</string>
     <string name="audio_speed">音频速度</string>
+    <string name="audio_effect">音乐均衡器</string>
+    <string name="audio_equalizer">均衡器:</string>
+    <string name="audio_style">风格:</string>
+    <string name="audio_reverb">混响:</string>
+    <string name="audio_bass_boost">重低音:</string>
+    <string name="audio_voice_enhancer">声音增强:</string>
 
     <string name="audio_handle">音频处理</string>
     <string name="media_handle">音视频处理</string>

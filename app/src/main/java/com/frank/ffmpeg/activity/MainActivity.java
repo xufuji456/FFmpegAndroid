@@ -30,7 +30,8 @@ public class MainActivity extends BaseActivity {
                 R.id.btn_live,
                 R.id.btn_filter,
                 R.id.btn_preview,
-                R.id.btn_probe
+                R.id.btn_probe,
+                R.id.btn_audio_effect
         );
     }
 
@@ -64,6 +65,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.btn_probe://probe media format
                 intent.setClass(MainActivity.this, ProbeFormatActivity.class);
+                break;
+            case R.id.btn_audio_effect://audio effect
+                intent.setClass(MainActivity.this, AudioEffectActivity.class);
                 break;
             default:
                 break;

@@ -8,57 +8,54 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:name=".FFmpegApplication"
-        tools:replace="android:name"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:name">
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- audio handle -->
-        <activity android:name=".activity.AudioHandleActivity" />
-        <!-- media handle -->
-        <activity android:name=".activity.MediaHandleActivity" />
-        <!-- video handle -->
-        <activity android:name=".activity.VideoHandleActivity" />
-        <!-- media player -->
+        </activity> <!-- audio handle -->
+        <activity android:name=".activity.AudioHandleActivity" /> <!-- media handle -->
+        <activity android:name=".activity.MediaHandleActivity" /> <!-- video handle -->
+        <activity android:name=".activity.VideoHandleActivity" /> <!-- media player -->
         <activity
             android:name=".activity.MediaPlayerActivity"
-            android:screenOrientation="landscape" />
-        <!-- local pusher -->
-        <activity
-            android:name=".activity.PushActivity" />
-        <!-- real time pusher -->
+            android:screenOrientation="landscape" /> <!-- local pusher -->
+        <activity android:name=".activity.PushActivity" /> <!-- real time pusher -->
         <activity
             android:name=".activity.LiveActivity"
-            android:screenOrientation="portrait" />
-        <!-- filter effect -->
+            android:screenOrientation="portrait" /> <!-- filter effect -->
         <activity
             android:name=".activity.FilterActivity"
-            android:screenOrientation="landscape" />
-        <!-- video preview -->
-        <activity android:name=".activity.VideoPreviewActivity"
+            android:screenOrientation="landscape" /> <!-- video preview -->
+        <activity
+            android:name=".activity.VideoPreviewActivity"
+            android:screenOrientation="portrait" /> <!-- probe media format -->
+        <activity
+            android:name=".activity.ProbeFormatActivity"
             android:screenOrientation="portrait" />
-        <!-- probe media format -->
-        <activity android:name=".activity.ProbeFormatActivity"
+        <activity android:name=".activity.AudioEffectActivity"
             android:screenOrientation="portrait" />
     </application>
 

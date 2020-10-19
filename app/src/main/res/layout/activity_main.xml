@@ -76,6 +76,13 @@
                 android:text="@string/media_probe"
                 android:layout_marginTop="10dp" />
 
+            <Button
+                android:id="@+id/btn_audio_effect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/audio_effect"
+                android:layout_marginTop="10dp" />
+
         </LinearLayout>
     </ScrollView>
 
