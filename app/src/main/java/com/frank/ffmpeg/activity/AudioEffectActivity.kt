@@ -63,7 +63,8 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
     private val onPreparedListener = MediaPlayer.OnPreparedListener {
         setupEqualizer()
         setupPresetStyle()
-        setupReverberation()
+        // some mobiles throws error here
+//        setupReverberation()
         setupBassBoost()
         setLoudnessEnhancer()
         setupVisualizer()
@@ -244,12 +245,12 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
     override fun onDestroy() {
         super.onDestroy()
 
-        mEqualizer!!.release()
-        mPresetReverb!!.release()
-        mBass!!.release()
-        loudnessEnhancer!!.release()
+        mEqualizer?.release()
+        mPresetReverb?.release()
+        mBass?.release()
+        loudnessEnhancer?.release()
         releaseVisualizer()
-        mPlayer!!.release()
+        mPlayer?.release()
     }
 
 }

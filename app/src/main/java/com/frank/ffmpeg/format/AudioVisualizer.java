@@ -1,7 +1,7 @@
 package com.frank.ffmpeg.format;
 
 import android.media.audiofx.Visualizer;
-import android.os.Build;
+import android.util.Log;
 
 /**
  * Visualizer of Audio frequency
@@ -12,14 +12,19 @@ public class AudioVisualizer {
     private Visualizer visualizer;
 
     public void initVisualizer(int audioSession, boolean waveform, boolean fft, Visualizer.OnDataCaptureListener dataCaptureListener) {
-        visualizer = new Visualizer(audioSession);
-        int captureSize = Visualizer.getCaptureSizeRange()[1];
-        int captureRate = Visualizer.getMaxCaptureRate() / 2;
+        try {
+            visualizer = new Visualizer(audioSession);
+            int captureSize = Visualizer.getCaptureSizeRange()[1];
+            int captureRate = Visualizer.getMaxCaptureRate() / 2;
 
-        visualizer.setCaptureSize(captureSize);
-        visualizer.setDataCaptureListener(dataCaptureListener, captureRate, waveform, fft);
-        visualizer.setScalingMode(Visualizer.SCALING_MODE_NORMALIZED);
-        visualizer.setEnabled(true);
+            visualizer.setCaptureSize(captureSize);
+            visualizer.setDataCaptureListener(dataCaptureListener, captureRate, waveform, fft);
+            visualizer.setScalingMode(Visualizer.SCALING_MODE_NORMALIZED);
+            visualizer.setEnabled(true);
+        } catch (Exception e) {
+            Log.e("AudioVisualizer", "initVisualizer error=" + e.toString());
+            releaseVisualizer();
+        }
     }
 
     public void releaseVisualizer() {
