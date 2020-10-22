@@ -42,7 +42,7 @@ public class FFmpegUtil {
      * @return cut success or not
      */
     public static String[] cutAudio(String inputPath, int startTime, int duration, String outputPath) {
-        String cutAudioCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vn %s";
+        String cutAudioCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vn %s";
         cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration, inputPath, outputPath);
         return cutAudioCmd.split(" ");
     }
@@ -200,7 +200,7 @@ public class FFmpegUtil {
      * @return cut video success or not
      */
     public static String[] cutVideo(String inputPath, int startTime, int duration, String outputPath) {
-        String cutVideoCmd = "ffmpeg -ss %d -t %d -i %s -acodec copy -vcodec copy %s";
+        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vcodec copy -no_negative_ts 1 %s";
         cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
         return cutVideoCmd.split(" ");
     }
@@ -294,7 +294,7 @@ public class FFmpegUtil {
      */
     public static String[] generatePalette(String inputPath, int startTime, int duration,
                                            int frameRate, int width, String outputPath) {
-        String paletteCmd = "ffmpeg -ss %d -t %d -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
+        String paletteCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
         paletteCmd = String.format(Locale.getDefault(), paletteCmd, startTime,
                 duration, inputPath, frameRate, width, outputPath);
         return paletteCmd.split(" ");
@@ -314,7 +314,7 @@ public class FFmpegUtil {
      */
     public static String[] generateGifByPalette(String inputPath, String palette, int startTime, int duration,
                                            int frameRate, int width, String outputPath) {
-        String paletteGifCmd = "ffmpeg -ss %d -t %d -i %s -i %s -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
+        String paletteGifCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -i %s -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
                 "paletteuse=dither=bayer:bayer_scale=3 %s";
         paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, startTime,
                 duration, inputPath, palette, frameRate, width, outputPath);
@@ -430,10 +430,10 @@ public class FFmpegUtil {
                                                  int frameRate, int width, String outputPath) {
         String toImage;
         if (width > 0) {
-            toImage = "ffmpeg -ss %d -t %d -i %s -an -vf fps=%d,scale=%d:-1 %s";
+            toImage = "ffmpeg -ss %d -accurate_seek -t %d -i %s -an -vf fps=%d,scale=%d:-1 %s";
             toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputPath, frameRate, width, outputPath);
         } else {
-            toImage = "ffmpeg -ss %d -t %d -i %s -an -r %d %s";
+            toImage = "ffmpeg -ss %d -accurate_seek -t %d -i %s -an -r %d %s";
             toImage = String.format(Locale.CHINESE, toImage, startTime, duration, inputPath, frameRate, outputPath);
         }
         toImage = toImage + "%3d.png";
