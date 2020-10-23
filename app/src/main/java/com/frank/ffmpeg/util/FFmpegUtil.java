@@ -200,7 +200,7 @@ public class FFmpegUtil {
      * @return cut video success or not
      */
     public static String[] cutVideo(String inputPath, int startTime, int duration, String outputPath) {
-        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vcodec copy -no_negative_ts 1 %s";
+        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vcodec copy -avoid_negative_ts 1 %s";
         cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
         return cutVideoCmd.split(" ");
     }
