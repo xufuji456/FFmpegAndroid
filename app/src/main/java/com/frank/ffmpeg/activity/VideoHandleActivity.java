@@ -26,7 +26,6 @@ import com.frank.ffmpeg.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN;
 import static com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH;
@@ -51,6 +50,7 @@ public class VideoHandleActivity extends BaseActivity {
     private final static int TYPE_IMAGE = 1;
     private final static int TYPE_GIF   = 2;
     private final static int TYPE_TEXT  = 3;
+    private final static int waterMarkType = TYPE_IMAGE;
 
     private String appendPath = PATH + File.separator + "snow.mp4";
     private String outputPath1 = PATH + File.separator + "output1.ts";
@@ -201,10 +201,9 @@ public class VideoHandleActivity extends BaseActivity {
                 //1:top left 2:top right 3:bottom left 4:bottom right
                 int location = 2;
                 int offsetXY = 5;
-                int waterMarkType = 1;
                 switch (waterMarkType) {
                     case TYPE_IMAGE:// image
-                        String photo = PATH + File.separator + "launcher.png";
+                        String photo = PATH + File.separator + "hello.png";
                         String photoMark = PATH + File.separator + "photoMark.mp4";
                         commandLine = FFmpegUtil.addWaterMarkImg(srcFile, photo, location, bitRate, offsetXY, photoMark);
                         break;

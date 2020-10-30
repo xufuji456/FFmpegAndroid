@@ -219,6 +219,20 @@ public class FFmpegUtil {
         return screenShotCmd.split(" ");
     }
 
+    private static String obtainOverlay(int offsetX, int offsetY, int location) {
+        switch (location) {
+            case 2:
+                return "overlay='(main_w-overlay_w)-" + offsetX + ":" + offsetY + "'";
+            case 3:
+                return "overlay='" + offsetX + ":(main_h-overlay_h)-" + offsetY + "'";
+            case 4:
+                return "overlay='(main_w-overlay_w)-" + offsetX + ":(main_h-overlay_h)-" + offsetY + "'";
+            case 1:
+            default:
+                return "overlay=" + offsetX + ":" + offsetY;
+        }
+    }
+
     /**
      * add watermark with image to video, you could assign the location and bitRate
      *
@@ -230,21 +244,11 @@ public class FFmpegUtil {
      * @param outputPath output file
      * @return add watermark success or not
      */
-    public static String[] addWaterMarkImg(String inputPath, String imgPath, int location, int bitRate, int offsetXY, String outputPath) {
+    public static String[] addWaterMarkImg(String inputPath, String imgPath, int location, int bitRate,
+                                           int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
-        String overlay;
         int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
-        if (location == 1) {
-            overlay = "overlay='" + offset + ":" + offset + "'";
-        } else if (location == 2) {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + "'";
-        } else if (location == 3) {
-            overlay = "overlay='" + offset + ":(main_h-overlay_h)-" + offset + "'";
-        } else if (location == 4) {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":(main_h-overlay_h)-" + offset + "'";
-        } else {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + "'";
-        }
+        String overlay = obtainOverlay(offset, offset, location);
         String waterMarkCmd = "ffmpeg -i %s -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
         waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
         return waterMarkCmd.split(" ");
@@ -261,21 +265,11 @@ public class FFmpegUtil {
      * @param outputPath output file
      * @return add watermark success or not
      */
-    public static String[] addWaterMarkGif(String inputPath, String imgPath, int location, int bitRate, int offsetXY, String outputPath) {
+    public static String[] addWaterMarkGif(String inputPath, String imgPath, int location, int bitRate,
+                                           int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
-        String overlay;
         int offset = ScreenUtil.dp2px(FFmpegApplication.getInstance(), offsetXY);
-        if (location == 1) {
-            overlay = "overlay='" + offset + ":" + offset + ":shortest=1'";
-        } else if (location == 2) {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + ":shortest=1'";
-        } else if (location == 3) {
-            overlay = "overlay='" + offset + ":(main_h-overlay_h)-" + offset + ":shortest=1'";
-        } else if (location == 4) {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":(main_h-overlay_h)-" + offset + ":shortest=1'";
-        } else {
-            overlay = "overlay='(main_w-overlay_w)-" + offset + ":" + offset + ":shortest=1'";
-        }
+        String overlay = obtainOverlay(offset, offset, location) + ":shortest=1";
         String waterMarkCmd = "ffmpeg -i %s -ignore_loop 0 -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
         waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
         return waterMarkCmd.split(" ");
