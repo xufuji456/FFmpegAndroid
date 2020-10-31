@@ -81,7 +81,7 @@ build_one(){
 --disable-decoders \
 --enable-decoder=mpeg4,h264,flv,gif,hevc,vp9,wmv3,png,ljpeg,jpeg2000,mjpeg,\
 aac,m4a,amrnb,amrwb,ape,dolby_e,dst,flac,opus,vorbis,wavesynth,wavpack,wmav2,\
-mp3float,mp3,mp3_at,mp3adufloat,mp3adu,mp3on4float,mp3on4,aac_fixed,aac_at,aac_latm,pcm_s16be,pcm_s16le \
+mp3float,mp3,mp3_at,mp3adufloat,mp3adu,mp3on4float,mp3on4,aac_fixed,aac_at,aac_latm,pcm_s16be,pcm_s16le,gif \
 --enable-muxers \
 --enable-parsers \
 --enable-protocols \
