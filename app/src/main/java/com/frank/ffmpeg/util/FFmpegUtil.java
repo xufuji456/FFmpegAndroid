@@ -90,13 +90,18 @@ public class FFmpegUtil {
      *
      * @param videoFile the file of pure video
      * @param audioFile the file of pure audio
-     * @param duration  the duration of video
+     * @param copy      copy codec
      * @param muxFile   output file
      * @return mux success or not
      */
-    public static String[] mediaMux(String videoFile, String audioFile, int duration, String muxFile) {
-        String mixAudioCmd = "ffmpeg -i %s -i %s -t %d %s";
-        mixAudioCmd = String.format(Locale.getDefault(), mixAudioCmd, videoFile, audioFile, duration, muxFile);
+    public static String[] mediaMux(String videoFile, String audioFile, boolean copy, String muxFile) {
+        String mixAudioCmd;
+        if (copy) {
+            mixAudioCmd = "ffmpeg -i %s -i %s -codec copy -y %s";
+        } else {
+            mixAudioCmd = "ffmpeg -i %s -i %s -y %s";
+        }
+        mixAudioCmd = String.format(Locale.getDefault(), mixAudioCmd, videoFile, audioFile, muxFile);
         return mixAudioCmd.split(" ");
     }
 

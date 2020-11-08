@@ -27,6 +27,7 @@
     <string name="media_extract_video">Video extract</string>
     <string name="media_play">Media play</string>
     <string name="media_probe">Media probe</string>
+    <string name="media_dubbing">Media dubbing</string>
 
     <string name="video_cut">Video cut</string>
     <string name="video_concat">Video concat</string>
