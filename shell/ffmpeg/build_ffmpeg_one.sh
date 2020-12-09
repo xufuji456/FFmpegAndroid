@@ -42,7 +42,7 @@ export EXTRA_CFLAGS="-Os -fpic $OPTIMIZE_CFLAGS -I$LAMEDIR/include"
 export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$LAMEDIR/lib"
 
 build_one(){
-  ./configure --target-os=linux --prefix=$PREFIX \
+  ./configure --target-os=android --prefix=$PREFIX \
 --enable-cross-compile \
 --arch=$CPU \
 --cc=$TOOLCHAIN/bin/$CPU-linux-$ANDROID-gcc \
@@ -90,6 +90,12 @@ pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,pcm_u32be,pcm_u32le,pcm_vidc,pcm_zork,ad
 --enable-muxers \
 --enable-parsers \
 --enable-protocols \
+--enable-jni \
+--enable-mediacodec \
+--enable-decoder=h264_mediacodec \
+--enable-decoder=hevc_mediacodec \
+--enable-decoder=mpeg4_mediacodec \
+--enable-decoder=vp9_mediacodec \
 --disable-demuxers \
 --enable-demuxer=aac,ac3,alaw,amr,amrnb,amrwb,ape,asf,asf_o,avi,cavsvideo,codec2,concat,dnxhd,eac3,flac,flv,\
 gif,gif_pipe,h263,h264,hevc,hls,image2,image2pipe,jpeg_pipe,lrc,m4v,matroska,webm,mjpeg,mov,mp4,m4a,3gp,mp3,mpeg,\

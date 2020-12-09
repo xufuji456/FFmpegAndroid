@@ -40,7 +40,7 @@ export EXTRA_CFLAGS="-Os -fpic $OPTIMIZE_CFLAGS -I$LAMEDIR/include"
 export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$LAMEDIR/lib"
 
 build_one(){
-  ./configure --target-os=linux --prefix=$PREFIX \
+  ./configure --target-os=android --prefix=$PREFIX \
 --enable-cross-compile \
 --arch=$CPU \
 --cc=$TOOLCHAIN/bin/$CPU-linux-$ANDROID-gcc \
@@ -85,6 +85,12 @@ mp3float,mp3,mp3_at,mp3adufloat,mp3adu,mp3on4float,mp3on4,aac_fixed,aac_at,aac_l
 --enable-muxers \
 --enable-parsers \
 --enable-protocols \
+--enable-jni \
+--enable-mediacodec \
+--enable-decoder=h264_mediacodec \
+--enable-decoder=hevc_mediacodec \
+--enable-decoder=mpeg4_mediacodec \
+--enable-decoder=vp9_mediacodec \
 --disable-demuxers \
 --enable-demuxer=aac,ac3,amr,amrnb,amrwb,ape,asf,asf_o,ast,avi,caf,cavsvideo,codec2,concat,data,dnxhd,flac,flv,g722,g729,\
 gif,gif_pipe,h264,hevc,hls,image2,image2pipe,ingenient,jpeg_pipe,lavfi,lrc,m4v,matroska,webm,mjpeg,mov,mp4,m4a,3gp,mp3,mpeg,\
