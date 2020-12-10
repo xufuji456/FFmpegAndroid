@@ -535,11 +535,24 @@ public class FFmpegUtil {
      * Rebuild the keyframe index of FLV, make it seekable
      * @param inputPath inputFile
      * @param outputPath targetFile
-     * @return command of build flv index
+     * @return command of building flv index
      */
     public static String[] buildFlvIndex(String inputPath, String outputPath) {
         String buildIndex = "ffmpeg -i %s -flvflags add_keyframe_index %s";
         buildIndex = String.format(buildIndex, inputPath, outputPath);
+        return buildIndex.split(" ");
+    }
+
+    /**
+     * Insert the picture into the header of video, which as a thumbnail
+     * @param inputPath inputFile
+     * @param picturePath the path of thumbnail
+     * @param outputPath targetFile
+     * @return command of inserting picture
+     */
+    public static String[] insertPicIntoVideo(String inputPath, String picturePath, String outputPath) {
+        String buildIndex = "ffmpeg -i %s -i %s -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic %s";
+        buildIndex = String.format(buildIndex, inputPath, picturePath, outputPath);
         return buildIndex.split(" ");
     }
 

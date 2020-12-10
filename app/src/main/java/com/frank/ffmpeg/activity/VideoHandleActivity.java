@@ -132,7 +132,8 @@ public class VideoHandleActivity extends BaseActivity {
                 R.id.btn_pip,
                 R.id.btn_moov,
                 R.id.btn_speed,
-                R.id.btn_flv
+                R.id.btn_flv,
+                R.id.btn_thumbnail
         );
     }
 
@@ -320,6 +321,15 @@ public class VideoHandleActivity extends BaseActivity {
                 }
                 String outputPath = PATH + File.separator + "frame_index.flv";
                 commandLine = FFmpegUtil.buildFlvIndex(srcFile, outputPath);
+                break;
+            case R.id.btn_thumbnail:// insert thumbnail into video
+                String thumbSuffix = FileUtil.getFileSuffix(srcFile);
+                if (thumbSuffix == null || thumbSuffix.isEmpty()) {
+                    return;
+                }
+                String thumbnailPath = PATH + File.separator + "thumb.jpg";
+                String thumbVideoPath = PATH + File.separator + "thumbnailVideo" + thumbSuffix;
+                commandLine = FFmpegUtil.insertPicIntoVideo(srcFile, thumbnailPath, thumbVideoPath);
                 break;
             default:
                 break;

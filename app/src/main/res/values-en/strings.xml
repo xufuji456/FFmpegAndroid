@@ -52,6 +52,7 @@
     <string name="video_moov">MOOV move ahead</string>
     <string name="video_speed">Playing speed</string>
     <string name="video_flv">FLV index</string>
+    <string name="video_thumbnail">Insert thumbnail</string>
 
     <string name="swap">Swap</string>
     <string name="start">Start</string>

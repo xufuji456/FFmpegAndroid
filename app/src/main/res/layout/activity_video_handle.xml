@@ -135,6 +135,13 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/video_flv"/>
 
+            <Button
+                android:id="@+id/btn_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/video_thumbnail"/>
+
         </LinearLayout>
     </ScrollView>
 
