@@ -6,7 +6,7 @@
     <string name="audio_mix">Audio mix</string>
     <string name="audio_play">AudioTrack play</string>
     <string name="audio_opensl">OpenSL play</string>
-    <string name="audio_encode">Audio encode</string>
+    <string name="audio_encode">PCM encode</string>
     <string name="pcm_concat">PCM concat</string>
     <string name="audio_speed">Audio speed</string>
     <string name="audio_effect">Audio effect</string>

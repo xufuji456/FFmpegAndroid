@@ -25,6 +25,7 @@ public class FileUtil {
     private final static String TYPE_WAV = "wav";
     private final static String TYPE_OGG = "ogg";
     private final static String TYPE_AC3 = "ac3";
+    private final static String TYPE_RAW = "pcm";
 
     public final static String TYPE_MP4 = "mp4";
     private final static String TYPE_MKV = "mkv";
@@ -119,7 +120,8 @@ public class FileUtil {
                 || path.endsWith(TYPE_WMA)
                 || path.endsWith(TYPE_WAV)
                 || path.endsWith(TYPE_OGG)
-                || path.endsWith(TYPE_AC3);
+                || path.endsWith(TYPE_AC3)
+                || path.endsWith(TYPE_RAW);
     }
 
     public static boolean isVideo(String path) {

@@ -6,7 +6,7 @@
     <string name="audio_mix">音频混合</string>
     <string name="audio_play">音频解码AudioTrack播放</string>
     <string name="audio_opensl">音频解码OpenSL播放</string>
-    <string name="audio_encode">音频编码</string>
+    <string name="audio_encode">PCM编码</string>
     <string name="pcm_concat">PCM合并</string>
     <string name="audio_speed">音频速度</string>
     <string name="audio_effect">音乐均衡器</string>

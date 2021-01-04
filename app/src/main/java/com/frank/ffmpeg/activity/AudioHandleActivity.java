@@ -163,12 +163,6 @@ public class AudioHandleActivity extends BaseActivity {
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return;
                 }
-//                List<String> fileList = new ArrayList<>();
-//                fileList.add(srcFile);
-//                fileList.add(appendFile);
-//                String concatFile = PATH + File.separator + "concat.mp3";
-//                commandLine = FFmpegUtil.concatAudio(fileList, concatFile);
-//                break;
                 concatAudio(srcFile);
                 return;
             case R.id.btn_mix://mix audio
@@ -189,12 +183,12 @@ public class AudioHandleActivity extends BaseActivity {
                 new Thread(() -> new AudioPlayer().playAudio(srcFile)).start();
                 return;
             case R.id.btn_audio_encode://audio encode
-                String pcmFile = PATH + File.separator + "concat.pcm";
-                String wavFile = PATH + File.separator + "new.wav";
+                String pcmFile = PATH + File.separator + "raw.pcm";
+                String wavFile = PATH + File.separator + "convert.mp3";
                 //sample rate, normal is 8000/16000/44100
-                int sampleRate = 8000;
+                int sampleRate = 44100;
                 //channel num of pcm
-                int channel = 1;
+                int channel = 2;
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel);
                 break;
             case R.id.btn_pcm_concat://concat PCM streams
