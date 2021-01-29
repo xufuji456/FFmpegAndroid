@@ -86,6 +86,13 @@
                 android:text="@string/video_multi"/>
 
             <Button
+                android:id="@+id/btn_add_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/video_subtitle"/>
+
+            <Button
                 android:id="@+id/btn_reverse_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

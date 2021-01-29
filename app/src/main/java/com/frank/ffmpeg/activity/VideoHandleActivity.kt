@@ -117,7 +117,8 @@ class VideoHandleActivity : BaseActivity() {
                 R.id.btn_moov,
                 R.id.btn_speed,
                 R.id.btn_flv,
-                R.id.btn_thumbnail
+                R.id.btn_thumbnail,
+                R.id.btn_add_subtitle
         )
     }
 
@@ -148,6 +149,10 @@ class VideoHandleActivity : BaseActivity() {
             showToast(getString(R.string.wrong_video_format))
             return
         }
+        val suffix = FileUtil.getFileSuffix(srcFile)
+        if (suffix == null || suffix.isEmpty()) {
+            return
+        }
         when (viewId) {
             R.id.btn_video_transform//transform format
             -> {
@@ -156,10 +161,6 @@ class VideoHandleActivity : BaseActivity() {
             }
             R.id.btn_video_cut//cut video
             -> {
-                val suffix = FileUtil.getFileSuffix(srcFile)
-                if (suffix == null || suffix.isEmpty()) {
-                    return
-                }
                 val cutVideo = PATH + File.separator + "cutVideo" + suffix
                 val startTime = 0
                 val duration = 20
@@ -321,13 +322,16 @@ class VideoHandleActivity : BaseActivity() {
             }
             R.id.btn_thumbnail// insert thumbnail into video
             -> {
-                val thumbSuffix = FileUtil.getFileSuffix(srcFile)
-                if (thumbSuffix == null || thumbSuffix.isEmpty()) {
-                    return
-                }
                 val thumbnailPath = PATH + File.separator + "thumb.jpg"
-                val thumbVideoPath = PATH + File.separator + "thumbnailVideo" + thumbSuffix
+                val thumbVideoPath = PATH + File.separator + "thumbnailVideo" + suffix
                 commandLine = FFmpegUtil.insertPicIntoVideo(srcFile, thumbnailPath, thumbVideoPath)
+            }
+            R.id.btn_add_subtitle//add subtitle into video
+            -> {
+                Log.e(TAG, "add subtitle...")
+                val subtitlePath = PATH + File.separator + "test.ass"
+                val addSubtitlePath = PATH + File.separator + "subtitle" + suffix
+                commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, addSubtitlePath)
             }
             else -> {
             }

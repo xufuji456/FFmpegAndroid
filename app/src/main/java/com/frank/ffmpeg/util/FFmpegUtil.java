@@ -95,14 +95,14 @@ public class FFmpegUtil {
      * @return mux success or not
      */
     public static String[] mediaMux(String videoFile, String audioFile, boolean copy, String muxFile) {
-        String mixAudioCmd;
+        String mediaMuxCmd;
         if (copy) {
-            mixAudioCmd = "ffmpeg -i %s -i %s -codec copy -y %s";
+            mediaMuxCmd = "ffmpeg -i %s -i %s -codec copy -y %s";
         } else {
-            mixAudioCmd = "ffmpeg -i %s -i %s -y %s";
+            mediaMuxCmd = "ffmpeg -i %s -i %s -y %s";
         }
-        mixAudioCmd = String.format(Locale.getDefault(), mixAudioCmd, videoFile, audioFile, muxFile);
-        return mixAudioCmd.split(" ");
+        mediaMuxCmd = String.format(Locale.getDefault(), mediaMuxCmd, videoFile, audioFile, muxFile);
+        return mediaMuxCmd.split(" ");
     }
 
     /**
@@ -114,9 +114,9 @@ public class FFmpegUtil {
      */
     public static String[] extractAudio(String inputPath, String outputPath) {
         //-vn: disable video
-        String mixAudioCmd = "ffmpeg -i %s -acodec copy -vn %s";
-        mixAudioCmd = String.format(mixAudioCmd, inputPath, outputPath);
-        return mixAudioCmd.split(" ");
+        String extractAudioCmd = "ffmpeg -i %s -acodec copy -vn %s";
+        extractAudioCmd = String.format(extractAudioCmd, inputPath, outputPath);
+        return extractAudioCmd.split(" ");
     }
 
     /**
@@ -128,9 +128,9 @@ public class FFmpegUtil {
      */
     public static String[] extractVideo(String inputPath, String outputPath) {
         //-an: disable audio
-        String mixAudioCmd = "ffmpeg -i %s -vcodec copy -an %s";
-        mixAudioCmd = String.format(mixAudioCmd, inputPath, outputPath);
-        return mixAudioCmd.split(" ");
+        String extractVideoCmd = "ffmpeg -i %s -vcodec copy -an %s";
+        extractVideoCmd = String.format(extractVideoCmd, inputPath, outputPath);
+        return extractVideoCmd.split(" ");
     }
 
     /**
@@ -360,9 +360,9 @@ public class FFmpegUtil {
      * @return encode audio success or not
      */
     public static String[] encodeAudio(String inputPath, String outputPath, int sampleRate, int channel) {
-        String combineVideo = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
-        combineVideo = String.format(Locale.getDefault(), combineVideo, sampleRate, channel, inputPath, outputPath);
-        return combineVideo.split(" ");
+        String encodeAudioCmd = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
+        encodeAudioCmd = String.format(Locale.getDefault(), encodeAudioCmd, sampleRate, channel, inputPath, outputPath);
+        return encodeAudioCmd.split(" ");
     }
 
     /**
@@ -551,9 +551,15 @@ public class FFmpegUtil {
      * @return command of inserting picture
      */
     public static String[] insertPicIntoVideo(String inputPath, String picturePath, String outputPath) {
-        String buildIndex = "ffmpeg -i %s -i %s -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic %s";
-        buildIndex = String.format(buildIndex, inputPath, picturePath, outputPath);
-        return buildIndex.split(" ");
+        String insertPicCmd = "ffmpeg -i %s -i %s -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic %s";
+        insertPicCmd = String.format(insertPicCmd, inputPath, picturePath, outputPath);
+        return insertPicCmd.split(" ");
+    }
+
+    public static String[] addSubtitleIntoVideo(String inputPath, String subtitlePath, String outputPath) {
+        String subtitleCmd = "ffmpeg -i %s -vf subtitles=%s %s";
+        subtitleCmd = String.format(subtitleCmd, inputPath, subtitlePath, outputPath);
+        return subtitleCmd.split(" ");
     }
 
     /**
