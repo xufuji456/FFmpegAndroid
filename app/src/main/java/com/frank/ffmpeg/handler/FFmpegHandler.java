@@ -140,7 +140,7 @@ public class FFmpegHandler {
                 Log.i(TAG, "handle ffprobe onEnd result=" + resultMsg);
                 MediaBean mediaBean = null;
                 if (resultMsg != null && !resultMsg.isEmpty()) {
-                    mediaBean = JsonParseTool.parseMediaFormat(resultMsg);
+                    mediaBean = JsonParseTool.INSTANCE.parseMediaFormat(resultMsg);
                 }
                 mHandler.obtainMessage(MSG_FINISH, mediaBean).sendToTarget();
             }
