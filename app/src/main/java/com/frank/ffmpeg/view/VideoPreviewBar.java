@@ -64,7 +64,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
         txtVideoProgress = view.findViewById(R.id.txt_video_progress);
         txtVideoDuration = view.findViewById(R.id.txt_video_duration);
         setListener();
-        screenWidth = ScreenUtil.getScreenWidth(context);
+        screenWidth = ScreenUtil.INSTANCE.getScreenWidth(context);
     }
 
     @Override

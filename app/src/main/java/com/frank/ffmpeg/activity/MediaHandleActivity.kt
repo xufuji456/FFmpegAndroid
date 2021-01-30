@@ -115,7 +115,7 @@ class MediaHandleActivity : BaseActivity() {
         when (viewId) {
             R.id.btn_mux//mux:pure video and pure audio
             -> {
-                ThreadPoolUtil.executeSingleThreadPool { mediaMux(srcFile) }
+                ThreadPoolUtil.executeSingleThreadPool (Runnable { mediaMux(srcFile) })
                 return
             }
             R.id.btn_extract_audio//extract audio
@@ -130,7 +130,7 @@ class MediaHandleActivity : BaseActivity() {
             }
             R.id.btn_dubbing//dubbing
             -> {
-                ThreadPoolUtil.executeSingleThreadPool { mediaDubbing(srcFile) }
+                ThreadPoolUtil.executeSingleThreadPool (Runnable{ mediaDubbing(srcFile) })
                 return
             }
             else -> {
