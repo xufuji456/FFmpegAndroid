@@ -358,9 +358,9 @@ class VideoHandleActivity : BaseActivity() {
         //probe width and height of the selected video
         val probeResult = FFmpegCmd.executeProbeSynchronize(FFmpegUtil.probeFormat(selectedPath))
         val mediaBean = JsonParseTool.parseMediaFormat(probeResult)
-        if (mediaBean != null && mediaBean.videoBean != null) {
-            width = mediaBean.videoBean.width
-            height = mediaBean.videoBean.height
+        if (mediaBean?.videoBean != null) {
+            width = mediaBean.videoBean!!.width
+            height = mediaBean.videoBean!!.height
             Log.e(TAG, "width=$width--height=$height")
         }
         val transformCmd2 = FFmpegUtil.transformVideoWithEncode(appendPath, width, height, outputPath2)
