@@ -169,7 +169,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
             @Override
             public void run() {
                 previewBar.setMax(durationMs);
-                txtVideoDuration.setText(TimeUtil.getVideoTime(durationMs));
+                txtVideoDuration.setText(TimeUtil.INSTANCE.getVideoTime(durationMs));
                 texturePreView.setVisibility(GONE);
             }
         });
@@ -198,7 +198,7 @@ public class VideoPreviewBar extends RelativeLayout implements HardwareDecode.On
 
     public void updateProgress(int progress) {
         if (progress >= 0 && progress <= duration) {
-            txtVideoProgress.setText(TimeUtil.getVideoTime(progress));
+            txtVideoProgress.setText(TimeUtil.INSTANCE.getVideoTime(progress));
             previewBar.setProgress(progress);
         }
     }
