@@ -106,14 +106,16 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     }
 
     private fun registerLister() {
-        horizontalAdapter!!.setOnItemClickListener(OnItemClickListener { position ->
-            if (!surfaceCreated)
-                return@OnItemClickListener
-            if (!FileUtil.checkFileExist(videoPath)) {
-                showSelectFile()
-                return@OnItemClickListener
+        horizontalAdapter!!.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                if (!surfaceCreated)
+                    return
+                if (!FileUtil.checkFileExist(videoPath)) {
+                    showSelectFile()
+                    return
+                }
+                doFilterPlay(position)
             }
-            doFilterPlay(position)
         })
 
         surfaceView!!.setOnClickListener {
@@ -167,7 +169,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
         super.onDestroy()
         isPlaying = false
         //FIXME
-        //        videoPlayer.release();
+//        videoPlayer?.release()
         videoPlayer = null
         horizontalAdapter = null
     }
@@ -187,8 +189,8 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
 
     companion object {
 
-        private val MSG_HIDE = 222
-        private val DELAY_TIME = 5000
+        private const val MSG_HIDE = 222
+        private const val DELAY_TIME = 5000
     }
 
 }
