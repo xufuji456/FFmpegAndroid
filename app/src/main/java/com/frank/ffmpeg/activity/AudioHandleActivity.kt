@@ -236,7 +236,7 @@ class AudioHandleActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mHandler?.removeCallbacksAndMessages(null)
+        mHandler.removeCallbacksAndMessages(null)
     }
 
     companion object {

@@ -12,7 +12,7 @@ import com.frank.ffmpeg.R
 import java.io.File
 
 /**
- * 使用ffmpeg推流直播
+ * Using FFmpeg to push stream
  * Created by frank on 2018/2/2.
  */
 class PushActivity : BaseActivity() {
@@ -41,7 +41,7 @@ class PushActivity : BaseActivity() {
     }
 
     private fun startPushStreaming() {
-        //TODO 视频文件格式为flv
+        //TODO the video format is flv
         val filePath = editFilePath!!.text.toString()
         val liveUrl = editLiveURL!!.text.toString()
         Log.i(TAG, "filePath=$filePath")
@@ -49,11 +49,8 @@ class PushActivity : BaseActivity() {
 
         if (!TextUtils.isEmpty(filePath) && !TextUtils.isEmpty(filePath)) {
             val file = File(filePath)
-            //判断文件是否存在
             if (file.exists()) {
-                //开启子线程
                 Thread(Runnable {
-                    //开始推流
                     Pusher().pushStream(filePath, liveUrl)
                 }).start()
             } else {
