@@ -1,8 +1,8 @@
 package com.frank.mp3;
 
 /**
- * Mp3Lite: use AudioTrack and OpenSL ES to play audio
- * Created by frank on 2018/2/1.
+ * Mp3Lite: use libmp3lame to encode audio
+ * Created by frank on 2011/02/66.
  */
 
 public class Mp3Lite {

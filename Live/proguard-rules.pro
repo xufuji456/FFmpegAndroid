@@ -23,3 +23,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keep public class com.frank.live.LivePusherNew {
+}
