@@ -135,10 +135,12 @@ class AudioHandleActivity : BaseActivity() {
                 Thread {
                     val transformPath = PATH + File.separator + "transformAudio.mp3"
                     try {
+                        mHandler.obtainMessage(MSG_BEGIN).sendToTarget()
                         val clazz = Class.forName("com.frank.mp3.Mp3Converter")
                         val instance = clazz.newInstance()
                         val method = clazz.getDeclaredMethod("convertToMp3", String::class.java, String::class.java)
                         method.invoke(instance, srcFile, transformPath)
+                        mHandler.obtainMessage(MSG_FINISH).sendToTarget()
                     } catch (e: Exception) {
                         Log.e("AudioHandleActivity", "convert mp3 error=" + e.message)
                     }
