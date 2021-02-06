@@ -16,7 +16,7 @@ import java.util.Locale
 import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.FFmpegHandler
-import com.frank.ffmpeg.mp3.Mp3Converter
+import com.frank.mp3.Mp3Converter
 import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.FileUtil
 

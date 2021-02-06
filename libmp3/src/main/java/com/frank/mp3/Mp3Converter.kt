@@ -1,4 +1,4 @@
-package com.frank.ffmpeg.mp3
+package com.frank.mp3
 
 import android.annotation.TargetApi
 import android.media.MediaCodec
@@ -17,7 +17,7 @@ import java.nio.ByteOrder
 import java.util.concurrent.LinkedBlockingDeque
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-class Mp3Converter {
+open class Mp3Converter {
 
     private var mMediaCodec: MediaCodec? = null
     private var mediaExtractor: MediaExtractor? = null

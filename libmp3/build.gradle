@@ -1,17 +1,16 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-
+apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+
+
     defaultConfig {
-        applicationId "com.frank.ffmpeg"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         externalNativeBuild {
             cmake {
@@ -22,10 +21,11 @@ android {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -40,28 +40,13 @@ android {
             jni.srcDirs = []
         }
     }
-
-    useLibrary "org.apache.http.legacy"
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    packagingOptions {
-        exclude 'META-INF/proguard/coroutines.pro'
-    }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerviewVersion"
-    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    testImplementation 'junit:junit:4.12'
-    implementation project(':Live')
     implementation "androidx.core:core-ktx:$rootProject.core_ktx"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycle_ktx"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    //implementation "libmp3" if you need mp3-lite module
-    implementation project(':libmp3')
 }

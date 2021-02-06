@@ -1,4 +1,4 @@
-package com.frank.ffmpeg.mp3
+package com.frank.mp3
 
 class Mp3LameBuilder internal constructor() {
 

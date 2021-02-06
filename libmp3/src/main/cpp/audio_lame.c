@@ -1,7 +1,10 @@
 
-#include "include/lame/lame.h"
+#include "lame.h"
 #include <jni.h>
-#include "ffmpeg_jni_define.h"
+
+#define MP3_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_mp3_Mp3Lite_ ## FUNC_NAME \
+    (JNIEnv *env, jclass thiz, ##__VA_ARGS__)\
 
 lame_global_flags *glf;
 
@@ -181,12 +184,12 @@ void close_lame(lame_global_flags *glf) {
 }
 
 
-AUDIO_PLAYER_FUNC(void, lameInitDefault) {
+MP3_FUNC(void, lameInitDefault) {
 
     glf = initializeDefault(env);
 }
 
-AUDIO_PLAYER_FUNC(void, lameInit,
+MP3_FUNC(void, lameInit,
                   jint inSampleRate, jint outChannel, jint outSampleRate, jint outBitrate,
                   jfloat scaleInput, jint mode, jint vbrMode, jint quality, jint vbrQuality,
                   jint abrMeanBitrate, jint lowPassFreq, jint highPassFreq, jstring id3tagTitle,
@@ -201,21 +204,21 @@ AUDIO_PLAYER_FUNC(void, lameInit,
                      id3tagComment);
 }
 
-AUDIO_PLAYER_FUNC(jint, lameEncode,
+MP3_FUNC(jint, lameEncode,
                   jshortArray buffer_l, jshortArray buffer_r, jint samples, jbyteArray mp3buf) {
     return encode(env, glf, buffer_l, buffer_r, samples, mp3buf);
 }
 
-AUDIO_PLAYER_FUNC(jint, encodeBufferInterleaved,
+MP3_FUNC(jint, encodeBufferInterleaved,
                   jshortArray pcm, jint samples, jbyteArray mp3buf) {
     return encodeBufferInterleaved(env, glf, pcm, samples, mp3buf);
 }
 
-AUDIO_PLAYER_FUNC(jint, lameFlush,
+MP3_FUNC(jint, lameFlush,
                   jbyteArray mp3buf) {
     return flush(env, glf, mp3buf);
 }
 
-AUDIO_PLAYER_FUNC(void, lameClose) {
+MP3_FUNC(void, lameClose) {
     close_lame(glf);
 }

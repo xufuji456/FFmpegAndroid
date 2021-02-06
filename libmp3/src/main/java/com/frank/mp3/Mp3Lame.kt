@@ -1,19 +1,13 @@
-package com.frank.ffmpeg.mp3
-
-import com.frank.ffmpeg.AudioPlayer
+package com.frank.mp3
 
 class Mp3Lame {
-
-    constructor() {
-        AudioPlayer.lameInitDefault()
-    }
 
     internal constructor(builder: Mp3LameBuilder) {
         initialize(builder)
     }
 
     private fun initialize(builder: Mp3LameBuilder) {
-        AudioPlayer.lameInit(builder.inSampleRate, builder.outChannel, builder.outSampleRate,
+        Mp3Lite.lameInit(builder.inSampleRate, builder.outChannel, builder.outSampleRate,
                 builder.outBitrate, builder.scaleInput, getIntForMode(builder.mode), getIntForVbrMode(builder.vbrMode), builder.quality, builder.vbrQuality, builder.abrMeanBitrate,
                 builder.lowPassFreq, builder.highPassFreq, builder.id3tagTitle, builder.id3tagArtist,
                 builder.id3tagAlbum, builder.id3tagYear, builder.id3tagComment)
@@ -22,20 +16,20 @@ class Mp3Lame {
     fun encode(buffer_l: ShortArray, buffer_r: ShortArray,
                samples: Int, mp3buf: ByteArray): Int {
 
-        return AudioPlayer.lameEncode(buffer_l, buffer_r, samples, mp3buf)
+        return Mp3Lite.lameEncode(buffer_l, buffer_r, samples, mp3buf)
     }
 
     internal fun encodeBufferInterLeaved(pcm: ShortArray, samples: Int,
                                          mp3buf: ByteArray): Int {
-        return AudioPlayer.encodeBufferInterleaved(pcm, samples, mp3buf)
+        return Mp3Lite.encodeBufferInterleaved(pcm, samples, mp3buf)
     }
 
     fun flush(mp3buf: ByteArray): Int {
-        return AudioPlayer.lameFlush(mp3buf)
+        return Mp3Lite.lameFlush(mp3buf)
     }
 
     fun close() {
-        AudioPlayer.lameClose()
+        Mp3Lite.lameClose()
     }
 
     private fun getIntForMode(mode: Mp3LameBuilder.Mode): Int {
