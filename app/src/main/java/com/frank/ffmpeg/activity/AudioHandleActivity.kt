@@ -5,6 +5,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,7 +17,6 @@ import java.util.Locale
 import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.FFmpegHandler
-import com.frank.mp3.Mp3Converter
 import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.FileUtil
 
@@ -133,9 +133,15 @@ class AudioHandleActivity : BaseActivity() {
                 commandLine = FFmpegUtil.transformAudio(srcFile, transformFile)
             } else { //use MediaCodec and libmp3lame to transform
                 Thread {
-                    val transformInput = PATH + File.separator + "transformAudio.mp3"
-                    val mp3Converter = Mp3Converter()
-                    mp3Converter.convertToMp3(srcFile, transformInput)
+                    val transformPath = PATH + File.separator + "transformAudio.mp3"
+                    try {
+                        val clazz = Class.forName("com.frank.mp3.Mp3Converter")
+                        val instance = clazz.newInstance()
+                        val method = clazz.getDeclaredMethod("convertToMp3", String::class.java, String::class.java)
+                        method.invoke(instance, srcFile, transformPath)
+                    } catch (e: Exception) {
+                        Log.e("AudioHandleActivity", "convert mp3 error=" + e.message)
+                    }
                 }.start()
             }
             R.id.btn_cut//cut audio, it's best not include special characters
