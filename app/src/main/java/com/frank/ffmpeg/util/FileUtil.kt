@@ -25,6 +25,7 @@ object FileUtil {
     private const val TYPE_OGG = "ogg"
     private const val TYPE_AC3 = "ac3"
     private const val TYPE_RAW = "pcm"
+    private const val TYPE_OPUS = "opus"
 
     const val TYPE_MP4 = "mp4"
     private const val TYPE_MKV = "mkv"
@@ -120,7 +121,8 @@ object FileUtil {
                 || path.endsWith(TYPE_WAV)
                 || path.endsWith(TYPE_OGG)
                 || path.endsWith(TYPE_AC3)
-                || path.endsWith(TYPE_RAW))
+                || path.endsWith(TYPE_RAW)
+                || path.endsWith(TYPE_OPUS))
     }
 
     fun isVideo(filePath: String): Boolean {
