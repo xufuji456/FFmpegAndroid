@@ -1,21 +1,28 @@
 //
 // Created by frank on 2018/2/3.
 //
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libswscale/swscale.h"
-#include "libswresample/swresample.h"
-#include "packet_queue.h"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <libavutil/imgutils.h>
 #include <android/log.h>
 #include <pthread.h>
 #include <jni.h>
-#include <libavutil/time.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/time.h"
+#include "libswscale/swscale.h"
+#include "libswresample/swresample.h"
+#include "packet_queue.h"
 #include "ffmpeg_jni_define.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define TAG "MediaPlayer"
 
@@ -93,10 +100,10 @@ int init_input_format_context(MediaPlayer* player, const char* file_name){
     player->video_stream_index = -1;
     player->audio_stream_index = -1;
     for (i = 0; i < player->format_context->nb_streams; i++) {
-        if (player->format_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO
+        if (player->format_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO
             && player->video_stream_index < 0) {
             player->video_stream_index = i;
-        } else if (player->format_context->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO
+        } else if (player->format_context->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO
             && player->audio_stream_index < 0) {
             player->audio_stream_index = i;
         }
@@ -115,7 +122,7 @@ int init_input_format_context(MediaPlayer* player, const char* file_name){
 }
 
 //open decoder
-int init_condec_context(MediaPlayer* player){
+int init_codec_context(MediaPlayer* player){
     //get codec context
     player->video_codec_context = player->format_context->streams[player->video_stream_index]->codec;
     //find audio and video decoder
@@ -184,7 +191,7 @@ void player_wait_for_frame(MediaPlayer *player, int64_t stream_time) {
 //                                                  (unsigned int) (sleep_time / 1000ll));
         gettimeofday(&now, NULL);
         timeout.tv_sec = now.tv_sec;
-        timeout.tv_nsec = (now.tv_usec + sleep_time) * 1000;
+        timeout.tv_nsec = static_cast<long>((now.tv_usec + sleep_time) * 1000);
         pthread_cond_timedwait(&player->cond, &player->mutex, &timeout);
     }
     pthread_mutex_unlock(&player->mutex);
@@ -236,7 +243,7 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
         sws_scale(sws_ctx, (uint8_t const * const *)player->yuv_frame->data,
                   player->yuv_frame->linesize, 0, player->video_height,
                   player->rgba_frame->data, player->rgba_frame->linesize);
-        uint8_t * dst = windowBuffer.bits;
+        uint8_t * dst = static_cast<uint8_t *>(windowBuffer.bits);
         int dstStride = windowBuffer.stride * 4;
         uint8_t * src = player->rgba_frame->data[0];
         int srcStride = player->rgba_frame->linesize[0];
@@ -284,26 +291,26 @@ void audio_decoder_prepare(MediaPlayer* player) {
     player->out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 }
 
-void audio_player_prepare(MediaPlayer* player, JNIEnv* env, jclass jthiz){
-    jclass player_class = (*env)->GetObjectClass(env,jthiz);
+void audio_player_prepare(MediaPlayer* player, JNIEnv* env, jobject thiz){
+    jclass player_class = env->GetObjectClass(thiz);
     if(!player_class){
         LOGE(TAG, "player_class not found...");
     }
     //get AudioTrack by reflection
-    jmethodID audio_track_method = (*env)->GetMethodID(
-            env,player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
+    jmethodID audio_track_method = env->GetMethodID(
+            player_class,"createAudioTrack","(II)Landroid/media/AudioTrack;");
     if(!audio_track_method){
         LOGE(TAG, "audio_track_method not found...");
     }
-    jobject audio_track = (*env)->CallObjectMethod(
-            env,jthiz,audio_track_method, player->out_sample_rate, player->out_channel_nb);
+    jobject audio_track = env->CallObjectMethod(
+            thiz, audio_track_method, player->out_sample_rate, player->out_channel_nb);
 
-    jclass audio_track_class = (*env)->GetObjectClass(env, audio_track);
-    jmethodID audio_track_play_mid = (*env)->GetMethodID(env,audio_track_class,"play","()V");
-    (*env)->CallVoidMethod(env, audio_track, audio_track_play_mid);
+    jclass audio_track_class = env->GetObjectClass(audio_track);
+    jmethodID audio_track_play_mid = env->GetMethodID(audio_track_class,"play","()V");
+    env->CallVoidMethod(audio_track, audio_track_play_mid);
 
-    player->audio_track = (*env)->NewGlobalRef(env, audio_track);
-    player->audio_track_write_mid = (*env)->GetMethodID(env,audio_track_class,"write","([BII)I");
+    player->audio_track = env->NewGlobalRef(audio_track);
+    player->audio_track_write_mid = env->GetMethodID(audio_track_class,"write","([BII)I");
 
     //malloc buffer
     player->audio_buffer = (uint8_t *)av_malloc(MAX_AUDIO_FRAME_SIZE);
@@ -342,20 +349,20 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
 
         if(javaVM != NULL){
             JNIEnv * env;
-            (*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
-            jbyteArray audio_sample_array = (*env)->NewByteArray(env,out_buffer_size);
-            jbyte* sample_byte_array = (*env)->GetByteArrayElements(env,audio_sample_array,NULL);
+            javaVM->AttachCurrentThread(&env, NULL);
+            jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
+            jbyte* sample_byte_array = env->GetByteArrayElements(audio_sample_array,NULL);
             memcpy(sample_byte_array, player->audio_buffer, (size_t) out_buffer_size);
-            (*env)->ReleaseByteArrayElements(env,audio_sample_array,sample_byte_array,0);
+            env->ReleaseByteArrayElements(audio_sample_array,sample_byte_array,0);
             //call write method of AudioTrack to play
-            (*env)->CallIntMethod(env, player->audio_track, player->audio_track_write_mid,
+            env->CallIntMethod(player->audio_track, player->audio_track_write_mid,
                                   audio_sample_array,0,out_buffer_size);
             //release local reference
-            (*env)->DeleteLocalRef(env,audio_sample_array);
+            env->DeleteLocalRef(audio_sample_array);
         }
     }
     if(javaVM != NULL){
-        (*javaVM)->DetachCurrentThread(javaVM);
+        javaVM->DetachCurrentThread();
     }
     return 0;
 }
@@ -388,7 +395,8 @@ void* write_packet_to_queue(void* arg){
         if(pkt->stream_index == player->video_stream_index || pkt->stream_index == player->audio_stream_index){
             AVPacketQueue *queue = player->packets[pkt->stream_index];
             pthread_mutex_lock(&player->mutex);
-            AVPacket* data = queue_push(queue, &player->mutex, &player->cond);
+            AVPacket* data = static_cast<AVPacket *>(queue_push(queue, &player->mutex,
+                                                                &player->cond));
             pthread_mutex_unlock(&player->mutex);
             *data = packet;
         }
@@ -422,9 +430,9 @@ void* decode_func(void* arg){
 
 MEDIA_PLAYER_FUNC(jint, setup, jstring filePath, jobject surface){
 
-    const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
+    const char *file_name = env->GetStringUTFChars(filePath, JNI_FALSE);
     int ret;
-    player = malloc(sizeof(MediaPlayer));
+    player = static_cast<MediaPlayer *>(malloc(sizeof(MediaPlayer)));
     if(player == NULL){
         return -1;
     }
@@ -432,7 +440,7 @@ MEDIA_PLAYER_FUNC(jint, setup, jstring filePath, jobject surface){
     if(ret < 0){
         return ret;
     }
-    ret = init_condec_context(player);
+    ret = init_codec_context(player);
     if(ret < 0){
         return ret;
     }
@@ -486,5 +494,5 @@ MEDIA_PLAYER_FUNC(void, release){
     pthread_cond_destroy(&player->cond);
     pthread_mutex_destroy(&player->mutex);
     free(player);
-    (*javaVM)->DestroyJavaVM(javaVM);
+    javaVM->DestroyJavaVM();
 }
