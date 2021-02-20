@@ -1,18 +1,18 @@
 //
 // Created by frank on 2018/2/3.
 //
-#include "AVpacket_queue.h"
+#include "packet_queue.h"
 #include <stdlib.h>
 #include <libavcodec/avcodec.h>
 
 
 AVPacketQueue *queue_init(int size) {
-    AVPacketQueue *queue = malloc(sizeof(AVPacketQueue));
+    AVPacketQueue *queue = static_cast<AVPacketQueue *>(malloc(sizeof(AVPacketQueue)));
     queue->size = size;
     queue->next_to_read = 0;
     queue->next_to_write = 0;
     int i;
-    queue->packets = malloc(sizeof(*queue->packets) * size);
+    queue->packets = static_cast<void **>(malloc(sizeof(*queue->packets) * size));
     for (i = 0; i < size; i++) {
         queue->packets[i] = malloc(sizeof(AVPacket));
     }

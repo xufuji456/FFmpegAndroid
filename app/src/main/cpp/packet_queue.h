@@ -2,10 +2,14 @@
 // Created by frank on 2018/2/3.
 //
 
-#ifndef VIDEOPLAYER_AVPACKET_QUEUE_H
-#define VIDEOPLAYER_AVPACKET_QUEUE_H
+#ifndef PACKET_QUEUE_H
+#define PACKET_QUEUE_H
 
 #include <pthread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct AVPacketQueue {
     //the size of queue
@@ -26,4 +30,8 @@ void *queue_push(AVPacketQueue *queue, pthread_mutex_t *mutex, pthread_cond_t *c
 
 void *queue_pop(AVPacketQueue *queue, pthread_mutex_t *mutex, pthread_cond_t *cond);
 
-#endif //VIDEOPLAYER_AVPACKET_QUEUE_H
+#endif //PACKET_QUEUE_H
+
+#ifdef __cplusplus
+}
+#endif
