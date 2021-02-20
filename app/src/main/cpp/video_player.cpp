@@ -1,16 +1,23 @@
 //
 // Created by frank on 2018/2/1.
 //
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libswscale/swscale.h"
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <libavutil/imgutils.h>
 #include <android/log.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 #include "ffmpeg_jni_define.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define TAG "VideoPlayer"
 
@@ -19,7 +26,7 @@ long duration = 0;
 
 VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
 
-    const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
+    const char *file_name = env->GetStringUTFChars( filePath, JNI_FALSE);
     LOGE(TAG, "open file:%s\n", file_name);
     av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
@@ -33,7 +40,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
     }
     int videoStream = -1, i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO
             && videoStream < 0) {
             videoStream = i;
         }
@@ -106,7 +113,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
                 sws_scale(sws_ctx, (uint8_t const *const *) pFrame->data,
                           pFrame->linesize, 0, pCodecCtx->height,
                           pFrameRGBA->data, pFrameRGBA->linesize);
-                uint8_t *dst = windowBuffer.bits;
+                uint8_t *dst = static_cast<uint8_t *>(windowBuffer.bits);
                 int dstStride = windowBuffer.stride * 4;
                 uint8_t *src = pFrameRGBA->data[0];
                 int srcStride = pFrameRGBA->linesize[0];
