@@ -4,16 +4,23 @@
 
 #include <jni.h>
 #include <string.h>
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+#include <android/log.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
 #include "libswresample/swresample.h"
 #include "libavutil/samplefmt.h"
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-#include <android/log.h>
-#include <libavutil/opt.h>
+#include "libavutil/opt.h"
 #include "ffmpeg_jni_define.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define TAG "OpenSLPlayer"
 
@@ -162,7 +169,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     int i;
     audioStream = -1;
     for (i = 0; i < aFormatCtx->nb_streams; i++) {
-        if (aFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO &&
+        if (aFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
             audioStream < 0) {
             audioStream = i;
         }
@@ -242,7 +249,7 @@ int releaseAudioPlayer() {
 AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
 
     int rate, channel;
-    const char *file_name = (*env)->GetStringUTFChars(env, filePath, NULL);
+    const char *file_name = env->GetStringUTFChars(filePath, NULL);
     LOGI(TAG, "file_name=%s", file_name);
 
     createAudioPlayer(&rate, &channel, file_name);
