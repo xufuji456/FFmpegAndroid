@@ -11,8 +11,12 @@
 #define LOGE(TAG, FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__);
 
 #define AUDIO_PLAYER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+extern "C" { \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_AudioPlayer_ ## FUNC_NAME \
-    (JNIEnv *env, jclass thiz, ##__VA_ARGS__)\
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__);\
+}\
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_AudioPlayer_ ## FUNC_NAME \
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
 
 #define FFMPEG_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_FFmpegCmd_ ## FUNC_NAME \

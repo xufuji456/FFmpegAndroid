@@ -6,19 +6,27 @@
 #include <unistd.h>
 #include <android/log.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 #include "libswresample/swresample.h"
 #include "ffmpeg_jni_define.h"
 
+#ifdef __cplusplus
+}
+#endif
+
 #define TAG "AudioPlayer"
 
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
 AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
-    const char *input_cstr = (*env)->GetStringUTFChars(env, input_jstr, NULL);
-    LOGI(TAG, "input_cstr=%s", input_cstr);
+    const char *input_cstr = env->GetStringUTFChars(input_jstr, NULL);
+    LOGI(TAG, "input url=%s", input_cstr);
     //register all modules
     av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
@@ -82,31 +90,31 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     //output channel number
     int out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 
-    jclass player_class = (*env)->GetObjectClass(env, thiz);
+    jclass player_class = env->GetObjectClass(thiz);
     if (!player_class) {
         LOGE(TAG, "player_class not found...");
     }
     //get AudioTrack by reflection
-    jmethodID audio_track_method = (*env)->GetMethodID(env, player_class, "createAudioTrack",
+    jmethodID audio_track_method = env->GetMethodID(player_class, "createAudioTrack",
                                                        "(II)Landroid/media/AudioTrack;");
     if (!audio_track_method) {
         LOGE(TAG, "audio_track_method not found...");
     }
-    jobject audio_track = (*env)->CallObjectMethod(env, thiz, audio_track_method, out_sample_rate,
+    jobject audio_track = env->CallObjectMethod(thiz, audio_track_method, out_sample_rate,
                                                    out_channel_nb);
 
     //call play method
-    jclass audio_track_class = (*env)->GetObjectClass(env, audio_track);
-    jmethodID audio_track_play_mid = (*env)->GetMethodID(env, audio_track_class, "play", "()V");
-    (*env)->CallVoidMethod(env, audio_track, audio_track_play_mid);
+    jclass audio_track_class = env->GetObjectClass(audio_track);
+    jmethodID audio_track_play_mid = env->GetMethodID(audio_track_class, "play", "()V");
+    env->CallVoidMethod(audio_track, audio_track_play_mid);
 
     //get write method
-    jmethodID audio_track_write_mid = (*env)->GetMethodID(env, audio_track_class, "write",
+    jmethodID audio_track_write_mid = env->GetMethodID(audio_track_class, "write",
                                                           "([BII)I");
 
     uint8_t *out_buffer = (uint8_t *) av_malloc(MAX_AUDIO_FRAME_SIZE);
 
-    int got_frame = 0, index = 0, ret;
+    int got_frame = 0, ret = 0;
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0) {
         //is audio stream index
@@ -118,7 +126,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
             }
             //decode success
             if (got_frame > 0) {
-                LOGI(TAG, "decode frame count=%d", index++);
                 //convert audio format
                 swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,
                             (const uint8_t **) frame->data, frame->nb_samples);
@@ -126,18 +133,17 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
                                                                  frame->nb_samples, out_sample_fmt,
                                                                  1);
 
-                jbyteArray audio_sample_array = (*env)->NewByteArray(env, out_buffer_size);
-                jbyte *sample_byte_array = (*env)->GetByteArrayElements(env, audio_sample_array,
-                                                                        NULL);
+                jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
+                jbyte *sample_byte_array = env->GetByteArrayElements(audio_sample_array, NULL);
                 //copy buffer data
                 memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
                 //release byteArray
-                (*env)->ReleaseByteArrayElements(env, audio_sample_array, sample_byte_array, 0);
+                env->ReleaseByteArrayElements(audio_sample_array, sample_byte_array, 0);
                 //call write method to play
-                (*env)->CallIntMethod(env, audio_track, audio_track_write_mid,
+                env->CallIntMethod(audio_track, audio_track_write_mid,
                                       audio_sample_array, 0, out_buffer_size);
                 //delete local reference
-                (*env)->DeleteLocalRef(env, audio_sample_array);
+                env->DeleteLocalRef(audio_sample_array);
                 usleep(1000 * 16);
             }
         }
@@ -149,6 +155,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     swr_free(&swrCtx);
     avcodec_close(codecCtx);
     avformat_close_input(&pFormatCtx);
-    (*env)->ReleaseStringUTFChars(env, input_jstr, input_cstr);
+    env->ReleaseStringUTFChars(input_jstr, input_cstr);
 
 }
