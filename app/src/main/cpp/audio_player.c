@@ -35,7 +35,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     //get the audio stream index in the stream array
     int i = 0, audio_stream_idx = -1;
     for (; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_idx = i;
             break;
         }
