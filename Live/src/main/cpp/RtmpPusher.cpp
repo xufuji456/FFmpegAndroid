@@ -1,5 +1,5 @@
 #include <jni.h>
-#include <string>
+#include <string.h>
 #include "include/rtmp/rtmp.h"
 #include "safe_queue.h"
 #include "PushInterface.h"
