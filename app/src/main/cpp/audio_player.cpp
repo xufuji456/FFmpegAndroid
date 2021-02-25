@@ -147,9 +147,10 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
                 usleep(1000 * 16);
             }
         }
-        av_free_packet(packet);
+        av_packet_unref(packet);
     }
     LOGI(TAG, "decode audio finish");
+    av_packet_free(&packet);
     av_frame_free(&frame);
     av_free(out_buffer);
     swr_free(&swrCtx);
