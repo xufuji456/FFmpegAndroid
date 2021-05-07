@@ -41,7 +41,6 @@ android {
         }
     }
 
-    useLibrary "org.apache.http.legacy"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -49,6 +48,8 @@ android {
 
     packagingOptions {
         exclude 'META-INF/proguard/coroutines.pro'
+        pickFirst 'lib/armeabi-v7a/libmp3lame.so'
+        pickFirst 'lib/arm64-v8a/libmp3lame.so'
     }
 }
 
