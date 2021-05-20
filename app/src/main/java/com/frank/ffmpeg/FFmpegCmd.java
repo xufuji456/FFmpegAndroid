@@ -23,6 +23,8 @@ public class FFmpegCmd {
         System.loadLibrary("media-handle");
     }
 
+    private final static String TAG = FFmpegCmd.class.getSimpleName();
+
     private final static int RESULT_SUCCESS = 1;
 
     private final static int RESULT_ERROR = 0;
@@ -58,7 +60,7 @@ public class FFmpegCmd {
                 //call JNI interface to execute FFmpeg cmd
                 int result = handle(commands);
                 if (onHandleListener != null) {
-                    onHandleListener.onEnd(result, null);
+                    onHandleListener.onEnd(result, "");
                 }
                 mProgressListener = null;
             }
@@ -88,10 +90,10 @@ public class FFmpegCmd {
                 for (String[] command : commands) {
                     result = handle(command);
                     count ++;
-                    Log.i("FFmpegCmd", count + " result=" + result);
+                    Log.i(TAG, count + " result=" + result);
                 }
                 if (onHandleListener != null) {
-                    onHandleListener.onEnd(result, null);
+                    onHandleListener.onEnd(result, "");
                 }
                 mProgressListener = null;
             }
@@ -158,7 +160,7 @@ public class FFmpegCmd {
     private native static String handleProbe(String[] commands);
 
     public static void onProgressCallback(int position, int duration, @FFmpegState int state) {
-        Log.e("FFmpegCmd", "onProgress position=" + position
+        Log.e(TAG, "onProgress position=" + position
                 + "--duration=" + duration + "--state=" + state);
         if (position > duration && duration > 0) {
             return;
@@ -174,4 +176,11 @@ public class FFmpegCmd {
             }
         }
     }
+
+    public static void onMsgCallback(String msg) {
+        if (msg != null && !msg.isEmpty()) {
+            Log.e(TAG, "from native msg=" + msg);
+        }
+    }
+
 }

@@ -11,6 +11,7 @@
 JNIEnv *ff_env;
 jclass ff_class;
 jmethodID ff_method;
+jmethodID msg_method;
 
 void log_callback(void*, int, const char*, va_list);
 
@@ -18,6 +19,7 @@ void init(JNIEnv *env) {
     ff_env = env;
     ff_class = (*env)->FindClass(env, "com/frank/ffmpeg/FFmpegCmd");
     ff_method = (*env)->GetStaticMethodID(env, ff_class, "onProgressCallback", "(III)V");
+    msg_method = (*env)->GetStaticMethodID(env, ff_class, "onMsgCallback", "(Ljava/lang/String;)V");
 }
 
 FFMPEG_FUNC(jint, handle, jobjectArray commands) {
@@ -62,6 +64,10 @@ void log_callback(void* ptr, int level, const char* format, va_list args) {
             break;
         case AV_LOG_ERROR:
             ALOGE(FFMPEG_TAG, format, args);
+            if (ff_env && msg_method) {
+                jstring jstr = (*ff_env)->NewStringUTF(ff_env, format);
+                (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr);
+            }
             break;
         default:
             ALOGI(FFMPEG_TAG, format, args);
