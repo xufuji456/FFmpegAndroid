@@ -65,12 +65,14 @@ void log_callback(void* ptr, int level, const char* format, va_list args) {
         case AV_LOG_ERROR:
             ALOGE(FFMPEG_TAG, format, args);
             if (ff_env && msg_method) {
-                jstring jstr = (*ff_env)->NewStringUTF(ff_env, format);
+                char *ff_msg = (char*) malloc(sizeof(char) * 1024);
+                vsprintf(ff_msg, format, args);
+                jstring jstr = (*ff_env)->NewStringUTF(ff_env, ff_msg);
                 (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr);
+                free(ff_msg);
             }
             break;
         default:
-            ALOGI(FFMPEG_TAG, format, args);
             break;
     }
 }
