@@ -82,7 +82,7 @@ build_one(){
 --enable-encoder=libmp3lame,libx264 \
 --disable-decoders \
 --enable-decoder=mjpeg,mpeg4,h263,h264,flv,hevc,wmv3,msmpeg4v3,msmpeg4v2,msvideo1,vc1,mpeg1video,mpeg2video,\
-aac,ac3,ac3_fixed,m4a,amrnb,amrwb,vorbis,wmav2,dca,truehd,tscc,tscc2,dvvideo,msrle,cinepak,indeo5,hq_hqa,\
+aac,ac3,ac3_fixed,m4a,amrnb,amrwb,vorbis,wmav2,truehd,tscc,tscc2,dvvideo,msrle,cinepak,indeo5,vp8,vp9,\
 mp3float,mp3,mp3adufloat,mp3adu,mp3on4float,mp3on4,aac_fixed,aac_latm,eac3,png,wmav1,wmv1,wmv2,\
 pcm_alaw,pcm_dvd,pcm_f16le,pcm_f24le,pcm_f32be,pcm_f32le,pcm_f64be,pcm_f64le,zlib,flac,opus,mlp,\
 pcm_s16be,pcm_s16le,pcm_s24be,pcm_s24le,pcm_s32be,pcm_s32le,pcm_s64be,pcm_s64le,pcm_mulaw,alac,adpcm_ms,\
