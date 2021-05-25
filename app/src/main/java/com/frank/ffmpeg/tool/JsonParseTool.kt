@@ -102,6 +102,10 @@ object JsonParseTool {
                     val channelLayout = jsonMediaStreamItem.optString("channel_layout")
                     audioBean.channelLayout = channelLayout
                     Log.e(TAG, "channelLayout=$channelLayout")
+                    val audioTag = jsonMediaFormat.getJSONObject("tags")
+                    if (audioTag != null) {
+                        parseTag(audioTag, audioBean)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -125,7 +129,9 @@ object JsonParseTool {
             val videoBean = mediaBean.videoBean
             formatBuilder.append("width:").append(videoBean!!.width).append("\n")
             formatBuilder.append("height:").append(videoBean.height).append("\n")
-            formatBuilder.append("aspectRatio:").append(videoBean.displayAspectRatio).append("\n")
+            if (!TextUtils.isEmpty(videoBean.displayAspectRatio)) {
+                formatBuilder.append("aspectRatio:").append(videoBean.displayAspectRatio).append("\n")
+            }
             formatBuilder.append("pixelFormat:").append(videoBean.pixelFormat).append("\n")
             formatBuilder.append("frameRate:").append(videoBean.frameRate).append("\n")
             if (videoBean.videoCodec != null) {
@@ -140,8 +146,46 @@ object JsonParseTool {
             if (audioBean.audioCodec != null) {
                 formatBuilder.append("audioCodec:").append(audioBean.audioCodec).append("\n")
             }
+            if (!TextUtils.isEmpty(audioBean.title)) {
+                formatBuilder.append("title:").append(audioBean.title).append("\n")
+            }
+            if (!TextUtils.isEmpty(audioBean.artist)) {
+                formatBuilder.append("artist:").append(audioBean.artist).append("\n")
+            }
+            if (!TextUtils.isEmpty(audioBean.album)) {
+                formatBuilder.append("album:").append(audioBean.album).append("\n")
+            }
+            if (!TextUtils.isEmpty(audioBean.composer)) {
+                formatBuilder.append("composer:").append(audioBean.composer).append("\n")
+            }
+            if (!TextUtils.isEmpty(audioBean.genre)) {
+                formatBuilder.append("genre:").append(audioBean.genre).append("\n")
+            }
         }
         return formatBuilder.toString()
+    }
+
+    private fun parseTag(audioTag: JSONObject, audioBean: AudioBean) {
+        val title = audioTag.optString("title")
+        audioBean.title = title
+        Log.e(TAG, "title=$title")
+        val artist = audioTag.optString("artist")
+        audioBean.artist = artist
+        val album = audioTag.optString("album")
+        audioBean.album = album
+        val albumArtist = audioTag.optString("album_artist")
+        audioBean.albumArtist = albumArtist
+        val composer = audioTag.optString("composer")
+        audioBean.composer = composer
+        val genre = audioTag.optString("genre")
+        audioBean.genre = genre
+        val lyrics = audioTag.optString("lyrics-eng")
+        if (lyrics != null && lyrics.contains("\r\n")) {
+            val array = lyrics.split("\r\n")
+            for (i in array.indices) {
+                Log.e(TAG, "lyrics=" + array[i])
+            }
+        }
     }
 
 }

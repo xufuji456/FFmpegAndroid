@@ -21,4 +21,18 @@ class AudioBean {
     //"channel_layout": "stereo"
     var channelLayout: String? = null
 
+    var title: String? = null
+
+    var artist: String? = null
+
+    var album: String? = null
+
+    var albumArtist: String? = null
+
+    var composer: String? = null
+
+    var genre: String? = null
+
+    var lyrics: List<String>? = null
+
 }
