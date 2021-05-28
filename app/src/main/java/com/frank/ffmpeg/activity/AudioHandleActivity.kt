@@ -1,6 +1,8 @@
 package com.frank.ffmpeg.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
@@ -177,7 +179,10 @@ class AudioHandleActivity : BaseActivity() {
             }
             R.id.btn_play_audio//use AudioTrack to play audio
             -> {
-                Thread { AudioPlayer().play(srcFile) }.start()
+//                Thread { AudioPlayer().play(srcFile) }.start()
+                val audioIntent = Intent(this@AudioHandleActivity, AudioPlayActivity::class.java)
+                audioIntent.data = Uri.parse(srcFile)
+                startActivity(audioIntent)
                 return
             }
             R.id.btn_play_opensl//use OpenSL ES to play audio

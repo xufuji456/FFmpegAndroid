@@ -51,8 +51,10 @@
         <activity
             android:name=".activity.ProbeFormatActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.AudioEffectActivity"
+        <activity
+            android:name=".activity.AudioEffectActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".activity.AudioPlayActivity"/>
     </application>
 
 </manifest>
