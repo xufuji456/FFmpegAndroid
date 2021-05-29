@@ -182,9 +182,7 @@ object JsonParseTool {
         val lyrics = audioTag.optString("lyrics-eng")
         if (lyrics != null && lyrics.contains("\r\n")) {
             val array = lyrics.split("\r\n")
-            for (i in array.indices) {
-                Log.e(TAG, "lyrics=" + array[i])
-            }
+            audioBean.lyrics = array
         }
     }
 
