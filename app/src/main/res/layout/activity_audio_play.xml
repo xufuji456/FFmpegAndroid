@@ -22,11 +22,13 @@
         android:textColor="@color/colorPrimary"
         android:textSize="18sp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.frank.ffmpeg.view.LrcView
         android:id="@+id/list_lyrics"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:layout_marginTop="160dp"
+        android:layout_marginBottom="160dp"/>
 
     <RelativeLayout
         android:id="@+id/layout_control"
