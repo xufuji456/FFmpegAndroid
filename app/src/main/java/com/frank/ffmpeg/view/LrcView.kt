@@ -9,6 +9,7 @@ import android.graphics.Paint.Align
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.IntDef
 
 import com.frank.ffmpeg.listener.OnLrcListener
 import com.frank.ffmpeg.model.LrcLine
@@ -42,7 +43,12 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
 
     private var mDisplayMode = DISPLAY_MODE_NORMAL
 
-    private val mode = MODE_HIGH_LIGHT_KARAOKE
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(MODE_HIGH_LIGHT_NORMAL, MODE_HIGH_LIGHT_KARAOKE)
+    annotation class HighLightMode
+
+    @HighLightMode
+    private var mode = MODE_HIGH_LIGHT_KARAOKE
 
 
     init {
@@ -109,20 +115,24 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
     }
 
     private fun drawKaraokeHighLightLrcRow(canvas: Canvas, width: Int, rowX: Int, highlightRowY: Int) {
+        if (width <= 0 || rowX <= 0 || highlightRowY <= 0) {
+            return
+        }
         val highLrcLine = mLrcLines!![mHighLightRow]
         val highlightText = highLrcLine.content
+        if (highlightText.isNullOrEmpty()) return
 
         mPaint.color = mNormalRowColor
         mPaint.textSize = mLrcFontSize.toFloat()
         mPaint.textAlign = Align.CENTER
-        canvas.drawText(highlightText!!, rowX.toFloat(), highlightRowY.toFloat(), mPaint)
+        canvas.drawText(highlightText, rowX.toFloat(), highlightRowY.toFloat(), mPaint)
 
         val highLineWidth = mPaint.measureText(highlightText).toInt()
         val leftOffset = (width - highLineWidth) / 2
         val start = highLrcLine.startTime
         val end = highLrcLine.endTime
         val highWidth = ((currentMillis - start) * 1.0f / (end - start) * highLineWidth).toInt()
-        if (highWidth > 0) {
+        if (highWidth > 0 && highWidth < Integer.MAX_VALUE) {
             mPaint.color = mHighLightRowColor
             val textBitmap = Bitmap.createBitmap(highWidth, highlightRowY + mPadding, Bitmap.Config.ARGB_8888)
             val textCanvas = Canvas(textBitmap)
@@ -196,6 +206,10 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
         invalidate()
     }
 
+    fun setHighLightMode(@HighLightMode mode: Int) {
+        this.mode = mode
+    }
+
     private fun seekLrc(position: Int, cb: Boolean) {
         if (mLrcLines == null || position < 0 || position > mLrcLines!!.size) {
             return
@@ -251,8 +265,8 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
 
         private const val noLrcTip = "No lyrics..."
 
-        private const val MODE_HIGH_LIGHT_NORMAL = 0
+        const val MODE_HIGH_LIGHT_NORMAL = 0
 
-        private const val MODE_HIGH_LIGHT_KARAOKE = 1
+        const val MODE_HIGH_LIGHT_KARAOKE = 1
     }
 }

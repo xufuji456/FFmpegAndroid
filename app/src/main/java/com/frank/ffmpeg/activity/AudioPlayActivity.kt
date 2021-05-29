@@ -59,6 +59,7 @@ class AudioPlayActivity : AppCompatActivity() {
                     audioBar?.max = duration
                 }
                 MSG_FINISH -> {
+                    if (msg.obj == null) return
                     val result = msg.obj as MediaBean
                     txtTitle?.text = result.audioBean?.title
                     txtArtist?.text = result.audioBean?.artist
