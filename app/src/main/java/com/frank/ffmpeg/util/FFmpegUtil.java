@@ -86,6 +86,24 @@ public class FFmpegUtil {
     //mixing formula: value = sample1 + sample2 - (sample1 * sample2 / (pow(2, 16-1) - 1))
 
     /**
+     * Set echo and delay effect
+     *
+     * @param inputPath  input file
+     * @param delay      delay to play
+     * @param outputPath output file
+     * @return mix success or not
+     */
+    public static String[] audioEcho(String inputPath, int delay, String outputPath) {
+        // in_gain (0, 1], Default is 0.6
+        // out_gain (0, 1], Default is 0.3
+        // delays (0 - 90000]. Default is 1000
+        // decays (0 - 1.0]. Default is 0.5
+        String echoCmd = "ffmpeg -i %s -af aecho=0.8:0.8:%d:0.5 %s";
+        echoCmd = String.format(Locale.getDefault(), echoCmd, inputPath, delay, outputPath);
+        return echoCmd.split(" ");
+    }
+
+    /**
      * mux audio and video together
      *
      * @param videoFile the file of pure video

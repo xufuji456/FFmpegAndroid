@@ -102,7 +102,8 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_play_opensl,
                 R.id.btn_audio_encode,
                 R.id.btn_pcm_concat,
-                R.id.btn_audio_speed
+                R.id.btn_audio_speed,
+                R.id.btn_audio_echo
         )
     }
 
@@ -219,6 +220,12 @@ class AudioHandleActivity : BaseActivity() {
                 val speed = 2.0f // funny effect, range from 0.5 to 100.0
                 val speedPath = PATH + File.separator + "speed.mp3"
                 commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed)
+            }
+            R.id.btn_audio_echo//setting echo effect
+            -> {
+                val echo = 1000 // echo effect, range from 0 to 90000
+                val echoPath = PATH + File.separator + "echo.mp3"
+                commandLine = FFmpegUtil.audioEcho(srcFile, echo, echoPath)
             }
             else -> {
             }

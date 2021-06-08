@@ -9,6 +9,7 @@
     <string name="audio_encode">PCM encode</string>
     <string name="pcm_concat">PCM concat</string>
     <string name="audio_speed">Audio speed</string>
+    <string name="audio_echo">Echo effect</string>
     <string name="audio_effect">Audio effect</string>
     <string name="audio_equalizer">Audio equalizer:</string>
     <string name="audio_style">Audio style:</string>
