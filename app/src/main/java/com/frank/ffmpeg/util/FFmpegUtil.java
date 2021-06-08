@@ -523,8 +523,9 @@ public class FFmpegUtil {
      * @return change speed success or not
      */
     public static String[] changeAudioSpeed(String inputPath, String outputPath, float speed) {
-        if (speed > 2 || speed < 0.5) {
-            throw new IllegalArgumentException("audio speed range is from 0.5 to 2");
+        // atempo range [0.5, 100.0]
+        if (speed > 100 || speed < 0.5) {
+            throw new IllegalArgumentException("audio speed range is from 0.5 to 100");
         }
         String speedCmd = "ffmpeg -i %s -filter_complex atempo=%.2f %s";
         speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, speed, outputPath);

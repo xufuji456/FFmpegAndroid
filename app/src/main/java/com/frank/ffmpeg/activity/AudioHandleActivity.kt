@@ -216,7 +216,7 @@ class AudioHandleActivity : BaseActivity() {
             }
             R.id.btn_audio_speed//change audio speed
             -> {
-                val speed = 2.0f//from 0.5 to 2.0
+                val speed = 2.0f // funny effect, range from 0.5 to 100.0
                 val speedPath = PATH + File.separator + "speed.mp3"
                 commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed)
             }
