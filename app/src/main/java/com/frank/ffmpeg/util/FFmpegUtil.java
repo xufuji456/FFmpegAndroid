@@ -104,6 +104,23 @@ public class FFmpegUtil {
     }
 
     /**
+     * Set tremolo effect, sinusoidal amplitude modulation
+     *
+     * @param inputPath  input file
+     * @param frequency  frequency
+     * @param depth      depth
+     * @param outputPath output file
+     * @return mix success or not
+     */
+    public static String[] audioTremolo(String inputPath, int frequency, float depth, String outputPath) {
+        // frequency [0.1, 20000.0], Default is 5
+        // depth (0, 1], Default is 0.5
+        String tremoloCmd = "ffmpeg -i %s -af tremolo=%d:%f %s";
+        tremoloCmd = String.format(Locale.getDefault(), tremoloCmd, inputPath, frequency, depth, outputPath);
+        return tremoloCmd.split(" ");
+    }
+
+    /**
      * mux audio and video together
      *
      * @param videoFile the file of pure video

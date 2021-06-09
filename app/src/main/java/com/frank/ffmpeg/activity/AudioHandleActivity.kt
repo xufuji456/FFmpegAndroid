@@ -103,7 +103,8 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_audio_encode,
                 R.id.btn_pcm_concat,
                 R.id.btn_audio_speed,
-                R.id.btn_audio_echo
+                R.id.btn_audio_echo,
+                R.id.btn_audio_tremolo
         )
     }
 
@@ -221,11 +222,18 @@ class AudioHandleActivity : BaseActivity() {
                 val speedPath = PATH + File.separator + "speed.mp3"
                 commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed)
             }
-            R.id.btn_audio_echo//setting echo effect
+            R.id.btn_audio_echo // setting echo effect
             -> {
                 val echo = 1000 // echo effect, range from 0 to 90000
                 val echoPath = PATH + File.separator + "echo.mp3"
                 commandLine = FFmpegUtil.audioEcho(srcFile, echo, echoPath)
+            }
+            R.id.btn_audio_tremolo //tremolo effect
+            -> {
+                val frequency = 5 // range from 0.1 to 20000.0
+                val depth = 0.9f // range from 0 to 1
+                val tremoloPath = PATH + File.separator + "tremolo.mp3"
+                commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, tremoloPath)
             }
             else -> {
             }
