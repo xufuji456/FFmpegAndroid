@@ -57,8 +57,6 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.recyclerview:recyclerview:$rootProject.recyclerviewVersion"
-    implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
-    testImplementation 'junit:junit:4.12'
     implementation project(':Live')
     implementation "androidx.core:core-ktx:$rootProject.core_ktx"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycle_ktx"
