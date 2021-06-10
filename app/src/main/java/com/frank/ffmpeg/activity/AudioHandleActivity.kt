@@ -104,7 +104,8 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_pcm_concat,
                 R.id.btn_audio_speed,
                 R.id.btn_audio_echo,
-                R.id.btn_audio_tremolo
+                R.id.btn_audio_tremolo,
+                R.id.btn_audio_denoise
         )
     }
 
@@ -234,6 +235,11 @@ class AudioHandleActivity : BaseActivity() {
                 val depth = 0.9f // range from 0 to 1
                 val tremoloPath = PATH + File.separator + "tremolo.mp3"
                 commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, tremoloPath)
+            }
+            R.id.btn_audio_denoise
+            -> {
+                val noisePath = PATH + File.separator + "denoise.mp3"
+                commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
             }
             else -> {
             }

@@ -90,6 +90,13 @@
             android:text="@string/audio_tremolo"
             android:layout_marginTop="10dp" />
 
+        <Button
+            android:id="@+id/btn_audio_denoise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_denoise"
+            android:layout_marginTop="10dp" />
+
     </LinearLayout>
 
     <include

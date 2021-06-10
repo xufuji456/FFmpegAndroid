@@ -121,6 +121,22 @@ public class FFmpegUtil {
     }
 
     /**
+     * Denoise audio samples with FFT
+     *
+     * @param inputPath  input file
+     * @param outputPath output file
+     * @return mix success or not
+     */
+    public static String[] audioDenoise(String inputPath, String outputPath) {
+        // nr: noise reduction in dB, [0.01 to 97], Default value is 12 dB
+        // nf: noise floor in dB, [-80 to -20],  Default value is -50 dB
+        // nt: noise type {w:white noise v:vinyl noise s:shellac noise}
+        String fftDenoiseCmd = "ffmpeg -i %s -af afftdn %s";
+        fftDenoiseCmd = String.format(Locale.getDefault(), fftDenoiseCmd, inputPath, outputPath);
+        return fftDenoiseCmd.split(" ");
+    }
+
+    /**
      * mux audio and video together
      *
      * @param videoFile the file of pure video
