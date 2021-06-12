@@ -78,7 +78,7 @@ class AudioHandleActivity : BaseActivity() {
                         txtProgress!!.visibility = View.VISIBLE
                         txtProgress!!.text = String.format(Locale.getDefault(), "%d%%", progress)
                     } else {
-                        txtProgress!!.visibility = View.INVISIBLE
+                        txtProgress!!.visibility = View.GONE
                     }
                 }
                 MSG_INFO -> {
@@ -119,7 +119,8 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_audio_echo,
                 R.id.btn_audio_tremolo,
                 R.id.btn_audio_denoise,
-                R.id.btn_audio_silence
+                R.id.btn_audio_silence,
+                R.id.btn_audio_volume
         )
     }
 
@@ -250,14 +251,20 @@ class AudioHandleActivity : BaseActivity() {
                 val tremoloPath = PATH + File.separator + "tremolo.mp3"
                 commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, tremoloPath)
             }
-            R.id.btn_audio_denoise
+            R.id.btn_audio_denoise //audio denoise
             -> {
                 val noisePath = PATH + File.separator + "denoise.mp3"
                 commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
             }
-            R.id.btn_audio_silence
+            R.id.btn_audio_silence //silence detect
             -> {
                 commandLine = FFmpegUtil.audioSilenceDetect(srcFile)
+            }
+            R.id.btn_audio_volume // modify volume
+            -> {
+                val volume = 0.5f // 0.0-1.0
+                val volumePath = PATH + File.separator + "volume.mp3"
+                commandLine = FFmpegUtil.audioVolume(srcFile, volume, volumePath)
             }
             else -> {
             }

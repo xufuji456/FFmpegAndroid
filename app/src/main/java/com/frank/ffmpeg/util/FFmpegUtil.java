@@ -147,6 +147,20 @@ public class FFmpegUtil {
     }
 
     /**
+     * Change volume of a chunk of audio
+     *
+     * @param inputPath  input file
+     * @param volume     volume
+     * @param outputPath output file
+     */
+    public static String[] audioVolume(String inputPath, float volume, String outputPath) {
+        // output_volume = volume * input_volume
+        String volumeCmd = "ffmpeg -i %s -af volume=%f %s";
+        volumeCmd = String.format(Locale.getDefault(), volumeCmd, inputPath, volume, outputPath);
+        return volumeCmd.split(" ");
+    }
+
+    /**
      * mux audio and video together
      *
      * @param videoFile the file of pure video
