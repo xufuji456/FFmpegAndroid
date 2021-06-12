@@ -12,6 +12,7 @@
     <string name="audio_echo">空灵效果</string>
     <string name="audio_tremolo">惊悚效果</string>
     <string name="audio_denoise">音频降噪</string>
+    <string name="audio_silence">静音检测</string>
     <string name="audio_effect">音乐均衡器</string>
     <string name="audio_equalizer">均衡器:</string>
     <string name="audio_style">风格:</string>

@@ -105,7 +105,8 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_audio_speed,
                 R.id.btn_audio_echo,
                 R.id.btn_audio_tremolo,
-                R.id.btn_audio_denoise
+                R.id.btn_audio_denoise,
+                R.id.btn_audio_silence
         )
     }
 
@@ -240,6 +241,10 @@ class AudioHandleActivity : BaseActivity() {
             -> {
                 val noisePath = PATH + File.separator + "denoise.mp3"
                 commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
+            }
+            R.id.btn_audio_silence
+            -> {
+                commandLine = FFmpegUtil.audioSilenceDetect(srcFile)
             }
             else -> {
             }

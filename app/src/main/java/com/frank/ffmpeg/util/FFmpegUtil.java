@@ -91,7 +91,6 @@ public class FFmpegUtil {
      * @param inputPath  input file
      * @param delay      delay to play
      * @param outputPath output file
-     * @return mix success or not
      */
     public static String[] audioEcho(String inputPath, int delay, String outputPath) {
         // in_gain (0, 1], Default is 0.6
@@ -110,7 +109,6 @@ public class FFmpegUtil {
      * @param frequency  frequency
      * @param depth      depth
      * @param outputPath output file
-     * @return mix success or not
      */
     public static String[] audioTremolo(String inputPath, int frequency, float depth, String outputPath) {
         // frequency [0.1, 20000.0], Default is 5
@@ -125,7 +123,6 @@ public class FFmpegUtil {
      *
      * @param inputPath  input file
      * @param outputPath output file
-     * @return mix success or not
      */
     public static String[] audioDenoise(String inputPath, String outputPath) {
         // nr: noise reduction in dB, [0.01 to 97], Default value is 12 dB
@@ -134,6 +131,19 @@ public class FFmpegUtil {
         String fftDenoiseCmd = "ffmpeg -i %s -af afftdn %s";
         fftDenoiseCmd = String.format(Locale.getDefault(), fftDenoiseCmd, inputPath, outputPath);
         return fftDenoiseCmd.split(" ");
+    }
+
+    /**
+     * Detect silence of a chunk of audio
+     *
+     * @param inputPath  input file
+     */
+    public static String[] audioSilenceDetect(String inputPath) {
+        // silence_start: 268.978
+        // silence_end: 271.048 | silence_duration: 2.06975
+        String silenceCmd = "ffmpeg -i %s -af silencedetect=noise=0.0001 -f null -";
+        silenceCmd = String.format(Locale.getDefault(), silenceCmd, inputPath);
+        return silenceCmd.split(" ");
     }
 
     /**

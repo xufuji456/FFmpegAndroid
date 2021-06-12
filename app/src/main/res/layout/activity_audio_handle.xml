@@ -44,14 +44,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_play"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_play_opensl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_opensl"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/btn_audio_encode"
@@ -95,6 +97,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_denoise"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/btn_audio_silence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_silence"
             android:layout_marginTop="10dp" />
 
     </LinearLayout>
