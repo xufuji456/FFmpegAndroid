@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_transform"
-            android:layout_marginTop="40dp" />
+            android:layout_marginTop="10dp" />
 
         <Button
             android:id="@+id/btn_cut"
@@ -97,6 +97,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_denoise"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/btn_audio_equalizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_add_equalizer"
             android:layout_marginTop="10dp" />
 
         <Button

@@ -2,7 +2,7 @@
     <string name="app_name">FFmpegAndroid</string>
     <string name="audio_transform">音频转码</string>
     <string name="audio_cut">音频剪切</string>
-    <string name="audio_concat">音频合并</string>
+    <string name="audio_concat">音频拼接</string>
     <string name="audio_mix">音乐混音</string>
     <string name="audio_play">音频解码AudioTrack播放</string>
     <string name="audio_opensl">音频解码OpenSL播放</string>

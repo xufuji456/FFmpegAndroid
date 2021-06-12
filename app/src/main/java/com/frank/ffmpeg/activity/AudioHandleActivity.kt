@@ -119,6 +119,7 @@ class AudioHandleActivity : BaseActivity() {
                 R.id.btn_audio_echo,
                 R.id.btn_audio_tremolo,
                 R.id.btn_audio_denoise,
+                R.id.btn_audio_equalizer,
                 R.id.btn_audio_silence,
                 R.id.btn_audio_volume
         )
@@ -255,6 +256,19 @@ class AudioHandleActivity : BaseActivity() {
             -> {
                 val noisePath = PATH + File.separator + "denoise.mp3"
                 commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
+            }
+            R.id.btn_audio_equalizer // equalizer plus
+            -> {
+                // key:band  value:gain=[0-20]
+                val bandList = arrayListOf<String>()
+                bandList.add("6b=5")
+                bandList.add("8b=4")
+                bandList.add("10b=3")
+                bandList.add("12b=2")
+                bandList.add("14b=1")
+                bandList.add("16b=0")
+                val equalizePath = PATH + File.separator + "equalize.mp3"
+                commandLine = FFmpegUtil.audioEqualizer(srcFile, bandList, equalizePath)
             }
             R.id.btn_audio_silence //silence detect
             -> {

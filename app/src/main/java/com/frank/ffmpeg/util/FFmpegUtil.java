@@ -161,6 +161,32 @@ public class FFmpegUtil {
     }
 
     /**
+     * Apply 18 band of equalizer into audio
+     *
+     * @param inputPath  input file
+     * @param bandList   bandList
+     * @param outputPath output file
+     */
+    public static String[] audioEqualizer(String inputPath, List<String> bandList, String outputPath) {
+        // unit: Hz  gain:0-20
+        /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         |   1b   |   2b   |   3b   |   4b   |   5b   |   6b   |   7b   |   8b   |   9b   |
+         |   65   |   92   |   131  |   185  |   262  |   370  |   523  |   740  |  1047  |
+         |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         |   10b  |   11b  |   12b  |   13b  |   14b  |   15b  |   16b  |   17b  |   18b  |
+         |   1480 |   2093 |   2960 |   4186 |   5920 |   8372 |  11840 |  16744 |  20000 |
+         |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+        StringBuilder builder = new StringBuilder();
+        for (String band:bandList) {
+            builder.append(band).append(":");
+        }
+        builder.deleteCharAt(builder.length()-1);
+        String equalizerCmd = "ffmpeg -i %s -af superequalizer=%s -y %s";
+        equalizerCmd = String.format(Locale.getDefault(), equalizerCmd, inputPath, builder.toString(), outputPath);
+        return equalizerCmd.split(" ");
+    }
+
+    /**
      * mux audio and video together
      *
      * @param videoFile the file of pure video
