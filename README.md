@@ -3,34 +3,30 @@ android端基于FFmpeg库的使用<br>
 添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 目前音视频相关处理：<br>
 
-- #### 音频剪切、拼接
+- #### 音频剪切
 - #### 音频混音
 - #### 音频转码
 - #### 音视频合成
-- #### 音频抽取
-- #### 音频解码播放
 - #### 音频编码
-- #### 视频抽取
 - #### 视频剪切
 - #### 视频转码
 - #### 视频截图
 - #### 视频降噪
 - #### 视频抽帧
-- #### 视频转GIF动图
-- #### 视频添加水印
+- #### 视频转GIF
+- #### 视频水印
 - #### 视频画面拼接
 - #### 视频反序倒播
 - #### 视频画中画
 - #### 图片合成视频
-- #### 视频解码播放
 - #### 本地直播推流
 - #### 实时直播推流
 - #### 音视频解码播放
-- #### FFmpeg的AVFilter滤镜
-- #### 使用mp3lame库进行mp3转码
+- #### 音乐歌词解析
 - #### 视频拖动实时预览
-- #### moov往前移动
+- #### FFmpeg的AVFilter滤镜
 - #### ffprobe检测多媒体格式
+- #### 使用mp3lame库进行mp3转码
 - #### IjkPlayer的RTSP超低延时直播
 
 ### Usage:
@@ -46,6 +42,9 @@ ffmpeg -i %s -s 1080x720 %s<br>
 ### (2) Probing media format:
 Select video or audio file from your file explorer, and click the button.<br>
 When it finishes probing, the result of metadata will display on screen.<br>
+
+### Joining the group to learn FFmpeg:
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
 
 ### Preview thumbnail when seeking:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
