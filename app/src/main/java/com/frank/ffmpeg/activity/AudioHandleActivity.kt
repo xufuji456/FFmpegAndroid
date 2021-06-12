@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 
 import java.io.File
 import java.util.ArrayList
@@ -22,9 +23,11 @@ import com.frank.ffmpeg.handler.FFmpegHandler
 import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.FileUtil
 
+import com.frank.ffmpeg.handler.FFmpegHandler.MSG_INFO
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS
+import java.lang.StringBuilder
 
 /**
  * Using ffmpeg command to handle audio
@@ -43,6 +46,7 @@ class AudioHandleActivity : BaseActivity() {
     private val outputPath1 = PATH + File.separator + "output1.mp3"
     private val outputPath2 = PATH + File.separator + "output2.mp3"
     private var isJointing = false
+    private var infoBuilder: StringBuilder? = null
 
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
@@ -61,6 +65,11 @@ class AudioHandleActivity : BaseActivity() {
                         FileUtil.deleteFile(outputPath1)
                         FileUtil.deleteFile(outputPath2)
                     }
+                    if (infoBuilder != null) {
+                        Toast.makeText(this@AudioHandleActivity,
+                                infoBuilder.toString(), Toast.LENGTH_LONG).show()
+                        infoBuilder = null
+                    }
                 }
                 MSG_PROGRESS -> {
                     val progress = msg.arg1
@@ -71,6 +80,10 @@ class AudioHandleActivity : BaseActivity() {
                     } else {
                         txtProgress!!.visibility = View.INVISIBLE
                     }
+                }
+                MSG_INFO -> {
+                    if (infoBuilder == null) infoBuilder = StringBuilder()
+                    infoBuilder?.append(msg.obj)
                 }
                 else -> {
                 }

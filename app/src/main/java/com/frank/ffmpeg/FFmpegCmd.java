@@ -180,6 +180,11 @@ public class FFmpegCmd {
     public static void onMsgCallback(String msg) {
         if (msg != null && !msg.isEmpty()) {
             Log.e(TAG, "from native msg=" + msg);
+
+            // silence detect callback
+            if (msg.startsWith("silence") && mProgressListener != null) {
+                mProgressListener.onMsg(msg);
+            }
         }
     }
 

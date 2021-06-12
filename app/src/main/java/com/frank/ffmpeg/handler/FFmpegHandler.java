@@ -8,6 +8,8 @@ import com.frank.ffmpeg.listener.OnHandleListener;
 import com.frank.ffmpeg.model.MediaBean;
 import com.frank.ffmpeg.tool.JsonParseTool;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -26,7 +28,9 @@ public class FFmpegHandler {
 
     public final static int MSG_CONTINUE = 2012;
 
-    public final static int MSG_TOAST = 4562;
+    public final static int MSG_TOAST = 5432;
+
+    public final static int MSG_INFO = 2222;
 
     private Handler mHandler;
 
@@ -54,6 +58,11 @@ public class FFmpegHandler {
             public void onBegin() {
                 Log.i(TAG, "handle onBegin...");
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+            }
+
+            @Override
+            public void onMsg(@NotNull String msg) {
+                mHandler.obtainMessage(MSG_INFO, msg).sendToTarget();
             }
 
             @Override
@@ -98,6 +107,11 @@ public class FFmpegHandler {
             }
 
             @Override
+            public void onMsg(@NotNull String msg) {
+
+            }
+
+            @Override
             public void onProgress(int progress, int duration) {
                 mHandler.obtainMessage(MSG_PROGRESS, progress, duration).sendToTarget();
             }
@@ -128,6 +142,11 @@ public class FFmpegHandler {
             public void onBegin() {
                 Log.i(TAG, "handle ffprobe onBegin...");
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+            }
+
+            @Override
+            public void onMsg(@NotNull String msg) {
+
             }
 
             @Override

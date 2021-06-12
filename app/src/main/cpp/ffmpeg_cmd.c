@@ -54,6 +54,16 @@ FFMPEG_FUNC(void, cancelTaskJni, jint cancel) {
     cancel_task(cancel);
 }
 
+void msg_callback(const char* format, va_list args) {
+    if (ff_env && msg_method) {
+        char *ff_msg = (char*) malloc(sizeof(char) * 1024);
+        vsprintf(ff_msg, format, args);
+        jstring jstr = (*ff_env)->NewStringUTF(ff_env, ff_msg);
+        (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr);
+        free(ff_msg);
+    }
+}
+
 void log_callback(void* ptr, int level, const char* format, va_list args) {
     switch (level) {
         case AV_LOG_WARNING:
@@ -61,16 +71,13 @@ void log_callback(void* ptr, int level, const char* format, va_list args) {
             break;
         case AV_LOG_INFO:
             ALOGI(FFMPEG_TAG, format, args);
+            if (format && strncmp("silence", format, 7) == 0) {
+                msg_callback(format, args);
+            }
             break;
         case AV_LOG_ERROR:
             ALOGE(FFMPEG_TAG, format, args);
-            if (ff_env && msg_method) {
-                char *ff_msg = (char*) malloc(sizeof(char) * 1024);
-                vsprintf(ff_msg, format, args);
-                jstring jstr = (*ff_env)->NewStringUTF(ff_env, ff_msg);
-                (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr);
-                free(ff_msg);
-            }
+            msg_callback(format, args);
             break;
         default:
             break;
