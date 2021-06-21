@@ -41,7 +41,7 @@ SLVolumeItf bqPlayerVolume;
 
 //audio effect
 const SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
-void *buffer;
+void *openBuffer;
 size_t bufferSize;
 uint8_t *outputBuffer;
 size_t outputBufferSize;
@@ -63,10 +63,10 @@ int getPCM(void **pcm, size_t *pcmSize);
 //callback by player
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) {
     bufferSize = 0;
-    getPCM(&buffer, &bufferSize);
-    if (NULL != buffer && 0 != bufferSize) {
+    getPCM(&openBuffer, &bufferSize);
+    if (NULL != openBuffer && 0 != bufferSize) {
         SLresult result;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, buffer, bufferSize);
+        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, openBuffer, bufferSize);
         if (result < 0) {
             LOGE(TAG, "Enqueue error...");
         } else {
