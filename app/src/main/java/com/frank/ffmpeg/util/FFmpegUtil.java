@@ -306,7 +306,11 @@ public class FFmpegUtil {
      * @return cut video success or not
      */
     public static String[] cutVideo(String inputPath, int startTime, int duration, String outputPath) {
-        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vcodec copy -avoid_negative_ts 1 %s";
+        // -map 0 -codec copy (copy all tracks)
+        // -map 0:v -vcodec copy (copy track of video)
+        // -map 0:a -acodec copy (copy all tracks of audio)
+        // -map 0:s -scodec copy (copy all tracks of subtitle)
+        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -map 0 -codec copy -avoid_negative_ts 1 %s";
         cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
         return cutVideoCmd.split(" ");
     }
