@@ -83,7 +83,7 @@ public class FFmpegUtil {
         mixAudioCmd = String.format(mixAudioCmd, inputPath, mixFile, outputPath);
         return mixAudioCmd.split(" ");
     }
-    //mixing formula: value = sample1 + sample2 - (sample1 * sample2 / (pow(2, 16-1) - 1))
+    //mixing formula: value = sample1 + sample2 - ((sample1 * sample2) >> 0x10)
 
     /**
      * Set echo and delay effect
