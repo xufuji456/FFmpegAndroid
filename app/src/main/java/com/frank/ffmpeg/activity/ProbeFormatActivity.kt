@@ -45,10 +45,12 @@ class ProbeFormatActivity : BaseActivity() {
                 MSG_FINISH -> {
                     progressProbe!!.visibility = View.GONE
                     layoutProbe!!.visibility = View.VISIBLE
-                    val result = msg.obj as MediaBean
-                    val resultFormat = JsonParseTool.stringFormat(result)
-                    if (!TextUtils.isEmpty(resultFormat) && txtProbeFormat != null) {
-                        txtProbeFormat!!.text = resultFormat
+                    val result = msg.obj?: msg.obj
+                    if (result != null) {
+                        val resultFormat = JsonParseTool.stringFormat(result as MediaBean)
+                        if (!TextUtils.isEmpty(resultFormat) && txtProbeFormat != null) {
+                            txtProbeFormat!!.text = resultFormat
+                        }
                     }
                 }
                 else -> {
