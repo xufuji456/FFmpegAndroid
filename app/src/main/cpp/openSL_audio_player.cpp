@@ -6,7 +6,6 @@
 #include <string.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-#include <android/log.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -241,7 +240,7 @@ int releaseAudioPlayer() {
     av_packet_unref(&packet);
     av_free(outputBuffer);
     av_free(aFrame);
-    avcodec_close(aCodecCtx);
+    avcodec_free_context(&aCodecCtx);
     avformat_close_input(&aFormatCtx);
     return 0;
 }

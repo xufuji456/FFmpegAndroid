@@ -5,7 +5,6 @@
 #include <android/native_window_jni.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <android/log.h>
 #include <pthread.h>
 #include <jni.h>
 
@@ -486,8 +485,8 @@ MEDIA_PLAYER_FUNC(void, release){
     av_free(player->yuv_frame);
     av_free(player->audio_buffer);
     av_free(player->audio_frame);
-    avcodec_close(player->video_codec_context);
-    avcodec_close(player->audio_codec_context);
+    avcodec_free_context(&player->video_codec_context);
+    avcodec_free_context(&player->audio_codec_context);
     avformat_close_input(&player->format_context);
     ANativeWindow_release(player->native_window);
     delete_queue(player);

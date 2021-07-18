@@ -4,7 +4,6 @@
 
 #include <jni.h>
 #include <string>
-#include <android/log.h>
 #include "ffmpeg_jni_define.h"
 
 #define TAG "FFmpegPusher"
@@ -19,7 +18,6 @@ extern "C" {
 
 PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
-    AVOutputFormat *output_format = NULL;
     AVFormatContext *in_format = NULL, *out_format = NULL;
     AVPacket packet;
     const char *file_path, *live_url;
@@ -77,8 +75,8 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 //            out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
         }
     }
-    output_format = out_format->oformat;
-    if (!(output_format->flags & AVFMT_NOFILE)) {
+
+    if (!(out_format->oformat->flags & AVFMT_NOFILE)) {
         ret = avio_open(&out_format->pb, live_url, AVIO_FLAG_WRITE);
         if (ret < 0) {
             LOGE(TAG, "could not open output url '%s'", live_url);
@@ -98,7 +96,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         if (ret < 0) {
             break;
         }
-        //计算帧间隔，参考时钟/采样率
+        // calculate pts and dts
         if (packet.pts == AV_NOPTS_VALUE) {
             AVRational time_base = in_format->streams[video_index]->time_base;
             int64_t cal_duration = (int64_t) (AV_TIME_BASE /
@@ -123,9 +121,9 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
         //pts to dts
         packet.pts = av_rescale_q_rnd(packet.pts, in_stream->time_base, out_stream->time_base,
-                                      (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+                                      AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
         packet.dts = av_rescale_q_rnd(packet.dts, in_stream->time_base, out_stream->time_base,
-                                      (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+                                      AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
         packet.duration = av_rescale_q(packet.duration, in_stream->time_base,
                                        out_stream->time_base);
         packet.pos = -1;
@@ -146,13 +144,12 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
     //Write tail
     av_write_trailer(out_format);
 
-    end:
-    avformat_close_input(&in_format);
+end:
     if (out_format && !(out_format->flags & AVFMT_NOFILE)) {
         avio_close(out_format->pb);
     }
-    avformat_free_context(in_format);
     avformat_free_context(out_format);
+    avformat_close_input(&in_format);
     env->ReleaseStringUTFChars(filePath, file_path);
     env->ReleaseStringUTFChars(liveUrl, live_url);
     if (ret < 0 && ret != AVERROR_EOF) {

@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <libavutil/imgutils.h>
-#include <android/log.h>
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/avfiltergraph.h>

@@ -5,7 +5,6 @@
 #include <android/native_window_jni.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <android/log.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,7 +129,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
     av_free(buffer);
     av_free(pFrameRGBA);
     av_free(pFrame);
-    avcodec_close(pCodecCtx);
+    avcodec_free_context(&pCodecCtx);
     avformat_close_input(&pFormatCtx);
     return 0;
 }
