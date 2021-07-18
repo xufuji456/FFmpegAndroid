@@ -198,7 +198,6 @@ class AudioHandleActivity : BaseActivity() {
             }
             R.id.btn_play_audio//use AudioTrack to play audio
             -> {
-//                Thread { AudioPlayer().play(srcFile) }.start()
                 val audioIntent = Intent(this@AudioHandleActivity, AudioPlayActivity::class.java)
                 audioIntent.data = Uri.parse(srcFile)
                 startActivity(audioIntent)

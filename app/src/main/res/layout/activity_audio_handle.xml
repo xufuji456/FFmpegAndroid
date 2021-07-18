@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:text="@string/audio_play"
             android:layout_marginTop="10dp"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <Button
             android:id="@+id/btn_play_opensl"
