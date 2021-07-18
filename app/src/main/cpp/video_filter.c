@@ -83,8 +83,8 @@ jboolean playAudio = JNI_TRUE;
 int init_filters(const char *filters_descr) {
     char args[512];
     int ret = 0;
-    AVFilter *buffersrc = avfilter_get_by_name("buffer");
-    AVFilter *buffersink = avfilter_get_by_name("buffersink");
+    const AVFilter *buffersrc = avfilter_get_by_name("buffer");
+    const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs = avfilter_inout_alloc();
     AVRational time_base = pFormatCtx->streams[video_stream_index]->time_base;
