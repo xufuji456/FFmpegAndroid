@@ -344,7 +344,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
         }
         //is video stream or not
         if (packet.stream_index == video_stream_index) {
-            //对该帧进行解码
+            // decode frame by frame
             avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
 
             if (frameFinished) {
@@ -389,22 +389,21 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
     end:
     is_playing = 0;
     av_free(buffer);
-    av_free(pFrameRGBA);
-    av_free(filter_frame);
-    av_free(pFrame);
-    avcodec_close(pCodecCtx);
-    avformat_close_input(&pFormatCtx);
+    av_free(out_buffer);
+    sws_freeContext(sws_ctx);
+    swr_free(&audio_swr_ctx);
     avfilter_free(buffersrc_ctx);
     avfilter_free(buffersink_ctx);
     avfilter_graph_free(&filter_graph);
-    avcodec_close(audioCodecCtx);
-    free(buffer);
-    free(sws_ctx);
-    free(&windowBuffer);
-    free(out_buffer);
-    free(audio_swr_ctx);
+    avcodec_free_context(&pCodecCtx);
+    avcodec_free_context(&audioCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    av_free(pFrameRGBA);
+    av_free(filter_frame);
+    av_free(pFrame);
+
     free(audio_track);
-    free(audio_track_write_mid);
+    free(&windowBuffer);
     ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     (*env)->ReleaseStringUTFChars(env, filterDescr, filter_descr);
