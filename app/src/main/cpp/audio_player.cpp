@@ -134,20 +134,16 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
     const char *input_cstr = env->GetStringUTFChars(input_jstr, NULL);
     LOGI(TAG, "input url=%s", input_cstr);
-    //register all modules
     av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
-    //open the audio file
     if (avformat_open_input(&pFormatCtx, input_cstr, NULL, NULL) != 0) {
         LOGE(TAG, "Couldn't open the audio file!");
         return;
     }
-    //find all streams info
     if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
         LOGE(TAG, "Couldn't find stream info!");
         return;
     }
-    //get the audio stream index in the stream array
     int i = 0, audio_stream_idx = -1;
     for (; i < pFormatCtx->nb_streams; i++) {
         if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -156,36 +152,25 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
         }
     }
 
-    //find audio decoder
     AVCodecContext *codecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
     AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
     if (codec == NULL) {
         LOGE(TAG, "Couldn't find audio decoder!");
         return;
     }
-    //open audio decoder
     if (avcodec_open2(codecCtx, codec, NULL) < 0) {
         LOGE(TAG, "Couldn't open audio decoder");
         return;
     }
-    //malloc packet memory
     AVPacket *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
-    //malloc frame memory
     AVFrame *frame = av_frame_alloc();
-    //frame->16bit 44100 PCM
     SwrContext *swrCtx = swr_alloc();
 
-    //input sampleFormat
     enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;
-    //output sampleFormat: 16bit PCM
     enum AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;
-    //input sampleRate
     int in_sample_rate = codecCtx->sample_rate;
-    //output sampleRate
     int out_sample_rate = in_sample_rate;
-    //input channel layout(2 channels, stereo by default)
     uint64_t in_ch_layout = codecCtx->channel_layout;
-    //output channel layout
     uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
 
     swr_alloc_set_opts(swrCtx,
@@ -193,8 +178,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
                        in_ch_layout, in_sample_fmt, in_sample_rate,
                        0, NULL);
     swr_init(swrCtx);
-
-    //output channel number
     int out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 
     jclass player_class = env->GetObjectClass(thiz);
@@ -209,16 +192,13 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     }
     jobject audio_track = env->CallObjectMethod(thiz, audio_track_method, out_sample_rate,
                                                    out_channel_nb);
-
     //call play method
     jclass audio_track_class = env->GetObjectClass(audio_track);
     jmethodID audio_track_play_mid = env->GetMethodID(audio_track_class, "play", "()V");
     env->CallVoidMethod(audio_track, audio_track_play_mid);
-
     //get write method
     jmethodID audio_track_write_mid = env->GetMethodID(audio_track_class, "write",
                                                           "([BII)I");
-
     uint8_t *out_buffer = (uint8_t *) av_malloc(MAX_AUDIO_FRAME_SIZE);
 
     /* Set up the filter graph. */
@@ -232,14 +212,11 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0) {
-        //is audio stream index
         if (packet->stream_index == audio_stream_idx) {
-            //do decode
             ret = avcodec_decode_audio4(codecCtx, frame, &got_frame, packet);
             if (ret < 0) {
                 break;
             }
-            //decode success
             if (got_frame > 0) {
                 ret = av_buffersrc_add_frame(audioSrcContext, frame);
                 if (ret < 0) {
@@ -264,14 +241,11 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
                 jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
                 jbyte *sample_byte_array = env->GetByteArrayElements(audio_sample_array, NULL);
-                //copy buffer data
                 memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
-                //release byteArray
                 env->ReleaseByteArrayElements(audio_sample_array, sample_byte_array, 0);
                 //call write method to play
                 env->CallIntMethod(audio_track, audio_track_write_mid,
                                       audio_sample_array, 0, out_buffer_size);
-                //delete local reference
                 env->DeleteLocalRef(audio_sample_array);
                 av_frame_unref(filter_frame);
                 usleep(SLEEP_TIME);
