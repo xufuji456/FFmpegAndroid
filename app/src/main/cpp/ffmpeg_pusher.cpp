@@ -121,9 +121,9 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
         //pts to dts
         packet.pts = av_rescale_q_rnd(packet.pts, in_stream->time_base, out_stream->time_base,
-                                      AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+                                      (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
         packet.dts = av_rescale_q_rnd(packet.dts, in_stream->time_base, out_stream->time_base,
-                                      AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+                                      (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
         packet.duration = av_rescale_q(packet.duration, in_stream->time_base,
                                        out_stream->time_base);
         packet.pos = -1;
