@@ -28,101 +28,101 @@ extern "C" {
 #define SLEEP_TIME 1000 * 16
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
-int init_filter_graph(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
+int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
     AVFilterGraph   *filter_graph;
-    AVFilterContext *abuffer_ctx;
-    const AVFilter  *abuffer;
+    AVFilterContext *buffer_ctx;
+    const AVFilter  *buffer;
     AVFilterContext *volume_ctx;
     const AVFilter  *volume;
-    AVFilterContext *abuffersink_ctx;
-    const AVFilter  *abuffersink;
+    AVFilterContext *buffersink_ctx;
+    const AVFilter  *buffersink;
     AVDictionary *options_dict = NULL;
     uint8_t ch_layout[64];
-    int err;
+    int ret;
 
     /* Create a new filter graph, which will contain all the filters. */
     filter_graph = avfilter_graph_alloc();
     if (!filter_graph) {
-        LOGE(TAG, "Unable to create filter graph:%d", stderr);
+        LOGE(TAG, "Unable to create filter graph...");
         return AVERROR(ENOMEM);
     }
     /* Create the abuffer filter: feed data into the graph. */
-    abuffer = avfilter_get_by_name("abuffer");
-    if (!abuffer) {
-        LOGE(TAG, "Could not find the abuffer filter:%d", stderr);
+    buffer = avfilter_get_by_name("abuffer");
+    if (!buffer) {
+        LOGE(TAG, "Could not find the buffer filter...");
         return AVERROR_FILTER_NOT_FOUND;
     }
-    abuffer_ctx = avfilter_graph_alloc_filter(filter_graph, abuffer, "src");
-    if (!abuffer_ctx) {
-        LOGE(TAG, "Could not allocate the abuffer instance:%d", stderr);
+    buffer_ctx = avfilter_graph_alloc_filter(filter_graph, buffer, "src");
+    if (!buffer_ctx) {
+        LOGE(TAG, "Could not allocate the buffer instance...");
         return AVERROR(ENOMEM);
     }
     /* Set the filter options through the AVOptions API. */
     av_get_channel_layout_string(reinterpret_cast<char *>(ch_layout), sizeof(ch_layout), 0, channel_layout);
-    av_opt_set    (abuffer_ctx, "channel_layout", reinterpret_cast<char *>(ch_layout), AV_OPT_SEARCH_CHILDREN);
-    av_opt_set    (abuffer_ctx, "sample_fmt",     av_get_sample_fmt_name(inputFormat), AV_OPT_SEARCH_CHILDREN);
-    av_opt_set_q  (abuffer_ctx, "time_base",      (AVRational){ 1, sample_rate },      AV_OPT_SEARCH_CHILDREN);
-    av_opt_set_int(abuffer_ctx, "sample_rate",    sample_rate,                         AV_OPT_SEARCH_CHILDREN);
-    err = avfilter_init_str(abuffer_ctx, NULL);
-    if (err < 0) {
-        LOGE(TAG, "Could not initialize the abuffer filter:%d", stderr);
-        return err;
+    av_opt_set    (buffer_ctx, "channel_layout", reinterpret_cast<char *>(ch_layout), AV_OPT_SEARCH_CHILDREN);
+    av_opt_set    (buffer_ctx, "sample_fmt",     av_get_sample_fmt_name(inputFormat), AV_OPT_SEARCH_CHILDREN);
+    av_opt_set_q  (buffer_ctx, "time_base",      (AVRational){ 1, sample_rate },      AV_OPT_SEARCH_CHILDREN);
+    av_opt_set_int(buffer_ctx, "sample_rate",    sample_rate,                         AV_OPT_SEARCH_CHILDREN);
+    ret = avfilter_init_str(buffer_ctx, NULL);
+    if (ret < 0) {
+        LOGE(TAG, "Could not initialize the buffer filter:%d", ret);
+        return ret;
     }
 
     /* Create volume filter. */
     volume = avfilter_get_by_name("volume");
     if (!volume) {
-        LOGE(TAG, "Could not find the volume filter:%d", stderr);
+        LOGE(TAG, "Could not find the volume filter...");
         return AVERROR_FILTER_NOT_FOUND;
     }
     volume_ctx = avfilter_graph_alloc_filter(filter_graph, volume, "volume");
     if (!volume_ctx) {
-        LOGE(TAG, "Could not allocate the volume instance:%d", stderr);
+        LOGE(TAG, "Could not allocate the volume instance...");
         return AVERROR(ENOMEM);
     }
     /* Passing the options is as key/value pairs in a dictionary. */
     av_dict_set(&options_dict, "volume", AV_STRINGIFY(VOLUME_VAL), 0);
-    err = avfilter_init_dict(volume_ctx, &options_dict);
+    ret = avfilter_init_dict(volume_ctx, &options_dict);
     av_dict_free(&options_dict);
-    if (err < 0) {
-        LOGE(TAG, "Could not initialize the volume filter:%d", stderr);
-        return err;
+    if (ret < 0) {
+        LOGE(TAG, "Could not initialize the volume filter:%d", ret);
+        return ret;
     }
 
     /* Create the abuffersink filter: get the filtered data from graph. */
-    abuffersink = avfilter_get_by_name("abuffersink");
-    if (!abuffersink) {
-        LOGE(TAG, "Could not find the abuffersink filter:%d", stderr);
+    buffersink = avfilter_get_by_name("abuffersink");
+    if (!buffersink) {
+        LOGE(TAG, "Could not find the abuffersink filter...");
         return AVERROR_FILTER_NOT_FOUND;
     }
-    abuffersink_ctx = avfilter_graph_alloc_filter(filter_graph, abuffersink, "sink");
-    if (!abuffersink_ctx) {
-        LOGE(TAG, "Could not allocate the abuffersink instance:%d", stderr);
+    buffersink_ctx = avfilter_graph_alloc_filter(filter_graph, buffersink, "sink");
+    if (!buffersink_ctx) {
+        LOGE(TAG, "Could not allocate the abuffersink instance...");
         return AVERROR(ENOMEM);
     }
-    err = avfilter_init_str(abuffersink_ctx, NULL);
-    if (err < 0) {
-        LOGE(TAG, "Could not initialize the abuffersink instance:%d", stderr);
-        return err;
+    ret = avfilter_init_str(buffersink_ctx, NULL);
+    if (ret < 0) {
+        LOGE(TAG, "Could not initialize the abuffersink instance:%d", ret);
+        return ret;
     }
     /* Connect the filters */
-    err = avfilter_link(abuffer_ctx, 0, volume_ctx, 0);
-    if (err >= 0)
-        err = avfilter_link(volume_ctx, 0, abuffersink_ctx, 0);
-    if (err < 0) {
-        LOGE(TAG, "Error connecting filters:%d", stderr);
-        return err;
+    ret = avfilter_link(buffer_ctx, 0, volume_ctx, 0);
+    if (ret >= 0)
+        ret = avfilter_link(volume_ctx, 0, buffersink_ctx, 0);
+    if (ret < 0) {
+        LOGE(TAG, "Error connecting filters:%d", ret);
+        return ret;
     }
     /* Configure the graph. */
-    err = avfilter_graph_config(filter_graph, NULL);
-    if (err < 0) {
-        LOGE(TAG, "Error configuring the filter graph:%d", err);
-        return err;
+    ret = avfilter_graph_config(filter_graph, NULL);
+    if (ret < 0) {
+        LOGE(TAG, "Error configuring the filter graph:%d", ret);
+        return ret;
     }
     *graph = filter_graph;
-    *src   = abuffer_ctx;
-    *sink  = abuffersink_ctx;
+    *src   = buffer_ctx;
+    *sink  = buffersink_ctx;
     return 0;
 }
 
@@ -203,7 +203,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
     /* Set up the filter graph. */
     AVFrame *filter_frame = av_frame_alloc();
-    ret = init_filter_graph(&audioFilterGraph, &audioSrcContext, &audioSinkContext,
+    ret = init_volume_filter(&audioFilterGraph, &audioSrcContext, &audioSinkContext,
             in_ch_layout, in_sample_fmt, in_sample_rate);
     if (ret < 0) {
         LOGE(TAG, "Unable to init filter graph:%d", stderr);
