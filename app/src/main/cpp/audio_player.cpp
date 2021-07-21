@@ -28,7 +28,7 @@ extern "C" {
 #define SLEEP_TIME 1000 * 16
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
-const char *filter_descr = "superequalizer=6b=6:8b=6";
+const char *filter_descr = "superequalizer=6b=4:8b=5:10b=5";
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
@@ -276,7 +276,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 //            in_ch_layout, in_sample_fmt, in_sample_rate);
     ret = init_equalizer_filter(codecCtx, &audioFilterGraph, &audioSrcContext, &audioSinkContext);
     if (ret < 0) {
-        LOGE(TAG, "Unable to init filter graph:%d", stderr);
+        LOGE(TAG, "Unable to init filter graph:%d", ret);
         goto end;
     }
 
@@ -290,35 +290,34 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
             if (got_frame > 0) {
                 ret = av_buffersrc_add_frame(audioSrcContext, frame);
                 if (ret < 0) {
-                    LOGE(TAG, "Error add the frame to the filter graph:%d", stderr);
+                    LOGE(TAG, "Error add the frame to the filter graph:%d", ret);
                 }
                 /* Get all the filtered output that is available. */
-                ret = av_buffersink_get_frame(audioSinkContext, filter_frame);
-                if (ret == AVERROR(EAGAIN)) {
-                    LOGE(TAG, "get filter frame again...");
-                    continue;
-                }
-                if (ret < 0) {
-                    LOGE(TAG, "Error get the frame from the filter graph:%d", stderr);
-                    goto end;
-                }
+                while (1) {
+                    ret = av_buffersink_get_frame(audioSinkContext, filter_frame);
+                    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+                        break;
+                    if (ret < 0) {
+                        LOGE(TAG, "Error get the frame from the filter graph:%d", ret);
+                        goto end;
+                    }
+                    //convert audio format
+                    swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,
+                                (const uint8_t **) /*frame*/filter_frame->data, /*frame*/filter_frame->nb_samples);
+                    int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
+                            /*frame*/filter_frame->nb_samples, out_sample_fmt, 1);
 
-                //convert audio format
-                swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,
-                            (const uint8_t **) /*frame*/filter_frame->data, /*frame*/filter_frame->nb_samples);
-                int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
-                        /*frame*/filter_frame->nb_samples, out_sample_fmt, 1);
-
-                jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
-                jbyte *sample_byte_array = env->GetByteArrayElements(audio_sample_array, NULL);
-                memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
-                env->ReleaseByteArrayElements(audio_sample_array, sample_byte_array, 0);
-                //call write method to play
-                env->CallIntMethod(audio_track, audio_track_write_mid,
-                                      audio_sample_array, 0, out_buffer_size);
-                env->DeleteLocalRef(audio_sample_array);
-                av_frame_unref(filter_frame);
-                usleep(SLEEP_TIME);
+                    jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
+                    jbyte *sample_byte_array = env->GetByteArrayElements(audio_sample_array, NULL);
+                    memcpy(sample_byte_array, out_buffer, (size_t) out_buffer_size);
+                    env->ReleaseByteArrayElements(audio_sample_array, sample_byte_array, 0);
+                    //call write method to play
+                    env->CallIntMethod(audio_track, audio_track_write_mid,
+                                       audio_sample_array, 0, out_buffer_size);
+                    env->DeleteLocalRef(audio_sample_array);
+                    av_frame_unref(filter_frame);
+                    usleep(SLEEP_TIME);
+                }
             }
         }
         av_packet_unref(packet);
