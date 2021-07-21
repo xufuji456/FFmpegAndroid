@@ -28,6 +28,8 @@ extern "C" {
 #define SLEEP_TIME 1000 * 16
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
+const char *filter_descr = "superequalizer=6b=6:8b=6";
+
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
     AVFilterGraph   *filter_graph;
@@ -126,6 +128,73 @@ int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterCon
     return 0;
 }
 
+int init_equalizer_filter(AVCodecContext *codecCtx, AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
+    int ret = 0;
+    char args[512];
+    AVFilterContext *buffersrc_ctx;
+    AVFilterContext *buffersink_ctx;
+    AVRational time_base       = codecCtx->time_base;
+    AVFilterInOut *inputs      = avfilter_inout_alloc();
+    AVFilterInOut *outputs     = avfilter_inout_alloc();
+    const AVFilter *buffersrc  = avfilter_get_by_name("abuffer");
+    const AVFilter *buffersink = avfilter_get_by_name("abuffersink");
+
+    AVFilterGraph *filter_graph = avfilter_graph_alloc();
+    if (!outputs || !inputs || !filter_graph) {
+        ret = AVERROR(ENOMEM);
+        goto end;
+    }
+
+    /* buffer audio source: the decoded frames from the decoder will be inserted here. */
+    if (!codecCtx->channel_layout)
+        codecCtx->channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(
+                codecCtx->channels));
+    snprintf(args, sizeof(args),
+             "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%" PRIx64 "",
+             time_base.num, time_base.den, codecCtx->sample_rate,
+             av_get_sample_fmt_name(codecCtx->sample_fmt), codecCtx->channel_layout);
+
+    ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
+                                       args, NULL, filter_graph);
+    if (ret < 0) {
+        LOGE(TAG, "Cannot create buffer source:%d", ret);
+        goto end;
+    }
+    /* buffer audio sink: to terminate the filter chain. */
+    ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
+                                       NULL, NULL, filter_graph);
+    if (ret < 0) {
+        LOGE(TAG, "Cannot create buffer sink:%d", ret);
+        goto end;
+    }
+
+    outputs->name = av_strdup("in");
+    outputs->filter_ctx = buffersrc_ctx;
+    outputs->pad_idx = 0;
+    outputs->next = NULL;
+    inputs->name = av_strdup("out");
+    inputs->filter_ctx = buffersink_ctx;
+    inputs->pad_idx = 0;
+    inputs->next = NULL;
+
+    if ((ret = avfilter_graph_parse_ptr(filter_graph, filter_descr,
+                                        &inputs, &outputs, NULL)) < 0) {
+        LOGE(TAG, "avfilter_graph_parse_ptr error:%d", ret);
+        goto end;
+    }
+    if ((ret = avfilter_graph_config(filter_graph, NULL)) < 0) {
+        LOGE(TAG, "avfilter_graph_config error:%d", ret);
+        goto end;
+    }
+    *graph = filter_graph;
+    *src   = buffersrc_ctx;
+    *sink  = buffersink_ctx;
+end:
+    avfilter_inout_free(&inputs);
+    avfilter_inout_free(&outputs);
+    return ret;
+}
+
 AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     int got_frame = 0, ret = 0;
     AVFilterGraph *audioFilterGraph;
@@ -203,8 +272,9 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
     /* Set up the filter graph. */
     AVFrame *filter_frame = av_frame_alloc();
-    ret = init_volume_filter(&audioFilterGraph, &audioSrcContext, &audioSinkContext,
-            in_ch_layout, in_sample_fmt, in_sample_rate);
+//    ret = init_volume_filter(&audioFilterGraph, &audioSrcContext, &audioSinkContext,
+//            in_ch_layout, in_sample_fmt, in_sample_rate);
+    ret = init_equalizer_filter(codecCtx, &audioFilterGraph, &audioSrcContext, &audioSinkContext);
     if (ret < 0) {
         LOGE(TAG, "Unable to init filter graph:%d", stderr);
         goto end;
