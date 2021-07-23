@@ -693,4 +693,10 @@ public class FFmpegUtil {
         return pushStreams.split(" ");
     }
 
+    public static String[] rotateVideo(String inputPath, int rotateDegree, String outputPath) {
+        String rotateCmd = "ffmpeg -i %s -c copy -metadata:s:v:0 rotate=%d %s";
+        rotateCmd = String.format(Locale.getDefault(), rotateCmd, inputPath, rotateDegree, outputPath);
+        return rotateCmd.split(" ");
+    }
+
 }

@@ -118,7 +118,8 @@ class VideoHandleActivity : BaseActivity() {
                 R.id.btn_speed,
                 R.id.btn_flv,
                 R.id.btn_thumbnail,
-                R.id.btn_add_subtitle
+                R.id.btn_add_subtitle,
+                R.id.btn_rotate
         )
     }
 
@@ -328,10 +329,15 @@ class VideoHandleActivity : BaseActivity() {
             }
             R.id.btn_add_subtitle//add subtitle into video
             -> {
-                Log.e(TAG, "add subtitle...")
                 val subtitlePath = PATH + File.separator + "test.ass"
                 val addSubtitlePath = PATH + File.separator + "subtitle" + suffix
                 commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, addSubtitlePath)
+            }
+            R.id.btn_rotate// set the rotate degree of video
+            -> {
+                val rotateDegree = 90
+                val addSubtitlePath = PATH + File.separator + "rotate" + rotateDegree + suffix
+                commandLine = FFmpegUtil.rotateVideo(srcFile, rotateDegree, addSubtitlePath)
             }
             else -> {
             }
