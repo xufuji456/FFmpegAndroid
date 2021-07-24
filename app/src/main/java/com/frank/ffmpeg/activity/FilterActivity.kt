@@ -24,7 +24,6 @@ import com.frank.ffmpeg.listener.OnItemClickListener
 import com.frank.ffmpeg.util.FileUtil
 
 import java.util.ArrayList
-import java.util.Arrays
 
 /**
  * Using ffmpeg to filter
@@ -42,7 +41,8 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     //is playing or not
     private var isPlaying: Boolean = false
     //the array of filter
-    private val filters = arrayOf("lutyuv='u=128:v=128'", "hue='h=60:s=-3'", "edgedetect=low=0.1:high=0.4", "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5", "colorbalance=bs=0.3", "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'", "hflip",
+    private val filters = arrayOf("lutyuv='u=128:v=128'", "hue='h=60:s=-3'", "edgedetect=low=0.1:high=0.4",
+            "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5", "colorbalance=bs=0.3", "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'", "hflip",
             //adjust the coefficient of sigma to control the blur
             "gblur=sigma=2:steps=1:planes=1:sigmaV=1", "rotate=180*PI/180", "unsharp")
     //vflip is up and down, hflip is left and right
@@ -97,7 +97,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         recyclerView!!.layoutManager = linearLayoutManager
-        val itemList = ArrayList(Arrays.asList(*txtArray))
+        val itemList = ArrayList(mutableListOf(*txtArray))
         horizontalAdapter = HorizontalAdapter(itemList)
         recyclerView!!.adapter = horizontalAdapter
 
@@ -168,8 +168,6 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     override fun onDestroy() {
         super.onDestroy()
         isPlaying = false
-        //FIXME
-//        videoPlayer?.release()
         videoPlayer = null
         horizontalAdapter = null
     }
