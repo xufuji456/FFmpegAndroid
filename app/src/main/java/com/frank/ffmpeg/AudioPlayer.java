@@ -15,7 +15,7 @@ public class AudioPlayer {
     }
 
     //using AudioTrack to play
-    public native void play(String audioPath);
+    public native void play(String audioPath, String filterDesc);
 
     //using OpenSL ES to play
     public native void playAudio(String audioPath);

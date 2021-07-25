@@ -28,7 +28,7 @@ extern "C" {
 #define SLEEP_TIME 1000 * 16
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
-const char *filter_descr = "superequalizer=6b=4:8b=5:10b=5";
+//const char *filter_descr = "superequalizer=6b=4:8b=5:10b=5";
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
@@ -128,7 +128,8 @@ int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterCon
     return 0;
 }
 
-int init_equalizer_filter(AVCodecContext *codecCtx, AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
+int init_equalizer_filter(const char *filter_desc, AVCodecContext *codecCtx, AVFilterGraph **graph,
+        AVFilterContext **src, AVFilterContext **sink) {
     int ret = 0;
     char args[512];
     AVFilterContext *buffersrc_ctx;
@@ -177,7 +178,7 @@ int init_equalizer_filter(AVCodecContext *codecCtx, AVFilterGraph **graph, AVFil
     inputs->pad_idx = 0;
     inputs->next = NULL;
 
-    if ((ret = avfilter_graph_parse_ptr(filter_graph, filter_descr,
+    if ((ret = avfilter_graph_parse_ptr(filter_graph, filter_desc,
                                         &inputs, &outputs, NULL)) < 0) {
         LOGE(TAG, "avfilter_graph_parse_ptr error:%d", ret);
         goto end;
@@ -195,7 +196,7 @@ end:
     return ret;
 }
 
-AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
+AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     int got_frame = 0, ret = 0;
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
@@ -203,6 +204,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
 
     const char *input_cstr = env->GetStringUTFChars(input_jstr, NULL);
     LOGI(TAG, "input url=%s", input_cstr);
+    const char *filter_desc = env->GetStringUTFChars(filter_jstr, NULL);
+    LOGE(TAG, "filter_desc=%s", filter_desc);
     av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
     if (avformat_open_input(&pFormatCtx, input_cstr, NULL, NULL) != 0) {
@@ -220,7 +223,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
             break;
         }
     }
-
     AVCodecContext *codecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
     AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
     if (codec == NULL) {
@@ -234,7 +236,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
     AVPacket *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
     AVFrame *frame = av_frame_alloc();
     SwrContext *swrCtx = swr_alloc();
-
     enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;
     enum AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;
     int in_sample_rate = codecCtx->sample_rate;
@@ -247,34 +248,31 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
                        in_ch_layout, in_sample_fmt, in_sample_rate,
                        0, NULL);
     swr_init(swrCtx);
-    int out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
-
+    int out_channel = av_get_channel_layout_nb_channels(out_ch_layout);
     jclass player_class = env->GetObjectClass(thiz);
     if (!player_class) {
         LOGE(TAG, "player_class not found...");
     }
     //get AudioTrack by reflection
     jmethodID audio_track_method = env->GetMethodID(player_class, "createAudioTrack",
-                                                       "(II)Landroid/media/AudioTrack;");
+            "(II)Landroid/media/AudioTrack;");
     if (!audio_track_method) {
         LOGE(TAG, "audio_track_method not found...");
     }
-    jobject audio_track = env->CallObjectMethod(thiz, audio_track_method, out_sample_rate,
-                                                   out_channel_nb);
+    jobject audio_track = env->CallObjectMethod(thiz, audio_track_method, out_sample_rate, out_channel);
     //call play method
     jclass audio_track_class = env->GetObjectClass(audio_track);
     jmethodID audio_track_play_mid = env->GetMethodID(audio_track_class, "play", "()V");
     env->CallVoidMethod(audio_track, audio_track_play_mid);
     //get write method
-    jmethodID audio_track_write_mid = env->GetMethodID(audio_track_class, "write",
-                                                          "([BII)I");
+    jmethodID audio_track_write_mid = env->GetMethodID(audio_track_class, "write", "([BII)I");
     uint8_t *out_buffer = (uint8_t *) av_malloc(MAX_AUDIO_FRAME_SIZE);
 
     /* Set up the filter graph. */
     AVFrame *filter_frame = av_frame_alloc();
 //    ret = init_volume_filter(&audioFilterGraph, &audioSrcContext, &audioSinkContext,
 //            in_ch_layout, in_sample_fmt, in_sample_rate);
-    ret = init_equalizer_filter(codecCtx, &audioFilterGraph, &audioSrcContext, &audioSinkContext);
+    ret = init_equalizer_filter(filter_desc, codecCtx, &audioFilterGraph, &audioSrcContext, &audioSinkContext);
     if (ret < 0) {
         LOGE(TAG, "Unable to init filter graph:%d", ret);
         goto end;
@@ -304,7 +302,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr) {
                     //convert audio format
                     swr_convert(swrCtx, &out_buffer, MAX_AUDIO_FRAME_SIZE,
                                 (const uint8_t **) /*frame*/filter_frame->data, /*frame*/filter_frame->nb_samples);
-                    int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
+                    int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel,
                             /*frame*/filter_frame->nb_samples, out_sample_fmt, 1);
 
                     jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
@@ -332,5 +330,5 @@ end:
     avcodec_free_context(&codecCtx);
     avformat_close_input(&pFormatCtx);
     env->ReleaseStringUTFChars(input_jstr, input_cstr);
-
+    env->ReleaseStringUTFChars(filter_jstr, filter_desc);
 }
