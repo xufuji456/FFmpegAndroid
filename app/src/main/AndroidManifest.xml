@@ -54,7 +54,8 @@
         <activity
             android:name=".activity.AudioEffectActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.AudioPlayActivity"/>
+        <activity android:name=".activity.AudioPlayActivity" />
+        <activity android:name=".activity.EqualizerActivity" />
     </application>
 
 </manifest>
