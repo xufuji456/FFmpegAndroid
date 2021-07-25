@@ -18,10 +18,6 @@
 
 #define TAG "VideoFilter"
 
-AVFilterContext *buffersink_ctx;
-AVFilterContext *buffersrc_ctx;
-AVFilterGraph *filter_graph;
-
 AVFormatContext *pFormatCtx;
 AVCodecContext *pCodecCtx;
 ANativeWindow *nativeWindow;
@@ -60,9 +56,11 @@ char* filters[] = {"lutyuv='u=128:v=128'",
                    "unsharp"};
 
 //init filter
-int init_filters(const char *filters_descr) {
+int init_filters(const char *filters_descr, AVCodecContext *codecCtx, AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
     char args[512];
     int ret = 0;
+    AVFilterContext *buffersrc_ctx;
+    AVFilterContext *buffersink_ctx;
     const AVFilter *buffersrc = avfilter_get_by_name("buffer");
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
@@ -70,26 +68,23 @@ int init_filters(const char *filters_descr) {
     AVRational time_base = pFormatCtx->streams[video_stream_index]->time_base;
     enum AVPixelFormat pix_fmts[] = {AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
 
-    filter_graph = avfilter_graph_alloc();
+    AVFilterGraph *filter_graph = avfilter_graph_alloc();
     if (!outputs || !inputs || !filter_graph) {
         ret = AVERROR(ENOMEM);
         goto end;
     }
-
     /* buffer video source: the decoded frames from the decoder will be inserted here. */
     snprintf(args, sizeof(args),
              "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-             pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
+             codecCtx->width, codecCtx->height, codecCtx->pix_fmt,
              time_base.num, time_base.den,
-             pCodecCtx->sample_aspect_ratio.num, pCodecCtx->sample_aspect_ratio.den);
-
+             codecCtx->sample_aspect_ratio.num, codecCtx->sample_aspect_ratio.den);
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
                                        args, NULL, filter_graph);
     if (ret < 0) {
         LOGE(TAG, "Cannot create buffer source\n");
         goto end;
     }
-
     /* buffer video sink: to terminate the filter chain. */
     ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
                                        NULL, NULL, filter_graph);
@@ -97,7 +92,6 @@ int init_filters(const char *filters_descr) {
         LOGE(TAG, "Cannot create buffer sink\n");
         goto end;
     }
-
     ret = av_opt_set_int_list(buffersink_ctx, "pix_fmts", pix_fmts,
                               AV_PIX_FMT_NONE, AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
@@ -109,7 +103,6 @@ int init_filters(const char *filters_descr) {
     outputs->filter_ctx = buffersrc_ctx;
     outputs->pad_idx = 0;
     outputs->next = NULL;
-
     inputs->name = av_strdup("out");
     inputs->filter_ctx = buffersink_ctx;
     inputs->pad_idx = 0;
@@ -118,14 +111,15 @@ int init_filters(const char *filters_descr) {
     if ((ret = avfilter_graph_parse_ptr(filter_graph, filters_descr,
                                         &inputs, &outputs, NULL)) < 0)
         goto end;
-
     if ((ret = avfilter_graph_config(filter_graph, NULL)) < 0)
         goto end;
 
-    end:
+    *graph = filter_graph;
+    *src   = buffersrc_ctx;
+    *sink  = buffersink_ctx;
+end:
     avfilter_inout_free(&inputs);
     avfilter_inout_free(&outputs);
-
     return ret;
 }
 
@@ -282,6 +276,9 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame) {
 VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position) {
     int ret;
     pos = position;
+    AVFilterContext *buffersink_ctx;
+    AVFilterContext *buffersrc_ctx;
+    AVFilterGraph *filter_graph;
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
 
     if ((ret = open_input(env, file_name, surface)) < 0) {
@@ -303,7 +300,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
     }
 
     //init filter
-    if ((ret = init_filters(filters[pos])) < 0) {
+    if ((ret = init_filters(filters[pos], pCodecCtx, &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
@@ -316,7 +313,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
         if (again) {
             again = 0;
             avfilter_graph_free(&filter_graph);
-            if ((ret = init_filters(filters[pos])) < 0) {
+            if ((ret = init_filters(filters[pos], pCodecCtx, &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
                 LOGE(TAG, "init_filter error, ret=%d\n", ret);
                 goto end;
             }
@@ -373,8 +370,8 @@ end:
     sws_freeContext(sws_ctx);
     swr_free(&audio_swr_ctx);
     avfilter_graph_free(&filter_graph);
-    avcodec_free_context(&pCodecCtx);
-    avcodec_free_context(&audioCodecCtx);
+//    avcodec_free_context(&pCodecCtx);
+//    avcodec_free_context(&audioCodecCtx);
     avformat_close_input(&pFormatCtx);
     av_free(pFrameRGBA);
     av_free(filter_frame);
