@@ -18,9 +18,9 @@ public class VideoPlayer {
 
     public native void setPlayRate(float playRate);
 
-    public native int filter(String filePath, Object surface, String filterType);
+    public native int filter(String filePath, Object surface, int position);
 
-    public native void again();
+    public native void again(int position);
 
     public native void release();
 

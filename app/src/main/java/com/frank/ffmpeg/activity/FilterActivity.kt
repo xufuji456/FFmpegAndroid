@@ -38,20 +38,25 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     private var surfaceView: SurfaceView? = null
     private var surfaceHolder: SurfaceHolder? = null
     private var surfaceCreated: Boolean = false
-    //is playing or not
-    private var isPlaying: Boolean = false
-    //the array of filter
-    private val filters = arrayOf("lutyuv='u=128:v=128'", "hue='h=60:s=-3'", "edgedetect=low=0.1:high=0.4",
-            "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5", "colorbalance=bs=0.3", "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'", "hflip",
-            //adjust the coefficient of sigma to control the blur
-            "gblur=sigma=2:steps=1:planes=1:sigmaV=1", "rotate=180*PI/180", "unsharp")
     //vflip is up and down, hflip is left and right
-    private val txtArray = arrayOf(FFmpegApplication.getInstance().getString(R.string.filter_sketch), FFmpegApplication.getInstance().getString(R.string.filter_distinct), FFmpegApplication.getInstance().getString(R.string.filter_edge), FFmpegApplication.getInstance().getString(R.string.filter_division), FFmpegApplication.getInstance().getString(R.string.filter_equalize), FFmpegApplication.getInstance().getString(R.string.filter_rectangle), FFmpegApplication.getInstance().getString(R.string.filter_flip), FFmpegApplication.getInstance().getString(R.string.filter_blur), FFmpegApplication.getInstance().getString(R.string.filter_rotate), FFmpegApplication.getInstance().getString(R.string.filter_sharpening))
+    private val txtArray = arrayOf(
+            FFmpegApplication.getInstance().getString(R.string.filter_sketch),
+            FFmpegApplication.getInstance().getString(R.string.filter_distinct),
+            FFmpegApplication.getInstance().getString(R.string.filter_edge),
+            FFmpegApplication.getInstance().getString(R.string.filter_division),
+            FFmpegApplication.getInstance().getString(R.string.filter_equalize),
+            FFmpegApplication.getInstance().getString(R.string.filter_rectangle),
+            FFmpegApplication.getInstance().getString(R.string.filter_flip),
+            FFmpegApplication.getInstance().getString(R.string.filter_blur),
+            FFmpegApplication.getInstance().getString(R.string.filter_rotate),
+            FFmpegApplication.getInstance().getString(R.string.filter_sharpening))
     private var horizontalAdapter: HorizontalAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var playAudio = true
     private var btnSound: ToggleButton? = null
     private var btnSelect: Button? = null
+    private var filterThread: Thread? = null
+
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -133,13 +138,14 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
      * @param position position in the array of filters
      */
     private fun doFilterPlay(position: Int) {
-        Thread(Runnable {
-            if (isPlaying) {
-                videoPlayer!!.again()
-            }
-            isPlaying = true
-            videoPlayer!!.filter(videoPath, surfaceHolder!!.surface, filters[position])
-        }).start()
+        if (filterThread == null) {
+            filterThread = Thread(Runnable {
+                videoPlayer!!.filter(videoPath, surfaceHolder!!.surface, position)
+            })
+            filterThread!!.start()
+        } else {
+            videoPlayer!!.again(position)
+        }
     }
 
     private fun setPlayAudio() {
@@ -163,11 +169,15 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         surfaceCreated = false
+        if (filterThread != null) {
+            videoPlayer?.release()
+            filterThread?.interrupt()
+            filterThread = null
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        isPlaying = false
         videoPlayer = null
         horizontalAdapter = null
     }

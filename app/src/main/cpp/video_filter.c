@@ -19,36 +19,22 @@
 #define TAG "VideoFilter"
 
 AVFilterContext *buffersink_ctx;
-
 AVFilterContext *buffersrc_ctx;
-
 AVFilterGraph *filter_graph;
 
-int video_stream_index = -1;
-
 AVFormatContext *pFormatCtx;
-
 AVCodecContext *pCodecCtx;
-
 ANativeWindow_Buffer windowBuffer;
-
 ANativeWindow *nativeWindow;
 
-AVFrame *pFrame;
-
-AVFrame *pFrameRGBA;
-
-AVFrame *filter_frame;
-
-uint8_t *buffer;
-
-struct SwsContext *sws_ctx;
-
-int is_playing;
-
 int again;
-
 int release;
+uint8_t *buffer;
+AVFrame *pFrame;
+AVFrame *pFrameRGBA;
+AVFrame *filter_frame;
+struct SwsContext *sws_ctx;
+int video_stream_index = -1;
 
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 jmethodID audio_track_write_mid;
@@ -61,22 +47,18 @@ int audio_stream_index = -1;
 int got_frame;
 AVCodecContext *audioCodecCtx;
 jboolean playAudio = JNI_TRUE;
+int pos;
 
-//const char *filter_descr = "lutyuv='u=128:v=128'";//black white
-//const char *filter_descr = "hue='h=60:s=-3'";//hue
-//const char *filter_descr = "vflip";//up or down
-//const char *filter_descr = "hflip";//left or right
-//const char *filter_descr = "rotate=90";//rotate
-//const char *filter_descr = "colorbalance=bs=0.3";//balance
-//const char *filter_descr = "drawbox=x=100:y=100:w=100:h=100:color=pink@0.5'";//rectangle
-//const char *filter_descr = "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5";//grid
-//const char *filter_descr = "edgedetect=low=0.1:high=0.4";//edge detection
-//const char *filter_descr = "lutrgb='r=0:g=0'";//lut
-//const char *filter_descr = "noise=alls=20:allf=t+u";//add noise
-//const char *filter_descr = "vignette='PI/4+random(1)*PI/50':eval=frame";//flash
-//const char *filter_descr = "gblur=sigma=0.5:steps=1:planes=1:sigmaV=1";//Gauss blur
-//const char *filter_descr = "drawtext=fontfile='arial.ttf':fontcolor=green:fontsize=30:text='Hello world'";//draw text
-//const char *filter_descr = "movie=my_logo.png[wm];[in][wm]overlay=5:5[out]";//add watermark
+char* filters[] = {"lutyuv='u=128:v=128'",
+                   "hue='h=60:s=-3'",
+                   "edgedetect=low=0.1:high=0.4",
+                   "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
+                   "colorbalance=bs=0.3",
+                   "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
+                   "hflip",
+                   "gblur=sigma=2:steps=1:planes=1:sigmaV=1",
+                   "rotate=180*PI/180",
+                   "unsharp"};
 
 //init filter
 int init_filters(const char *filters_descr) {
@@ -298,48 +280,48 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame) {
     return 0;
 }
 
-VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filterDescr) {
-
+VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position) {
     int ret;
+    pos = position;
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
-    const char *filter_descr = (*env)->GetStringUTFChars(env, filterDescr, JNI_FALSE);
-    //open input file
-    if (!is_playing) {
-        LOGI(TAG, "open_input...");
-        if ((ret = open_input(env, file_name, surface)) < 0) {
-            LOGE(TAG, "Couldn't allocate video frame.");
-            goto end;
-        }
-        //register filter
-        avfilter_register_all();
-        filter_frame = av_frame_alloc();
-        if (filter_frame == NULL) {
-            LOGE(TAG, "Couldn't allocate filter frame.");
-            ret = -1;
-            goto end;
-        }
-        //init audio decoder
-        if ((ret = init_audio(env, thiz)) < 0) {
-            LOGE(TAG, "Couldn't init_audio.");
-            goto end;
-        }
 
+    if ((ret = open_input(env, file_name, surface)) < 0) {
+        LOGE(TAG, "Couldn't allocate video frame.");
+        goto end;
+    }
+    //register filter
+    avfilter_register_all();
+    filter_frame = av_frame_alloc();
+    if (filter_frame == NULL) {
+        LOGE(TAG, "Couldn't allocate filter frame.");
+        ret = -1;
+        goto end;
+    }
+    //init audio decoder
+    if ((ret = init_audio(env, thiz)) < 0) {
+        LOGE(TAG, "Couldn't init_audio.");
+        goto end;
     }
 
     //init filter
-    if ((ret = init_filters(filter_descr)) < 0) {
+    if ((ret = init_filters(filters[pos])) < 0) {
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
 
-    is_playing = 1;
     int frameFinished;
     AVPacket packet;
 
     while (av_read_frame(pFormatCtx, &packet) >= 0 && !release) {
         //switch filter
         if (again) {
-            goto again;
+            again = 0;
+            avfilter_graph_free(&filter_graph);
+            if ((ret = init_filters(filters[pos])) < 0) {
+                LOGE(TAG, "init_filter error, ret=%d\n", ret);
+                goto end;
+            }
+            LOGE(TAG, "play again,filter_descr=_=%s", filters[pos]);
         }
         //is video stream or not
         if (packet.stream_index == video_stream_index) {
@@ -385,14 +367,11 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
         }
         av_packet_unref(&packet);
     }
-    end:
-    is_playing = 0;
+end:
     av_free(buffer);
     av_free(out_buffer);
     sws_freeContext(sws_ctx);
     swr_free(&audio_swr_ctx);
-    avfilter_free(buffersrc_ctx);
-    avfilter_free(buffersink_ctx);
     avfilter_graph_free(&filter_graph);
     avcodec_free_context(&pCodecCtx);
     avcodec_free_context(&audioCodecCtx);
@@ -401,20 +380,17 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jstring filte
     av_free(filter_frame);
     av_free(pFrame);
 
-    free(audio_track);
-    free(&windowBuffer);
+//    free(audio_track);
+//    free(&windowBuffer);
     ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
-    (*env)->ReleaseStringUTFChars(env, filterDescr, filter_descr);
     LOGE(TAG, "do release...");
-    again:
-    again = 0;
-    LOGE(TAG, "play again...");
     return ret;
 }
 
-VIDEO_PLAYER_FUNC(void, again) {
+VIDEO_PLAYER_FUNC(void, again, jint position) {
     again = 1;
+    pos = position;
 }
 
 VIDEO_PLAYER_FUNC(void, release) {
