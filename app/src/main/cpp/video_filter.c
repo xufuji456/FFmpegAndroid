@@ -56,7 +56,8 @@ char* filters[] = {"lutyuv='u=128:v=128'",
                    "unsharp"};
 
 //init filter
-int init_filters(const char *filters_descr, AVCodecContext *codecCtx, AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
+int init_filters(const char *filters_descr, AVRational time_base, AVCodecContext *codecCtx,
+        AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
     char args[512];
     int ret = 0;
     AVFilterContext *buffersrc_ctx;
@@ -65,7 +66,6 @@ int init_filters(const char *filters_descr, AVCodecContext *codecCtx, AVFilterGr
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs = avfilter_inout_alloc();
-    AVRational time_base = pFormatCtx->streams[video_stream_index]->time_base;
     enum AVPixelFormat pix_fmts[] = {AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
 
     AVFilterGraph *filter_graph = avfilter_graph_alloc();
@@ -300,7 +300,9 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
     }
 
     //init filter
-    if ((ret = init_filters(filters[pos], pCodecCtx, &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
+    AVRational time_base = pFormatCtx->streams[video_stream_index]->time_base;
+    if ((ret = init_filters(filters[pos], time_base, pCodecCtx,
+            &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
@@ -313,7 +315,8 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
         if (again) {
             again = 0;
             avfilter_graph_free(&filter_graph);
-            if ((ret = init_filters(filters[pos], pCodecCtx, &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
+            if ((ret = init_filters(filters[pos], time_base, pCodecCtx,
+                    &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
                 LOGE(TAG, "init_filter error, ret=%d\n", ret);
                 goto end;
             }
