@@ -24,7 +24,6 @@ AVFilterGraph *filter_graph;
 
 AVFormatContext *pFormatCtx;
 AVCodecContext *pCodecCtx;
-ANativeWindow_Buffer windowBuffer;
 ANativeWindow *nativeWindow;
 
 int again;
@@ -339,6 +338,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
                 ret = av_buffersink_get_frame(buffersink_ctx, filter_frame);
                 if (ret >= 0) {
                     // lock native window
+                    ANativeWindow_Buffer windowBuffer;
                     ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
                     // convert
                     sws_scale(sws_ctx, (uint8_t const *const *) filter_frame->data,
@@ -380,8 +380,8 @@ end:
     av_free(filter_frame);
     av_free(pFrame);
 
-//    free(audio_track);
-//    free(&windowBuffer);
+    audio_track = NULL;
+    audio_track_write_mid = NULL;
     ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     LOGE(TAG, "do release...");
