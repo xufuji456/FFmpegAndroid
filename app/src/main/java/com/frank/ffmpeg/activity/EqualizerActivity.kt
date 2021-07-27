@@ -30,7 +30,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
     private var equalizerAdapter: EqualizerAdapter? = null
-    private var audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
+    private var audioPath = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
 
     override val layoutId: Int
         get() = R.layout.activity_equalizer
@@ -68,6 +68,10 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     }
 
     private fun doEqualize() {
+        doEqualize(0, 0)
+    }
+
+    private fun doEqualize(index: Int, progress: Int) {
 //        val bandList = arrayListOf<String>()
 //        bandList.add("6b=5")
 //        bandList.add("8b=4")
@@ -75,19 +79,19 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
 //        bandList.add("12b=2")
 //        bandList.add("14b=1")
 //        bandList.add("16b=0")
-        val filter = "superequalizer=6b=4:8b=5:10b=5"
         if (filterThread == null) {
+            val filter = "superequalizer=6b=4:8b=5:10b=5"
             filterThread = Thread(Runnable {
                 mAudioPlayer!!.play(audioPath, filter)
             })
             filterThread!!.start()
         } else {
-//            mAudioPlayer!!.again(position)
+            mAudioPlayer!!.again("superequalizer=8b=4:10b=5:12b=5")
         }
     }
 
     override fun onProgress(index: Int, progress: Int) {
-        doEqualize()
+        doEqualize(index, progress)
     }
 
     override fun onViewClick(view: View) {
