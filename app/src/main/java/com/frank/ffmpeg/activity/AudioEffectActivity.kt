@@ -31,7 +31,7 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
     companion object {
         private val TAG = AudioEffectActivity::class.java.simpleName
 
-        private val AUDIO_PATH = Environment.getExternalStorageDirectory().path + "/heart.mp3"
+        private val AUDIO_PATH = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
     }
 
     private var mPlayer: MediaPlayer? = null

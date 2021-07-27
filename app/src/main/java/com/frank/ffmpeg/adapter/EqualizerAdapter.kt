@@ -43,9 +43,9 @@ class EqualizerAdapter(private val context: Context, private val onSeeBarListene
 
         holder.barEqualizer.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    onSeeBarListener?.onProgress(i, progress)
-                }
+//                if (fromUser) {
+//                    onSeeBarListener?.onProgress(i, progress)
+//                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -53,7 +53,7 @@ class EqualizerAdapter(private val context: Context, private val onSeeBarListene
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-
+                onSeeBarListener?.onProgress(i, seekBar.progress)
             }
         })
     }
