@@ -2,6 +2,7 @@ package com.frank.ffmpeg.activity
 
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.util.Pair
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,6 +11,7 @@ import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.listener.OnSeeBarListener
+import java.lang.StringBuilder
 import java.util.ArrayList
 
 class EqualizerActivity : BaseActivity(), OnSeeBarListener {
@@ -22,10 +24,12 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
      |   10b  |   11b  |   12b  |   13b  |   14b  |   15b  |   16b  |   17b  |   18b  |
      |   1480 |   2093 |   2960 |   4186 |   5920 |   8372 |  11840 |  16744 |  20000 |
      |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-    private val bandsList = arrayListOf(
+    private val bandsList = intArrayOf(
             65, 92, 131, 185, 262, 370,
             523, 740, 1047, 1480, 2093, 2960,
             4180, 5920, 8372, 11840, 16744, 20000)
+
+    private val selectBandList = IntArray(bandsList.size)
     private val minEQLevel = 0
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
@@ -55,8 +59,8 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     private fun setupEqualizer() {
         val equalizerList = ArrayList<Pair<*, *>>()
         val maxEQLevel = 20
-        for (i in 0 until bandsList.size) {
-            val centerFreq = bandsList[i].toString() + " Hz"
+        for (element in bandsList) {
+            val centerFreq = "$element Hz"
             val pair = Pair.create(centerFreq, 0)
             equalizerList.add(pair)
         }
@@ -72,13 +76,6 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     }
 
     private fun doEqualize(index: Int, progress: Int) {
-//        val bandList = arrayListOf<String>()
-//        bandList.add("6b=5")
-//        bandList.add("8b=4")
-//        bandList.add("10b=3")
-//        bandList.add("12b=2")
-//        bandList.add("14b=1")
-//        bandList.add("16b=0")
         if (filterThread == null) {
             val filter = "superequalizer=6b=4:8b=5:10b=5"
             filterThread = Thread(Runnable {
@@ -86,7 +83,18 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
             })
             filterThread!!.start()
         } else {
-            mAudioPlayer!!.again("superequalizer=8b=4:10b=5:12b=5")
+            if (index < 0 || index >= selectBandList.size) return
+            selectBandList[index] = progress
+            val builder = StringBuilder()
+            builder.append("superequalizer=")
+            for (i in selectBandList.indices) {
+                if (selectBandList[i] > 0) {
+                    builder.append(i + 1).append("b=").append(selectBandList[i]).append(":")
+                }
+            }
+            builder.deleteCharAt(builder.length - 1)
+            Log.e("Equalizer", "update filter=$builder")
+            mAudioPlayer!!.again(builder.toString())
         }
     }
 
