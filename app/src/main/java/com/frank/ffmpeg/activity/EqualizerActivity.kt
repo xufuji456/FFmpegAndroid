@@ -109,4 +109,13 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     override fun onSelectedFile(filePath: String) {
         audioPath = filePath
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (filterThread != null) {
+            mAudioPlayer!!.release()
+            filterThread?.interrupt()
+            filterThread = null
+        }
+    }
 }

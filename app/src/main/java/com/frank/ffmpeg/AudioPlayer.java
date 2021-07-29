@@ -19,6 +19,8 @@ public class AudioPlayer {
 
     public native void again(String filterDesc);
 
+    public native void release();
+
     //using OpenSL ES to play
     public native void playAudio(String audioPath);
 

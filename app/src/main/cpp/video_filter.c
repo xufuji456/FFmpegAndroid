@@ -384,7 +384,9 @@ end:
     audio_track_write_mid = NULL;
     ANativeWindow_release(nativeWindow);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
-    LOGE(TAG, "do release...");
+    again = 0;
+    release = 0;
+    LOGE(TAG, "video release...");
     return ret;
 }
 

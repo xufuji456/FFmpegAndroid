@@ -29,6 +29,7 @@ extern "C" {
 #define MAX_AUDIO_FRAME_SIZE 48000 * 4
 
 int filter_again = 0;
+int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
@@ -280,7 +281,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     }
 
     //read audio frame
-    while (av_read_frame(pFormatCtx, packet) >= 0) {
+    while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
         if (packet->stream_index != audio_stream_idx) {
             av_packet_unref(packet);
             continue;
@@ -343,10 +344,17 @@ end:
     avformat_close_input(&pFormatCtx);
     env->ReleaseStringUTFChars(input_jstr, input_cstr);
     env->ReleaseStringUTFChars(filter_jstr, filter_desc);
+    filter_again = 0;
+    filter_release = 0;
+    LOGE(TAG, "audio release...");
 }
 
 AUDIO_PLAYER_FUNC(void, again, jstring filter_jstr) {
     if (!filter_jstr) return;
     filter_again = 1;
     filter_desc = env->GetStringUTFChars(filter_jstr, NULL);
+}
+
+AUDIO_PLAYER_FUNC(void, release) {
+    filter_release = 1;
 }
