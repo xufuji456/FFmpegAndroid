@@ -14,6 +14,8 @@ public class AudioPlayer {
         System.loadLibrary("media-handle");
     }
 
+    private AudioTrack mAudioTrack;
+
     //using AudioTrack to play
     public native void play(String audioPath, String filterDesc);
 
@@ -46,7 +48,15 @@ public class AudioPlayer {
 
         int bufferSizeInBytes = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat);
 
-        return new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, channelConfig, audioFormat,
+        mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, channelConfig, audioFormat,
                 bufferSizeInBytes, AudioTrack.MODE_STREAM);
+        return mAudioTrack;
+    }
+
+    public void releaseAudioTrack() {
+        if (mAudioTrack != null) {
+            mAudioTrack.release();
+            mAudioTrack = null;
+        }
     }
 }

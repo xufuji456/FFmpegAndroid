@@ -344,6 +344,8 @@ end:
     avformat_close_input(&pFormatCtx);
     env->ReleaseStringUTFChars(input_jstr, input_cstr);
     env->ReleaseStringUTFChars(filter_jstr, filter_desc);
+    jmethodID releaseMethod = env->GetMethodID(player_class, "releaseAudioTrack", "()V");
+    env->CallVoidMethod(thiz, releaseMethod);
     filter_again = 0;
     filter_release = 0;
     LOGE(TAG, "audio release...");
