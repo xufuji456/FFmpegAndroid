@@ -119,7 +119,8 @@ class VideoHandleActivity : BaseActivity() {
                 R.id.btn_flv,
                 R.id.btn_thumbnail,
                 R.id.btn_add_subtitle,
-                R.id.btn_rotate
+                R.id.btn_rotate,
+                R.id.btn_gop
         )
     }
 
@@ -338,6 +339,12 @@ class VideoHandleActivity : BaseActivity() {
                 val rotateDegree = 90
                 val addSubtitlePath = PATH + File.separator + "rotate" + rotateDegree + suffix
                 commandLine = FFmpegUtil.rotateVideo(srcFile, rotateDegree, addSubtitlePath)
+            }
+            R.id.btn_gop// change the gop(key frame interval) of video
+            -> {
+                val gop = 30
+                val gopPath = PATH + File.separator + "gop" + gop + suffix
+                commandLine = FFmpegUtil.changeGOP(srcFile, gop, gopPath)
             }
             else -> {
             }

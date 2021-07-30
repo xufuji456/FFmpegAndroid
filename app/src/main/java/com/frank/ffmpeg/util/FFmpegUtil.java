@@ -699,4 +699,10 @@ public class FFmpegUtil {
         return rotateCmd.split(" ");
     }
 
+    public static String[] changeGOP(String inputPath, int gop, String outputPath) {
+        String rotateCmd = "ffmpeg -i %s -g %d %s";
+        rotateCmd = String.format(Locale.getDefault(), rotateCmd, inputPath, gop, outputPath);
+        return rotateCmd.split(" ");
+    }
+
 }

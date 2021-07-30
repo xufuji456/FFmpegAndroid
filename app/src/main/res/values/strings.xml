@@ -42,7 +42,7 @@
     <string name="video_transform">视频转码</string>
     <string name="video_screen_shot">视频截图</string>
     <string name="video_screen_record">屏幕录制</string>
-    <string name="video_from_photo">图片合成视频</string>
+    <string name="video_from_photo">合成视频</string>
     <string name="video_extract_frame">视频抽帧</string>
     <string name="video_part_zoom">视频局部放大</string>
     <string name="video_play">视频播放</string>
@@ -60,6 +60,7 @@
     <string name="video_flv">FLV索引</string>
     <string name="video_thumbnail">插入封面</string>
     <string name="video_subtitle">添加字幕</string>
+    <string name="video_gop">关键帧间隔</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>
