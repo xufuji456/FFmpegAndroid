@@ -334,14 +334,13 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         av_packet_unref(packet);
     }
 end:
-    av_packet_free(&packet);
-    av_frame_free(&frame);
-    av_frame_free(&filter_frame);
     av_free(out_buffer);
     swr_free(&swrCtx);
     avfilter_graph_free(&audioFilterGraph);
-    avcodec_free_context(&codecCtx);
+//    avcodec_free_context(&codecCtx);
     avformat_close_input(&pFormatCtx);
+    av_frame_free(&frame);
+    av_frame_free(&filter_frame);
     env->ReleaseStringUTFChars(input_jstr, input_cstr);
     env->ReleaseStringUTFChars(filter_jstr, filter_desc);
     jmethodID releaseMethod = env->GetMethodID(player_class, "releaseAudioTrack", "()V");
