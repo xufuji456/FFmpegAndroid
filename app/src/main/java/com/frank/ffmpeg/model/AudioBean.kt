@@ -35,4 +35,6 @@ class AudioBean {
 
     var lyrics: List<String>? = null
 
+    var lrcLineList: List<LrcLine>? = null
+
 }

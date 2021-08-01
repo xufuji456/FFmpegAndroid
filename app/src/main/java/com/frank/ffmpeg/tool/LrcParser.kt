@@ -129,10 +129,12 @@ class LrcParser {
             var currentTime: Long = 0
             while (matcher.find()) {
                 val groupCount = matcher.groupCount()
+                var currentTimeStr: String? = ""
                 for (index in 0 until groupCount) {
                     val timeStr = matcher.group(index)
                     if (index == 0) {
-                        currentTime = TimeUtil.timeStrToLong(timeStr.substring(1, timeStr.length - 1))
+                        currentTimeStr = timeStr.substring(1, timeStr.length - 1)
+                        currentTime = TimeUtil.timeStrToLong(currentTimeStr)
                     }
                 }
                 val content = pattern.split(str)
@@ -141,6 +143,7 @@ class LrcParser {
                     currentContent = content[content.size - 1]
                 }
                 val lrcLine = LrcLine()
+                lrcLine.timeString = currentTimeStr
                 lrcLine.startTime = currentTime
                 lrcLine.endTime = currentTime + 10 * 1000
                 lrcLine.content = currentContent

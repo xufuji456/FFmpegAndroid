@@ -243,7 +243,7 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
 
     companion object {
 
-        private const val mSeekLineTextSize = 15
+        private const val mSeekLineTextSize = 25
 
         private const val mSeekLineColor = Color.RED
 

@@ -15,12 +15,14 @@ import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.FFmpegHandler
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH
 import com.frank.ffmpeg.listener.OnLrcListener
+import com.frank.ffmpeg.model.AudioBean
 import com.frank.ffmpeg.model.MediaBean
 import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.TimeUtil
 import com.frank.ffmpeg.model.LrcLine
 import com.frank.ffmpeg.tool.LrcLineTool
 import com.frank.ffmpeg.tool.LrcParser
+import com.frank.ffmpeg.util.ThreadPoolUtil
 import com.frank.ffmpeg.view.LrcView
 import java.io.File
 
@@ -63,9 +65,10 @@ class AudioPlayActivity : AppCompatActivity() {
                 MSG_FINISH -> {
                     if (msg.obj == null) return
                     val result = msg.obj as MediaBean
-                    txtTitle?.text = result.audioBean?.title
-                    txtArtist?.text = result.audioBean?.artist
-                    val lyrics = result.audioBean?.lyrics
+                    val audioBean = result.audioBean
+                    txtTitle?.text = audioBean?.title
+                    txtArtist?.text = audioBean?.artist
+                    val lyrics = audioBean?.lyrics
                     if (lyrics != null) {
                         val lrcList = arrayListOf<LrcLine>()
                         for (i in lyrics.indices) {
@@ -75,6 +78,8 @@ class AudioPlayActivity : AppCompatActivity() {
                         }
                         LrcLineTool.sortLyrics(lrcList)
                         lrcView?.setLrc(lrcList)
+                    } else if (audioBean?.lrcLineList != null) {
+                        lrcView?.setLrc(audioBean.lrcLineList!!)
                     }
                 }
             }
@@ -156,14 +161,19 @@ class AudioPlayActivity : AppCompatActivity() {
         }
         if (!lrcPath.isNullOrEmpty() && File(lrcPath).exists()) {
             // should parsing in work thread
-            val lrcParser = LrcParser()
-            val lrcInfo = lrcParser.readLrc(lrcPath)
-            Log.e(TAG, "title=${lrcInfo?.title},album=${lrcInfo?.album},artist=${lrcInfo?.artist}")
-            if (lrcInfo?.lrcLineList != null) {
-                lrcView?.setLrc(lrcInfo.lrcLineList!!)
-            }
-            txtTitle?.text = lrcInfo?.title
-            txtArtist?.text = lrcInfo?.artist
+            ThreadPoolUtil.executeSingleThreadPool(Runnable {
+                val lrcParser = LrcParser()
+                val lrcInfo = lrcParser.readLrc(lrcPath)
+                Log.e(TAG, "title=${lrcInfo?.title},album=${lrcInfo?.album},artist=${lrcInfo?.artist}")
+                val mediaBean = MediaBean()
+                val audioBean = AudioBean()
+                audioBean.title = lrcInfo?.title
+                audioBean.album = lrcInfo?.album
+                audioBean.artist = lrcInfo?.artist
+                audioBean.lrcLineList = lrcInfo?.lrcLineList
+                mediaBean.audioBean = audioBean
+                mHandler.obtainMessage(MSG_FINISH, mediaBean).sendToTarget()
+            })
         } else {
             val ffmpegHandler = FFmpegHandler(mHandler)
             val commandLine = FFmpegUtil.probeFormat(path)
