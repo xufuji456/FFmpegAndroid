@@ -79,4 +79,15 @@ object TimeUtil {
         }
     }
 
+    /**
+     * string time to milliseconds
+     */
+    fun timeConvert(timeStr: String): Long {
+        var timeString = timeStr
+        timeString = timeString.replace('.', ':')
+        val times = timeString.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return (Integer.valueOf(times[0]) * 60 * 1000 +
+                Integer.valueOf(times[1]) * 1000 +
+                Integer.valueOf(times[2])).toLong()
+    }
 }

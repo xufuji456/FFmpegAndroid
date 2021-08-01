@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.tool
 
 import com.frank.ffmpeg.model.LrcLine
+import com.frank.ffmpeg.util.TimeUtil
 
 import java.util.ArrayList
 import java.util.Collections
@@ -28,7 +29,7 @@ object LrcLineTool {
                 val mLrcLine = LrcLine()
                 mLrcLine.content = content
                 mLrcLine.timeString = temp
-                val startTime = timeConvert(temp)
+                val startTime = TimeUtil.timeConvert(temp)
                 mLrcLine.startTime = startTime
                 listTimes.add(mLrcLine)
             }
@@ -38,18 +39,6 @@ object LrcLineTool {
             return null
         }
 
-    }
-
-    /**
-     * string time to milliseconds
-     */
-    private fun timeConvert(timeStr: String): Long {
-        var timeString = timeStr
-        timeString = timeString.replace('.', ':')
-        val times = timeString.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        return (Integer.valueOf(times[0]) * 60 * 1000 +
-                Integer.valueOf(times[1]) * 1000 +
-                Integer.valueOf(times[2])).toLong()
     }
 
     fun getLrcLine(line: String?): List<LrcLine>? {
