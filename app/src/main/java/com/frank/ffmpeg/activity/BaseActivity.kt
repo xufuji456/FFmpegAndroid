@@ -16,6 +16,7 @@ import android.widget.Toast
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.util.ContentUtil
+import java.lang.Exception
 
 /**
  * base Activity
@@ -74,10 +75,14 @@ abstract class BaseActivity : AppCompatActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (data != null && data.data != null) {
-            val filePath = ContentUtil.getPath(this, data.data)
-            Log.i(TAG, "filePath=" + filePath!!)
-            onSelectedFile(filePath)
+        try {
+            if (data != null && data.data != null) {
+                val filePath = ContentUtil.getPath(this, data.data!!)
+                Log.i(TAG, "filePath=" + filePath!!)
+                onSelectedFile(filePath)
+            }
+        } catch (e : Exception) {
+            e.printStackTrace()
         }
     }
 

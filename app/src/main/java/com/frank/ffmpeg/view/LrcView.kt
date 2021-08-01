@@ -23,7 +23,7 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
 
     private val mPadding = 10
 
-    private val mLrcFontSize = 35
+    private val mLrcFontSize = 45
 
     private var mHighLightRow = 0
 
@@ -48,7 +48,7 @@ class LrcView(context: Context, attr: AttributeSet) : View(context, attr) {
     annotation class HighLightMode
 
     @HighLightMode
-    private var mode = MODE_HIGH_LIGHT_KARAOKE
+    private var mode = MODE_HIGH_LIGHT_NORMAL
 
 
     init {

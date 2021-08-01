@@ -20,7 +20,9 @@ import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.TimeUtil
 import com.frank.ffmpeg.model.LrcLine
 import com.frank.ffmpeg.tool.LrcLineTool
+import com.frank.ffmpeg.tool.LrcParser
 import com.frank.ffmpeg.view.LrcView
+import java.io.File
 
 class AudioPlayActivity : AppCompatActivity() {
 
@@ -147,9 +149,26 @@ class AudioPlayActivity : AppCompatActivity() {
 
     private fun initLrc() {
         if (path.isNullOrEmpty()) return
-        val ffmpegHandler = FFmpegHandler(mHandler)
-        val commandLine = FFmpegUtil.probeFormat(path)
-        ffmpegHandler.executeFFprobeCmd(commandLine)
+        var lrcPath: String? = null
+        if (path!!.contains(".")) {
+            lrcPath = path!!.substring(0, path!!.lastIndexOf(".")) + ".lrc"
+            Log.e(TAG, "lrcPath=$lrcPath")
+        }
+        if (!lrcPath.isNullOrEmpty() && File(lrcPath).exists()) {
+            // should parsing in work thread
+            val lrcParser = LrcParser()
+            val lrcInfo = lrcParser.readLrc(lrcPath)
+            Log.e(TAG, "title=${lrcInfo?.title},album=${lrcInfo?.album},artist=${lrcInfo?.artist}")
+            if (lrcInfo?.lrcLineList != null) {
+                lrcView?.setLrc(lrcInfo.lrcLineList!!)
+            }
+            txtTitle?.text = lrcInfo?.title
+            txtArtist?.text = lrcInfo?.artist
+        } else {
+            val ffmpegHandler = FFmpegHandler(mHandler)
+            val commandLine = FFmpegUtil.probeFormat(path)
+            ffmpegHandler.executeFFprobeCmd(commandLine)
+        }
     }
 
     private fun isPlaying() :Boolean {
@@ -159,6 +178,7 @@ class AudioPlayActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         try {
+            mHandler.removeCallbacksAndMessages(null)
             audioPlayer.stop()
             audioPlayer.release()
         } catch (e: Exception) {

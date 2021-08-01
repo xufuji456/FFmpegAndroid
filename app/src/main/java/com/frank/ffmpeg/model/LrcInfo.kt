@@ -1,8 +1,5 @@
 package com.frank.ffmpeg.model
 
-import java.util.ArrayList
-
-
 class LrcInfo {
 
     var title: String? = null
@@ -14,5 +11,5 @@ class LrcInfo {
     var version: String? = null
     var offset: Int = 0
 
-    var lrcLineList: ArrayList<LrcLine>? = null
+    var lrcLineList: List<LrcLine>? = null
 }
