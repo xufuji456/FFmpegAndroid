@@ -29,7 +29,7 @@ object LrcLineTool {
                 val mLrcLine = LrcLine()
                 mLrcLine.content = content
                 mLrcLine.timeString = temp
-                val startTime = TimeUtil.timeConvert(temp)
+                val startTime = TimeUtil.timeStrToLong(temp)
                 mLrcLine.startTime = startTime
                 listTimes.add(mLrcLine)
             }
