@@ -70,20 +70,30 @@ public class FFmpegUtil {
     }
 
     /**
-     * mix one and another audio
+     * mix multiple audio inputs into a single output
      *
      * @param inputPath  input file
-     * @param mixFile    background music
+     * @param mixPath    background music
      * @param outputPath output file
      * @return mix success or not
      */
-    public static String[] mixAudio(String inputPath, String mixFile, String outputPath) {
-        //adjust volume:using '-vol 50', which is form 0 to 100
-        String mixAudioCmd = "ffmpeg -i %s -i %s -filter_complex amix=inputs=2:duration=first -strict -2 %s";
-        mixAudioCmd = String.format(mixAudioCmd, inputPath, mixFile, outputPath);
+    public static String[] mixAudio(String inputPath, String mixPath, String outputPath) {
+        //duration: first shortest longest
+        String mixAudioCmd = "ffmpeg -i %s -i %s -filter_complex amix=inputs=2:duration=longest -vn %s";
+        mixAudioCmd = String.format(mixAudioCmd, inputPath, mixPath, outputPath);
         return mixAudioCmd.split(" ");
     }
     //mixing formula: value = sample1 + sample2 - ((sample1 * sample2) >> 0x10)
+
+    /**
+     * merge multiple audio streams into a single multi-channel stream
+     *
+     */
+    public static String[] mergeAudio(String inputPath, String mergePath, String outputPath) {
+        String mergeCmd = "ffmpeg -i %s -i %s -filter_complex [0:a][1:a]amerge=inputs=2[aout] -map [aout] %s";
+        mergeCmd = String.format(mergeCmd, inputPath, mergePath, outputPath);
+        return mergeCmd.split(" ");
+    }
 
     /**
      * Set echo and delay effect

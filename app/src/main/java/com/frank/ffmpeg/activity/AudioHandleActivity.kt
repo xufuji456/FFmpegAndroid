@@ -193,8 +193,13 @@ class AudioHandleActivity : BaseActivity() {
                 if (mixSuffix == null || mixSuffix.isEmpty()) {
                     return
                 }
-                val mixFile = PATH + File.separator + "mix" + mixSuffix
-                commandLine = FFmpegUtil.mixAudio(srcFile, appendFile, mixFile)
+                commandLine = if (mixAudio) {
+                    val mixAudio = PATH + File.separator + "mix" + mixSuffix
+                    FFmpegUtil.mixAudio(srcFile, appendFile, mixAudio)
+                } else {
+                    val mergeAudio = PATH + File.separator + "merge" + mixSuffix
+                    FFmpegUtil.mergeAudio(srcFile, appendFile, mergeAudio)
+                }
             }
             R.id.btn_play_audio//use AudioTrack to play audio
             -> {
@@ -316,6 +321,8 @@ class AudioHandleActivity : BaseActivity() {
         private val PATH = Environment.getExternalStorageDirectory().path
 
         private const val useFFmpeg = true
+
+        private const val mixAudio = true
     }
 
 }
