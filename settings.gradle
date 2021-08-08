@@ -1,1 +1,3 @@
-include ':app', ':Live', ':OnLive', ':libmp3'
+include ':app'
+include ':Live'
+include ':libmp3'
