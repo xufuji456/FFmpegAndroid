@@ -206,9 +206,6 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
     packet->m_body[0] = 0x27;
     if (type == NAL_SLICE_IDR) {
         packet->m_body[0] = 0x17;
-        if (DEBUG) {
-            LOGI("IDR key frame");
-        }
     }
     //packet type
     packet->m_body[1] = 0x01;
