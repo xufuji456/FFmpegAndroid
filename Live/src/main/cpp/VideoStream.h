@@ -4,7 +4,7 @@
 
 #include <inttypes.h>
 #include <pthread.h>
-#include "include/rtmp/rtmp.h"
+#include "rtmp/rtmp.h"
 #include "include/x264/x264.h"
 
 class VideoStream {

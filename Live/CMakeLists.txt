@@ -13,12 +13,13 @@ set_target_properties(faac
                        PROPERTIES IMPORTED_LOCATION
                        ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libfaac.a)
 
-add_library(rtmp
-             STATIC
-             IMPORTED)
-set_target_properties(rtmp
-                       PROPERTIES IMPORTED_LOCATION
-                       ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/librtmp.a)
+add_subdirectory(src/main/cpp/rtmp)
+#add_library(rtmp
+#             STATIC
+#             IMPORTED)
+#set_target_properties(rtmp
+#                       PROPERTIES IMPORTED_LOCATION
+#                       ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/librtmp.a)
 
 add_library(x264
             STATIC

@@ -2,7 +2,7 @@
 #ifndef AUDIOSTREAM_H
 #define AUDIOSTREAM_H
 
-#include "include/rtmp/rtmp.h"
+#include "rtmp/rtmp.h"
 #include "include/faac/faac.h"
 #include <sys/types.h>
 
