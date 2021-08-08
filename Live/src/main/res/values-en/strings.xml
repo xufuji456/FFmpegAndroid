@@ -5,6 +5,7 @@
     <string name="stop">stop</string>
     <string name="mute">mute</string>
     <string name="voice">voice</string>
+    <string name="take_photo">photo</string>
 
     <string name="effect_beauty">beauty</string>
     <string name="effect_cool">cool</string>

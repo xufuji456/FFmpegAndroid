@@ -94,7 +94,7 @@ public class PushActivity extends Activity implements Callback {
         //SurfaceView
         mSmartCameraView = findViewById(R.id.gl_surfaceview);
         //beauty type
-        beautyTypeSelector = findViewById(R.id.beauty_type_selctor);
+        beautyTypeSelector = findViewById(R.id.beauty_type_selector);
         //mute
         btnMute = findViewById(R.id.button_mute);
         //take photo
