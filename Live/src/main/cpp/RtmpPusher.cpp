@@ -1,6 +1,5 @@
 #include <jni.h>
 #include <string>
-#include "include/rtmp/rtmp.h"
 #include "safe_queue.h"
 #include "PushInterface.h"
 #include "VideoStream.h"

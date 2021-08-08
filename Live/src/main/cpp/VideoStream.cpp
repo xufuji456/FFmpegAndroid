@@ -2,7 +2,6 @@
 #include <cstring>
 #include <jni.h>
 #include "VideoStream.h"
-#include "include/rtmp/rtmp.h"
 #include "PushInterface.h"
 
 VideoStream::VideoStream() {
