@@ -36,8 +36,7 @@ public class RtspLiveActivity extends AppCompatActivity implements IjkPlayerList
     private boolean isSilence;
     private String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-    //    private final static String url = "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov";
-    private final static String url = "rtmp://58.200.131.2:1935/livetv/hunantv";
+    private final static String url = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
