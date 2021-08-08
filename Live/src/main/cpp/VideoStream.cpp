@@ -5,14 +5,14 @@
 #include "PushInterface.h"
 
 VideoStream::VideoStream() {
-    pthread_mutex_init(&mutex, 0);
+    pthread_mutex_init(&mutex, nullptr);
 }
 
 VideoStream::~VideoStream() {
     pthread_mutex_destroy(&mutex);
     if (videoCodec) {
         x264_encoder_close(videoCodec);
-        videoCodec = 0;
+        videoCodec = nullptr;
     }
     if (pic_in) {
         x264_picture_clean(pic_in);
@@ -30,7 +30,7 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     uvSize = ySize / 4;
     if (videoCodec) {
         x264_encoder_close(videoCodec);
-        videoCodec = 0;
+        videoCodec = nullptr;
     }
     if (pic_in) {
         x264_picture_clean(pic_in);
@@ -147,7 +147,7 @@ void VideoStream::encodeDataNew(int8_t *y_plane, int8_t *u_plane, int8_t *v_plan
 
 void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len) {
     int bodySize = 13 + sps_len + 3 + pps_len;
-    RTMPPacket *packet = new RTMPPacket;
+    auto *packet = new RTMPPacket;
     RTMPPacket_Alloc(packet, bodySize);
     int i = 0;
     //start code
@@ -200,7 +200,7 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
         payload += 3;
     }
     int bodySize = 9 + i_payload;
-    RTMPPacket *packet = new RTMPPacket;
+    auto *packet = new RTMPPacket;
     RTMPPacket_Alloc(packet, bodySize);
 
     packet->m_body[0] = 0x27;

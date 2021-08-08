@@ -11,7 +11,7 @@ AudioStream::~AudioStream() {
     DELETE(buffer);
     if (audioCodec) {
         faacEncClose(audioCodec);
-        audioCodec = 0;
+        audioCodec = nullptr;
     }
 }
 
@@ -48,7 +48,7 @@ RTMPPacket *AudioStream::getAudioTag() {
     u_long len;
     faacEncGetDecoderSpecificInfo(audioCodec, &buf, &len);
     int bodySize = static_cast<int>(2 + len);
-    RTMPPacket *packet = new RTMPPacket;
+    auto *packet = new RTMPPacket;
     RTMPPacket_Alloc(packet, bodySize);
     //channel layout: stereo
     packet->m_body[0] = 0xAF;
@@ -75,7 +75,7 @@ void AudioStream::encodeData(int8_t *data) {
                                 static_cast<unsigned int>(maxOutputBytes));
     if (byteLen > 0) {
         int bodySize = 2 + byteLen;
-        RTMPPacket *packet = new RTMPPacket;
+        auto *packet = new RTMPPacket;
         RTMPPacket_Alloc(packet, bodySize);
         //stereo
         packet->m_body[0] = 0xAF;
