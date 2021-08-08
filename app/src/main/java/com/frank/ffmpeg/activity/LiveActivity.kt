@@ -1,7 +1,9 @@
 package com.frank.ffmpeg.activity
 
 import android.annotation.SuppressLint
+import android.content.IntentFilter
 import android.media.AudioFormat
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -14,6 +16,8 @@ import android.widget.Toast
 import android.widget.ToggleButton
 
 import com.frank.ffmpeg.R
+import com.frank.ffmpeg.handler.ConnectionReceiver
+import com.frank.ffmpeg.listener.OnNetworkChangeListener
 import com.frank.live.camera2.Camera2Helper
 import com.frank.live.listener.LiveStateChangeListener
 import com.frank.live.param.AudioParam
@@ -25,9 +29,12 @@ import com.frank.live.LivePusherNew
  * Created by frank on 2018/1/28.
  */
 
-class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, LiveStateChangeListener {
+open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, LiveStateChangeListener, OnNetworkChangeListener {
     private var textureView: SurfaceView? = null
     private var livePusher: LivePusherNew? = null
+    private var isPushing = false
+    private var connectionReceiver: ConnectionReceiver? = null
+
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -50,6 +57,7 @@ class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, Liv
         hideActionBar()
         initView()
         initPusher()
+        registerBroadcast(this)
     }
 
     private fun initView() {
@@ -75,13 +83,22 @@ class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, Liv
         livePusher!!.setPreviewDisplay(textureView!!.holder)
     }
 
+    private fun registerBroadcast(networkChangeListener: OnNetworkChangeListener) {
+        connectionReceiver = ConnectionReceiver(networkChangeListener)
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(connectionReceiver, intentFilter)
+    }
+
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         when (buttonView.id) {
             R.id.btn_live//start or stop living
             -> if (isChecked) {
                 livePusher!!.startPush(LIVE_URL, this)
+                isPushing = true
             } else {
                 livePusher!!.stopPush()
+                isPushing = false
             }
             R.id.btn_mute//mute or not
             -> {
@@ -101,7 +118,14 @@ class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, Liv
     override fun onDestroy() {
         super.onDestroy()
         if (livePusher != null) {
+            if (isPushing) {
+                isPushing = false
+                livePusher?.stopPush()
+            }
             livePusher!!.release()
+        }
+        if (connectionReceiver != null) {
+            unregisterReceiver(connectionReceiver)
         }
     }
 
@@ -115,10 +139,18 @@ class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, Liv
 
     }
 
+    override fun onNetworkChange() {
+        Toast.makeText(this, "network is not available", Toast.LENGTH_SHORT).show()
+        if (livePusher != null && isPushing) {
+            livePusher?.stopPush()
+            isPushing = false
+        }
+    }
+
     companion object {
 
         private val TAG = LiveActivity::class.java.simpleName
-        private const val LIVE_URL = "rtmp://192.168.1.3/live/stream"
+        private const val LIVE_URL = "rtmp://192.168.31.212/live/stream"
         private const val MSG_ERROR = 100
     }
 }
