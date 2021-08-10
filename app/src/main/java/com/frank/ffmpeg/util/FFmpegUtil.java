@@ -72,18 +72,36 @@ public class FFmpegUtil {
     /**
      * mix multiple audio inputs into a single output
      *
-     * @param inputPath  input file
-     * @param mixPath    background music
-     * @param outputPath output file
-     * @return mix success or not
      */
     public static String[] mixAudio(String inputPath, String mixPath, String outputPath) {
-        //duration: first shortest longest
-        String mixAudioCmd = "ffmpeg -i %s -i %s -filter_complex amix=inputs=2:duration=longest -vn %s";
-        mixAudioCmd = String.format(mixAudioCmd, inputPath, mixPath, outputPath);
-        return mixAudioCmd.split(" ");
+        //mixing formula: value = sample1 + sample2 - ((sample1 * sample2) >> 0x10)
+        return mixAudio(inputPath, mixPath, 0, 0, false, outputPath);
     }
-    //mixing formula: value = sample1 + sample2 - ((sample1 * sample2) >> 0x10)
+
+    public static String[] mixAudio(String inputPath, String mixPath, int weight1, int weight2,
+                                    boolean disableThumb, String outputPath) {
+        //duration: first shortest longest
+        //weight: adjust weight(volume) of each audio stream
+        //disableThumb:(-vn)if not disable, it may cause incorrect mixing
+        int len = 8;
+        String amix = "amix=inputs=2:duration=longest";
+        if (disableThumb) len += 1;
+        String[] mixAudioCmd = new String[len];
+        mixAudioCmd[0] = "ffmpeg";
+        mixAudioCmd[1] = "-i";
+        mixAudioCmd[2] = inputPath;
+        mixAudioCmd[3] = "-i";
+        mixAudioCmd[4] = mixPath;
+        mixAudioCmd[5] = "-filter_complex";
+        if (weight1 > 0 && weight2 > 0) {
+            String weight = ":weights=" + "'" + weight1 + " " + weight2 + "'";
+            amix += weight;
+        }
+        mixAudioCmd[6] = amix;
+        if (disableThumb) mixAudioCmd[7] = "-vn";
+        mixAudioCmd[len-1] = outputPath;
+        return mixAudioCmd;
+    }
 
     /**
      * merge multiple audio streams into a single multi-channel stream
