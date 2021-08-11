@@ -57,6 +57,13 @@
                 android:text="@string/video_water_mark"/>
 
             <Button
+                android:id="@+id/btn_remove_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/video_remove_logo"/>
+
+            <Button
                 android:id="@+id/btn_generate_gif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

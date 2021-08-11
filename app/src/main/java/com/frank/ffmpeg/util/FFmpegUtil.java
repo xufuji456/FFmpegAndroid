@@ -414,6 +414,18 @@ public class FFmpegUtil {
     }
 
     /**
+     * Remove watermark from video: Suppress logo by a simple interpolation of the surrounding pixels.
+     * Just set a rectangle covering the logo and watch it disappear
+     *
+     * @return delogo cmd
+     */
+    public static String[] removeLogo(String inputPath, int x, int y, int width, int height, String outputPath) {
+        String delogoCmd = "ffmpeg -i %s -filter_complex delogo=x=%d:y=%d:w=%d:h=%d %s";
+        delogoCmd = String.format(Locale.getDefault(), delogoCmd, inputPath, x, y, width, height, outputPath);
+        return delogoCmd.split(" ");
+    }
+
+    /**
      * generate a palette for gif
      *
      * @param inputPath  input file

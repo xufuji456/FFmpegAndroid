@@ -38,6 +38,7 @@
     <string name="video_cut">Video cut</string>
     <string name="video_concat">Video concat</string>
     <string name="video_water_mark">Video watermark</string>
+    <string name="video_remove_logo">Remove logo</string>
     <string name="video_to_gif">To Gif</string>
     <string name="video_transform">Video transform</string>
     <string name="video_screen_shot">Screen shot</string>

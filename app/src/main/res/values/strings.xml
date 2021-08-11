@@ -38,6 +38,7 @@
     <string name="video_cut">视频剪切</string>
     <string name="video_concat">视频拼接</string>
     <string name="video_water_mark">视频水印</string>
+    <string name="video_remove_logo">去除水印</string>
     <string name="video_to_gif">视频转Gif</string>
     <string name="video_transform">视频转码</string>
     <string name="video_screen_shot">视频截图</string>

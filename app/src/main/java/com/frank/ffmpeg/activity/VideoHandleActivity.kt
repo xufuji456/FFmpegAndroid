@@ -120,7 +120,8 @@ class VideoHandleActivity : BaseActivity() {
                 R.id.btn_thumbnail,
                 R.id.btn_add_subtitle,
                 R.id.btn_rotate,
-                R.id.btn_gop
+                R.id.btn_gop,
+                R.id.btn_remove_logo
         )
     }
 
@@ -183,12 +184,12 @@ class VideoHandleActivity : BaseActivity() {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(srcFile)
                 val mBitRate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
-                if (mBitRate != null && !mBitRate.isEmpty()) {
+                if (mBitRate != null && mBitRate.isNotEmpty()) {
                     val probeBitrate = Integer.valueOf(mBitRate)
                     bitRate = probeBitrate / 1000 / 100 * 100
                 }
                 //1:top left 2:top right 3:bottom left 4:bottom right
-                val location = 2
+                val location = 1
                 val offsetXY = 5
                 when (waterMarkType) {
                     TYPE_IMAGE// image
@@ -215,6 +216,13 @@ class VideoHandleActivity : BaseActivity() {
                     else -> {
                     }
                 }
+            }
+            R.id.btn_remove_logo//Remove logo from video: suppress logo by a simple interpolation
+            -> {
+                val removeLogoPath = PATH + File.separator + "removeLogo" + suffix
+                val widthL = 64
+                val heightL = 40
+                commandLine = FFmpegUtil.removeLogo(srcFile, 5, 5, widthL, heightL, removeLogoPath)
             }
             R.id.btn_generate_gif//convert video into gif
             -> {
