@@ -8,6 +8,42 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="@string/audio_effect">
+    </TextView>
+
+    <RadioGroup
+        android:id="@+id/group_audio_effect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/btn_effect_echo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_effect_echo"/>
+
+        <RadioButton
+            android:id="@+id/btn_effect_funny"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_effect_funny"
+            android:layout_marginStart="5dp"/>
+
+        <RadioButton
+            android:id="@+id/btn_effect_tremolo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_effect_tremolo"
+            android:layout_marginStart="5dp"/>
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/audio_equalizer">
     </TextView>
@@ -15,7 +51,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_equalizer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="50dp">
     </androidx.recyclerview.widget.RecyclerView>
 
 

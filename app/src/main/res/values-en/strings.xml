@@ -21,6 +21,11 @@
     <string name="audio_reverb">Audio reverb:</string>
     <string name="audio_bass_boost">Bass boost:</string>
     <string name="audio_voice_enhancer">Voice enhancer:</string>
+    <string name="audio_effect_echo">Ethereal</string>
+    <string name="audio_effect_funny">Funny</string>
+    <string name="audio_effect_tremolo">Tremolo</string>
+    <string name="audio_effect_lolita">Lolita</string>
+    <string name="audio_effect_uncle">Uncle</string>
 
     <string name="audio_handle">Audio handle</string>
     <string name="media_handle">Media handle</string>

@@ -5,6 +5,8 @@ import android.os.Environment
 import android.util.Log
 import android.util.Pair
 import android.view.View
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.frank.ffmpeg.AudioPlayer
@@ -54,6 +56,18 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
         equalizerView.layoutManager = layoutManager
         equalizerAdapter = EqualizerAdapter(this, this)
         equalizerView.adapter = equalizerAdapter
+
+        val effectEcho: RadioButton = findViewById(R.id.btn_effect_echo)
+        val effectFunny: RadioButton = findViewById(R.id.btn_effect_funny)
+        val effectTremolo: RadioButton = findViewById(R.id.btn_effect_tremolo)
+        val effectGroup: RadioGroup = findViewById(R.id.group_audio_effect)
+        effectGroup.setOnCheckedChangeListener { group, checkedId ->
+            when (checkedId) {
+                effectEcho.id -> doAudioEffect(0)
+                effectFunny.id -> doAudioEffect(1)
+                effectTremolo.id -> doAudioEffect(2)
+            }
+        }
     }
 
     private fun setupEqualizer() {
@@ -95,6 +109,32 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
             builder.deleteCharAt(builder.length - 1)
             Log.e("Equalizer", "update filter=$builder")
             mAudioPlayer!!.again(builder.toString())
+        }
+    }
+
+    private fun getAudioEffect(index: Int) :String {
+        return when (index) {
+            0 -> "aecho=0.8:0.8:1000:0.5"
+            1 -> "atempo=2"
+            2 -> "tremolo=5:0.9"
+            else -> {
+                ""
+            }
+        }
+    }
+
+    private fun doAudioEffect(index: Int) {
+        var effect = getAudioEffect(index)
+        if (effect.isEmpty()) return
+        val filter = ",superequalizer=6b=4:8b=5:10b=5"
+        effect += filter
+        if (filterThread == null) {
+            filterThread = Thread(Runnable {
+                mAudioPlayer!!.play(audioPath, effect)
+            })
+            filterThread!!.start()
+        } else {
+            mAudioPlayer!!.again(effect)
         }
     }
 

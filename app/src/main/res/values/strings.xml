@@ -15,12 +15,17 @@
     <string name="audio_silence">静音检测</string>
     <string name="audio_volume">修改音量</string>
     <string name="audio_add_equalizer">均衡器+</string>
-    <string name="audio_effect">音乐均衡器</string>
+    <string name="audio_effect">音效</string>
     <string name="audio_equalizer">均衡器:</string>
     <string name="audio_style">风格:</string>
     <string name="audio_reverb">混响:</string>
     <string name="audio_bass_boost">重低音:</string>
     <string name="audio_voice_enhancer">声音增强:</string>
+    <string name="audio_effect_echo">空灵</string>
+    <string name="audio_effect_funny">搞笑</string>
+    <string name="audio_effect_tremolo">惊悚</string>
+    <string name="audio_effect_lolita">萝莉</string>
+    <string name="audio_effect_uncle">大叔</string>
 
     <string name="audio_handle">音频处理</string>
     <string name="media_handle">音视频处理</string>
