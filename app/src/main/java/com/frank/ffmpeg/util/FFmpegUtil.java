@@ -385,8 +385,7 @@ public class FFmpegUtil {
     public static String[] addWaterMarkImg(String inputPath, String imgPath, int location, int bitRate,
                                            int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
-        int offset = ScreenUtil.INSTANCE.dp2px(FFmpegApplication.getInstance(), offsetXY);
-        String overlay = obtainOverlay(offset, offset, location);
+        String overlay = obtainOverlay(offsetXY, offsetXY, location);
         String waterMarkCmd = "ffmpeg -i %s -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
         waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
         return waterMarkCmd.split(" ");

@@ -190,7 +190,7 @@ class VideoHandleActivity : BaseActivity() {
                 }
                 //1:top left 2:top right 3:bottom left 4:bottom right
                 val location = 1
-                val offsetXY = 5
+                val offsetXY = 10
                 when (waterMarkType) {
                     TYPE_IMAGE// image
                     -> {
@@ -222,7 +222,7 @@ class VideoHandleActivity : BaseActivity() {
                 val removeLogoPath = PATH + File.separator + "removeLogo" + suffix
                 val widthL = 64
                 val heightL = 40
-                commandLine = FFmpegUtil.removeLogo(srcFile, 5, 5, widthL, heightL, removeLogoPath)
+                commandLine = FFmpegUtil.removeLogo(srcFile, 10, 10, widthL, heightL, removeLogoPath)
             }
             R.id.btn_generate_gif//convert video into gif
             -> {
