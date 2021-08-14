@@ -39,6 +39,20 @@
             android:text="@string/audio_effect_tremolo"
             android:layout_marginStart="5dp"/>
 
+        <RadioButton
+            android:id="@+id/btn_effect_lolita"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_effect_lolita"
+            android:layout_marginStart="5dp"/>
+
+        <RadioButton
+            android:id="@+id/btn_effect_uncle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_effect_uncle"
+            android:layout_marginStart="5dp"/>
+
     </RadioGroup>
 
     <TextView

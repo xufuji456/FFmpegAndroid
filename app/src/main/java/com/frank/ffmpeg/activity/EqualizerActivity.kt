@@ -60,12 +60,16 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
         val effectEcho: RadioButton = findViewById(R.id.btn_effect_echo)
         val effectFunny: RadioButton = findViewById(R.id.btn_effect_funny)
         val effectTremolo: RadioButton = findViewById(R.id.btn_effect_tremolo)
+        val effectLolita: RadioButton = findViewById(R.id.btn_effect_lolita)
+        val effectUncle: RadioButton = findViewById(R.id.btn_effect_uncle)
         val effectGroup: RadioGroup = findViewById(R.id.group_audio_effect)
         effectGroup.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 effectEcho.id -> doAudioEffect(0)
                 effectFunny.id -> doAudioEffect(1)
                 effectTremolo.id -> doAudioEffect(2)
+                effectLolita.id -> doAudioEffect(3)
+                effectUncle.id -> doAudioEffect(4)
             }
         }
     }
@@ -117,6 +121,8 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
             0 -> "aecho=0.8:0.8:1000:0.5"
             1 -> "atempo=2"
             2 -> "tremolo=5:0.9"
+            3 -> "asetrate=44100*1.4,aresample=44100,atempo=1/1.4"
+            4 -> "asetrate=44100*0.6,aresample=44100,atempo=1/0.6"
             else -> {
                 ""
             }
@@ -126,7 +132,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     private fun doAudioEffect(index: Int) {
         var effect = getAudioEffect(index)
         if (effect.isEmpty()) return
-        val filter = ",superequalizer=6b=4:8b=5:10b=5"
+        val filter = ",superequalizer=8b=5"
         effect += filter
         if (filterThread == null) {
             filterThread = Thread(Runnable {
