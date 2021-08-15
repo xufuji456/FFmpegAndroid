@@ -18,7 +18,7 @@ extern "C" {
 
 PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
-    AVFormatContext *in_format = NULL, *out_format = NULL;
+    AVFormatContext *in_format = nullptr, *out_format = nullptr;
     AVPacket packet;
     const char *file_path, *live_url;
     int video_index = -1;
@@ -26,8 +26,8 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
     int frame_index = 0;
     int64_t start_time = 0;
 
-    file_path = env->GetStringUTFChars(filePath, NULL);
-    live_url = env->GetStringUTFChars(liveUrl, NULL);
+    file_path = env->GetStringUTFChars(filePath, nullptr);
+    live_url = env->GetStringUTFChars(liveUrl, nullptr);
 
     LOGE(TAG, "file_path=%s", file_path);
     LOGE(TAG, "live_url=%s", live_url);
@@ -49,7 +49,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         }
     }
     av_dump_format(in_format, 0, file_path, 0);
-    avformat_alloc_output_context2(&out_format, NULL, "flv", live_url);
+    avformat_alloc_output_context2(&out_format, nullptr, "flv", live_url);
     if (!out_format) {
         LOGE(TAG, "could not alloc output context...");
         ret = AVERROR_UNKNOWN;
@@ -84,7 +84,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         }
     }
     //Write header
-    ret = avformat_write_header(out_format, NULL);
+    ret = avformat_write_header(out_format, nullptr);
     if (ret < 0) {
         LOGE(TAG, "could not write header...");
         goto end;

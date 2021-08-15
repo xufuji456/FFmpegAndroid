@@ -24,15 +24,15 @@ extern "C" {
 #define TAG "OpenSLPlayer"
 
 //object of engine
-SLObjectItf engineObject = NULL;
+SLObjectItf engineObject = nullptr;
 SLEngineItf engineEngine;
 
 //object of mixer
-SLObjectItf outputMixObject = NULL;
-SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
+SLObjectItf outputMixObject = nullptr;
+SLEnvironmentalReverbItf outputMixEnvironmentalReverb = nullptr;
 
 //object of buffer
-SLObjectItf bqPlayerObject = NULL;
+SLObjectItf bqPlayerObject = nullptr;
 SLPlayItf bqPlayerPlay;
 SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 SLEffectSendItf bqPlayerEffectSend;
@@ -63,7 +63,7 @@ int getPCM(void **pcm, size_t *pcmSize);
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) {
     bufferSize = 0;
     getPCM(&openBuffer, &bufferSize);
-    if (NULL != openBuffer && 0 != bufferSize) {
+    if (nullptr != openBuffer && 0 != bufferSize) {
         SLresult result;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, openBuffer, bufferSize);
         if (result < 0) {
@@ -77,7 +77,7 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *contex
 //create the engine of OpenSLES
 void createEngine() {
     SLresult result;
-    result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    result = slCreateEngine(&engineObject, 0, nullptr, 0, nullptr, nullptr);
     LOGI(TAG, "slCreateEngine=%d", result);
     result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
     LOGI(TAG, "engineObject->Realize=%d", result);
@@ -118,7 +118,7 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     SLDataSource audioSrc = {&buffer_queue, &format_pcm};
 
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
-    SLDataSink audioSnk = {&loc_outmix, NULL};
+    SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
@@ -136,7 +136,7 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
                                              &bqPlayerBufferQueue);
     LOGI(TAG, "GetInterface bqPlayerBufferQueue=%d", result);
 
-    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
+    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, nullptr);
     LOGI(TAG, "RegisterCallback=%d", result);
 
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
@@ -155,12 +155,12 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     av_register_all();
     aFormatCtx = avformat_alloc_context();
 
-    if (avformat_open_input(&aFormatCtx, file_name, NULL, NULL) != 0) {
+    if (avformat_open_input(&aFormatCtx, file_name, nullptr, nullptr) != 0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
 
-    if (avformat_find_stream_info(aFormatCtx, NULL) < 0) {
+    if (avformat_find_stream_info(aFormatCtx, nullptr) < 0) {
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
@@ -184,7 +184,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
         fprintf(stderr, "Unsupported codec!\n");
         return -1;
     }
-    if (avcodec_open2(aCodecCtx, aCodec, NULL) < 0) {
+    if (avcodec_open2(aCodecCtx, aCodec, nullptr) < 0) {
         LOGE(TAG, "Could not open codec.");
         return -1;
     }
@@ -248,35 +248,35 @@ int releaseAudioPlayer() {
 AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
 
     int rate, channel;
-    const char *file_name = env->GetStringUTFChars(filePath, NULL);
+    const char *file_name = env->GetStringUTFChars(filePath, nullptr);
     LOGI(TAG, "file_name=%s", file_name);
 
     createAudioPlayer(&rate, &channel, file_name);
     createEngine();
     createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
-    bqPlayerCallback(bqPlayerBufferQueue, NULL);
+    bqPlayerCallback(bqPlayerBufferQueue, nullptr);
 }
 
 AUDIO_PLAYER_FUNC(void, stop) {
-    if (bqPlayerObject != NULL) {
+    if (bqPlayerObject != nullptr) {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
-        bqPlayerObject = NULL;
-        bqPlayerPlay = NULL;
-        bqPlayerBufferQueue = NULL;
-        bqPlayerEffectSend = NULL;
-        bqPlayerVolume = NULL;
+        bqPlayerObject = nullptr;
+        bqPlayerPlay = nullptr;
+        bqPlayerBufferQueue = nullptr;
+        bqPlayerEffectSend = nullptr;
+        bqPlayerVolume = nullptr;
     }
 
-    if (outputMixObject != NULL) {
+    if (outputMixObject != nullptr) {
         (*outputMixObject)->Destroy(outputMixObject);
-        outputMixObject = NULL;
-        outputMixEnvironmentalReverb = NULL;
+        outputMixObject = nullptr;
+        outputMixEnvironmentalReverb = nullptr;
     }
 
-    if (engineObject != NULL) {
+    if (engineObject != nullptr) {
         (*engineObject)->Destroy(engineObject);
-        engineObject = NULL;
-        engineEngine = NULL;
+        engineObject = nullptr;
+        engineEngine = nullptr;
     }
 
     releaseAudioPlayer();

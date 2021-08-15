@@ -85,12 +85,12 @@ int init_input_format_context(MediaPlayer* player, const char* file_name){
     //alloc format context
     player->format_context = avformat_alloc_context();
     //open the input file
-    if(avformat_open_input(&player->format_context, file_name, NULL, NULL)!=0) {
+    if(avformat_open_input(&player->format_context, file_name, nullptr, nullptr)!=0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
     //find the info of all streams
-    if(avformat_find_stream_info(player->format_context, NULL)<0) {
+    if(avformat_find_stream_info(player->format_context, nullptr)<0) {
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
@@ -126,21 +126,21 @@ int init_codec_context(MediaPlayer* player){
     player->video_codec_context = player->format_context->streams[player->video_stream_index]->codec;
     //find audio and video decoder
     player->video_codec = avcodec_find_decoder(player->video_codec_context->codec_id);
-    if(player->video_codec == NULL) {
+    if(player->video_codec == nullptr) {
         LOGE(TAG, "couldn't find video Codec.");
         return -1;
     }
-    if(avcodec_open2(player->video_codec_context, player->video_codec, NULL) < 0) {
+    if(avcodec_open2(player->video_codec_context, player->video_codec, nullptr) < 0) {
         LOGE(TAG, "Couldn't open video codec.");
         return -1;
     }
     player->audio_codec_context = player->format_context->streams[player->audio_stream_index]->codec;
     player->audio_codec = avcodec_find_decoder(player->audio_codec_context->codec_id);
-    if( player->audio_codec == NULL) {
+    if( player->audio_codec == nullptr) {
         LOGE(TAG, "couldn't find audio Codec.");
         return -1;
     }
-    if(avcodec_open2(player->audio_codec_context, player->audio_codec, NULL) < 0) {
+    if(avcodec_open2(player->audio_codec_context, player->audio_codec, nullptr) < 0) {
         LOGE(TAG, "Couldn't open audio codec.");
         return -1;
     }
@@ -188,7 +188,7 @@ void player_wait_for_frame(MediaPlayer *player, int64_t stream_time) {
         //TODO: waiting util time out
 //        pthread_cond_timeout_np(&player->cond, &player->mutex,
 //                                                  (unsigned int) (sleep_time / 1000ll));
-        gettimeofday(&now, NULL);
+        gettimeofday(&now, nullptr);
         timeout.tv_sec = now.tv_sec;
         timeout.tv_nsec = static_cast<long>((now.tv_usec + sleep_time) * 1000);
         pthread_cond_timedwait(&player->cond, &player->mutex, &timeout);
@@ -204,7 +204,7 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
     ANativeWindow_Buffer windowBuffer;
     player->yuv_frame = av_frame_alloc();
     player->rgba_frame = av_frame_alloc();
-    if(player->rgba_frame == NULL || player->yuv_frame == NULL) {
+    if(player->rgba_frame == nullptr || player->yuv_frame == nullptr) {
         LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
@@ -224,9 +224,9 @@ int decode_video(MediaPlayer* player, AVPacket* packet){
             player->video_height,
             AV_PIX_FMT_RGBA,
             SWS_BILINEAR,
-            NULL,
-            NULL,
-            NULL);
+            nullptr,
+            nullptr,
+            nullptr);
 
     int frameFinished;
     //decode video frame
@@ -285,7 +285,7 @@ void audio_decoder_prepare(MediaPlayer* player) {
     swr_alloc_set_opts(player->swrContext,
                        out_ch_layout, player->out_sample_fmt, player->out_sample_rate,
                        in_ch_layout, in_sample_fmt, in_sample_rate,
-                       0, NULL);
+                       0, nullptr);
     swr_init(player->swrContext);
     player->out_channel_nb = av_get_channel_layout_nb_channels(out_ch_layout);
 }
@@ -332,7 +332,7 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
                 MAX_AUDIO_FRAME_SIZE,
                 (const uint8_t **)player->audio_frame->data,
                 player->audio_frame->nb_samples);
-        int out_buffer_size = av_samples_get_buffer_size(NULL,
+        int out_buffer_size = av_samples_get_buffer_size(nullptr,
                 player->out_channel_nb,
                 player->audio_frame->nb_samples,
                 player->out_sample_fmt,
@@ -346,11 +346,11 @@ int decode_audio(MediaPlayer* player, AVPacket* packet){
             player_wait_for_frame(player, player->audio_clock + AUDIO_TIME_ADJUST_US);
         }
 
-        if(javaVM != NULL){
+        if(javaVM != nullptr){
             JNIEnv * env;
-            javaVM->AttachCurrentThread(&env, NULL);
+            javaVM->AttachCurrentThread(&env, nullptr);
             jbyteArray audio_sample_array = env->NewByteArray(out_buffer_size);
-            jbyte* sample_byte_array = env->GetByteArrayElements(audio_sample_array,NULL);
+            jbyte* sample_byte_array = env->GetByteArrayElements(audio_sample_array, nullptr);
             memcpy(sample_byte_array, player->audio_buffer, (size_t) out_buffer_size);
             env->ReleaseByteArrayElements(audio_sample_array,sample_byte_array,0);
             //call write method of AudioTrack to play
@@ -432,7 +432,7 @@ MEDIA_PLAYER_FUNC(jint, setup, jstring filePath, jobject surface){
     const char *file_name = env->GetStringUTFChars(filePath, JNI_FALSE);
     int ret;
     player = static_cast<MediaPlayer *>(malloc(sizeof(MediaPlayer)));
-    if(player == NULL){
+    if(player == nullptr){
         return -1;
     }
     ret = init_input_format_context(player, file_name);
@@ -456,23 +456,23 @@ MEDIA_PLAYER_FUNC(jint, setup, jstring filePath, jobject surface){
 }
 
 MEDIA_PLAYER_FUNC(jint, play){
-    pthread_mutex_init(&player->mutex, NULL);
-    pthread_cond_init(&player->cond, NULL);
+    pthread_mutex_init(&player->mutex, nullptr);
+    pthread_cond_init(&player->cond, nullptr);
 
-    pthread_create(&player->write_thread, NULL, write_packet_to_queue, (void*)player);
+    pthread_create(&player->write_thread, nullptr, write_packet_to_queue, (void*)player);
     sleep(1);
     player->start_time = 0;
 
     Decoder data1 = {player, player->video_stream_index}, *decoder_data1 = &data1;
-    pthread_create(&player->video_thread, NULL, decode_func, (void*)decoder_data1);
+    pthread_create(&player->video_thread, nullptr, decode_func, (void*)decoder_data1);
 
     Decoder data2 = {player, player->audio_stream_index}, *decoder_data2 = &data2;
-    pthread_create(&player->audio_thread,NULL,decode_func,(void*)decoder_data2);
+    pthread_create(&player->audio_thread, nullptr, decode_func, (void*)decoder_data2);
 
 
-    pthread_join(player->write_thread, NULL);
-    pthread_join(player->video_thread, NULL);
-    pthread_join(player->audio_thread, NULL);
+    pthread_join(player->write_thread, nullptr);
+    pthread_join(player->video_thread, nullptr);
+    pthread_join(player->audio_thread, nullptr);
 
     return 0;
 }

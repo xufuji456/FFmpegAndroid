@@ -29,11 +29,11 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
     LOGE(TAG, "open file:%s\n", file_name);
     av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
-    if (avformat_open_input(&pFormatCtx, file_name, NULL, NULL) != 0) {
+    if (avformat_open_input(&pFormatCtx, file_name, nullptr, nullptr) != 0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+    if (avformat_find_stream_info(pFormatCtx, nullptr) < 0) {
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
@@ -57,11 +57,11 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
 
     AVCodecContext *pCodecCtx = pFormatCtx->streams[videoStream]->codec;
     AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-    if (pCodec == NULL) {
+    if (pCodec == nullptr) {
         LOGE(TAG, "couldn't find Codec.");
         return -1;
     }
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
+    if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
         LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
@@ -72,13 +72,13 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
     ANativeWindow_setBuffersGeometry(nativeWindow, videoWidth, videoHeight,
                                      WINDOW_FORMAT_RGBA_8888);
     ANativeWindow_Buffer windowBuffer;
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
+    if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
         LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
     AVFrame *pFrame = av_frame_alloc();
     AVFrame *pFrameRGBA = av_frame_alloc();
-    if (pFrameRGBA == NULL || pFrame == NULL) {
+    if (pFrameRGBA == nullptr || pFrame == nullptr) {
         LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
@@ -96,9 +96,9 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
                                                 pCodecCtx->height,
                                                 AV_PIX_FMT_RGBA,
                                                 SWS_BILINEAR,
-                                                NULL,
-                                                NULL,
-                                                NULL);
+                                                nullptr,
+                                                nullptr,
+                                                nullptr);
 
     int frameFinished;
     AVPacket packet;
