@@ -58,7 +58,7 @@ struct _struct_window_param {
 /* Prototypes for the window function */
 typedef struct _struct_window_context window_context;
 typedef struct _struct_window_param window_param;
-void window_get_param(void * p_aout, window_param * p_param);
+void window_get_param(window_param * p_param);
 bool window_init(int i_buffer_size, window_param * p_param, window_context * p_ctx);
 void window_scale_in_place(int16_t * p_buffer, window_context * p_ctx);
 void window_close(window_context * p_ctx);

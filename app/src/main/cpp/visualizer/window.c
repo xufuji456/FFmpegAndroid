@@ -44,10 +44,6 @@
 static const char * const window_list[NB_WINDOWS] = {
         "none", "hann", "flattop", "blackmanharris", "kaiser",
 };
-static const char * const window_list_text[NB_WINDOWS] = {
-//        N_("None"), N_("Hann"), N_("Flat Top"), N_("Blackman-Harris"), N_("Kaiser"),
-        "None", "Hann", "Flat Top", "Blackman-Harris", "Kaiser",
-};
 
 /*
  * The modified Bessel function I0(x).  See Chapter 6 of the "Numerical Recipes
@@ -62,17 +58,17 @@ static float bessi0(float x)
     {
         y = x / 3.75;
         y *= y;
-        ans = 1.0 + y * ( 3.5156229 + y * ( 3.0899424 + y * ( 1.2067492
+        ans = (float) (1.0 + y * ( 3.5156229 + y * ( 3.0899424 + y * ( 1.2067492
                   + y * ( 0.2659732 + y * ( 0.360768e-1
-                  + y * 0.45813e-2 ) ) ) ) );
+                  + y * 0.45813e-2 ) ) ) ) ) );
     }
     else
     {
         y = 3.75 / ax;
-        ans = ( exp( ax ) / sqrt( ax ) ) * ( 0.39894228 + y * ( 0.1328592e-1
+        ans = (float) ( ( exp( ax ) / sqrt( ax ) ) * ( 0.39894228 + y * ( 0.1328592e-1
             + y * ( 0.225319e-2 + y * ( -0.157565e-2 + y * ( 0.916281e-2
             + y * ( -0.2057706e-1 + y * ( 0.2635537e-1 + y * ( -0.1647633e-1
-            + y * 0.392377e-2 ) ) ) ) ) ) ) );
+            + y * 0.392377e-2 ) ) ) ) ) ) ) ) );
     }
     return ans;
 }
@@ -80,13 +76,13 @@ static float bessi0(float x)
 /*
  * Obtain the window type from the window type variable.
  */
-void window_get_param(void * p_aout, window_param * p_param)
+void window_get_param(window_param * p_param)
 {
     /* Fetch Kaiser parameter */
-    p_param->f_kaiser_alpha = 1; //TODO var_InheritFloat( p_aout, "effect-kaiser-param" );
+    p_param->f_kaiser_alpha = 1.0f;
 
     /* Fetch window type */
-    char * psz_preset = "hann"; //TODO var_InheritString( p_aout, "effect-fft-window" );
+    char * psz_preset = "hann";
     if( !psz_preset )
     {
         goto no_preset;
@@ -96,16 +92,12 @@ void window_get_param(void * p_aout, window_param * p_param)
     {
         if( !strcasecmp( psz_preset, window_list[i] ) )
         {
-//            free( psz_preset );//TODO
-            p_param->wind_type = i;
+            p_param->wind_type = (window_type) i;
             return;
         }
     }
-//    free( psz_preset );//TODO
 
 no_preset:
-//    msg_Warn( p_aout, "No matching window preset found; using rectangular "
-//                      "window (i.e. no window)" );
     p_param->wind_type = NONE;
 }
 
@@ -132,7 +124,6 @@ bool window_init(int i_buffer_size, window_param * p_param, window_context * p_c
         goto exit;
     }
 
-//    pf_table = vlc_alloc( i_buffer_size, sizeof( *pf_table ) );
     pf_table = (float * )malloc( i_buffer_size * sizeof(*pf_table));
     if( !pf_table )
     {
@@ -191,7 +182,6 @@ bool window_init(int i_buffer_size, window_param * p_param, window_context * p_c
     }
     default:
         /* We should not reach here */
-//        vlc_assert_unreachable();
         break;
     }
 

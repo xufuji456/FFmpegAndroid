@@ -55,7 +55,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     p_sys->wind_param = *w_param;//TODO
 
     /* Fetch the FFT window parameters */
-    window_get_param(/*VLC_OBJECT( p_filter )*/NULL, &p_sys->wind_param);//TODO
+    window_get_param(&p_sys->wind_param);
 
     /* Create the FIFO for the audio data. */
     vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
@@ -219,6 +219,7 @@ static void *Thread(void *p_data)
 //        vlc_tick_wait(block->i_pts + (block->i_length / 2));
 //        vlc_gl_Swap(gl);
         usleep(block->i_pts + (block->i_length / 2));
+        LOGE("height[0]=%f, height[1]=%f, height=[2]=%f", height[0], height[1], height[2]);
 
 release:
         window_close(&wind_ctx);
