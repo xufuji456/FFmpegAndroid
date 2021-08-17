@@ -49,7 +49,6 @@ struct block_t
 
 typedef struct
 {
-//    vlc_thread_t thread;
     pthread_t thread;
 
     /* Audio data */
@@ -66,12 +65,12 @@ typedef struct
     window_param wind_param;
 } filter_sys_t;
 
-static void *Thread(void *);
+static void *fft_thread(void *);
 
-/*static*/ int Open(filter_sys_t *p_sys);
+/*static*/ int open_visualizer(filter_sys_t *p_sys);
 
 /*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf);
 
-/*static*/ void Close(filter_sys_t *p_filter);
+/*static*/ void close_visualizer(filter_sys_t *p_filter);
 
 #endif //PLAYER_CORE_RUN_FFT_H

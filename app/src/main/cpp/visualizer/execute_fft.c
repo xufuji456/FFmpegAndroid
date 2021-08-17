@@ -38,7 +38,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     return p_dup;
 }
 
-/*static*/ int Open(filter_sys_t *p_sys)
+/*static*/ int open_visualizer(filter_sys_t *p_sys)
 {
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -67,7 +67,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
 //        return VLC_ENOMEM;
 //    }
 
-    pthread_create (&p_sys->thread, NULL, Thread, p_sys);
+    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);
 
     return VLC_SUCCESS;
 }
@@ -78,7 +78,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     return p_in_buf;
 }
 
-/*static*/ void Close(filter_sys_t *p_filter)
+/*static*/ void close_visualizer(filter_sys_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter;
 
@@ -90,7 +90,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     free(p_sys->p_prev_s16_buff);
 }
 
-static void *Thread(void *p_data)
+static void *fft_thread(void *p_data)
 {
     filter_sys_t *p_sys = (filter_sys_t*)p_data;
     block_t *block;

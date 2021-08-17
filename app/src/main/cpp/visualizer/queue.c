@@ -132,7 +132,6 @@ void *vlc_queue_Dequeue(vlc_queue_t *q)
     void *entry;
 
     vlc_queue_Lock(q);
-//    vlc_testcancel();
 
     while (vlc_queue_IsEmpty(q))
         vlc_queue_Wait(q);

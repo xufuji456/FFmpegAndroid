@@ -46,9 +46,7 @@ typedef struct vlc_queue
     struct vlc_queue_entry *first;
     struct vlc_queue_entry **lastp;
     ptrdiff_t next_offset;
-//    vlc_mutex_t lock;
     pthread_mutex_t lock;
-//    vlc_cond_t wait;
     pthread_cond_t wait;
 } vlc_queue_t;
 
