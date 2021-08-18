@@ -41,8 +41,8 @@ public class FFmpegUtil {
      * @param outputPath output file
      * @return cut success or not
      */
-    public static String[] cutAudio(String inputPath, int startTime, int duration, String outputPath) {
-        String cutAudioCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -acodec copy -vn %s";
+    public static String[] cutAudio(String inputPath, float startTime, float duration, String outputPath) {
+        String cutAudioCmd = "ffmpeg -ss %f -accurate_seek -t %f -i %s -acodec copy -vn %s";
         cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration, inputPath, outputPath);
         return cutAudioCmd.split(" ");
     }
@@ -333,12 +333,12 @@ public class FFmpegUtil {
      * @param outputPath output file
      * @return cut video success or not
      */
-    public static String[] cutVideo(String inputPath, int startTime, int duration, String outputPath) {
+    public static String[] cutVideo(String inputPath, float startTime, float duration, String outputPath) {
         // -map 0 -codec copy (copy all tracks)
         // -map 0:v -vcodec copy (copy track of video)
         // -map 0:a -acodec copy (copy all tracks of audio)
         // -map 0:s -scodec copy (copy all tracks of subtitle)
-        String cutVideoCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -map 0 -codec copy -avoid_negative_ts 1 %s";
+        String cutVideoCmd = "ffmpeg -ss %f -accurate_seek -t %f -i %s -map 0 -codec copy -avoid_negative_ts 1 %s";
         cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
         return cutVideoCmd.split(" ");
     }
@@ -347,13 +347,13 @@ public class FFmpegUtil {
      * screenshot from video, you could assign the specific time
      *
      * @param inputPath  input file
-     * @param time       which time you want to shot
+     * @param offset     which time you want to shot
      * @param outputPath output file
      * @return screenshot success or not
      */
-    public static String[] screenShot(String inputPath, int time, String outputPath) {
-        String screenShotCmd = "ffmpeg -ss %d -i %s -f image2 -vframes 1 -an %s";
-        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, time, inputPath, outputPath);
+    public static String[] screenShot(String inputPath, float offset, String outputPath) {
+        String screenShotCmd = "ffmpeg -ss %f -i %s -f image2 -vframes 1 -an %s";
+        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, offset, inputPath, outputPath);
         return screenShotCmd.split(" ");
     }
 

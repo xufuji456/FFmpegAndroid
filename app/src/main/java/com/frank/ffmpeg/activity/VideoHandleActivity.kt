@@ -165,8 +165,8 @@ class VideoHandleActivity : BaseActivity() {
             R.id.btn_video_cut//cut video
             -> {
                 val cutVideo = PATH + File.separator + "cutVideo" + suffix
-                val startTime = 0
-                val duration = 20
+                val startTime = 5.5f
+                val duration = 20.0f
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, cutVideo)
             }
             R.id.btn_video_concat//concat video together
@@ -174,7 +174,7 @@ class VideoHandleActivity : BaseActivity() {
             R.id.btn_screen_shot//video snapshot
             -> {
                 val screenShot = PATH + File.separator + "screenShot.jpg"
-                val time = 18
+                val time = 10.5f
                 commandLine = FFmpegUtil.screenShot(srcFile, time, screenShot)
             }
             R.id.btn_water_mark//add watermark to video

@@ -174,7 +174,7 @@ class AudioHandleActivity : BaseActivity() {
                     return
                 }
                 val cutFile = PATH + File.separator + "cutAudio" + suffix
-                commandLine = FFmpegUtil.cutAudio(srcFile, 10, 15, cutFile)
+                commandLine = FFmpegUtil.cutAudio(srcFile, 10.5f, 15.0f, cutFile)
             }
             R.id.btn_concat//concat audio
             -> {
