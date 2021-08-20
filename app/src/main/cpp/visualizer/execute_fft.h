@@ -2,8 +2,8 @@
 // Created by frank on 2021/8/16.
 //
 
-#ifndef PLAYER_CORE_RUN_FFT_H
-#define PLAYER_CORE_RUN_FFT_H
+#ifndef EXECUTE_FFT_H
+#define EXECUTE_FFT_H
 
 #include "vlc_queue.h"
 #include "fft.h"
@@ -73,4 +73,4 @@ static void *fft_thread(void *);
 
 /*static*/ void close_visualizer(filter_sys_t *p_filter);
 
-#endif //PLAYER_CORE_RUN_FFT_H
+#endif //EXECUTE_FFT_H

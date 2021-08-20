@@ -39,7 +39,6 @@ public:
 
     void push(T new_value) {
 #ifdef C11
-        //锁 和智能指针原理类似，自动释放
         lock_guard<mutex> lk(mt);
         if (work) {
             q.push(new_value);
@@ -62,9 +61,7 @@ public:
     int pop(T &value) {
         int ret = 0;
 #ifdef C11
-        //占用空间相对lock_guard 更大一点且相对更慢一点，但是配合条件必须使用它，更灵活
         unique_lock<mutex> lk(mt);
-        //第二个参数 lambda表达式：false则不阻塞 往下走
         cv.wait(lk,[this]{return !work || !q.empty();});
         if (!q.empty()) {
             value = q.front();
@@ -105,7 +102,7 @@ public:
     }
 
     int size() {
-        return q.size();
+        return static_cast<int>(q.size());
     }
 
     void clear() {
@@ -119,7 +116,7 @@ public:
         }
 #else
         pthread_mutex_lock(&mutex);
-        int size = q.size();
+        int size = static_cast<int>(q.size());
         for (int i = 0; i < size; ++i) {
             T value = q.front();
             releaseCallback(value);
