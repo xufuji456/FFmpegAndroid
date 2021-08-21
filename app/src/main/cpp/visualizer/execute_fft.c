@@ -15,29 +15,6 @@
 #define BAR_DECREMENT .075f
 #define ROTATION_MAX 20
 
-static inline void block_CopyProperties(block_t *dst, const block_t *src)
-{
-    dst->i_dts        = src->i_dts;
-    dst->i_pts        = src->i_pts;
-    dst->i_flags      = src->i_flags;
-    dst->i_length     = src->i_length;
-    dst->i_nb_samples = src->i_nb_samples;
-}
-
-static inline block_t *block_Duplicate(const block_t *p_block)
-{
-//    block_t *p_dup = block_Alloc(p_block->i_buffer);//TODO
-    block_t *p_dup = (block_t*) malloc(sizeof(block_t));
-    if(p_dup == NULL) return NULL;
-    p_dup->i_buffer = p_block->i_buffer;
-    p_dup->p_buffer = (uint8_t*) malloc(p_block->i_buffer);//TODO
-
-    block_CopyProperties(p_dup, p_block);
-    memcpy(p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer);
-
-    return p_dup;
-}
-
 /*static*/ int open_visualizer(filter_sys_t *p_sys)
 {
     if (p_sys == NULL)
@@ -58,7 +35,9 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     window_get_param(&p_sys->wind_param);
 
     /* Create the FIFO for the audio data. */
-    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
+//    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
+    vlc_queue_t *queue = vlc_queue_init(5);
+    p_sys->queue = *queue;
     p_sys->dead = false;
 
     /* Create the thread */
@@ -74,7 +53,8 @@ static inline block_t *block_Duplicate(const block_t *p_block)
 
 /*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf)
 {
-    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(p_in_buf));
+//    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(p_in_buf));
+    vlc_queue_push(&p_sys->queue, p_in_buf);
     return p_in_buf;
 }
 
@@ -83,7 +63,7 @@ static inline block_t *block_Duplicate(const block_t *p_block)
     filter_sys_t *p_sys = p_filter;
 
     /* Terminate the thread. */
-    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
+    vlc_queue_free(&p_sys->queue);
 //    vlc_join(p_sys->thread, NULL);
     pthread_join(p_sys->thread, NULL);
 
@@ -97,7 +77,8 @@ static void *fft_thread(void *p_data)
 
     float height[NB_BANDS] = {0};
     LOGE("start FFT thread...");
-    while ((block = vlc_queue_DequeueKillable(&p_sys->queue, &p_sys->dead)))
+//    while ((block = vlc_queue_DequeueKillable(&p_sys->queue, &p_sys->dead)))
+    while ((block = vlc_queue_pop(&p_sys->queue)))
     {
         LOGE("running FFT transform...");
         unsigned win_width, win_height;
@@ -218,15 +199,14 @@ static void *fft_thread(void *p_data)
         /* Wait to swapp the frame on time. */
 //        vlc_tick_wait(block->i_pts + (block->i_length / 2));
 //        vlc_gl_Swap(gl);
-        usleep(block->i_pts + (block->i_length / 2));
+        usleep(200*1000 /*block->i_pts + (block->i_length / 2)*/);
         LOGE("height[0]=%f, height[1]=%f, height=[2]=%f", height[0], height[1], height[2]);
 
 release:
         window_close(&wind_ctx);
         fft_close(p_state);
-//        block_Release(block);//TODO
-        if (block->p_buffer) free(block->p_buffer);
-        free(block);
+//        if (block->p_buffer) free(block->p_buffer);
+//        free(block);
     }
 
     return NULL;

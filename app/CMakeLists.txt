@@ -35,7 +35,7 @@ add_library( # Sets the name of the library.
             src/main/cpp/fast_start.c
             src/main/cpp/ffprobe_cmd.cpp
             src/main/cpp/visualizer/fft.c
-            src/main/cpp/visualizer/queue.c
+            src/main/cpp/visualizer/block_queue.c
             src/main/cpp/visualizer/execute_fft.c
             src/main/cpp/visualizer/window.c
         )
