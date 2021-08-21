@@ -17,6 +17,7 @@
 #include "ffmpeg_jni_define.h"
 
 #define TAG "VideoFilter"
+#define ENABLE_MEDIACODEC 1
 
 AVFormatContext *pFormatCtx;
 AVCodecContext *pCodecCtx;
@@ -150,7 +151,17 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
     }
 
     pCodecCtx = pFormatCtx->streams[video_stream_index]->codec;
-    AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+    AVCodec *pCodec;
+    if (ENABLE_MEDIACODEC && pCodecCtx->codec_id == AV_CODEC_ID_H264) {
+        // note: Some devices will bring blurred screen, when using mediacodec
+        pCodec = avcodec_find_decoder_by_name("h264_mediacodec");
+        if (pCodec == NULL) {
+            pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+        }
+        LOGE(TAG, "codec name=%s", pCodec->name);
+    } else {
+        pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+    }
     if (pCodec == NULL) {
         LOGE(TAG, "couldn't find Codec.");
         return -1;

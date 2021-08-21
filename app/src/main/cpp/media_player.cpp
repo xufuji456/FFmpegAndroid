@@ -19,6 +19,7 @@ extern "C" {
 #include "libswresample/swresample.h"
 #include "packet_queue.h"
 #include "ffmpeg_jni_define.h"
+#include "include/libavcodec/jni.h"
 #ifdef __cplusplus
 }
 #endif
@@ -75,6 +76,7 @@ MediaPlayer* player;
 
 jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved){
     javaVM = vm;
+    av_jni_set_java_vm(vm, nullptr);// set JavaVM into FFmpeg
     return JNI_VERSION_1_6;
 }
 
