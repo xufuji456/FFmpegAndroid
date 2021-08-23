@@ -200,7 +200,8 @@ static void *fft_thread(void *p_data)
 //        vlc_tick_wait(block->i_pts + (block->i_length / 2));
 //        vlc_gl_Swap(gl);
         usleep(200*1000 /*block->i_pts + (block->i_length / 2)*/);
-        LOGE("height[0]=%f, height[1]=%f, height=[2]=%f", height[0], height[1], height[2]);
+//        LOGE("height[0]=%f, height[1]=%f, height=[2]=%f", height[0], height[1], height[2]);
+        block->fft_callback.callback(height);
 
 release:
         window_close(&wind_ctx);

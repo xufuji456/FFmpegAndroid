@@ -23,6 +23,10 @@ typedef int64_t vlc_tick_t;
 
 typedef struct block_t block_t;
 
+typedef struct FFT_callback {
+    void (*callback)(void*);
+} FFT_callback;
+
 struct block_t
 {
     block_t    *p_next;
@@ -34,6 +38,8 @@ struct block_t
 
     vlc_tick_t  i_pts;
     vlc_tick_t  i_length;
+
+    FFT_callback fft_callback;
 };
 
 typedef struct
