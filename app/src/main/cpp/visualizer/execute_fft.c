@@ -21,7 +21,7 @@
         return VLC_ENOMEM;
 
     /* Create the object for the thread */
-    p_sys->i_channels = 2;//TODO
+    p_sys->i_channels = 1;
     p_sys->i_prev_nb_samples = 0;
     p_sys->p_prev_s16_buff = NULL;
 
@@ -35,16 +35,9 @@
     window_get_param(&p_sys->wind_param);
 
     /* Create the FIFO for the audio data. */
-//    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
     vlc_queue_t *queue = vlc_queue_init(5);
     p_sys->queue = *queue;
     p_sys->dead = false;
-
-    /* Create the thread */
-//    if (vlc_clone(&p_sys->thread, Thread, p_filter,
-//                  VLC_THREAD_PRIORITY_VIDEO)) {
-//        return VLC_ENOMEM;
-//    }
 
     pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);
 
@@ -53,7 +46,6 @@
 
 /*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf)
 {
-//    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(p_in_buf));
     vlc_queue_push(&p_sys->queue, p_in_buf);
     return p_in_buf;
 }
@@ -64,7 +56,6 @@
 
     /* Terminate the thread. */
     vlc_queue_free(&p_sys->queue);
-//    vlc_join(p_sys->thread, NULL);
     pthread_join(p_sys->thread, NULL);
 
     free(p_sys->p_prev_s16_buff);
@@ -77,12 +68,10 @@ static void *fft_thread(void *p_data)
 
     float height[NB_BANDS] = {0};
     LOGE("start FFT thread...");
-//    while ((block = vlc_queue_DequeueKillable(&p_sys->queue, &p_sys->dead)))
+
     while ((block = vlc_queue_pop(&p_sys->queue)))
     {
         LOGE("running FFT transform...");
-        unsigned win_width, win_height;
-
         /* Horizontal scale for 20-band equalizer */
         const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
                                    36,47,62,82,107,141,184,255};
@@ -199,15 +188,12 @@ static void *fft_thread(void *p_data)
         /* Wait to swapp the frame on time. */
 //        vlc_tick_wait(block->i_pts + (block->i_length / 2));
 //        vlc_gl_Swap(gl);
-        usleep(200*1000 /*block->i_pts + (block->i_length / 2)*/);
-//        LOGE("height[0]=%f, height[1]=%f, height=[2]=%f", height[0], height[1], height[2]);
+        usleep(10*1000 /*block->i_pts + (block->i_length / 2)*/);
         block->fft_callback.callback(height);
 
 release:
         window_close(&wind_ctx);
         fft_close(p_state);
-//        if (block->p_buffer) free(block->p_buffer);
-//        free(block);
     }
 
     return NULL;

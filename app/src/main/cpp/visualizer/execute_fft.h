@@ -29,10 +29,7 @@ typedef struct FFT_callback {
 
 struct block_t
 {
-    block_t    *p_next;
-
     uint8_t    *p_buffer; /**< Payload start */
-    size_t      i_buffer; /**< Payload length */
 
     unsigned    i_nb_samples; /* Used for audio */
 
