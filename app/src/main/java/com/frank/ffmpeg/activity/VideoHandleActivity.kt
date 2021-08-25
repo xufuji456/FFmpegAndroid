@@ -339,7 +339,7 @@ class VideoHandleActivity : BaseActivity() {
             R.id.btn_add_subtitle//add subtitle into video
             -> {
                 val subtitlePath = PATH + File.separator + "test.ass"
-                val addSubtitlePath = PATH + File.separator + "subtitle" + suffix
+                val addSubtitlePath = PATH + File.separator + "subtitle.mkv"
                 commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, addSubtitlePath)
             }
             R.id.btn_rotate// set the rotate degree of video

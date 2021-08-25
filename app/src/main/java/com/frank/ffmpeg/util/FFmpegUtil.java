@@ -702,7 +702,7 @@ public class FFmpegUtil {
     }
 
     public static String[] addSubtitleIntoVideo(String inputPath, String subtitlePath, String outputPath) {
-        String subtitleCmd = "ffmpeg -i %s -vf subtitles=%s %s";
+        String subtitleCmd = "ffmpeg -i %s -i %s -map 0:v -map 0:a -map 1:s -c copy %s";
         subtitleCmd = String.format(subtitleCmd, inputPath, subtitlePath, outputPath);
         return subtitleCmd.split(" ");
     }
