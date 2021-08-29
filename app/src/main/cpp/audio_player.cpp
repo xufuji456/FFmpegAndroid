@@ -34,6 +34,8 @@ int filter_again = 0;
 int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
 
+static void fft_callback(void* arg);
+
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
     AVFilterGraph   *filter_graph;
@@ -385,10 +387,8 @@ static void *input(void *) {
     size_t len = 256;
     auto *data = static_cast<uint8_t *>(malloc(len * sizeof(uint8_t)));
     auto *block = static_cast<block_t *>(malloc(sizeof(block_t)));
-    block->i_buffer = len;
     block->p_buffer = data;
     block->i_nb_samples = len;
-    block->i_pts = tick;
 
     block->fft_callback.callback = fft_callback;
 
@@ -397,6 +397,7 @@ static void *input(void *) {
         for (int j = 0; j < len; j++) {
             block->p_buffer[j] = i+j;
         }
+        block->i_pts = tick;
 
         filter_audio(p_sys, block);
         tick += 16*1000;
