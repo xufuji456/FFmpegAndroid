@@ -19,26 +19,6 @@
 /** Not enough memory */
 #define VLC_ENOMEM         (-2)
 
-typedef int64_t vlc_tick_t;
-
-typedef struct block_t block_t;
-
-typedef struct FFT_callback {
-    void (*callback)(void*);
-} FFT_callback;
-
-struct block_t
-{
-    uint8_t    *p_buffer; /**< Payload start */
-
-    unsigned    i_nb_samples; /* Used for audio */
-
-    vlc_tick_t  i_pts;
-    vlc_tick_t  i_length;
-
-    FFT_callback fft_callback;
-};
-
 typedef struct
 {
     pthread_t thread;

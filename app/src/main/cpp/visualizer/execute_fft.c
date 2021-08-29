@@ -46,8 +46,7 @@
 
 /*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf)
 {
-    vlc_queue_push(&p_sys->queue, p_in_buf);
-    return p_in_buf;
+    return vlc_queue_push(&p_sys->queue, p_in_buf);
 }
 
 /*static*/ void close_visualizer(filter_sys_t *p_filter)

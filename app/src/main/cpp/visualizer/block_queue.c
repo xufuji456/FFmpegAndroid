@@ -3,8 +3,6 @@
 //
 #include "block_queue.h"
 #include <stdlib.h>
-#include <libavcodec/avcodec.h>
-
 
 vlc_queue_t *vlc_queue_init(int size) {
     vlc_queue_t *queue = (vlc_queue_t *)(malloc(sizeof(vlc_queue_t)));
@@ -14,7 +12,9 @@ vlc_queue_t *vlc_queue_init(int size) {
     int i;
     queue->packets = (void **)(malloc(sizeof(*queue->packets) * size));
     for (i = 0; i < size; i++) {
-        queue->packets[i] = malloc(sizeof(AVPacket));
+        block_t *packet = malloc(sizeof(block_t));
+        packet->i_nb_samples = 0;
+        queue->packets[i] = packet;
     }
     pthread_mutex_init(&queue->mutex, NULL);
     pthread_cond_init(&queue->cond, NULL);
