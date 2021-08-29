@@ -44,7 +44,7 @@
     return VLC_SUCCESS;
 }
 
-/*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf)
+/*static*/ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
 {
     return vlc_queue_push(&p_sys->queue, p_in_buf);
 }

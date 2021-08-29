@@ -41,7 +41,7 @@ static void *fft_thread(void *);
 
 /*static*/ int open_visualizer(filter_sys_t *p_sys);
 
-/*static*/ block_t *filter_audio(filter_sys_t *p_sys, block_t *p_in_buf);
+/*static*/ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf);
 
 /*static*/ void close_visualizer(filter_sys_t *p_filter);
 
