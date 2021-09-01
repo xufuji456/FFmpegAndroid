@@ -24,7 +24,7 @@
 #ifndef VLC_VISUAL_FFT_H_
 #define VLC_VISUAL_FFT_H_
 
-#define FFT_BUFFER_SIZE_LOG 9
+#define FFT_BUFFER_SIZE_LOG 8
 
 #define FFT_BUFFER_SIZE (1 << FFT_BUFFER_SIZE_LOG)
 

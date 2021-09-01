@@ -13,6 +13,7 @@ import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.listener.OnSeeBarListener
+import com.frank.ffmpeg.view.VisualizerView
 import java.lang.StringBuilder
 import java.util.ArrayList
 
@@ -33,8 +34,10 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
 
     private val selectBandList = IntArray(bandsList.size)
     private val minEQLevel = 0
+    private val fftData = ByteArray(/*20*/256)
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
+    private var visualizerView: VisualizerView? = null
     private var equalizerAdapter: EqualizerAdapter? = null
     private var audioPath = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
 
@@ -50,6 +53,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     }
 
     private fun initView() {
+        visualizerView = findViewById(R.id.visualizer_fft)
         val equalizerView = findViewById<RecyclerView>(R.id.list_equalizer)
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
@@ -87,6 +91,16 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
             equalizerAdapter!!.setEqualizerList(equalizerList)
         }
         mAudioPlayer = AudioPlayer()
+        mAudioPlayer?.setOnFftCallback {
+            Log.e("Equalizer", "fft data[0]=" + it[0] + "--data[1]=" + it[1] + "--data[2]=" + it[2])
+            if (visualizerView != null && it != null) {
+                for (i in it.indices) {
+                    fftData[i] = (it[i]/*10/4.2f*/).toByte()
+                }
+                Log.e("Equalizer", "data[0]=" + fftData[0] + "--data[1]=" + fftData[1] + "--data[2]=" + fftData[2])
+                visualizerView!!.post { visualizerView!!.setWaveData(fftData) }
+            }
+        }
     }
 
     private fun doEqualize() {

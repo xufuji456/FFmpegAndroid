@@ -188,7 +188,7 @@ static void *fft_thread(void *p_data)
 //        vlc_tick_wait(block->i_pts + (block->i_length / 2));
 //        vlc_gl_Swap(gl);
         usleep(10*1000 /*block->i_pts + (block->i_length / 2)*/);
-        block->fft_callback.callback(height);
+        block->fft_callback.callback(p_dest);
 
 release:
         window_close(&wind_ctx);

@@ -59,4 +59,21 @@ public class AudioPlayer {
             mAudioTrack = null;
         }
     }
+
+    private OnFFTCallback onFFTCallback;
+
+    public interface OnFFTCallback {
+        void onFFT(int[] data);
+    }
+
+    public void setOnFftCallback(OnFFTCallback onFFTCallback) {
+        this.onFFTCallback = onFFTCallback;
+    }
+
+    public void fftCallbackFromJNI(int[] data) {
+        if (data != null && onFFTCallback != null) {
+           onFFTCallback.onFFT(data);
+        }
+    }
+
 }
