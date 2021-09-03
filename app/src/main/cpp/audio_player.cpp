@@ -390,18 +390,6 @@ AUDIO_PLAYER_FUNC(void, release) {
     filter_release = 1;
 }
 
-pthread_t input_thread;
-filter_sys_t *p_sys;
-
-static void *input(void *);
-
-AUDIO_PLAYER_FUNC(void, openFFT) {
-    pthread_create(&input_thread, nullptr, input, nullptr);
-
-    p_sys = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
-    open_visualizer(p_sys);
-}
-
 static void fft_callback(void* arg) {
 //    float* data = (float*) arg;
 //    LOGE(TAG, "fft data[0]=%f,data[1]=%f,data[2]=%f", data[0], data[1], data[2]);
@@ -412,30 +400,4 @@ static void fft_callback(void* arg) {
     jniEnv->SetIntArrayRegion(dataArray, 0, /*20*/256, (int*)arg);
     jniEnv->CallVoidMethod(jni_object, fft_method, dataArray);
     java_vm->DetachCurrentThread();
-}
-
-static void *input(void *) {
-    int64_t tick = 0;
-    size_t len = 256;
-    auto *data = static_cast<uint8_t *>(malloc(len * sizeof(uint8_t)));
-    auto *block = static_cast<block_t *>(malloc(sizeof(block_t)));
-    block->p_buffer = data;
-    block->i_nb_samples = len;
-
-    block->fft_callback.callback = fft_callback;
-
-    LOGE(TAG, "begin input...");
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < len; j++) {
-            block->p_buffer[j] = i+j;
-        }
-        block->i_pts = tick;
-
-        filter_audio(p_sys, block);
-        tick += 16*1000;
-        usleep(200 * 1000);
-    }
-    LOGE(TAG, "finish input-_-");
-//    close_visualizer(p_sys);
-    return nullptr;
 }
