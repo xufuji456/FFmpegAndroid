@@ -43,7 +43,7 @@ ffmpeg -i %s -s 1080x720 %s<br>
 Select video or audio file from your file explorer, and click the button.<br>
 When it finishes probing, the result of metadata will display on screen.<br>
 
-### Joining the group to learn FFmpeg:
+### Joining the group to learn FFmpeg(1群已满):
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
 
 ### Preview thumbnail when seeking:
