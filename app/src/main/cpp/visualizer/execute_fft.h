@@ -45,4 +45,6 @@ static void *fft_thread(void *);
 
 /*static*/ void close_visualizer(filter_sys_t *p_filter);
 
+void fft_once(void *p_data, block_t *block, int16_t *output);
+
 #endif //PLAYER_CORE_RUN_FFT_H

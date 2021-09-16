@@ -34,11 +34,7 @@ int filter_again = 0;
 int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
 
-JavaVM *java_vm;
-jobject jni_object;
-jmethodID fft_method;
-
-static void fft_callback(void* arg);
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t* arg);
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
@@ -287,15 +283,14 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 //        goto end;
     }
 
-    env->GetJavaVM(&java_vm);
-    jni_object = env->NewGlobalRef(thiz);
-    fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([I)V");
+    jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([I)V");
 
     filter_sys_t *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
     open_visualizer(fft_filter);
     auto *block = static_cast<block_t *>(malloc(sizeof(block_t)));
     block->i_nb_samples = 0;
-    block->fft_callback.callback = fft_callback;
+//    block->fft_callback.callback = fft_callback;
+    int16_t *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
 
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
@@ -327,7 +322,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
             if (block->i_nb_samples == frame->nb_samples) {
                 LOGE(TAG, "start frame->nb_samples=%d", frame->nb_samples);
                 memcpy(block->p_buffer, frame->data[0], static_cast<size_t>(frame->nb_samples));
-                filter_audio(fft_filter, block);
+                fft_once(fft_filter, block, output);
+                fft_callback(env, thiz, fft_method, output);
             }
 
             ret = av_buffersrc_add_frame(audioSrcContext, frame);
@@ -390,14 +386,8 @@ AUDIO_PLAYER_FUNC(void, release) {
     filter_release = 1;
 }
 
-static void fft_callback(void* arg) {
-//    float* data = (float*) arg;
-//    LOGE(TAG, "fft data[0]=%f,data[1]=%f,data[2]=%f", data[0], data[1], data[2]);
-
-    JNIEnv *jniEnv = nullptr;
-    java_vm->AttachCurrentThread(&jniEnv, nullptr);
-    jintArray dataArray = jniEnv->NewIntArray(/*20*/256);
-    jniEnv->SetIntArrayRegion(dataArray, 0, /*20*/256, (int*)arg);
-    jniEnv->CallVoidMethod(jni_object, fft_method, dataArray);
-    java_vm->DetachCurrentThread();
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg) {
+    jintArray dataArray = jniEnv->NewIntArray(256);
+    jniEnv->SetIntArrayRegion(dataArray, 0, 256, (int*)arg);
+    jniEnv->CallVoidMethod(thiz, fft_method, dataArray);
 }
