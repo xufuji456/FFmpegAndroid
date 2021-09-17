@@ -283,7 +283,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 //        goto end;
     }
 
-    jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([I)V");
+    jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
     filter_sys_t *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
     open_visualizer(fft_filter);
@@ -387,7 +387,8 @@ AUDIO_PLAYER_FUNC(void, release) {
 }
 
 void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg) {
-    jintArray dataArray = jniEnv->NewIntArray(256);
-    jniEnv->SetIntArrayRegion(dataArray, 0, 256, (int*)arg);
+    LOGE(TAG, "arg[100]=%d,arg[101]=%d,arg[102]=%d", arg[100], arg[101], arg[102]);
+    jshortArray dataArray = jniEnv->NewShortArray(256);
+    jniEnv->SetShortArrayRegion(dataArray, 0, 256, arg);
     jniEnv->CallVoidMethod(thiz, fft_method, dataArray);
 }

@@ -304,6 +304,7 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
     }
 
     memcpy(output, p_dest, FFT_BUFFER_SIZE);
+    LOGE("out[100]=%d,out[101]=%d,out[102]=%d", output[100], output[101], output[102]);
 
 release:
     window_close(&wind_ctx);
