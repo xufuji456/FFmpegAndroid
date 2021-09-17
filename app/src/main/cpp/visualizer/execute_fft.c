@@ -9,11 +9,9 @@
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, \
                    __VA_ARGS__))
 
-#define SPECTRUM_WIDTH 4.f
 #define NB_BANDS 20
 #define ROTATION_INCREMENT .1f
 #define BAR_DECREMENT .075f
-#define ROTATION_MAX 20
 
 /*static*/ int open_visualizer(filter_sys_t *p_sys)
 {
@@ -170,23 +168,6 @@ static void *fft_thread(void *p_data)
                         ? new_height : height[i];
         }
 
-        /* Determine the camera rotation angle. */
-        p_sys->f_rotationAngle += p_sys->f_rotationIncrement;
-        if (p_sys->f_rotationAngle <= -ROTATION_MAX)
-            p_sys->f_rotationIncrement = ROTATION_INCREMENT;
-        else if (p_sys->f_rotationAngle >= ROTATION_MAX)
-            p_sys->f_rotationIncrement = -ROTATION_INCREMENT;
-
-        /* Render the frame. */
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glPushMatrix();
-//        glRotatef(p_sys->f_rotationAngle, 0, 1, 0);
-//        drawBars(height);
-//        glPopMatrix();
-
-        /* Wait to swapp the frame on time. */
-//        vlc_tick_wait(block->i_pts + (block->i_length / 2));
-//        vlc_gl_Swap(gl);
         usleep(10*1000 /*block->i_pts + (block->i_length / 2)*/);
         block->fft_callback.callback(p_dest);
 
@@ -202,16 +183,10 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
 {
     filter_sys_t *p_sys = (filter_sys_t*)p_data;
 
-    float height[NB_BANDS] = {0};
-
-    /* Horizontal scale for 20-band equalizer */
-    const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
-                               36,47,62,82,107,141,184,255};
-
     fft_state *p_state = NULL; /* internal FFT data */
     DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
 
-    unsigned i, j;
+    unsigned i;
     float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
     int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                   the FFT (first channel) */
@@ -281,27 +256,6 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
     for (i = 0; i< FFT_BUFFER_SIZE; ++i)
         p_dest[i] = p_output[i] *  (2 ^ 16)
                     / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
-
-    for (i = 0 ; i < NB_BANDS; i++)
-    {
-        /* Decrease the previous size of the bar. */
-        height[i] -= BAR_DECREMENT;
-        if (height[i] < 0)
-            height[i] = 0;
-
-        int y = 0;
-        /* We search the maximum on one scale
-           to determine the current size of the bar. */
-        for (j = xscale[i]; j < xscale[i + 1]; j++)
-        {
-            if (p_dest[j] > y)
-                y = p_dest[j];
-        }
-        /* Calculate the height of the bar */
-        float new_height = y != 0 ? logf(y) * 0.4f : 0;
-        height[i] = new_height > height[i]
-                    ? new_height : height[i];
-    }
 
     memcpy(output, p_dest, FFT_BUFFER_SIZE);
     LOGE("out[100]=%d,out[101]=%d,out[102]=%d", output[100], output[101], output[102]);
