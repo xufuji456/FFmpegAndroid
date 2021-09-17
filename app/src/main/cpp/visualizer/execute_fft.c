@@ -190,7 +190,6 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
     float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
     int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                   the FFT (first channel) */
-    int16_t p_dest[FFT_BUFFER_SIZE];           /* Adapted FFT result */
     float *p_buffl = (float*)block->p_buffer;  /* Original buffer */
 
     int16_t  *p_buffs;                         /* int16_t converted buffer */
@@ -254,10 +253,9 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
     fft_perform (p_buffer1, p_output, p_state);
 
     for (i = 0; i< FFT_BUFFER_SIZE; ++i)
-        p_dest[i] = p_output[i] *  (2 ^ 16)
+        output[i] = p_output[i] *  (2 ^ 16)
                     / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
 
-    memcpy(output, p_dest, FFT_BUFFER_SIZE);
     LOGE("out[100]=%d,out[101]=%d,out[102]=%d", output[100], output[101], output[102]);
 
 release:
