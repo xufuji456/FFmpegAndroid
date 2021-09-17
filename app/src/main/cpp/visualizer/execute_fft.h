@@ -39,12 +39,16 @@ typedef struct
 
 static void *fft_thread(void *);
 
-/*static*/ int open_visualizer(filter_sys_t *p_sys);
+int open_visualizer(filter_sys_t *p_sys);
 
-/*static*/ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf);
+block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf);
 
-/*static*/ void close_visualizer(filter_sys_t *p_filter);
+void close_visualizer(filter_sys_t *p_filter);
 
 void fft_once(void *p_data, block_t *block, int16_t *output);
+
+int init_visualizer(filter_sys_t *p_sys);
+
+void release_visualizer(filter_sys_t *p_sys);
 
 #endif //PLAYER_CORE_RUN_FFT_H

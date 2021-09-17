@@ -286,10 +286,9 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
     filter_sys_t *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
-    open_visualizer(fft_filter);
+    init_visualizer(fft_filter);
     auto *block = static_cast<block_t *>(malloc(sizeof(block_t)));
     block->i_nb_samples = 0;
-//    block->fft_callback.callback = fft_callback;
     int16_t *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
 
     //read audio frame
@@ -317,10 +316,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
                 auto *data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
                 block->p_buffer = data;
                 block->i_nb_samples = static_cast<unsigned int>(frame->nb_samples);
-                LOGE(TAG, "frame->nb_samples=%d", frame->nb_samples);
             }
             if (block->i_nb_samples == frame->nb_samples) {
-                LOGE(TAG, "start frame->nb_samples=%d", frame->nb_samples);
                 memcpy(block->p_buffer, frame->data[0], static_cast<size_t>(frame->nb_samples));
                 fft_once(fft_filter, block, output);
                 fft_callback(env, thiz, fft_method, output);
@@ -373,6 +370,7 @@ end:
     env->CallVoidMethod(thiz, releaseMethod);
     filter_again = 0;
     filter_release = 0;
+    release_visualizer(fft_filter);
     LOGE(TAG, "audio release...");
 }
 
@@ -387,7 +385,6 @@ AUDIO_PLAYER_FUNC(void, release) {
 }
 
 void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg) {
-    LOGE(TAG, "arg[100]=%d,arg[101]=%d,arg[102]=%d", arg[100], arg[101], arg[102]);
     jshortArray dataArray = jniEnv->NewShortArray(256);
     jniEnv->SetShortArrayRegion(dataArray, 0, 256, arg);
     jniEnv->CallVoidMethod(thiz, fft_method, dataArray);

@@ -13,7 +13,7 @@
 #define ROTATION_INCREMENT .1f
 #define BAR_DECREMENT .075f
 
-/*static*/ int open_visualizer(filter_sys_t *p_sys)
+int open_visualizer(filter_sys_t *p_sys)
 {
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -33,29 +33,30 @@
     window_get_param(&p_sys->wind_param);
 
     /* Create the FIFO for the audio data. */
-//    vlc_queue_t *queue = vlc_queue_init(5);
-//    p_sys->queue = *queue;
-//    p_sys->dead = false;
+    vlc_queue_t *queue = vlc_queue_init(5);
+    p_sys->queue = *queue;
+    p_sys->dead = false;
 
-//    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);//TODO
+    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);//TODO
 
     return VLC_SUCCESS;
 }
 
-/*static*/ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
+block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
 {
     return vlc_queue_push(&p_sys->queue, p_in_buf);
 }
 
-/*static*/ void close_visualizer(filter_sys_t *p_filter)
+void close_visualizer(filter_sys_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter;
-
     /* Terminate the thread. */
     vlc_queue_free(&p_sys->queue);
     pthread_join(p_sys->thread, NULL);
 
     free(p_sys->p_prev_s16_buff);
+    free(&p_sys->wind_param);
+    free(p_sys);
 }
 
 static void *fft_thread(void *p_data)
@@ -177,6 +178,34 @@ release:
     }
 
     return NULL;
+}
+
+
+int init_visualizer(filter_sys_t *p_sys)
+{
+    if (p_sys == NULL)
+        return -1;
+
+    /* Create the object for the thread */
+    p_sys->i_channels = 1;
+    p_sys->i_prev_nb_samples = 0;
+    p_sys->p_prev_s16_buff = NULL;
+
+    window_param *w_param = (window_param*) malloc(sizeof(window_param));
+    p_sys->wind_param = *w_param;
+
+    /* Fetch the FFT window parameters */
+    window_get_param(&p_sys->wind_param);
+
+    return 0;
+}
+
+void release_visualizer(filter_sys_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter;
+    free(p_sys->p_prev_s16_buff);
+    free(&p_sys->wind_param);
+    free(p_sys);
 }
 
 void fft_once(void *p_data, block_t *block, int16_t *output)
