@@ -208,7 +208,7 @@ void release_visualizer(filter_sys_t *p_filter)
     free(p_sys);
 }
 
-void fft_once(void *p_data, block_t *block, int16_t *output)
+void fft_once(void *p_data, uint8_t *p_buffer, int nb_samples, int16_t *output)
 {
     filter_sys_t *p_sys = (filter_sys_t*)p_data;
 
@@ -219,31 +219,31 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
     float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
     int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                   the FFT (first channel) */
-    float *p_buffl = (float*)block->p_buffer;  /* Original buffer */
+    float *p_buffl = (float*)p_buffer;  /* Original buffer */
 
     int16_t  *p_buffs;                         /* int16_t converted buffer */
     int16_t  *p_s16_buff;                      /* int16_t converted buffer */
 
-    if (!block->i_nb_samples) {
+    if (!nb_samples) {
         LOGE("no samples yet...");
         goto release;
     }
 
     /* Allocate the buffer only if the number of samples change */
-    if (block->i_nb_samples != p_sys->i_prev_nb_samples)
+    if (nb_samples != p_sys->i_prev_nb_samples)
     {
         free(p_sys->p_prev_s16_buff);
-        p_sys->p_prev_s16_buff = malloc(block->i_nb_samples *
+        p_sys->p_prev_s16_buff = malloc(nb_samples *
                                         p_sys->i_channels *
                                         sizeof(int16_t));
         if (!p_sys->p_prev_s16_buff)
             goto release;
-        p_sys->i_prev_nb_samples = block->i_nb_samples;
+        p_sys->i_prev_nb_samples = nb_samples;
     }
     p_buffs = p_s16_buff = p_sys->p_prev_s16_buff;
 
     /* Convert the buffer to int16_t */
-    for (i = block->i_nb_samples * p_sys->i_channels; i--;)
+    for (i = nb_samples * p_sys->i_channels; i--;)
     {
         union {float f; int32_t i;} u;
 
@@ -275,14 +275,14 @@ void fft_once(void *p_data, block_t *block, int16_t *output)
         p_buffer1[i] = *p_buffs;
 
         p_buffs += p_sys->i_channels;
-        if (p_buffs >= &p_s16_buff[block->i_nb_samples * p_sys->i_channels])
+        if (p_buffs >= &p_s16_buff[nb_samples * p_sys->i_channels])
             p_buffs = p_s16_buff;
     }
     window_scale_in_place (p_buffer1, &wind_ctx);
     fft_perform (p_buffer1, p_output, p_state);
 
-    for (i = 0; i< FFT_BUFFER_SIZE; ++i)
-        output[i] = p_output[i] *  (2 ^ 16)
+    for (i = 0; i < FFT_BUFFER_SIZE; ++i)
+        output[i] = p_output[i] * (2 ^ 16)
                     / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
 
     LOGE("out[100]=%d,out[101]=%d,out[102]=%d", output[100], output[101], output[102]);

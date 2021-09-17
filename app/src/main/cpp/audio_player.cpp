@@ -285,11 +285,11 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
-    filter_sys_t *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
+    auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
     init_visualizer(fft_filter);
-    auto *block = static_cast<block_t *>(malloc(sizeof(block_t)));
-    block->i_nb_samples = 0;
-    int16_t *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
+    uint8_t *data = nullptr;
+    int nb_samples = 0;
+    auto *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
 
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
@@ -312,14 +312,13 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         }
         if (got_frame > 0) {
 
-            if (block->i_nb_samples == 0 && frame->nb_samples > 100) {
-                auto *data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
-                block->p_buffer = data;
-                block->i_nb_samples = static_cast<unsigned int>(frame->nb_samples);
+            if (frame->nb_samples > 256) {
+                nb_samples = frame->nb_samples;
+                data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
             }
-            if (block->i_nb_samples == frame->nb_samples) {
-                memcpy(block->p_buffer, frame->data[0], static_cast<size_t>(frame->nb_samples));
-                fft_once(fft_filter, block, output);
+            if (nb_samples == frame->nb_samples) {
+                memcpy(data, frame->data[0], static_cast<size_t>(frame->nb_samples));
+                fft_once(fft_filter, data, nb_samples, output);
                 fft_callback(env, thiz, fft_method, output);
             }
 
