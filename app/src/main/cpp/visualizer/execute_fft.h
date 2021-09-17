@@ -2,8 +2,8 @@
 // Created by frank on 2021/8/16.
 //
 
-#ifndef PLAYER_CORE_RUN_FFT_H
-#define PLAYER_CORE_RUN_FFT_H
+#ifndef EXECUTE_FFT_H
+#define EXECUTE_FFT_H
 
 #include "block_queue.h"
 #include "fft.h"
@@ -51,4 +51,4 @@ int init_visualizer(filter_sys_t *p_sys);
 
 void release_visualizer(filter_sys_t *p_sys);
 
-#endif //PLAYER_CORE_RUN_FFT_H
+#endif //EXECUTE_FFT_H
