@@ -34,7 +34,7 @@ int filter_again = 0;
 int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
 
-void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t* arg);
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t* arg, int samples);
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
@@ -286,7 +286,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
     auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
-    fft_filter->output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
+    fft_filter->out_samples = FFT_BUFFER_SIZE;
+    fft_filter->output = static_cast<int16_t *>(malloc(fft_filter->out_samples * sizeof(int16_t)));
     init_visualizer(fft_filter);
 
     //read audio frame
@@ -317,7 +318,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
             if (fft_filter->nb_samples == frame->nb_samples) {
                 memcpy(fft_filter->data, frame->data[0], static_cast<size_t>(frame->nb_samples));
                 fft_once(fft_filter);
-                fft_callback(env, thiz, fft_method, fft_filter->output);
+                fft_callback(env, thiz, fft_method, fft_filter->output, fft_filter->out_samples);
             }
 
             ret = av_buffersrc_add_frame(audioSrcContext, frame);
@@ -381,8 +382,8 @@ AUDIO_PLAYER_FUNC(void, release) {
     filter_release = 1;
 }
 
-void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg) {
-    jshortArray dataArray = jniEnv->NewShortArray(256);
-    jniEnv->SetShortArrayRegion(dataArray, 0, 256, arg);
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg, int samples) {
+    jshortArray dataArray = jniEnv->NewShortArray(samples);
+    jniEnv->SetShortArrayRegion(dataArray, 0, samples, arg);
     jniEnv->CallVoidMethod(thiz, fft_method, dataArray);
 }
