@@ -287,8 +287,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 
     auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
     init_visualizer(fft_filter);
-    uint8_t *data = nullptr;
-    int nb_samples = 0;
     auto *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
 
     //read audio frame
@@ -313,12 +311,12 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         if (got_frame > 0) {
 
             if (frame->nb_samples > 256) {
-                nb_samples = frame->nb_samples;
-                data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
+                fft_filter->nb_samples = frame->nb_samples;
+                fft_filter->data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
             }
-            if (nb_samples == frame->nb_samples) {
-                memcpy(data, frame->data[0], static_cast<size_t>(frame->nb_samples));
-                fft_once(fft_filter, data, nb_samples, output);
+            if (fft_filter->nb_samples == frame->nb_samples) {
+                memcpy(fft_filter->data, frame->data[0], static_cast<size_t>(frame->nb_samples));
+                fft_once(fft_filter, output);
                 fft_callback(env, thiz, fft_method, output);
             }
 

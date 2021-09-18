@@ -203,14 +203,21 @@ int init_visualizer(filter_sys_t *p_sys)
 void release_visualizer(filter_sys_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter;
-    free(p_sys->p_prev_s16_buff);
+    if (!p_sys) return;
+    if (p_sys->p_prev_s16_buff) {
+        free(p_sys->p_prev_s16_buff);
+    }
     free(&p_sys->wind_param);
+    if (p_sys->data) {
+        free(p_sys->data);
+    }
     free(p_sys);
 }
 
-void fft_once(void *p_data, uint8_t *p_buffer, int nb_samples, int16_t *output)
+void fft_once(void *p_data, int16_t *output)
 {
     filter_sys_t *p_sys = (filter_sys_t*)p_data;
+    int nb_samples = p_sys->nb_samples;
 
     fft_state *p_state = NULL; /* internal FFT data */
     DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
@@ -219,7 +226,7 @@ void fft_once(void *p_data, uint8_t *p_buffer, int nb_samples, int16_t *output)
     float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
     int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                   the FFT (first channel) */
-    float *p_buffl = (float*)p_buffer;  /* Original buffer */
+    float *p_buffl = (float*)p_sys->data;  /* Original buffer */
 
     int16_t  *p_buffs;                         /* int16_t converted buffer */
     int16_t  *p_s16_buff;                      /* int16_t converted buffer */

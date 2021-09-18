@@ -35,6 +35,9 @@ typedef struct
 
     /* FFT window parameters */
     window_param wind_param;
+
+    uint8_t *data;
+    int nb_samples;
 } filter_sys_t;
 
 static void *fft_thread(void *);
@@ -45,7 +48,7 @@ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf);
 
 void close_visualizer(filter_sys_t *p_filter);
 
-void fft_once(void *p_data, uint8_t *p_buffer, int nb_samples, int16_t *output);
+void fft_once(void *p_data, int16_t *output);
 
 int init_visualizer(filter_sys_t *p_sys);
 
