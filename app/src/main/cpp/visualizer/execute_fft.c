@@ -27,7 +27,7 @@ int open_visualizer(filter_sys_t *p_sys)
     p_sys->f_rotationIncrement = ROTATION_INCREMENT;
 
     window_param *w_param = (window_param*) malloc(sizeof(window_param));
-    p_sys->wind_param = *w_param;//TODO
+    p_sys->wind_param = *w_param;
 
     /* Fetch the FFT window parameters */
     window_get_param(&p_sys->wind_param);
@@ -37,7 +37,7 @@ int open_visualizer(filter_sys_t *p_sys)
     p_sys->queue = *queue;
     p_sys->dead = false;
 
-    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);//TODO
+    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);
 
     return 0;
 }
@@ -298,11 +298,10 @@ void fft_once(filter_sys_t *p_sys)
     window_scale_in_place (p_buffer1, &wind_ctx);
     fft_perform (p_buffer1, p_output, p_state);
 
-    for (i = 0; i < out_samples; ++i)
+    for (i = 0; i < out_samples; ++i) {
         p_sys->output[i] = p_output[i] * (2 ^ 16)
                     / ((out_samples / 2 * 32768) ^ 2);
-
-    LOGE("out[100]=%d,out[101]=%d,out[102]=%d", p_sys->output[100], p_sys->output[101], p_sys->output[102]);
+    }
 
 release:
     window_close(&wind_ctx);
