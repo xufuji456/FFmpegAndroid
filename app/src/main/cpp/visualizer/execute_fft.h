@@ -12,13 +12,6 @@
 #include <math.h>
 #include <unistd.h>
 
-/** No error */
-#define VLC_SUCCESS        (-0)
-/** Unspecified error */
-#define VLC_EGENERIC       (-1)
-/** Not enough memory */
-#define VLC_ENOMEM         (-2)
-
 typedef struct
 {
     pthread_t thread;

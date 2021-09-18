@@ -16,7 +16,7 @@
 int open_visualizer(filter_sys_t *p_sys)
 {
     if (p_sys == NULL)
-        return VLC_ENOMEM;
+        return -1;
 
     /* Create the object for the thread */
     p_sys->i_channels = 1;
@@ -39,7 +39,7 @@ int open_visualizer(filter_sys_t *p_sys)
 
     pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);//TODO
 
-    return VLC_SUCCESS;
+    return 0;
 }
 
 block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
@@ -187,52 +187,54 @@ release:
 }
 
 
-int init_visualizer(filter_sys_t *p_sys)
+int init_visualizer(filter_sys_t *p_filter)
 {
-    if (p_sys == NULL)
+    if (p_filter == NULL)
         return -1;
 
     /* Create the object for the thread */
-    p_sys->i_channels = 1;
-    p_sys->i_prev_nb_samples = 0;
-    p_sys->p_prev_s16_buff = NULL;
+    p_filter->i_channels = 1;
+    p_filter->i_prev_nb_samples = 0;
+    p_filter->p_prev_s16_buff = NULL;
 
     window_param *w_param = (window_param*) malloc(sizeof(window_param));
-    p_sys->wind_param = *w_param;
+    p_filter->wind_param = *w_param;
 
     /* Fetch the FFT window parameters */
-    window_get_param(&p_sys->wind_param);
+    window_get_param(&p_filter->wind_param);
 
+    p_filter->out_samples = FFT_BUFFER_SIZE;
+    p_filter->output = (int16_t *) (malloc(p_filter->out_samples * sizeof(int16_t)));
     return 0;
 }
 
 void release_visualizer(filter_sys_t *p_filter)
 {
-    filter_sys_t *p_sys = p_filter;
-    if (!p_sys) return;
-    if (p_sys->p_prev_s16_buff) {
-        free(p_sys->p_prev_s16_buff);
+    if (!p_filter) return;
+    if (p_filter->p_prev_s16_buff) {
+        free(p_filter->p_prev_s16_buff);
     }
-    free(&p_sys->wind_param);
-    if (p_sys->data) {
-        free(p_sys->data);
+    free(&p_filter->wind_param);
+    if (p_filter->data) {
+        free(p_filter->data);
     }
-    if (p_sys->output) {
-        free(p_sys->output);
+    if (p_filter->output) {
+        free(p_filter->output);
     }
-    free(p_sys);
+    free(p_filter);
 }
 
 void fft_once(filter_sys_t *p_sys)
 {
     int nb_samples = p_sys->nb_samples;
+    int out_samples = p_sys->out_samples;
 
     fft_state *p_state = NULL; /* internal FFT data */
     DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
 
     unsigned i;
-    float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
-    int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
+    float p_output[out_samples];           /* Raw FFT Result  */
+    int16_t p_buffer1[out_samples];        /* Buffer on which we perform
                                                   the FFT (first channel) */
     float *p_buffl = (float*)p_sys->data;  /* Original buffer */
 
@@ -278,13 +280,13 @@ void fft_once(filter_sys_t *p_sys)
         LOGE("unable to initialize FFT transform...");
         goto release;
     }
-    if (!window_init(FFT_BUFFER_SIZE, &p_sys->wind_param, &wind_ctx))
+    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx))
     {
         LOGE("unable to initialize FFT window...");
         goto release;
     }
     p_buffs = p_s16_buff;
-    for (i = 0 ; i < FFT_BUFFER_SIZE; i++)
+    for (i = 0 ; i < out_samples; i++)
     {
         p_output[i] = 0;
         p_buffer1[i] = *p_buffs;
@@ -296,9 +298,9 @@ void fft_once(filter_sys_t *p_sys)
     window_scale_in_place (p_buffer1, &wind_ctx);
     fft_perform (p_buffer1, p_output, p_state);
 
-    for (i = 0; i < FFT_BUFFER_SIZE; ++i)
+    for (i = 0; i < out_samples; ++i)
         p_sys->output[i] = p_output[i] * (2 ^ 16)
-                    / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
+                    / ((out_samples / 2 * 32768) ^ 2);
 
     LOGE("out[100]=%d,out[101]=%d,out[102]=%d", p_sys->output[100], p_sys->output[101], p_sys->output[102]);
 

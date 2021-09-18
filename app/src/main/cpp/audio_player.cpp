@@ -286,8 +286,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
     auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
-    fft_filter->out_samples = FFT_BUFFER_SIZE;
-    fft_filter->output = static_cast<int16_t *>(malloc(fft_filter->out_samples * sizeof(int16_t)));
     init_visualizer(fft_filter);
 
     //read audio frame
@@ -311,7 +309,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         }
         if (got_frame > 0) {
 
-            if (frame->nb_samples > 256) {
+            if (!fft_filter->data && frame->nb_samples > fft_filter->out_samples) {
                 fft_filter->nb_samples = frame->nb_samples;
                 fft_filter->data = static_cast<uint8_t *>(malloc(frame->nb_samples * sizeof(uint8_t)));
             }
