@@ -384,4 +384,5 @@ void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * 
     jshortArray dataArray = jniEnv->NewShortArray(samples);
     jniEnv->SetShortArrayRegion(dataArray, 0, samples, arg);
     jniEnv->CallVoidMethod(thiz, fft_method, dataArray);
+    jniEnv->DeleteLocalRef(dataArray);
 }
