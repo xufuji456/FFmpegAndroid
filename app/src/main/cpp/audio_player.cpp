@@ -2,7 +2,7 @@
 // Created by frank on 2018/2/1.
 //
 #include <jni.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 
 #ifdef __cplusplus
@@ -286,8 +286,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
 
     auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
+    fft_filter->output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
     init_visualizer(fft_filter);
-    auto *output = static_cast<int16_t *>(malloc(FFT_BUFFER_SIZE * sizeof(int16_t)));
 
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
@@ -316,8 +316,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
             }
             if (fft_filter->nb_samples == frame->nb_samples) {
                 memcpy(fft_filter->data, frame->data[0], static_cast<size_t>(frame->nb_samples));
-                fft_once(fft_filter, output);
-                fft_callback(env, thiz, fft_method, output);
+                fft_once(fft_filter);
+                fft_callback(env, thiz, fft_method, fft_filter->output);
             }
 
             ret = av_buffersrc_add_frame(audioSrcContext, frame);

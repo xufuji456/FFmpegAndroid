@@ -38,6 +38,7 @@ typedef struct
 
     uint8_t *data;
     int nb_samples;
+    int16_t * output;
 } filter_sys_t;
 
 static void *fft_thread(void *);
@@ -48,7 +49,7 @@ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf);
 
 void close_visualizer(filter_sys_t *p_filter);
 
-void fft_once(void *p_data, int16_t *output);
+void fft_once(filter_sys_t *p_sys);
 
 int init_visualizer(filter_sys_t *p_sys);
 

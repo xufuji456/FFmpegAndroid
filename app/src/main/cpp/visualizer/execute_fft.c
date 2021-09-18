@@ -56,6 +56,12 @@ void close_visualizer(filter_sys_t *p_filter)
 
     free(p_sys->p_prev_s16_buff);
     free(&p_sys->wind_param);
+    if (p_sys->data) {
+        free(p_sys->data);
+    }
+    if (p_sys->output) {
+        free(p_sys->output);
+    }
     free(p_sys);
 }
 
@@ -211,12 +217,14 @@ void release_visualizer(filter_sys_t *p_filter)
     if (p_sys->data) {
         free(p_sys->data);
     }
+    if (p_sys->output) {
+        free(p_sys->output);
+    }
     free(p_sys);
 }
 
-void fft_once(void *p_data, int16_t *output)
+void fft_once(filter_sys_t *p_sys)
 {
-    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     int nb_samples = p_sys->nb_samples;
 
     fft_state *p_state = NULL; /* internal FFT data */
@@ -289,10 +297,10 @@ void fft_once(void *p_data, int16_t *output)
     fft_perform (p_buffer1, p_output, p_state);
 
     for (i = 0; i < FFT_BUFFER_SIZE; ++i)
-        output[i] = p_output[i] * (2 ^ 16)
+        p_sys->output[i] = p_output[i] * (2 ^ 16)
                     / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
 
-    LOGE("out[100]=%d,out[101]=%d,out[102]=%d", output[100], output[101], output[102]);
+    LOGE("out[100]=%d,out[101]=%d,out[102]=%d", p_sys->output[100], p_sys->output[101], p_sys->output[102]);
 
 release:
     window_close(&wind_ctx);
