@@ -203,6 +203,9 @@ int init_visualizer(filter_sys_t *p_filter)
     /* Fetch the FFT window parameters */
     window_get_param(&p_filter->wind_param);
 
+    p_filter->data = NULL;
+    p_filter->data_size = 0;
+    p_filter->nb_samples = 0;
     p_filter->out_samples = FFT_BUFFER_SIZE;
     p_filter->output = (int16_t *) (malloc(p_filter->out_samples * sizeof(int16_t)));
     return 0;
