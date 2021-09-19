@@ -34,7 +34,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
 
     private val selectBandList = IntArray(bandsList.size)
     private val minEQLevel = 0
-    private val fftData = ByteArray(/*20*/256)
+    private val fftData = ByteArray(256)
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
     private var visualizerView: VisualizerView? = null
@@ -92,12 +92,10 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
         }
         mAudioPlayer = AudioPlayer()
         mAudioPlayer?.setOnFftCallback {
-            Log.e("Equalizer", "fft data[0]=" + it[0] + "--data[1]=" + it[1] + "--data[2]=" + it[2])
             if (visualizerView != null && it != null) {
                 for (i in it.indices) {
                     fftData[i] = (it[i]/*10/4.2f*/).toByte()
                 }
-                Log.e("Equalizer", "data[0]=" + fftData[0] + "--data[1]=" + fftData[1] + "--data[2]=" + fftData[2])
                 visualizerView!!.post { visualizerView!!.setWaveData(fftData) }
             }
         }

@@ -30,6 +30,7 @@ typedef struct
     window_param wind_param;
 
     uint8_t *data;
+    int data_size;
     int nb_samples;
     int16_t * output;
     int out_samples;
@@ -48,5 +49,7 @@ void fft_once(filter_sys_t *p_sys);
 int init_visualizer(filter_sys_t *p_sys);
 
 void release_visualizer(filter_sys_t *p_sys);
+
+int ensure_memory(filter_sys_t *fft_filter, int nb_samples);
 
 #endif //EXECUTE_FFT_H
