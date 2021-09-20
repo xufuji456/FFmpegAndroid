@@ -32,7 +32,7 @@ typedef struct
     uint8_t *data;
     int data_size;
     int nb_samples;
-    int16_t * output;
+    int8_t * output;
     int out_samples;
 } filter_sys_t;
 

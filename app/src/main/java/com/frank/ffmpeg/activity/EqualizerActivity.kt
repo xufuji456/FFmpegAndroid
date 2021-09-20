@@ -34,12 +34,11 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
 
     private val selectBandList = IntArray(bandsList.size)
     private val minEQLevel = 0
-    private val fftData = ByteArray(256)
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
     private var visualizerView: VisualizerView? = null
     private var equalizerAdapter: EqualizerAdapter? = null
-    private var audioPath = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
+    private var audioPath = Environment.getExternalStorageDirectory().path + "/boy.mp3"
 
     override val layoutId: Int
         get() = R.layout.activity_equalizer
@@ -93,10 +92,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
         mAudioPlayer = AudioPlayer()
         mAudioPlayer?.setOnFftCallback {
             if (visualizerView != null && it != null) {
-                for (i in it.indices) {
-                    fftData[i] = (it[i]).toByte()
-                }
-                visualizerView!!.post { visualizerView!!.setWaveData(fftData) }
+                visualizerView!!.post { visualizerView!!.setWaveData(it) }
             }
         }
     }

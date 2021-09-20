@@ -317,8 +317,10 @@ void fft_once(filter_sys_t *p_sys)
     fft_perform (p_buffer1, p_output, p_state);
 
     for (i = 0; i < out_samples; ++i) {
-        p_sys->output[i] = p_output[i] * (2 ^ 16)
+        int16_t temp = p_output[i] * (2 ^ 16)
                     / ((out_samples / 2 * 32768) ^ 2);
+
+        p_sys->output[i] = temp & 0xFF;
     }
 
 release:

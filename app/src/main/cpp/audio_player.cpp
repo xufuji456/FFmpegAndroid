@@ -34,7 +34,7 @@ int filter_again = 0;
 int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
 
-void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t* arg, int samples);
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int8_t* arg, int samples);
 
 int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink,
         uint64_t channel_layout, AVSampleFormat inputFormat, int sample_rate) {
@@ -283,7 +283,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 //        goto end;
     }
 
-    jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([S)V");
+    jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([B)V");
 
     auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
     init_visualizer(fft_filter);
@@ -377,9 +377,9 @@ AUDIO_PLAYER_FUNC(void, release) {
     filter_release = 1;
 }
 
-void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int16_t * arg, int samples) {
-    jshortArray dataArray = jniEnv->NewShortArray(samples);
-    jniEnv->SetShortArrayRegion(dataArray, 0, samples, arg);
+void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int8_t * arg, int samples) {
+    jbyteArray dataArray = jniEnv->NewByteArray(samples);
+    jniEnv->SetByteArrayRegion(dataArray, 0, samples, arg);
     jniEnv->CallVoidMethod(thiz, fft_method, dataArray);
     jniEnv->DeleteLocalRef(dataArray);
 }

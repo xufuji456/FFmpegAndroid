@@ -63,14 +63,14 @@ public class AudioPlayer {
     private OnFFTCallback onFFTCallback;
 
     public interface OnFFTCallback {
-        void onFFT(short[] data);
+        void onFFT(byte[] data);
     }
 
     public void setOnFftCallback(OnFFTCallback onFFTCallback) {
         this.onFFTCallback = onFFTCallback;
     }
 
-    public void fftCallbackFromJNI(short[] data) {
+    public void fftCallbackFromJNI(byte[] data) {
         if (data != null && onFFTCallback != null) {
            onFFTCallback.onFFT(data);
         }
