@@ -94,7 +94,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
         mAudioPlayer?.setOnFftCallback {
             if (visualizerView != null && it != null) {
                 for (i in it.indices) {
-                    fftData[i] = (it[i]/*10/4.2f*/).toByte()
+                    fftData[i] = (it[i]).toByte()
                 }
                 visualizerView!!.post { visualizerView!!.setWaveData(fftData) }
             }
