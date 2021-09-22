@@ -15,12 +15,10 @@
 typedef struct
 {
     pthread_t thread;
-
-    /* Audio data */
     vlc_queue_t queue;
     bool dead;
-    unsigned i_channels;
-    unsigned i_prev_nb_samples;
+    int i_channels;
+    int i_prev_nb_samples;
     int16_t *p_prev_s16_buff;
 
     float f_rotationAngle;
