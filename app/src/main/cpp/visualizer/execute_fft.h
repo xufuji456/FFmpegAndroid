@@ -17,6 +17,8 @@ extern "C" {
 
 #include "block_queue.h"
 
+#define MIN_FFT_SIZE 128
+
 typedef struct
 {
     pthread_t thread;
