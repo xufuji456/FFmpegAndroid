@@ -3,7 +3,6 @@ package com.frank.ffmpeg.adapter
 import android.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,11 +35,10 @@ class HorizontalAdapter(private val itemList: List<String>?) : RecyclerView.Adap
         if (onItemClickListener != null) {
             okViewHolder.btnSelect.setOnClickListener {
                 notifyItemChanged(lastClickPosition)
-                Log.i("onBindViewHolder", "lastClickPosition=$lastClickPosition")
                 //select the current color
                 okViewHolder.btnSelect.setTextColor(Color.BLUE)
-                onItemClickListener!!.onItemClick(okViewHolder.adapterPosition)
-                lastClickPosition = okViewHolder.adapterPosition
+                onItemClickListener!!.onItemClick(okViewHolder.absoluteAdapterPosition)
+                lastClickPosition = okViewHolder.absoluteAdapterPosition
             }
         }
     }
