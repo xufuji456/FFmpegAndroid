@@ -19,6 +19,8 @@ extern "C" {
 
 #define MIN_FFT_SIZE 128
 
+#define FIXED_FFT 1
+
 typedef struct
 {
     pthread_t thread;
@@ -53,6 +55,8 @@ int init_visualizer(filter_sys_t *p_sys);
 void release_visualizer(filter_sys_t *p_sys);
 
 int ensure_memory(filter_sys_t *fft_filter, int nb_samples);
+
+void fft_float(filter_sys_t *p_sys);
 
 void fft_fixed(filter_sys_t *p_sys);
 

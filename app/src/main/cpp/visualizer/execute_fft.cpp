@@ -202,7 +202,11 @@ int init_visualizer(filter_sys_t *p_filter)
     p_filter->data = nullptr;
     p_filter->data_size = 0;
     p_filter->nb_samples = 0;
-    p_filter->out_samples = FFT_BUFFER_SIZE;
+    if (FIXED_FFT) {
+        p_filter->out_samples = 1 << 9;
+    } else {
+        p_filter->out_samples = FFT_BUFFER_SIZE;
+    }
     p_filter->output = (int8_t *) (malloc(p_filter->out_samples * sizeof(int8_t)));
     return 0;
 }
@@ -238,7 +242,7 @@ int ensure_memory(filter_sys_t *fft_filter, int nb_samples) {
     return 0;
 }
 
-void fft_once(filter_sys_t *p_sys)
+void fft_float(filter_sys_t *p_sys)
 {
     int nb_samples = p_sys->nb_samples;
     int out_samples = p_sys->out_samples;
@@ -373,6 +377,15 @@ void fft_fixed(filter_sys_t *p_sys)
     window_scale_in_place ((int16_t *) (p_sys->data), &wind_ctx);
     doFft((uint8_t *) p_sys->output, p_sys->data, out_samples);
 
-    release:
+release:
     window_close(&wind_ctx);
+}
+
+void fft_once(filter_sys_t *p_sys)
+{
+    if (FIXED_FFT) {
+        fft_fixed(p_sys);
+    } else {
+        fft_float(p_sys);
+    }
 }
