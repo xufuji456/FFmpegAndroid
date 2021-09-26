@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "fft.h"
 #include "window.h"
+#include "fixed_fft.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,6 +51,8 @@ int init_visualizer(filter_sys_t *p_sys);
 void release_visualizer(filter_sys_t *p_sys);
 
 int ensure_memory(filter_sys_t *fft_filter, int nb_samples);
+
+void fft_fixed(filter_sys_t *p_sys);
 
 #ifdef __cplusplus
 }

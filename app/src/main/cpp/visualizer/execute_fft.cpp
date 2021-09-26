@@ -110,7 +110,7 @@ static void *fft_thread(void *p_data)
         /* Convert the buffer to int16_t */
         for (i = block->i_nb_samples * p_sys->i_channels; i--;)
         {
-            union {float f; int32_t i;} u;
+            union {float f; int32_t i;} u{};
 
             u.f = *p_buffl + 384.f;
             if (u.i > 0x43c07fff)
@@ -276,7 +276,7 @@ void fft_once(filter_sys_t *p_sys)
     /* Convert the buffer to int16_t */
     for (i = nb_samples * p_sys->i_channels; i--;)
     {
-        union {float f; int32_t i;} u;
+        union {float f; int32_t i;} u{};
 
         u.f = *p_buffl + 384.f;
         if (u.i > 0x43c07fff)
@@ -322,4 +322,57 @@ void fft_once(filter_sys_t *p_sys)
 release:
     window_close(&wind_ctx);
     fft_close(p_state);
+}
+
+int doFft(uint8_t *fft, const uint8_t *waveform, int mCaptureSize)
+{
+    int32_t workspace[mCaptureSize >> 1];
+    int32_t nonzero = 0;
+
+    for (uint32_t i = 0; i < mCaptureSize; i += 2) {
+        workspace[i >> 1] =
+                ((waveform[i] ^ 0x80) << 24) | ((waveform[i + 1] ^ 0x80) << 8);
+        nonzero |= workspace[i >> 1];
+    }
+
+    if (nonzero) {
+        fixed_fft_real(mCaptureSize >> 1, workspace);
+    }
+
+    for (uint32_t i = 0; i < mCaptureSize; i += 2) {
+        short tmp = workspace[i >> 1] >> 21;
+        while (tmp > 127 || tmp < -128) tmp >>= 1;
+        fft[i] = tmp;
+        tmp = workspace[i >> 1];
+        tmp >>= 5;
+        while (tmp > 127 || tmp < -128) tmp >>= 1;
+        fft[i + 1] = tmp;
+    }
+
+    return 0;
+}
+
+void fft_fixed(filter_sys_t *p_sys)
+{
+    int nb_samples = p_sys->nb_samples;
+    int out_samples = p_sys->out_samples;
+
+    DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
+
+    if (!nb_samples) {
+        LOGE("no samples yet...");
+        goto release;
+    }
+
+    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx))
+    {
+        LOGE("unable to initialize FFT window...");
+        goto release;
+    }
+
+    window_scale_in_place ((int16_t *) (p_sys->data), &wind_ctx);
+    doFft((uint8_t *) p_sys->output, p_sys->data, out_samples);
+
+    release:
+    window_close(&wind_ctx);
 }
