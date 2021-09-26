@@ -5,33 +5,41 @@
 #ifndef EXECUTE_FFT_H
 #define EXECUTE_FFT_H
 
+#include <math.h>
+#include <unistd.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "block_queue.h"
 #include "fft.h"
 #include "window.h"
 
-#include <math.h>
-#include <unistd.h>
+#ifdef __cplusplus
+}
+#endif
 
 typedef struct
 {
-    pthread_t thread;
-    vlc_queue_t queue;
-    bool dead;
-    int i_channels;
-    int i_prev_nb_samples;
-    int16_t *p_prev_s16_buff;
+pthread_t thread;
+vlc_queue_t queue;
+bool dead;
+int i_channels;
+int i_prev_nb_samples;
+int16_t *p_prev_s16_buff;
 
-    float f_rotationAngle;
-    float f_rotationIncrement;
+float f_rotationAngle;
+float f_rotationIncrement;
 
-    /* FFT window parameters */
-    window_param wind_param;
+/* FFT window parameters */
+window_param wind_param;
 
-    uint8_t *data;
-    int data_size;
-    int nb_samples;
-    int8_t *output;
-    int out_samples;
+uint8_t *data;
+int data_size;
+int nb_samples;
+int8_t *output;
+int out_samples;
 } filter_sys_t;
 
 static void *fft_thread(void *);

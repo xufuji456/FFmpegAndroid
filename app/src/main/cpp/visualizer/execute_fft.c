@@ -44,7 +44,7 @@ int open_visualizer(filter_sys_t *p_sys)
 
 block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
 {
-    return vlc_queue_push(&p_sys->queue, p_in_buf);
+    return (block_t *) vlc_queue_push(&p_sys->queue, p_in_buf);
 }
 
 void close_visualizer(filter_sys_t *p_filter)
@@ -73,7 +73,7 @@ static void *fft_thread(void *p_data)
     float height[NB_BANDS] = {0};
     LOGE("start FFT thread...");
 
-    while ((block = vlc_queue_pop(&p_sys->queue)))
+    while ((block = (block_t *) vlc_queue_pop(&p_sys->queue)))
     {
         LOGE("running FFT transform...");
         /* Horizontal scale for 20-band equalizer */
@@ -102,7 +102,7 @@ static void *fft_thread(void *p_data)
         if (block->i_nb_samples != p_sys->i_prev_nb_samples)
         {
             free(p_sys->p_prev_s16_buff);
-            p_sys->p_prev_s16_buff = malloc(block->i_nb_samples *
+            p_sys->p_prev_s16_buff = (short *) malloc(block->i_nb_samples *
                                             p_sys->i_channels *
                                             sizeof(int16_t));
             if (!p_sys->p_prev_s16_buff)
@@ -268,7 +268,7 @@ void fft_once(filter_sys_t *p_sys)
     if (nb_samples != p_sys->i_prev_nb_samples)
     {
         free(p_sys->p_prev_s16_buff);
-        p_sys->p_prev_s16_buff = malloc(nb_samples *
+        p_sys->p_prev_s16_buff = (short *) malloc(nb_samples *
                                         p_sys->i_channels *
                                         sizeof(int16_t));
         if (!p_sys->p_prev_s16_buff)
