@@ -16,30 +16,23 @@ extern "C" {
 #include "fft.h"
 #include "window.h"
 
-#ifdef __cplusplus
-}
-#endif
-
 typedef struct
 {
-pthread_t thread;
-vlc_queue_t queue;
-bool dead;
-int i_channels;
-int i_prev_nb_samples;
-int16_t *p_prev_s16_buff;
+    pthread_t thread;
+    vlc_queue_t queue;
+    bool dead;
+    int i_channels;
+    int i_prev_nb_samples;
+    int16_t *p_prev_s16_buff;
 
-float f_rotationAngle;
-float f_rotationIncrement;
+    /* FFT window parameters */
+    window_param wind_param;
 
-/* FFT window parameters */
-window_param wind_param;
-
-uint8_t *data;
-int data_size;
-int nb_samples;
-int8_t *output;
-int out_samples;
+    uint8_t *data;
+    int data_size;
+    int nb_samples;
+    int8_t *output;
+    int out_samples;
 } filter_sys_t;
 
 static void *fft_thread(void *);
@@ -57,5 +50,9 @@ int init_visualizer(filter_sys_t *p_sys);
 void release_visualizer(filter_sys_t *p_sys);
 
 int ensure_memory(filter_sys_t *fft_filter, int nb_samples);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //EXECUTE_FFT_H

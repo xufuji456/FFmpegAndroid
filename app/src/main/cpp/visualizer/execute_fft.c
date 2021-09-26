@@ -23,9 +23,6 @@ int open_visualizer(filter_sys_t *p_sys)
     p_sys->i_prev_nb_samples = 0;
     p_sys->p_prev_s16_buff = NULL;
 
-    p_sys->f_rotationAngle = 0;
-    p_sys->f_rotationIncrement = ROTATION_INCREMENT;
-
     window_param *w_param = (window_param*) malloc(sizeof(window_param));
     p_sys->wind_param = *w_param;
 
