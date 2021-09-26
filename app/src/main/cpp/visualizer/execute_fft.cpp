@@ -10,20 +10,19 @@
                    __VA_ARGS__))
 
 #define NB_BANDS 20
-#define ROTATION_INCREMENT .1f
 #define BAR_DECREMENT .075f
 
 int open_visualizer(filter_sys_t *p_sys)
 {
-    if (p_sys == NULL)
+    if (p_sys == nullptr)
         return -1;
 
     /* Create the object for the thread */
     p_sys->i_channels = 1;
     p_sys->i_prev_nb_samples = 0;
-    p_sys->p_prev_s16_buff = NULL;
+    p_sys->p_prev_s16_buff = nullptr;
 
-    window_param *w_param = (window_param*) malloc(sizeof(window_param));
+    auto *w_param = (window_param*) malloc(sizeof(window_param));
     p_sys->wind_param = *w_param;
 
     /* Fetch the FFT window parameters */
@@ -34,7 +33,7 @@ int open_visualizer(filter_sys_t *p_sys)
     p_sys->queue = *queue;
     p_sys->dead = false;
 
-    pthread_create (&p_sys->thread, NULL, fft_thread, p_sys);
+    pthread_create (&p_sys->thread, nullptr, fft_thread, p_sys);
 
     return 0;
 }
@@ -49,7 +48,7 @@ void close_visualizer(filter_sys_t *p_filter)
     filter_sys_t *p_sys = p_filter;
     /* Terminate the thread. */
     vlc_queue_free(&p_sys->queue);
-    pthread_join(p_sys->thread, NULL);
+    pthread_join(p_sys->thread, nullptr);
 
     free(p_sys->p_prev_s16_buff);
     free(&p_sys->wind_param);
@@ -64,7 +63,7 @@ void close_visualizer(filter_sys_t *p_filter)
 
 static void *fft_thread(void *p_data)
 {
-    filter_sys_t *p_sys = (filter_sys_t*)p_data;
+    auto *p_sys = (filter_sys_t*)p_data;
     block_t *block;
 
     float height[NB_BANDS] = {0};
@@ -77,7 +76,7 @@ static void *fft_thread(void *p_data)
         const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
                                    36,47,62,82,107,141,184,255};
 
-        fft_state *p_state = NULL; /* internal FFT data */
+        fft_state *p_state = nullptr; /* internal FFT data */
         DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
 
         unsigned i, j;
@@ -85,7 +84,7 @@ static void *fft_thread(void *p_data)
         int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                       the FFT (first channel) */
         int16_t p_dest[FFT_BUFFER_SIZE];           /* Adapted FFT result */
-        float *p_buffl = (float*)block->p_buffer;  /* Original buffer */
+        auto *p_buffl = (float*)block->p_buffer;  /* Original buffer */
 
         int16_t  *p_buffs;                         /* int16_t converted buffer */
         int16_t  *p_s16_buff;                      /* int16_t converted buffer */
@@ -180,27 +179,27 @@ release:
         fft_close(p_state);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
 int init_visualizer(filter_sys_t *p_filter)
 {
-    if (p_filter == NULL)
+    if (p_filter == nullptr)
         return -1;
 
     /* Create the object for the thread */
     p_filter->i_channels = 1;
     p_filter->i_prev_nb_samples = 0;
-    p_filter->p_prev_s16_buff = NULL;
+    p_filter->p_prev_s16_buff = nullptr;
 
-    window_param *w_param = (window_param*) malloc(sizeof(window_param));
+    auto *w_param = (window_param*) malloc(sizeof(window_param));
     p_filter->wind_param = *w_param;
 
     /* Fetch the FFT window parameters */
     window_get_param(&p_filter->wind_param);
 
-    p_filter->data = NULL;
+    p_filter->data = nullptr;
     p_filter->data_size = 0;
     p_filter->nb_samples = 0;
     p_filter->out_samples = FFT_BUFFER_SIZE;
@@ -244,14 +243,14 @@ void fft_once(filter_sys_t *p_sys)
     int nb_samples = p_sys->nb_samples;
     int out_samples = p_sys->out_samples;
 
-    fft_state *p_state = NULL; /* internal FFT data */
+    fft_state *p_state = nullptr; /* internal FFT data */
     DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
 
     unsigned i;
     float p_output[out_samples];           /* Raw FFT Result  */
     int16_t p_buffer1[out_samples];        /* Buffer on which we perform
                                                   the FFT (first channel) */
-    float *p_buffl = (float*)p_sys->data;  /* Original buffer */
+    auto *p_buffl = (float*)p_sys->data;  /* Original buffer */
 
     int16_t  *p_buffs;                         /* int16_t converted buffer */
     int16_t  *p_s16_buff;                      /* int16_t converted buffer */
