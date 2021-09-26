@@ -59,7 +59,7 @@ fft_state *visual_fft_init(void)
     fft_state *p_state;
     unsigned int i;
 
-    p_state = malloc( sizeof(*p_state) );
+    p_state = (fft_state *) malloc( sizeof(*p_state) );
     if(! p_state )
         return NULL;
 

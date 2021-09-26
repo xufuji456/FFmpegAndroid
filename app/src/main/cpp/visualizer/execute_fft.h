@@ -7,14 +7,14 @@
 
 #include <math.h>
 #include <unistd.h>
+#include "fft.h"
+#include "window.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "block_queue.h"
-#include "fft.h"
-#include "window.h"
 
 typedef struct
 {

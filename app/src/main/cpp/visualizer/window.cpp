@@ -113,6 +113,7 @@ no_preset:
 bool window_init(int i_buffer_size, window_param * p_param, window_context * p_ctx)
 {
     float * pf_table = NULL;
+    int i_buffer_size_minus_1 = i_buffer_size - 1;
     window_type wind_type = p_param->wind_type;
 
     if( wind_type != HANN && wind_type != FLATTOP
@@ -131,7 +132,6 @@ bool window_init(int i_buffer_size, window_param * p_param, window_context * p_c
         return false;
     }
 
-    int i_buffer_size_minus_1 = i_buffer_size - 1;
     switch( wind_type )
     {
     case HANN:
