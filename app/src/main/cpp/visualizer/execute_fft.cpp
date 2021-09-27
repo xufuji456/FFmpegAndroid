@@ -188,7 +188,6 @@ int init_visualizer(filter_sys_t *p_filter)
     if (p_filter == nullptr)
         return -1;
 
-    /* Create the object for the thread */
     p_filter->i_channels = 1;
     p_filter->i_prev_nb_samples = 0;
     p_filter->p_prev_s16_buff = nullptr;
@@ -255,8 +254,7 @@ void fft_float(filter_sys_t *p_sys)
 
     unsigned i;
     float p_output[out_samples];           /* Raw FFT Result  */
-    int16_t p_buffer1[out_samples];        /* Buffer on which we perform
-                                                  the FFT (first channel) */
+    int16_t p_buffer1[out_samples];        /* Buffer on which we perform */
     auto *p_buffl = (float*)p_sys->data;  /* Original buffer */
 
     int16_t  *p_buffs;                         /* int16_t converted buffer */
@@ -268,8 +266,7 @@ void fft_float(filter_sys_t *p_sys)
     }
 
     /* Allocate the buffer only if the number of samples change */
-    if (nb_samples != p_sys->i_prev_nb_samples)
-    {
+    if (nb_samples != p_sys->i_prev_nb_samples) {
         free(p_sys->p_prev_s16_buff);
         p_sys->p_prev_s16_buff = (short *) malloc(nb_samples *
                                         p_sys->i_channels *
@@ -281,8 +278,7 @@ void fft_float(filter_sys_t *p_sys)
     p_buffs = p_s16_buff = p_sys->p_prev_s16_buff;
 
     /* Convert the buffer to int16_t */
-    for (i = nb_samples * p_sys->i_channels; i--;)
-    {
+    for (i = nb_samples * p_sys->i_channels; i--;) {
         union {float f; int32_t i;} u{};
 
         u.f = *p_buffl + 384.f;
@@ -296,13 +292,11 @@ void fft_float(filter_sys_t *p_sys)
         p_buffl++; p_buffs++;
     }
     p_state = visual_fft_init();
-    if (!p_state)
-    {
+    if (!p_state) {
         LOGE("unable to initialize FFT transform...");
         goto release;
     }
-    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx))
-    {
+    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx)) {
         LOGE("unable to initialize FFT window...");
         goto release;
     }
@@ -364,15 +358,14 @@ void fft_fixed(filter_sys_t *p_sys)
     int nb_samples = p_sys->nb_samples;
     int out_samples = p_sys->out_samples;
 
-    DEFINE_WIND_CONTEXT(wind_ctx); /* internal window data */
+    DEFINE_WIND_CONTEXT(wind_ctx);
 
     if (!nb_samples) {
         LOGE("no samples yet...");
         goto release;
     }
 
-    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx))
-    {
+    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx)) {
         LOGE("unable to initialize FFT window...");
         goto release;
     }
