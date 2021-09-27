@@ -3,8 +3,12 @@ package com.frank.ffmpeg.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.frank.ffmpeg.R
+import com.frank.ffmpeg.adapter.WaterfallAdapter
+import com.frank.ffmpeg.listener.OnItemClickListener
 
 /**
  * The main entrance of all Activity
@@ -18,47 +22,64 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initViewsWithClick(
-                R.id.btn_audio,
-                R.id.btn_video,
-                R.id.btn_media,
-                R.id.btn_play,
-                R.id.btn_push,
-                R.id.btn_live,
-                R.id.btn_filter,
-                R.id.btn_preview,
-                R.id.btn_probe,
-                R.id.btn_audio_effect
-        )
+        initView()
     }
 
-    override fun onViewClick(view: View) {
+    private fun initView() {
+        val list = listOf(
+                getString(R.string.audio_handle),
+                getString(R.string.video_handle),
+                getString(R.string.media_handle),
+                getString(R.string.video_push),
+                getString(R.string.video_live),
+                getString(R.string.video_filter),
+                getString(R.string.video_preview),
+                getString(R.string.media_probe),
+                getString(R.string.audio_effect))
+
+        val viewWaterfall: RecyclerView = findViewById(R.id.list_main_item)
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        viewWaterfall.layoutManager = layoutManager
+
+        val adapter = WaterfallAdapter(list)
+        adapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                doClick(position)
+            }
+        })
+        viewWaterfall.adapter = adapter
+    }
+
+    private fun doClick(pos: Int) {
         val intent = Intent()
-        when (view.id) {
-            R.id.btn_audio//handle audio
+        when (pos) {
+            0 //handle audio
             -> intent.setClass(this@MainActivity, AudioHandleActivity::class.java)
-            R.id.btn_video//handle video
+            1 //handle video
             -> intent.setClass(this@MainActivity, VideoHandleActivity::class.java)
-            R.id.btn_media//handle media
+            2 //handle media
             -> intent.setClass(this@MainActivity, MediaHandleActivity::class.java)
-            R.id.btn_play//media play
-            -> intent.setClass(this@MainActivity, MediaPlayerActivity::class.java)
-            R.id.btn_push//pushing
+            3 //pushing
             -> intent.setClass(this@MainActivity, PushActivity::class.java)
-            R.id.btn_live//realtime living with rtmp stream
+            4 //realtime living with rtmp stream
             -> intent.setClass(this@MainActivity, LiveActivity::class.java)
-            R.id.btn_filter//filter effect
+            5 //filter effect
             -> intent.setClass(this@MainActivity, FilterActivity::class.java)
-            R.id.btn_preview//preview thumbnail
+            6 //preview thumbnail
             -> intent.setClass(this@MainActivity, VideoPreviewActivity::class.java)
-            R.id.btn_probe//probe media format
+            7 //probe media format
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
-            R.id.btn_audio_effect//audio effect
+            8 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
+//            -> intent.setClass(this@MainActivity, MediaPlayerActivity::class.java)
             else -> {
             }
         }
         startActivity(intent)
+    }
+
+    override fun onViewClick(view: View) {
+
     }
 
     override fun onSelectedFile(filePath: String) {
