@@ -1,0 +1,297 @@
+
+
+if HAVE_ALSA
+if STATIC_ALSA
+  libsox_la_SOURCES += alsa.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @ALSA_LIBS@
+else
+  libsox_la_LIBADD += @ALSA_LIBS@
+endif
+else
+  libsox_fmt_alsa_la_SOURCES = alsa.c
+  libsox_fmt_alsa_la_LIBADD = @ALSA_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_alsa.la
+endif
+endif
+
+if HAVE_AMRNB
+if STATIC_AMRNB
+  libsox_la_SOURCES += amr-nb.c amr.h
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @AMRNB_LIBS@
+else
+  libsox_la_LIBADD += @AMRNB_LIBS@
+endif
+else
+  libsox_fmt_amr_nb_la_SOURCES = amr-nb.c amr.h
+  libsox_fmt_amr_nb_la_LIBADD = @AMRNB_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_amr_nb.la
+endif
+endif
+
+if HAVE_AMRWB
+if STATIC_AMRWB
+  libsox_la_SOURCES += amr-wb.c amr.h
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @AMRWB_LIBS@
+else
+  libsox_la_LIBADD += @AMRWB_LIBS@
+endif
+else
+  libsox_fmt_amr_wb_la_SOURCES = amr-wb.c amr.h
+  libsox_fmt_amr_wb_la_LIBADD = @AMRWB_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_amr_wb.la
+endif
+endif
+
+if HAVE_AO
+if STATIC_AO
+  libsox_la_SOURCES += ao.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @AO_LIBS@
+else
+  libsox_la_LIBADD += @AO_LIBS@
+endif
+else
+  libsox_fmt_ao_la_SOURCES = ao.c
+  libsox_fmt_ao_la_LIBADD = @AO_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_ao.la
+endif
+endif
+
+if HAVE_COREAUDIO
+if STATIC_COREAUDIO
+  libsox_la_SOURCES += coreaudio.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @COREAUDIO_LIBS@
+else
+  libsox_la_LIBADD += @COREAUDIO_LIBS@
+endif
+else
+  libsox_fmt_coreaudio_la_SOURCES = coreaudio.c
+  libsox_fmt_coreaudio_la_LIBADD = @COREAUDIO_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_coreaudio.la
+endif
+endif
+
+if HAVE_FLAC
+if STATIC_FLAC
+  libsox_la_SOURCES += flac.c
+  libsox_la_CFLAGS += @FLAC_CFLAGS@
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @FLAC_LIBS@
+else
+  libsox_la_LIBADD += @FLAC_LIBS@
+endif
+else
+  libsox_fmt_flac_la_SOURCES = flac.c
+  libsox_fmt_opus_la_CFLAGS = @FLAC_CFLAGS@
+  libsox_fmt_flac_la_LIBADD = @FLAC_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_flac.la
+endif
+endif
+
+if HAVE_GSM
+if STATIC_GSM
+  libsox_la_SOURCES += gsm.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @LIBGSM_LIBS@
+else
+  libsox_la_LIBADD += @LIBGSM_LIBS@
+endif
+else
+  libsox_fmt_gsm_la_SOURCES = gsm.c
+  libsox_fmt_gsm_la_LIBADD = @LIBGSM_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_gsm.la
+endif
+endif
+
+if HAVE_LPC10
+if STATIC_LPC10
+  libsox_la_SOURCES += lpc10.c
+  libsox_la_CFLAGS += @LPC10_CFLAGS@
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @LPC10_LIBS@
+else
+  libsox_la_LIBADD += @LPC10_LIBS@
+endif
+else
+  libsox_fmt_lpc10_la_SOURCES = lpc10.c
+  libsox_fmt_lpc10_la_CFLAGS = @LPC10_CFLAGS@
+  libsox_fmt_lpc10_la_LIBADD = @LPC10_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_lpc10.la
+endif
+endif
+
+if HAVE_MP3
+if STATIC_MP3
+  libsox_la_SOURCES += mp3.c mp3-util.h
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @MP3_LIBS@
+else
+  libsox_la_LIBADD += @MP3_LIBS@
+endif
+else
+  libsox_fmt_mp3_la_SOURCES = mp3.c mp3-util.h
+  libsox_fmt_mp3_la_LIBADD = @MP3_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_mp3.la
+endif
+endif
+
+if HAVE_OPUS
+if STATIC_OPUS
+  libsox_la_SOURCES += opus.c
+  libsox_la_CFLAGS += @OPUS_CFLAGS@
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @OPUS_LIBS@
+else
+  libsox_la_LIBADD += @OPUS_LIBS@
+endif
+else
+  libsox_fmt_opus_la_SOURCES = opus.c
+  libsox_fmt_opus_la_CFLAGS = @OPUS_CFLAGS@
+  libsox_fmt_opus_la_LIBADD = @OPUS_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_opus.la
+endif
+endif
+
+if HAVE_OSS
+if STATIC_OSS
+  libsox_la_SOURCES += oss.c
+else
+  libsox_fmt_oss_la_SOURCES = oss.c
+  pkglib_LTLIBRARIES += libsox_fmt_oss.la
+endif
+endif
+
+if HAVE_PULSEAUDIO
+if STATIC_PULSEAUDIO
+  libsox_la_SOURCES += pulseaudio.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @PULSEAUDIO_LIBS@
+else
+  libsox_la_LIBADD += @PULSEAUDIO_LIBS@
+endif
+else
+  libsox_fmt_pulseaudio_la_SOURCES = pulseaudio.c
+  libsox_fmt_pulseaudio_la_LIBADD = @PULSEAUDIO_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_pulseaudio.la
+endif
+endif
+
+if HAVE_WAVEAUDIO
+if STATIC_WAVEAUDIO
+  libsox_la_SOURCES += waveaudio.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @WAVEAUDIO_LIBS@
+else
+  libsox_la_LIBADD += @WAVEAUDIO_LIBS@
+endif
+else
+  libsox_fmt_waveaudio_la_SOURCES = waveaudio.c
+  libsox_fmt_waveaudio_la_LIBADD = @WAVEAUDIO_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_waveaudio.la
+endif
+endif
+
+if HAVE_SNDIO
+if STATIC_SNDIO
+  libsox_la_SOURCES += sndio.c
+  libsox_la_LIBADD += @SNDIO_LIBS@
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @SNDIO_LIBS@
+else
+  libsox_la_LIBADD += @SNDIO_LIBS@
+endif
+else
+  libsox_fmt_sndio_la_SOURCES = sndio.c
+  libsox_fmt_sndio_la_LIBADD = @SNDIO_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_sndio.la
+endif
+endif
+
+if HAVE_SUNAUDIO
+if STATIC_SUNAUDIO
+  libsox_la_SOURCES += sunaudio.c
+else
+  libsox_fmt_sunau_la_SOURCES = sunaudio.c
+  pkglib_LTLIBRARIES += libsox_fmt_sunau.la
+endif
+endif
+
+if HAVE_OGGVORBIS
+if STATIC_OGGVORBIS
+  libsox_la_SOURCES += vorbis.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @OGGVORBIS_LIBS@
+else
+  libsox_la_LIBADD += @OGGVORBIS_LIBS@
+endif
+else
+  libsox_fmt_vorbis_la_SOURCES = vorbis.c
+  libsox_fmt_vorbis_la_LIBADD = @OGGVORBIS_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_vorbis.la
+endif
+endif
+
+if HAVE_WAVPACK
+if STATIC_WAVPACK
+  libsox_la_SOURCES += wavpack.c
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @WAVPACK_LIBS@
+else
+  libsox_la_LIBADD += @WAVPACK_LIBS@
+endif
+else
+  libsox_fmt_wavpack_la_SOURCES = wavpack.c
+  libsox_fmt_wavpack_la_LIBADD = @WAVPACK_LIBS@
+  pkglib_LTLIBRARIES += libsox_fmt_wavpack.la
+endif
+endif
+
+
+if HAVE_SNDFILE
+if STATIC_SNDFILE
+  libsox_la_SOURCES += sndfile.c caf.c mat4.c mat5.c paf.c fap.c w64.c xi.c pvf.c sd2.c
+  libsox_la_CFLAGS += @LIBSNDFILE_CFLAGS@
+if STATIC_LIBSOX_ONLY
+  sox_LDADD += @LIBSNDFILE_LIBS@
+else
+  libsox_la_LIBADD += @LIBSNDFILE_LIBS@
+endif
+else
+libsox_fmt_sndfile_la_SOURCES = sndfile.c
+libsox_fmt_sndfile_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_sndfile_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_caf_la_SOURCES = caf.c sndfile.c
+libsox_fmt_caf_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_caf_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_mat4_la_SOURCES = mat4.c sndfile.c
+libsox_fmt_mat4_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_mat4_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_mat5_la_SOURCES = mat5.c sndfile.c
+libsox_fmt_mat5_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_mat5_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_paf_la_SOURCES = paf.c sndfile.c
+libsox_fmt_paf_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_paf_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_fap_la_SOURCES = fap.c sndfile.c
+libsox_fmt_fap_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_fap_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_w64_la_SOURCES = w64.c sndfile.c
+libsox_fmt_w64_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_w64_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_xi_la_SOURCES = xi.c sndfile.c
+libsox_fmt_wi_la_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_xi_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_pvf_la_SOURCES = pvf.c sndfile.c
+libsox_fmt_pvf_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_pvf_la_LIBADD = @LIBSNDFILE_LIBS@
+libsox_fmt_sd2_la_SOURCES = sd2.c sndfile.c
+libsox_fmt_sd2_CFLAGS = @LIBSNDFILE_CFLAGS@
+libsox_fmt_sd2_la_LIBADD = @LIBSNDFILE_LIBS@
+pkglib_LTLIBRARIES += libsox_fmt_sndfile.la libsox_fmt_caf.la libsox_fmt_mat4.la libsox_fmt_mat5.la libsox_fmt_paf.la libsox_fmt_fap.la libsox_fmt_w64.la libsox_fmt_xi.la libsox_fmt_pvf.la libsox_fmt_sd2.la
+endif
+endif
+
