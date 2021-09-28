@@ -309,9 +309,10 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         }
         if (got_frame > 0) {
 
-            ret = ensure_memory(fft_filter, frame->nb_samples);
-            if (ret == 0 && fft_filter->nb_samples == frame->nb_samples) {
-                memcpy(fft_filter->data, frame->data[0], static_cast<size_t>(frame->nb_samples));
+            int nb_samples = frame->nb_samples < MAX_FFT_SIZE ? frame->nb_samples : MAX_FFT_SIZE;
+            if (nb_samples >= MIN_FFT_SIZE) {
+                fft_filter->nb_samples = nb_samples;
+                memcpy(fft_filter->data, frame->data[0], nb_samples);
                 fft_once(fft_filter);
                 fft_callback(env, thiz, fft_method, fft_filter->output, fft_filter->out_samples);
             }

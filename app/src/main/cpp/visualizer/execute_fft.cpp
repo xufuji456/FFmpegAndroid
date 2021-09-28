@@ -207,6 +207,8 @@ int init_visualizer(filter_sys_t *p_filter)
     p_filter->out_samples = FFT_BUFFER_SIZE;
 #endif
     p_filter->output = (int8_t *) (malloc(p_filter->out_samples * sizeof(int8_t)));
+    p_filter->data_size = MAX_FFT_SIZE;
+    p_filter->data = (uint8_t *) (malloc(MAX_FFT_SIZE * sizeof(uint8_t)));
     return 0;
 }
 
@@ -224,24 +226,6 @@ void release_visualizer(filter_sys_t *p_filter)
         free(p_filter->output);
     }
     free(p_filter);
-}
-
-int ensure_memory(filter_sys_t *fft_filter, int nb_samples) {
-    if (nb_samples < MIN_FFT_SIZE) {
-        return -1;
-    }
-    if (nb_samples != fft_filter->nb_samples) {
-        if (!fft_filter->data) {
-            fft_filter->data_size = nb_samples;
-            fft_filter->data = (uint8_t *) (malloc(nb_samples * sizeof(uint8_t)));
-        } else if (nb_samples > fft_filter->data_size) {
-            fft_filter->data_size = nb_samples;
-            fft_filter->data = (uint8_t *) (realloc(fft_filter->data, nb_samples * sizeof(uint8_t)));
-        }
-        if (!fft_filter->data) return -1;
-        fft_filter->nb_samples = nb_samples;
-    }
-    return 0;
 }
 
 void fft_float(filter_sys_t *p_sys)
