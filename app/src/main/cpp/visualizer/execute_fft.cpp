@@ -23,10 +23,10 @@ int open_visualizer(filter_sys_t *p_sys)
     p_sys->p_prev_s16_buff = nullptr;
 
     auto *w_param = (window_param*) malloc(sizeof(window_param));
-    p_sys->wind_param = *w_param;
+    p_sys->wind_param = w_param;
 
     /* Fetch the FFT window parameters */
-    window_get_param(&p_sys->wind_param);
+    window_get_param(p_sys->wind_param);
 
     /* Create the FIFO for the audio data. */
     vlc_queue_t *queue = vlc_queue_init(5);
@@ -51,7 +51,7 @@ void close_visualizer(filter_sys_t *p_filter)
     pthread_join(p_sys->thread, nullptr);
 
     free(p_sys->p_prev_s16_buff);
-    free(&p_sys->wind_param);
+    free(p_sys->wind_param);
     if (p_sys->data) {
         free(p_sys->data);
     }
@@ -128,7 +128,7 @@ static void *fft_thread(void *p_data)
             LOGE("unable to initialize FFT transform...");
             goto release;
         }
-        if (!window_init(FFT_BUFFER_SIZE, &p_sys->wind_param, &wind_ctx))
+        if (!window_init(FFT_BUFFER_SIZE, p_sys->wind_param, &wind_ctx))
         {
             LOGE("unable to initialize FFT window...");
             goto release;
@@ -194,10 +194,10 @@ int init_visualizer(filter_sys_t *p_filter)
 
     auto *w_param = (window_param*) malloc(sizeof(window_param));
     if (!w_param) return -1;
-    p_filter->wind_param = *w_param;
+    p_filter->wind_param = w_param;
 
     /* Fetch the FFT window parameters */
-    window_get_param(&p_filter->wind_param);
+    window_get_param(p_filter->wind_param);
 
     p_filter->data = nullptr;
     p_filter->data_size = 0;
@@ -223,7 +223,7 @@ void release_visualizer(filter_sys_t *p_filter)
     if (p_filter->p_prev_s16_buff) {
         free(p_filter->p_prev_s16_buff);
     }
-    free(&p_filter->wind_param);
+    free(p_filter->wind_param);
     if (p_filter->data) {
         free(p_filter->data);
     }
@@ -285,7 +285,7 @@ void fft_float(filter_sys_t *p_sys)
         LOGE("unable to initialize FFT transform...");
         goto release;
     }
-    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx)) {
+    if (!window_init(out_samples, p_sys->wind_param, &wind_ctx)) {
         LOGE("unable to initialize FFT window...");
         goto release;
     }
@@ -354,7 +354,7 @@ void fft_fixed(filter_sys_t *p_sys)
         goto release;
     }
 
-    if (!window_init(out_samples, &p_sys->wind_param, &wind_ctx)) {
+    if (!window_init(out_samples, p_sys->wind_param, &wind_ctx)) {
         LOGE("unable to initialize FFT window...");
         goto release;
     }

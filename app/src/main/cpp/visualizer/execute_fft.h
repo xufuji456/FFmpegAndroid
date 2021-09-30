@@ -32,7 +32,7 @@ typedef struct
     int16_t *p_prev_s16_buff;
 
     /* FFT window parameters */
-    window_param wind_param;
+    window_param *wind_param;
 
     uint8_t *data;
     int data_size;
