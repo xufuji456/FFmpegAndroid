@@ -36,11 +36,12 @@ typedef struct
 
 class FrankVisualizer {
 
+private:
+    std::mutex mFftLock;
+
 public:
     FrankVisualizer();
     ~FrankVisualizer();
-
-    std::mutex mFftLock;
 
     filter_sys_t *fft_context = nullptr;
 
