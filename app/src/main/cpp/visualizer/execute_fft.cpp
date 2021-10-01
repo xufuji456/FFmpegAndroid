@@ -17,13 +17,10 @@ int open_visualizer(filter_sys_t *p_sys)
     if (p_sys == nullptr)
         return -1;
 
-    /* Create the object for the thread */
     p_sys->i_channels = 1;
     p_sys->i_prev_nb_samples = 0;
     p_sys->p_prev_s16_buff = nullptr;
-
-    auto *w_param = (window_param*) malloc(sizeof(window_param));
-    p_sys->wind_param = w_param;
+    p_sys->wind_param = new window_param();
 
     /* Fetch the FFT window parameters */
     window_get_param(p_sys->wind_param);
@@ -46,19 +43,22 @@ block_t *filter_audio(filter_sys_t *p_sys, void *p_in_buf)
 void close_visualizer(filter_sys_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter;
-    /* Terminate the thread. */
     vlc_queue_free(&p_sys->queue);
     pthread_join(p_sys->thread, nullptr);
 
-    free(p_sys->p_prev_s16_buff);
-    free(p_sys->wind_param);
+    if (p_sys->p_prev_s16_buff) {
+        delete [] (p_sys->p_prev_s16_buff);
+    }
+    if (p_sys->wind_param) {
+        delete (p_sys->wind_param);
+    }
     if (p_sys->data) {
-        free(p_sys->data);
+        delete [] (p_sys->data);
     }
     if (p_sys->output) {
-        free(p_sys->output);
+        delete [] (p_sys->output);
     }
-    free(p_sys);
+    delete (p_sys);
 }
 
 static void *fft_thread(void *p_data)
@@ -97,10 +97,8 @@ static void *fft_thread(void *p_data)
         /* Allocate the buffer only if the number of samples change */
         if (block->i_nb_samples != p_sys->i_prev_nb_samples)
         {
-            free(p_sys->p_prev_s16_buff);
-            p_sys->p_prev_s16_buff = (short *) malloc(block->i_nb_samples *
-                                            p_sys->i_channels *
-                                            sizeof(int16_t));
+            if (p_sys->p_prev_s16_buff) delete [] (p_sys->p_prev_s16_buff);
+            p_sys->p_prev_s16_buff = new int16_t [block->i_nb_samples * p_sys->i_channels];
             if (!p_sys->p_prev_s16_buff)
                 goto release;
             p_sys->i_prev_nb_samples = block->i_nb_samples;
@@ -192,9 +190,7 @@ int init_visualizer(filter_sys_t *p_filter)
     p_filter->i_prev_nb_samples = 0;
     p_filter->p_prev_s16_buff = nullptr;
 
-    auto *w_param = (window_param*) malloc(sizeof(window_param));
-    if (!w_param) return -1;
-    p_filter->wind_param = w_param;
+    p_filter->wind_param = new window_param();
 
     /* Fetch the FFT window parameters */
     window_get_param(p_filter->wind_param);
@@ -207,10 +203,10 @@ int init_visualizer(filter_sys_t *p_filter)
 #else
     p_filter->out_samples = FFT_BUFFER_SIZE;
 #endif
-    p_filter->output = (int8_t *) (malloc(p_filter->out_samples * sizeof(int8_t)));
+    p_filter->output = new int8_t[p_filter->out_samples];
     if (!p_filter->output) return -1;
     p_filter->data_size = MAX_FFT_SIZE;
-    p_filter->data = (uint8_t *) (malloc(MAX_FFT_SIZE * sizeof(uint8_t)));
+    p_filter->data = new uint8_t[MAX_FFT_SIZE];
     if (!p_filter->data) {
         return -1;
     }
@@ -221,16 +217,18 @@ void release_visualizer(filter_sys_t *p_filter)
 {
     if (!p_filter) return;
     if (p_filter->p_prev_s16_buff) {
-        free(p_filter->p_prev_s16_buff);
+        delete [] (p_filter->p_prev_s16_buff);
     }
-    free(p_filter->wind_param);
+    if (p_filter->wind_param) {
+        delete (p_filter->wind_param);
+    }
     if (p_filter->data) {
-        free(p_filter->data);
+        delete [] (p_filter->data);
     }
     if (p_filter->output) {
-        free(p_filter->output);
+        delete [] (p_filter->output);
     }
-    free(p_filter);
+    delete (p_filter);
 }
 
 void fft_float(filter_sys_t *p_sys)
@@ -256,10 +254,8 @@ void fft_float(filter_sys_t *p_sys)
 
     /* Allocate the buffer only if the number of samples change */
     if (nb_samples != p_sys->i_prev_nb_samples) {
-        free(p_sys->p_prev_s16_buff);
-        p_sys->p_prev_s16_buff = (short *) malloc(nb_samples *
-                                        p_sys->i_channels *
-                                        sizeof(int16_t));
+        if (p_sys->p_prev_s16_buff) delete [] (p_sys->p_prev_s16_buff);
+        p_sys->p_prev_s16_buff = new int16_t [nb_samples * p_sys->i_channels];
         if (!p_sys->p_prev_s16_buff)
             goto release;
         p_sys->i_prev_nb_samples = nb_samples;
