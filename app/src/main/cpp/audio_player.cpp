@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <cstdlib>
 #include <unistd.h>
+#include "visualizer/frank_visualizer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,8 +20,6 @@ extern "C" {
 #include "libavutil/opt.h"
 #include "ffmpeg_jni_define.h"
 
-#include "visualizer/execute_fft.h"
-
 #ifdef __cplusplus
 }
 #endif
@@ -33,6 +32,7 @@ extern "C" {
 int filter_again = 0;
 int filter_release = 0;
 const char *filter_desc = "superequalizer=6b=4:8b=5:10b=5";
+FrankVisualizer *mVisualizer;
 
 void fft_callback(JNIEnv *jniEnv, jobject thiz, jmethodID fft_method, int8_t* arg, int samples);
 
@@ -285,8 +285,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([B)V");
 
-    auto *fft_filter = static_cast<filter_sys_t *>(malloc(sizeof(filter_sys_t)));
-    init_visualizer(fft_filter);
+    mVisualizer = new FrankVisualizer();
+    mVisualizer->init_visualizer();
 
     //read audio frame
     while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
@@ -311,10 +311,10 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 
             int nb_samples = frame->nb_samples < MAX_FFT_SIZE ? frame->nb_samples : MAX_FFT_SIZE;
             if (nb_samples >= MIN_FFT_SIZE) {
-                fft_filter->nb_samples = nb_samples;
-                memcpy(fft_filter->data, frame->data[0], nb_samples);
-                fft_once(fft_filter);
-                fft_callback(env, thiz, fft_method, fft_filter->output, fft_filter->out_samples);
+                mVisualizer->fft_context->nb_samples = nb_samples;
+                memcpy(mVisualizer->fft_context->data, frame->data[0], nb_samples);
+                mVisualizer->fft_run();
+                fft_callback(env, thiz, fft_method, mVisualizer->fft_context->output, mVisualizer->fft_context->out_samples);
             }
 
             ret = av_buffersrc_add_frame(audioSrcContext, frame);
@@ -364,7 +364,7 @@ end:
     env->CallVoidMethod(thiz, releaseMethod);
     filter_again = 0;
     filter_release = 0;
-    release_visualizer(fft_filter);
+    mVisualizer->release_visualizer();
     LOGE(TAG, "audio release...");
 }
 

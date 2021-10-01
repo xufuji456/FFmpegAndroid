@@ -37,7 +37,7 @@ add_library( # Sets the name of the library.
             src/main/cpp/visualizer/fft.cpp
             src/main/cpp/visualizer/fixed_fft.cpp
             src/main/cpp/visualizer/block_queue.c
-            src/main/cpp/visualizer/execute_fft.cpp
+            src/main/cpp/visualizer/frank_visualizer.cpp
             src/main/cpp/visualizer/window.cpp
         )
 
