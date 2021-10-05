@@ -113,7 +113,6 @@ set(formats_srcs
         ima_rw.h
         ima_rw.c
         la-fmt.c
-#        lpc10.c
         lu-fmt.c
         maud.c
         nulfile.c
