@@ -45,7 +45,7 @@
   FORMAT(s4)
 //  FORMAT(sf)
   FORMAT(sln)
-  FORMAT(smp)
+//  FORMAT(smp)
   FORMAT(sounder)
   FORMAT(soundtool)
   FORMAT(sox)
