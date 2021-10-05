@@ -20,7 +20,7 @@
 //  FORMAT(aifc)
 //  FORMAT(aiff)
   FORMAT(al)
-  FORMAT(au)
+//  FORMAT(au)
   FORMAT(avr)
   FORMAT(cdr)
   FORMAT(cvsd)
