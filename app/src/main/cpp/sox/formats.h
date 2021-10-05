@@ -30,7 +30,7 @@
   FORMAT(f4)
   FORMAT(f8)
 //  FORMAT(gsrt)
-  FORMAT(hcom)
+//  FORMAT(hcom)
   FORMAT(htk)
   FORMAT(ima)
   FORMAT(la)
