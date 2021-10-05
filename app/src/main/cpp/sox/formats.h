@@ -49,7 +49,7 @@
   FORMAT(sounder)
   FORMAT(soundtool)
   FORMAT(sox)
-  FORMAT(sphere)
+//  FORMAT(sphere)
 //  FORMAT(svx)
   FORMAT(txw)
   FORMAT(u1)
