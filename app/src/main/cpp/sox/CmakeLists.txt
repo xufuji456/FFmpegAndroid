@@ -122,7 +122,6 @@ set(formats_srcs
         vox.h
         vox-fmt.c
         wav.c
-        wve.c
         xa.c
         )
 
