@@ -17,8 +17,8 @@
 
 /*-------------------------- Static format handlers --------------------------*/
 
-  FORMAT(aifc)
-  FORMAT(aiff)
+//  FORMAT(aifc)
+//  FORMAT(aiff)
   FORMAT(al)
   FORMAT(au)
   FORMAT(avr)

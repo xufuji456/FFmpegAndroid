@@ -1,4 +1,5 @@
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}config.h)
+
+set(PROJECT_NAME sox)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -13,7 +14,6 @@ if(CMAKE_COMPILER_IS_GNUCC)
     else(${ver} LESS 403)
         add_definitions(-Wtraditional-conversion)
     endif(${ver} LESS 403)
-    #add_definitions(-Werror)
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 if (NOT EXTERNAL_GSM)
@@ -87,10 +87,6 @@ set(formats_srcs
         adpcm.h
         adpcms.h
         adpcms.c
-        aifc-fmt.c
-        aiff.c
-        aiff.h
-        aiff-fmt.c
         al-fmt.c
         au.c
         avr.c
@@ -152,24 +148,24 @@ set(formats_srcs
         xa.c
         )
 
-# Uncomment for bit-rot detection on linux
-#set(formats_srcs ${formats_srcs} coreaudio sndio sunaudio waveaudio)
-#add_definitions(-Ibit-rot)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/bit-rot)
 
 add_library(${PROJECT_NAME} STATIC
-        effects.c formats_i.c libsox_i.c
-        effects_i.c ${formats_srcs}
-        effects_i_dsp.c getopt.c
-        ${effects_srcs} util.c
-        libsox.c xmalloc.c
+        ${effects_srcs}
+        effects.c
+        effects_i.c
+        effects_i_dsp.c
+        ${formats_srcs}
+        formats_i.c
+        formats.c
+        getopt.c
+        libsox_i.c
+        libsox.c
+        util.c
+        xmalloc.c
         )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-#add_executable(${PROJECT_NAME} ${PROJECT_NAME}.c)
-
-#target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME} lpc10 ${optional_libs})
 
 find_program(LN ln)
 if (LN)

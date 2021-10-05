@@ -477,7 +477,7 @@ static void UNUSED rewind_pipe(FILE * fp)
   /* To fix this #error, either simply remove the #error line and live without
    * file-type detection with pipes, or add support for your compiler in the
    * lines above.  Test with cat monkey.wav | ./sox --info - */
-  #error FIX NEEDED HERE
+//  #error FIX NEEDED HERE //FIXME
   #define NO_REWIND_PIPE
   (void)fp;
 #endif
