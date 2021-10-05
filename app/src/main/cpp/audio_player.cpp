@@ -231,7 +231,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     }
     AVCodecContext *codecCtx = pFormatCtx->streams[audio_stream_idx]->codec;
     AVCodec *codec = avcodec_find_decoder(codecCtx->codec_id);
-    if (codec == NULL) {
+    if (codec == nullptr) {
         LOGE(TAG, "Couldn't find audio decoder!");
         return;
     }
@@ -239,7 +239,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         LOGE(TAG, "Couldn't open audio decoder");
         return;
     }
-    AVPacket *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
+    auto *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
     AVFrame *frame = av_frame_alloc();
     SwrContext *swrCtx = swr_alloc();
     enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;
@@ -271,7 +271,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     env->CallVoidMethod(audio_track, audio_track_play_mid);
     //get write method
     jmethodID audio_track_write_mid = env->GetMethodID(audio_track_class, "write", "([BII)I");
-    uint8_t *out_buffer = (uint8_t *) av_malloc(MAX_AUDIO_FRAME_SIZE);
+    auto *out_buffer = (uint8_t *) av_malloc(MAX_AUDIO_FRAME_SIZE);
 
     /* Set up the filter graph. */
     AVFrame *filter_frame = av_frame_alloc();
