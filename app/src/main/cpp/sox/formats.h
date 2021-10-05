@@ -25,7 +25,7 @@
 //  FORMAT(cdr)
 //  FORMAT(cvsd)
 //  FORMAT(cvu)
-  FORMAT(dat)
+//  FORMAT(dat)
 //  FORMAT(dvms)
   FORMAT(f4)
   FORMAT(f8)
