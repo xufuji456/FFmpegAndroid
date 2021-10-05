@@ -87,12 +87,12 @@ set(formats_srcs
         adpcms.h
         adpcms.c
         al-fmt.c
-        cvsd.h
-        cvsd.c
-        cvsd-fmt.c
+#        cvsd.h
+#        cvsd.c
+#        cvsd-fmt.c
         coreaudio.c
         dat.c
-        dvms-fmt.c
+#        dvms-fmt.c
         f4-fmt.c
         f8-fmt.c
         g711.h
