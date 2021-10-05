@@ -21,7 +21,7 @@
 //  FORMAT(aiff)
   FORMAT(al)
 //  FORMAT(au)
-  FORMAT(avr)
+//  FORMAT(avr)
   FORMAT(cdr)
   FORMAT(cvsd)
   FORMAT(cvu)
