@@ -22,7 +22,7 @@
   FORMAT(al)
 //  FORMAT(au)
 //  FORMAT(avr)
-  FORMAT(cdr)
+//  FORMAT(cdr)
   FORMAT(cvsd)
   FORMAT(cvu)
   FORMAT(dat)

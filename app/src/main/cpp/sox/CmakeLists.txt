@@ -87,8 +87,6 @@ set(formats_srcs
         adpcms.h
         adpcms.c
         al-fmt.c
-        avr.c
-        cdr.c
         cvsd.h
         cvsd.c
         cvsd-fmt.c
