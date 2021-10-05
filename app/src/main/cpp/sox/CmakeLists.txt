@@ -97,7 +97,6 @@ set(formats_srcs
         g723_40.c
         g72x.c
         g72x.h
-        htk.c
         ima-fmt.c
         ima_rw.h
         ima_rw.c

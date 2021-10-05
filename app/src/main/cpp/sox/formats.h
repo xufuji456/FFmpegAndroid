@@ -31,7 +31,7 @@
   FORMAT(f8)
 //  FORMAT(gsrt)
 //  FORMAT(hcom)
-  FORMAT(htk)
+//  FORMAT(htk)
   FORMAT(ima)
   FORMAT(la)
   FORMAT(lu)
