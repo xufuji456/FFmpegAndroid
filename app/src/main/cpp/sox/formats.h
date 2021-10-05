@@ -50,7 +50,7 @@
   FORMAT(soundtool)
   FORMAT(sox)
   FORMAT(sphere)
-  FORMAT(svx)
+//  FORMAT(svx)
   FORMAT(txw)
   FORMAT(u1)
   FORMAT(u2)

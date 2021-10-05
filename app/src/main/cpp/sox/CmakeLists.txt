@@ -82,7 +82,6 @@ set(effects_srcs
         vol.c
         )
 set(formats_srcs
-        8svx.c
         adpcm.c
         adpcm.h
         adpcms.h
