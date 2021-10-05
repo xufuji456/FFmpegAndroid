@@ -43,7 +43,7 @@
   FORMAT(s2)
   FORMAT(s3)
   FORMAT(s4)
-  FORMAT(sf)
+//  FORMAT(sf)
   FORMAT(sln)
   FORMAT(smp)
   FORMAT(sounder)

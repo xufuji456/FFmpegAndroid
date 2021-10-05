@@ -109,7 +109,6 @@ set(formats_srcs
         s2-fmt.c
         s3-fmt.c
         s4-fmt.c
-        sf.c
         skelform.c
         smp.c
         sounder.c
