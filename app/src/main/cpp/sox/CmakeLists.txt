@@ -122,7 +122,6 @@ set(formats_srcs
         vox.h
         vox-fmt.c
         wav.c
-        xa.c
         )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/bit-rot)

@@ -61,7 +61,7 @@
   FORMAT(vox)
   FORMAT(wav)
 //  FORMAT(wve)
-  FORMAT(xa)
+//  FORMAT(xa)
 
 /*--------------------- Plugin or static format handlers ---------------------*/
 
