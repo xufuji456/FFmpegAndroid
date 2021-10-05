@@ -112,11 +112,6 @@ set(formats_srcs
         sounder.c
         soundtool.c
         sox-fmt.c
-        u1-fmt.c
-        u2-fmt.c
-        u3-fmt.c
-        u4-fmt.c
-        ul-fmt.c
         voc.c
         vox.c
         vox.h
