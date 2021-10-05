@@ -51,7 +51,7 @@
   FORMAT(sox)
 //  FORMAT(sphere)
 //  FORMAT(svx)
-  FORMAT(txw)
+//  FORMAT(txw)
   FORMAT(u1)
   FORMAT(u2)
   FORMAT(u3)

@@ -112,7 +112,6 @@ set(formats_srcs
         sounder.c
         soundtool.c
         sox-fmt.c
-        tx16w.c
         u1-fmt.c
         u2-fmt.c
         u3-fmt.c
