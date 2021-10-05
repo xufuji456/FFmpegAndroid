@@ -36,7 +36,7 @@
   FORMAT(la)
   FORMAT(lu)
 //  FORMAT(maud)
-  FORMAT(nul)
+//  FORMAT(nul)
   FORMAT(prc)
   FORMAT(raw)
   FORMAT(s1)
