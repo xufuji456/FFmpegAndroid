@@ -102,7 +102,6 @@ set(formats_srcs
         ima_rw.c
         la-fmt.c
         lu-fmt.c
-        prc.c
         raw.c
         raw.h
         raw-fmt.c
