@@ -49,6 +49,10 @@ set_target_properties( ffmpeg
                        PROPERTIES IMPORTED_LOCATION
                        ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libffmpeg.so )
 
+# third-party library: sox
+add_subdirectory(src/main/cpp/sox)
+include_directories(src/main/cpp/sox)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 include_directories(src/main/cpp)
@@ -68,6 +72,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
                        media-handle
                        ffmpeg
+                       sox
                        -landroid #native_window
                        -ljnigraphics #bitmap
                        -lOpenSLES #openSLES
