@@ -109,8 +109,6 @@ set(formats_srcs
         s2-fmt.c
         s3-fmt.c
         s4-fmt.c
-        sounder.c
-        soundtool.c
         sox-fmt.c
         voc.c
         vox.c
