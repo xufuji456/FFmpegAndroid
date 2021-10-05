@@ -5,7 +5,7 @@
 
 #include "sox_i.h"
 
-#include <CoreAudio/CoreAudio.h>
+#include "CoreAudio/CoreAudio.h"
 #include <pthread.h>
 
 #define Buffactor 4
