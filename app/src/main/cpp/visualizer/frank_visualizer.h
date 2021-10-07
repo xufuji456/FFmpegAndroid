@@ -39,13 +39,15 @@ class FrankVisualizer {
 private:
     std::mutex mFftLock;
 
+    filter_sys_t *fft_context = nullptr;
+
 public:
     FrankVisualizer();
     ~FrankVisualizer();
 
-    filter_sys_t *fft_context = nullptr;
+    int getOutputSample();
 
-    void fft_run();
+    int8_t* fft_run(uint8_t *input_buffer, int nb_samples);
 
     int init_visualizer();
 

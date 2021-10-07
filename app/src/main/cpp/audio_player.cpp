@@ -311,10 +311,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
 
             int nb_samples = frame->nb_samples < MAX_FFT_SIZE ? frame->nb_samples : MAX_FFT_SIZE;
             if (nb_samples >= MIN_FFT_SIZE) {
-                mVisualizer->fft_context->nb_samples = nb_samples;
-                memcpy(mVisualizer->fft_context->data, frame->data[0], nb_samples);
-                mVisualizer->fft_run();
-                fft_callback(env, thiz, fft_method, mVisualizer->fft_context->output, mVisualizer->fft_context->out_samples);
+                int8_t *output_data = mVisualizer->fft_run(frame->data[0], nb_samples);
+                fft_callback(env, thiz, fft_method, output_data, mVisualizer->getOutputSample());
             }
 
             ret = av_buffersrc_add_frame(audioSrcContext, frame);

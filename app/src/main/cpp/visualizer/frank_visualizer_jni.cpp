@@ -63,14 +63,12 @@ VISUALIZER_FUNC(int, nativeInitVisualizer) {
 VISUALIZER_FUNC(int, nativeCaptureData, jobject buffer, jint size) {
     if (!buffer) return -1;
     FrankVisualizer *mVisualizer = getCustomVisualizer(env, thiz);
-    if (!mVisualizer || !mVisualizer->fft_context) return -2;
+    if (!mVisualizer) return -2;
     int nb_samples = size < MAX_FFT_SIZE ? size : MAX_FFT_SIZE;
     if (nb_samples >= MIN_FFT_SIZE) {
-        mVisualizer->fft_context->nb_samples = nb_samples;
-        auto *direct_buffer = static_cast<uint8_t *>(env->GetDirectBufferAddress(buffer));
-        memcpy(mVisualizer->fft_context->data, direct_buffer, static_cast<size_t>(nb_samples));
-        mVisualizer->fft_run();
-        fft_callback(env, mVisualizer->fft_context->output, mVisualizer->fft_context->out_samples);
+        auto *input_buffer = static_cast<uint8_t *>(env->GetDirectBufferAddress(buffer));
+        int8_t *output_data = mVisualizer->fft_run(input_buffer, nb_samples);
+        fft_callback(env, output_data, mVisualizer->getOutputSample());
     }
     return 0;
 }

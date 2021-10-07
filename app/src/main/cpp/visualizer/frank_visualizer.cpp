@@ -158,8 +158,10 @@ FrankVisualizer::~FrankVisualizer() {
     LOGE("FrankVisualizer release...");
 }
 
-void FrankVisualizer::fft_run() {
+int8_t* FrankVisualizer::fft_run(uint8_t *input_buffer, int nb_samples) {
     mFftLock.lock();
+    fft_context->nb_samples = nb_samples;
+    memcpy(fft_context->data, input_buffer, static_cast<size_t>(nb_samples));
     filter_sys_t *p_sys = fft_context;
 #ifdef FIXED_FFT
     fft_fixed(p_sys);
@@ -167,6 +169,14 @@ void FrankVisualizer::fft_run() {
     fft_float(p_sys);
 #endif
     mFftLock.unlock();
+    return fft_context->output;
+}
+
+int FrankVisualizer::getOutputSample() {
+    if (fft_context) {
+        return fft_context->out_samples;
+    }
+    return 0;
 }
 
 int FrankVisualizer::init_visualizer() {
