@@ -19,6 +19,7 @@ struct fields_t {
     jfieldID context;
     jclass visual_class;
     jmethodID fft_method;
+    jbyteArray data_array;
 };
 
 static fields_t fields;
@@ -43,10 +44,8 @@ FrankVisualizer *getCustomVisualizer(JNIEnv *env, jobject thiz) {
 }
 
 void fft_callback(JNIEnv *jniEnv, int8_t * arg, int samples) {
-    jbyteArray dataArray = jniEnv->NewByteArray(samples);
-    jniEnv->SetByteArrayRegion(dataArray, 0, samples, arg);
-    jniEnv->CallStaticVoidMethod(fields.visual_class, fields.fft_method, dataArray);
-    jniEnv->DeleteLocalRef(dataArray);
+    jniEnv->SetByteArrayRegion(fields.data_array, 0, samples, arg);
+    jniEnv->CallStaticVoidMethod(fields.visual_class, fields.fft_method, fields.data_array);
 }
 
 VISUALIZER_FUNC(int, nativeInitVisualizer) {
@@ -56,6 +55,8 @@ VISUALIZER_FUNC(int, nativeInitVisualizer) {
     jclass mVisualClass = env->FindClass(className);
     fields.visual_class = (jclass) env->NewGlobalRef(mVisualClass);
     fields.fft_method = env->GetStaticMethodID(fields.visual_class, "onFftCallback", "([B)V");
+    jbyteArray dataArray = env->NewByteArray(MAX_FFT_SIZE);
+    fields.data_array = (jbyteArray) env->NewGlobalRef(dataArray);
     return mVisualizer->init_visualizer();
 }
 
@@ -79,6 +80,7 @@ VISUALIZER_FUNC(void, nativeReleaseVisualizer) {
     if (!mVisualizer) return;
     mVisualizer->release_visualizer();
     delete mVisualizer;
+    env->DeleteGlobalRef(fields.data_array);
     env->DeleteGlobalRef(fields.visual_class);
     env->SetLongField(thiz, fields.context, 0);
 }
