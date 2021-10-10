@@ -12,13 +12,15 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import java.io.File
 import java.util.ArrayList
 import java.util.Locale
 
-import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
+import com.frank.ffmpeg.adapter.WaterfallAdapter
 import com.frank.ffmpeg.handler.FFmpegHandler
 import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.FileUtil
@@ -27,6 +29,7 @@ import com.frank.ffmpeg.handler.FFmpegHandler.MSG_INFO
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS
+import com.frank.ffmpeg.listener.OnItemClickListener
 import java.lang.StringBuilder
 
 /**
@@ -37,10 +40,10 @@ import java.lang.StringBuilder
 class AudioHandleActivity : BaseActivity() {
     private val appendFile = PATH + File.separator + "heart.m4a"
 
-    private var layoutAudioHandle: LinearLayout? = null
+    private var layoutAudioHandle: RecyclerView? = null
     private var layoutProgress: LinearLayout? = null
     private var txtProgress: TextView? = null
-    private var viewId: Int = 0
+    private var currentPosition: Int = 0
     private var ffmpegHandler: FFmpegHandler? = null
 
     private val outputPath1 = PATH + File.separator + "output1.mp3"
@@ -97,7 +100,6 @@ class AudioHandleActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideActionBar()
         initView()
         ffmpegHandler = FFmpegHandler(mHandler)
     }
@@ -105,29 +107,38 @@ class AudioHandleActivity : BaseActivity() {
     private fun initView() {
         layoutProgress = getView(R.id.layout_progress)
         txtProgress = getView(R.id.txt_progress)
-        layoutAudioHandle = getView(R.id.layout_audio_handle)
-        initViewsWithClick(
-                R.id.btn_transform,
-                R.id.btn_cut,
-                R.id.btn_concat,
-                R.id.btn_mix,
-                R.id.btn_play_audio,
-                R.id.btn_play_opensl,
-                R.id.btn_audio_encode,
-                R.id.btn_pcm_concat,
-                R.id.btn_audio_speed,
-                R.id.btn_audio_echo,
-                R.id.btn_audio_tremolo,
-                R.id.btn_audio_denoise,
-                R.id.btn_audio_equalizer,
-                R.id.btn_audio_silence,
-                R.id.btn_audio_volume
-        )
+        val list = listOf(
+                getString(R.string.audio_transform),
+                getString(R.string.audio_cut),
+                getString(R.string.audio_concat),
+                getString(R.string.audio_mix),
+                getString(R.string.audio_play),
+                getString(R.string.audio_speed),
+                getString(R.string.audio_echo),
+                getString(R.string.audio_tremolo),
+                getString(R.string.audio_denoise),
+                getString(R.string.audio_add_equalizer),
+                getString(R.string.audio_silence),
+                getString(R.string.audio_volume),
+                getString(R.string.audio_encode),
+                getString(R.string.pcm_concat))
+
+        layoutAudioHandle = findViewById(R.id.list_audio_item)
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        layoutAudioHandle?.layoutManager = layoutManager
+
+        val adapter = WaterfallAdapter(list)
+        adapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                currentPosition = position
+                selectFile()
+            }
+        })
+        layoutAudioHandle?.adapter = adapter
     }
 
     override fun onViewClick(view: View) {
-        viewId = view.id
-        selectFile()
+
     }
 
     override fun onSelectedFile(filePath: String) {
@@ -148,8 +159,8 @@ class AudioHandleActivity : BaseActivity() {
             showToast(getString(R.string.wrong_audio_format))
             return
         }
-        when (viewId) {
-            R.id.btn_transform -> if (useFFmpeg) { //use FFmpeg to transform
+        when (currentPosition) {
+            0 -> if (useFFmpeg) { //use FFmpeg to transform
                 val transformFile = PATH + File.separator + "transformAudio.mp3"
                 commandLine = FFmpegUtil.transformAudio(srcFile, transformFile)
             } else { //use MediaCodec and libmp3lame to transform
@@ -167,7 +178,7 @@ class AudioHandleActivity : BaseActivity() {
                     }
                 }.start()
             }
-            R.id.btn_cut//cut audio, it's best not include special characters
+            1 //cut audio, it's best not include special characters
             -> {
                 val suffix = FileUtil.getFileSuffix(srcFile)
                 if (suffix == null || suffix.isEmpty()) {
@@ -176,7 +187,7 @@ class AudioHandleActivity : BaseActivity() {
                 val cutFile = PATH + File.separator + "cutAudio" + suffix
                 commandLine = FFmpegUtil.cutAudio(srcFile, 10.5f, 15.0f, cutFile)
             }
-            R.id.btn_concat//concat audio
+            2 //concat audio
             -> {
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return
@@ -184,7 +195,7 @@ class AudioHandleActivity : BaseActivity() {
                 concatAudio(srcFile)
                 return
             }
-            R.id.btn_mix//mix audio
+            3 //mix audio
             -> {
                 if (!FileUtil.checkFileExist(appendFile)) {
                     return
@@ -201,67 +212,38 @@ class AudioHandleActivity : BaseActivity() {
                     FFmpegUtil.mergeAudio(srcFile, appendFile, mergeAudio)
                 }
             }
-            R.id.btn_play_audio//use AudioTrack to play audio
+            4 //use AudioTrack to play audio
             -> {
                 val audioIntent = Intent(this@AudioHandleActivity, AudioPlayActivity::class.java)
                 audioIntent.data = Uri.parse(srcFile)
                 startActivity(audioIntent)
                 return
             }
-            R.id.btn_play_opensl//use OpenSL ES to play audio
-            -> {
-                Thread { AudioPlayer().playAudio(srcFile) }.start()
-                return
-            }
-            R.id.btn_audio_encode//audio encode
-            -> {
-                val pcmFile = PATH + File.separator + "raw.pcm"
-                val wavFile = PATH + File.separator + "convert.mp3"
-                //sample rate, normal is 8000/16000/44100
-                val sampleRate = 44100
-                //channel num of pcm
-                val channel = 2
-                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel)
-            }
-            R.id.btn_pcm_concat//concat PCM streams
-            -> {
-                val srcPCM = PATH + File.separator + "audio.pcm"
-                val appendPCM = PATH + File.separator + "audio.pcm"
-                val concatPCM = PATH + File.separator + "concat.pcm"
-                if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)) {
-                    return
-                }
-
-                mHandler.obtainMessage(MSG_BEGIN).sendToTarget()
-                FileUtil.concatFile(srcPCM, appendPCM, concatPCM)
-                mHandler.obtainMessage(MSG_FINISH).sendToTarget()
-                return
-            }
-            R.id.btn_audio_speed//change audio speed
+            5 //change audio speed
             -> {
                 val speed = 2.0f // funny effect, range from 0.5 to 100.0
                 val speedPath = PATH + File.separator + "speed.mp3"
                 commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed)
             }
-            R.id.btn_audio_echo // setting echo effect
+            6 // setting echo effect
             -> {
                 val echo = 1000 // echo effect, range from 0 to 90000
                 val echoPath = PATH + File.separator + "echo.mp3"
                 commandLine = FFmpegUtil.audioEcho(srcFile, echo, echoPath)
             }
-            R.id.btn_audio_tremolo //tremolo effect
+            7 //tremolo effect
             -> {
                 val frequency = 5 // range from 0.1 to 20000.0
                 val depth = 0.9f // range from 0 to 1
                 val tremoloPath = PATH + File.separator + "tremolo.mp3"
                 commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, tremoloPath)
             }
-            R.id.btn_audio_denoise //audio denoise
+            8 //audio denoise
             -> {
                 val noisePath = PATH + File.separator + "denoise.mp3"
                 commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
             }
-            R.id.btn_audio_equalizer // equalizer plus
+            9 // equalizer plus
             -> {
                 // key:band  value:gain=[0-20]
                 val bandList = arrayListOf<String>()
@@ -274,15 +256,39 @@ class AudioHandleActivity : BaseActivity() {
                 val equalizePath = PATH + File.separator + "equalize.mp3"
                 commandLine = FFmpegUtil.audioEqualizer(srcFile, bandList, equalizePath)
             }
-            R.id.btn_audio_silence //silence detect
+            10 //silence detect
             -> {
                 commandLine = FFmpegUtil.audioSilenceDetect(srcFile)
             }
-            R.id.btn_audio_volume // modify volume
+            11 // modify volume
             -> {
                 val volume = 0.5f // 0.0-1.0
                 val volumePath = PATH + File.separator + "volume.mp3"
                 commandLine = FFmpegUtil.audioVolume(srcFile, volume, volumePath)
+            }
+            12 //audio encode
+            -> {
+                val pcmFile = PATH + File.separator + "raw.pcm"
+                val wavFile = PATH + File.separator + "convert.mp3"
+                //sample rate, normal is 8000/16000/44100
+                val sampleRate = 44100
+                //channel num of pcm
+                val channel = 2
+                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel)
+            }
+            13 //concat PCM streams
+            -> {
+                val srcPCM = PATH + File.separator + "audio.pcm"
+                val appendPCM = PATH + File.separator + "audio.pcm"
+                val concatPCM = PATH + File.separator + "concat.pcm"
+                if (!FileUtil.checkFileExist(srcPCM) || !FileUtil.checkFileExist(appendPCM)) {
+                    return
+                }
+
+                mHandler.obtainMessage(MSG_BEGIN).sendToTarget()
+                FileUtil.concatFile(srcPCM, appendPCM, concatPCM)
+                mHandler.obtainMessage(MSG_FINISH).sendToTarget()
+                return
             }
             else -> {
             }

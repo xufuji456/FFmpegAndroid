@@ -4,7 +4,7 @@
     <string name="audio_cut">音频剪切</string>
     <string name="audio_concat">音频拼接</string>
     <string name="audio_mix">音乐混音</string>
-    <string name="audio_play">AudioTrack播放</string>
+    <string name="audio_play">音频播放</string>
     <string name="audio_opensl">OpenSL播放</string>
     <string name="audio_encode">PCM编码</string>
     <string name="pcm_concat">PCM合并</string>

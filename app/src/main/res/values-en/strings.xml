@@ -4,7 +4,7 @@
     <string name="audio_cut">Audio cut</string>
     <string name="audio_concat">Audio concat</string>
     <string name="audio_mix">Audio mix</string>
-    <string name="audio_play">AudioTrack play</string>
+    <string name="audio_play">Audio play</string>
     <string name="audio_opensl">OpenSL play</string>
     <string name="audio_encode">PCM encode</string>
     <string name="pcm_concat">PCM concat</string>
