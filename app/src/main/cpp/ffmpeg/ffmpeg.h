@@ -19,13 +19,15 @@
 #ifndef FFTOOLS_FFMPEG_H
 #define FFTOOLS_FFMPEG_H
 
-#include "config.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <signal.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "cmdutils.h"
+#include "config.h"
 
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
@@ -45,6 +47,9 @@
 #include "libavutil/threadmessage.h"
 
 #include "libswresample/swresample.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define VSYNC_AUTO       -1
 #define VSYNC_PASSTHROUGH 0
