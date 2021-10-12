@@ -113,12 +113,8 @@ extern "C" {
 #include <time.h>
 #include <setjmp.h>
 
-jmp_buf jump_buf;
-
 const char program_name[] = "ffmpeg";
 const int program_birth_year = 2000;
-
-static FILE *vstats_file;
 
 const char *const forced_keyframes_const_names[] = {
     "n",
@@ -147,12 +143,17 @@ static int nb_frames_drop = 0;
 static int64_t decode_error_stat[2];
 
 static int want_sdp = 1;
-
 static BenchmarkTimeStamps current_time;
-AVIOContext *progress_avio = NULL;
-
 static uint8_t *subtitle_out;
 
+static volatile int received_sigterm = 0;
+static volatile int received_nb_signals = 0;
+static atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
+static volatile int ffmpeg_exited = 0;
+static int main_return_code = 0;
+static FILE *vstats_file;
+
+AVIOContext *progress_avio = NULL;
 InputStream **input_streams = NULL;
 int        nb_input_streams = 0;
 InputFile   **input_files   = NULL;
@@ -167,6 +168,8 @@ FilterGraph **filtergraphs;
 int        nb_filtergraphs;
 
 int cancel_execute = 0;
+jmp_buf jump_buf;
+
 #if HAVE_TERMIOS_H
 
 /* init terminal so that we can grab keys */
@@ -340,12 +343,6 @@ void term_exit(void)
     av_log(NULL, AV_LOG_QUIET, "%s", "");
     term_exit_sigsafe();
 }
-
-static volatile int received_sigterm = 0;
-static volatile int received_nb_signals = 0;
-static atomic_int transcode_init_done = ATOMIC_VAR_INIT(0);
-static volatile int ffmpeg_exited = 0;
-static int main_return_code = 0;
 
 static void
 sigterm_handler(int sig)

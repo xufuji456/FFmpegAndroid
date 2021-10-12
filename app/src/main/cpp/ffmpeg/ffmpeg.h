@@ -578,6 +578,7 @@ extern OutputStream **output_streams;
 extern int         nb_output_streams;
 extern OutputFile   **output_files;
 extern int         nb_output_files;
+extern AVIOContext *progress_avio;
 
 extern FilterGraph **filtergraphs;
 extern int        nb_filtergraphs;
@@ -608,7 +609,6 @@ extern int print_stats;
 extern int qp_hist;
 extern int stdin_interaction;
 extern int frame_bits_per_raw_sample;
-extern AVIOContext *progress_avio;
 extern float max_error_rate;
 extern char *videotoolbox_pixfmt;
 
