@@ -58,7 +58,7 @@ static HWDevice *hw_device_add(void)
         nb_hw_devices = 0;
         return NULL;
     }
-    hw_devices[nb_hw_devices] = av_mallocz(sizeof(HWDevice));
+    hw_devices[nb_hw_devices] = static_cast<HWDevice *>(av_mallocz(sizeof(HWDevice)));
     if (!hw_devices[nb_hw_devices])
         return NULL;
     return hw_devices[nb_hw_devices++];
@@ -74,7 +74,7 @@ static char *hw_device_default_name(enum AVHWDeviceType type)
     size_t index_pos;
     int index, index_limit = 1000;
     index_pos = strlen(type_name);
-    name = av_malloc(index_pos + 4);
+    name = static_cast<char *>(av_malloc(index_pos + 4));
     if (!name)
         return NULL;
     for (index = 0; index < index_limit; index++) {
@@ -432,7 +432,7 @@ int hw_device_setup_for_encode(OutputStream *ost)
 
 static int hwaccel_retrieve_data(AVCodecContext *avctx, AVFrame *input)
 {
-    InputStream *ist = avctx->opaque;
+    InputStream *ist = static_cast<InputStream *>(avctx->opaque);
     AVFrame *output = NULL;
     enum AVPixelFormat output_format = ist->hwaccel_output_format;
     int err;
@@ -474,7 +474,7 @@ fail:
 
 int hwaccel_decode_init(AVCodecContext *avctx)
 {
-    InputStream *ist = avctx->opaque;
+    InputStream *ist = static_cast<InputStream *>(avctx->opaque);
 
     ist->hwaccel_retrieve_data = &hwaccel_retrieve_data;
 
