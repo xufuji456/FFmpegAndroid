@@ -21,7 +21,7 @@ add_library( # Sets the name of the library.
             src/main/cpp/ffmpeg/cmdutils.c
             src/main/cpp/ffmpeg/ffmpeg.cpp
             src/main/cpp/ffmpeg/ffmpeg_filter.c
-            src/main/cpp/ffmpeg/ffmpeg_opt.c
+            src/main/cpp/ffmpeg/ffmpeg_opt.cpp
             src/main/cpp/ffmpeg_cmd.c
             src/main/cpp/ffmpeg/ffprobe.c
             src/main/cpp/ffmpeg/ffmpeg_hw.cpp
