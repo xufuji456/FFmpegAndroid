@@ -18,7 +18,7 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
 
-            src/main/cpp/ffmpeg/cmdutils.c
+            src/main/cpp/ffmpeg/cmdutils.cpp
             src/main/cpp/ffmpeg/ffmpeg.cpp
             src/main/cpp/ffmpeg/ffmpeg_filter.cpp
             src/main/cpp/ffmpeg/ffmpeg_opt.cpp
