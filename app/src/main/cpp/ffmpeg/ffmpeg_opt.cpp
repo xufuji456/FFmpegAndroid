@@ -315,7 +315,7 @@ static int opt_map(void *optctx, const char *opt, const char *arg)
         /* this mapping refers to lavfi output */
         const char *c = map + 1;
 //        GROW_ARRAY(o->stream_maps, o->nb_stream_maps);
-        o->stream_maps = (StreamMap *)(grow_array(o->stream_maps, sizeof(o->stream_maps),
+        o->stream_maps = (StreamMap *)(grow_array(o->stream_maps, sizeof(*o->stream_maps),
                 &o->nb_stream_maps, o->nb_stream_maps + 1));
         m = &o->stream_maps[o->nb_stream_maps - 1];
         m->linklabel = av_get_token(&c, "]");
@@ -351,7 +351,7 @@ static int opt_map(void *optctx, const char *opt, const char *arg)
                     continue;
                 }
 //                GROW_ARRAY(o->stream_maps, o->nb_stream_maps);
-                o->stream_maps = (StreamMap *)(grow_array(o->stream_maps, sizeof(o->stream_maps),
+                o->stream_maps = (StreamMap *)(grow_array(o->stream_maps, sizeof(*o->stream_maps),
                                                           &o->nb_stream_maps, o->nb_stream_maps + 1));
                 m = &o->stream_maps[o->nb_stream_maps - 1];
 
@@ -390,7 +390,7 @@ static int opt_attach(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = static_cast<OptionsContext *>(optctx);
 //    GROW_ARRAY(o->attachments, o->nb_attachments);
-    o->attachments = (const char **)(grow_array(o->attachments, sizeof(o->attachments),
+    o->attachments = (const char **)(grow_array(o->attachments, sizeof(*o->attachments),
                                               &o->nb_attachments, o->nb_attachments + 1));
     o->attachments[o->nb_attachments - 1] = arg;
     return 0;
@@ -409,7 +409,7 @@ static int opt_map_channel(void *optctx, const char *opt, const char *arg)
         return AVERROR(ENOMEM);
 
 //    GROW_ARRAY(o->audio_channel_maps, o->nb_audio_channel_maps);
-    o->audio_channel_maps = (AudioChannelMap *)(grow_array(o->audio_channel_maps, sizeof(o->audio_channel_maps),
+    o->audio_channel_maps = (AudioChannelMap *)(grow_array(o->audio_channel_maps, sizeof(*o->audio_channel_maps),
                                                 &o->nb_audio_channel_maps, o->nb_audio_channel_maps + 1));
     m = &o->audio_channel_maps[o->nb_audio_channel_maps - 1];
 
@@ -736,7 +736,7 @@ static void add_input_streams(OptionsContext *o, AVFormatContext *ic)
             exit_program(1);
 
 //        GROW_ARRAY(input_streams, nb_input_streams);
-        input_streams = (InputStream **)(grow_array(input_streams, sizeof(input_streams),
+        input_streams = (InputStream **)(grow_array(input_streams, sizeof(*input_streams),
                                                                &nb_input_streams, nb_input_streams + 1));
         input_streams[nb_input_streams - 1] = ist;
 
@@ -1206,7 +1206,7 @@ static int open_input_file(OptionsContext *o, const char *filename)
     av_dump_format(ic, nb_input_files, filename, 0);
 
 //    GROW_ARRAY(input_files, nb_input_files);
-    input_files = (InputFile **) (grow_array(input_files, sizeof(input_files), &nb_input_files, nb_input_files + 1));
+    input_files = (InputFile **) (grow_array(input_files, sizeof(*input_files), &nb_input_files, nb_input_files + 1));
     f = static_cast<InputFile *>(av_mallocz(sizeof(*f)));
     if (!f)
         exit_program(1);
@@ -1383,7 +1383,7 @@ static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, e
         st->id = o->streamid_map[oc->nb_streams - 1];
 
 //    GROW_ARRAY(output_streams, nb_output_streams);
-    output_streams = (OutputStream **) (grow_array(output_streams, sizeof(output_streams), &nb_output_streams, nb_output_streams + 1));
+    output_streams = (OutputStream **) (grow_array(output_streams, sizeof(*output_streams), &nb_output_streams, nb_output_streams + 1));
     if (!(ost = static_cast<OutputStream *>(av_mallocz(sizeof(*ost)))))
         exit_program(1);
     output_streams[nb_output_streams - 1] = ost;
@@ -2212,7 +2212,7 @@ static int open_output_file(OptionsContext *o, const char *filename)
     }
 
 //    GROW_ARRAY(output_files, nb_output_files);
-    output_files = (OutputFile **) (grow_array(output_files, sizeof(output_files), &nb_output_files, nb_output_files + 1));
+    output_files = (OutputFile **) (grow_array(output_files, sizeof(*output_files), &nb_output_files, nb_output_files + 1));
     of = static_cast<OutputFile *>(av_mallocz(sizeof(*of)));
     if (!of)
         exit_program(1);
@@ -3220,7 +3220,7 @@ static int opt_audio_qscale(void *optctx, const char *opt, const char *arg)
 static int opt_filter_complex(void *optctx, const char *opt, const char *arg)
 {
 //    GROW_ARRAY(filtergraphs, nb_filtergraphs);
-    filtergraphs = (FilterGraph **) (grow_array(filtergraphs, sizeof(filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1));
+    filtergraphs = (FilterGraph **) (grow_array(filtergraphs, sizeof(*filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1));
     if (!(filtergraphs[nb_filtergraphs - 1] = static_cast<FilterGraph *>(av_mallocz(
             sizeof(*filtergraphs[0])))))
         return AVERROR(ENOMEM);
@@ -3241,7 +3241,7 @@ static int opt_filter_complex_script(void *optctx, const char *opt, const char *
         return AVERROR(EINVAL);
 
 //    GROW_ARRAY(filtergraphs, nb_filtergraphs);
-    filtergraphs = (FilterGraph **) (grow_array(filtergraphs, sizeof(filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1));
+    filtergraphs = (FilterGraph **) (grow_array(filtergraphs, sizeof(*filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1));
     if (!(filtergraphs[nb_filtergraphs - 1] = static_cast<FilterGraph *>(av_mallocz(
             sizeof(*filtergraphs[0])))))
         return AVERROR(ENOMEM);

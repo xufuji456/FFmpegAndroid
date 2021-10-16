@@ -226,7 +226,7 @@ int init_simple_filtergraph(InputStream *ist, OutputStream *ost)
     fg->index = nb_filtergraphs;
 
 //    GROW_ARRAY(fg->outputs, fg->nb_outputs);
-    fg->outputs = (OutputFilter **) grow_array(fg->outputs, sizeof(fg->outputs), &fg->nb_outputs, fg->nb_outputs + 1);
+    fg->outputs = (OutputFilter **) grow_array(fg->outputs, sizeof(*fg->outputs), &fg->nb_outputs, fg->nb_outputs + 1);
     if (!(fg->outputs[0] = (OutputFilter *)av_mallocz(sizeof(*fg->outputs[0]))))
         exit_program(1);
     fg->outputs[0]->ost   = ost;
@@ -236,7 +236,7 @@ int init_simple_filtergraph(InputStream *ist, OutputStream *ost)
     ost->filter = fg->outputs[0];
 
 //    GROW_ARRAY(fg->inputs, fg->nb_inputs);
-    fg->inputs = (InputFilter **) grow_array(fg->inputs, sizeof(fg->inputs), &fg->nb_inputs, fg->nb_inputs + 1);
+    fg->inputs = (InputFilter **) grow_array(fg->inputs, sizeof(*fg->inputs), &fg->nb_inputs, fg->nb_inputs + 1);
     if (!(fg->inputs[0] = (InputFilter *)av_mallocz(sizeof(*fg->inputs[0]))))
         exit_program(1);
     fg->inputs[0]->ist   = ist;
@@ -248,11 +248,11 @@ int init_simple_filtergraph(InputStream *ist, OutputStream *ost)
         exit_program(1);
 
 //    GROW_ARRAY(ist->filters, ist->nb_filters);
-    ist->filters = (InputFilter **) grow_array(ist->filters, sizeof(ist->filters), &ist->nb_filters, ist->nb_filters + 1);
+    ist->filters = (InputFilter **) grow_array(ist->filters, sizeof(*ist->filters), &ist->nb_filters, ist->nb_filters + 1);
     ist->filters[ist->nb_filters - 1] = fg->inputs[0];
 
 //    GROW_ARRAY(filtergraphs, nb_filtergraphs);
-    filtergraphs = (FilterGraph **) grow_array(filtergraphs, sizeof(filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1);
+    filtergraphs = (FilterGraph **) grow_array(filtergraphs, sizeof(*filtergraphs), &nb_filtergraphs, nb_filtergraphs + 1);
     filtergraphs[nb_filtergraphs - 1] = fg;
 
     return 0;
@@ -347,7 +347,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
     ist->decoding_needed |= DECODING_FOR_FILTER;
     ist->st->discard = AVDISCARD_NONE;
 
-    fg->inputs = (InputFilter **) grow_array(fg->inputs, sizeof(fg->inputs), &fg->nb_inputs, fg->nb_inputs + 1);
+    fg->inputs = (InputFilter **) grow_array(fg->inputs, sizeof(*fg->inputs), &fg->nb_inputs, fg->nb_inputs + 1);
 //    GROW_ARRAY(fg->inputs, fg->nb_inputs);
     if (!(fg->inputs[fg->nb_inputs - 1] = (InputFilter *) av_mallocz(sizeof(*fg->inputs[0]))))
         exit_program(1);
@@ -362,7 +362,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
         exit_program(1);
 
 //    GROW_ARRAY(ist->filters, ist->nb_filters);
-    ist->filters = (InputFilter **) grow_array(ist->filters, sizeof(ist->filters), &ist->nb_filters, ist->nb_filters + 1);
+    ist->filters = (InputFilter **) grow_array(ist->filters, sizeof(*ist->filters), &ist->nb_filters, ist->nb_filters + 1);
     ist->filters[ist->nb_filters - 1] = fg->inputs[fg->nb_inputs - 1];
 }
 
@@ -387,7 +387,7 @@ int init_complex_filtergraph(FilterGraph *fg)
         init_input_filter(fg, cur);
 
     for (cur = outputs; cur;) {
-        fg->outputs = (OutputFilter **) grow_array(fg->outputs, sizeof(fg->outputs), &fg->nb_outputs, fg->nb_outputs + 1);
+        fg->outputs = (OutputFilter **) grow_array(fg->outputs, sizeof(*fg->outputs), &fg->nb_outputs, fg->nb_outputs + 1);
 //        GROW_ARRAY(fg->outputs, fg->nb_outputs);
         fg->outputs[fg->nb_outputs - 1] = (OutputFilter *) av_mallocz(sizeof(*fg->outputs[0]));
         if (!fg->outputs[fg->nb_outputs - 1])
