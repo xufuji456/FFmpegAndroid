@@ -23,9 +23,6 @@
 #include <stdio.h>
 #include <signal.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "cmdutils.h"
 #include "config.h"
 
@@ -47,9 +44,6 @@ extern "C" {
 #include "libavutil/threadmessage.h"
 
 #include "libswresample/swresample.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define VSYNC_AUTO       -1
 #define VSYNC_PASSTHROUGH 0
@@ -626,7 +620,9 @@ extern char *qsv_device;
 #endif
 extern HWDevice *filter_hw_device;
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 void term_init(void);
 void term_exit(void);
 
@@ -669,6 +665,9 @@ int hw_device_setup_for_decode(InputStream *ist);
 int hw_device_setup_for_encode(OutputStream *ost);
 
 int hwaccel_decode_init(AVCodecContext *avctx);
+#ifdef __cplusplus
+}
+#endif
 
 int run(int argc, char **argv);
 
