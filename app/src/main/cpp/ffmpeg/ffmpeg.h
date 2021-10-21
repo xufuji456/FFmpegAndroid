@@ -22,6 +22,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <signal.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "cmdutils.h"
 #include "config.h"
@@ -45,6 +48,9 @@
 
 #include "libswresample/swresample.h"
 
+#ifdef __cplusplus
+}
+#endif
 #define VSYNC_AUTO       -1
 #define VSYNC_PASSTHROUGH 0
 #define VSYNC_CFR         1

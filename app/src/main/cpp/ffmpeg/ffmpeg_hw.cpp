@@ -17,9 +17,13 @@
  */
 
 #include <string.h>
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "libavutil/avstring.h"
-
+#ifdef __cplusplus
+}
+#endif
 #include "ffmpeg.h"
 
 static int nb_hw_devices;

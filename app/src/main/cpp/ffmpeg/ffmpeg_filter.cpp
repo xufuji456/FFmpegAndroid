@@ -21,7 +21,9 @@
 #include <stdint.h>
 
 #include "ffmpeg.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "libavfilter/avfilter.h"
 #include "libavfilter/buffersink.h"
 #include "libavfilter/buffersrc.h"
@@ -36,7 +38,9 @@
 #include "libavutil/pixfmt.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/samplefmt.h"
-
+#ifdef __cplusplus
+}
+#endif
 static const enum AVPixelFormat *get_compliance_unofficial_pix_fmts(enum AVCodecID codec_id, const enum AVPixelFormat default_formats[])
 {
     static const enum AVPixelFormat mjpeg_formats[] =

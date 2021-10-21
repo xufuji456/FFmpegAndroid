@@ -28,7 +28,9 @@
 /* Include only the enabled headers since some compilers (namely, Sun
    Studio) will not omit unused inline functions and create undefined
    references to libraries that are not being built. */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "config.h"
 #include "compat/va_copy.h"
 #include "libavformat/avformat.h"
@@ -53,6 +55,10 @@
 #include "libavutil/ffversion.h"
 #include "libavutil/version.h"
 #include "cmdutils.h"
+#ifdef __cplusplus
+}
+#endif
+
 #if CONFIG_NETWORK
 #include "libavformat/network.h"
 #endif

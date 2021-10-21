@@ -22,7 +22,9 @@
 
 #include "ffmpeg.h"
 #include "cmdutils.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "libavformat/avformat.h"
 
 #include "libavcodec/avcodec.h"
@@ -40,7 +42,9 @@
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/pixfmt.h"
-
+#ifdef __cplusplus
+}
+#endif
 #define DEFAULT_PASS_LOGFILENAME_PREFIX "ffmpeg2pass"
 
 #define MATCH_PER_STREAM_OPT(name, type, outvar, fmtctx, st)\
