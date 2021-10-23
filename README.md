@@ -49,6 +49,3 @@ When it finishes probing, the result of metadata will display on screen.<br>
 ### Preview thumbnail when seeking:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
 
-***
-<br><br>
-
