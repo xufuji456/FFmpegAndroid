@@ -7,70 +7,76 @@ ffprobe用于检测多媒体流格式；ffplay用于播放视频,包括本地与
 # 一、ffmpeg命令行
 ## 1、命令行参数介绍
 Print help / information / capabilities:<br>
---help topic$~~~~~~~~$show help<br>
--version$~~~~~~~~~~~~$show version<br>
--formats$~~~~~~~~~~~~$show available formats<br>
--muxers$~~~~~~~~~~~~~$show available muxers<br>
--demuxers$~~~~~~~~~~~$show available demuxers<br>
--devices$~~~~~~~~~~~~$show available devices<br>
--codecs$~~~~~~~~~~~~~$show available codecs<br>
--decoders$~~~~~~~~~~~$show available decoders<br>
--encoders$~~~~~~~~~~~$show available encoders<br>
--bsfs$~~~~~~~~~~~~~~~$show available bit stream filters<br>
--protocols$~~~~~~~~~~$show available protocols<br>
--filters$~~~~~~~~~~~~$show available filters<br>
--pix_fmts$~~~~~~~~~~~$show available pixel formats<br>
--sample_fmts$~~~~~~~~$show available audio sample formats<br>
--hwaccels$~~~~~~~~~~~$show available HW acceleration methods<br>
+|:--------|:--------|
+|--help topic       |show help<br>
+|-version           |show version<br>
+|-formats           |show available formats<br>
+|-muxers            |show available muxers<br>
+|-demuxers          |show available demuxers<br>
+|-devices           |show available devices<br>
+|-codecs            |show available codecs<br>
+|-decoders          |show available decoders<br>
+|-encoders          |show available encoders<br>
+|-bsfs              |show available bit stream filters<br>
+|-protocols         |show available protocols<br>
+|-filters           |show available filters<br>
+|-pix_fmts          |show available pixel formats<br>
+|-sample_fmts       |show available audio sample formats<br>
+|-hwaccels          |show available HW acceleration methods<br>
 
 Global options (affect whole program instead of just one file:<br>
--v loglevel$~~~~~~~~~$set logging level<br>
--y$~~~~~~~~~~~~~~~~~~$overwrite output files<br>
--n$~~~~~~~~~~~~~~~~~~$never overwrite output files<br>
--filter_threads$~~~~~$number of non-complex filter threads<br>
--stats$~~~~~~~~~~~~~~$print progress report during encoding<br>
--vol volume$~~~~~~~~~$change audio volume (256=normal)<br>
+|:--------|:--------|
+|-v loglevel        |set logging level<br>
+|-y                 |overwrite output files<br>
+|-n                 |never overwrite output files<br>
+|-filter_threads    |number of non-complex filter threads<br>
+|-stats             |print progress report during encoding<br>
+|-vol volume        |change audio volume (256=normal)<br>
 
 Per-file main options:<br>
--f fmt$~~~~~~~~~~~~~~$force format<br>
--c codec$~~~~~~~~~~~~$codec name<br>
--codec codec$~~~~~~~~$codec name<br>
--t duration$~~~~~~~~~$record or transcode "duration" seconds of audio/video<br>
--to time_stop$~~~~~~~$record or transcode stop time<br>
--fs limit_size$~~~~~~$set the limit file size in bytes<br>
--ss time_off$~~~~~~~~$set the start time offset<br>
--sseof time_off$~~~~~$set the start time offset relative to EOF<br>
--frames number$~~~~~~$set the number of frames to output<br>
--filter filter_graph set stream filtergraph<br>
--discard$~~~~~~~~~~~~$discard<br>
--disposition$~~~~~~~~$disposition<br>
+|:--------|:--------|
+|-f fmt             |force format<br>
+|-c codec           |codec name<br>
+|-codec codec       |codec name<br>
+|-t duration        |record or transcode "duration" seconds of audio/video<br>
+|-to time_stop      |record or transcode stop time<br>
+|-fs limit_size     |set the limit file size in bytes<br>
+|-ss time_off       |set the start time offset<br>
+|-sseof time_off    |set the start time offset relative to EOF<br>
+|-frames number     |set the number of frames to output<br>
+|-filter filter_graph |set stream filtergraph<br>
+|-discard           |discard<br>
+|-disposition       |disposition<br>
 
 Video options:<br>
--vframes number$~~~~~$set the number of video frames to output<br>
--r rate$~~~~~~~~~~~~~$set frame rate (Hz value, fraction or abbreviation)<br>
--s size$~~~~~~~~~~~~~$set frame size (WxH or abbreviation)<br>
--aspect aspect$~~~~~~$set aspect ratio (4:3, 16:9 or 1.3333, 1.7777)<br>
--bits_per_raw_sample number  set the number of bits per raw sample<br>
--vn$~~~~~~~~~~~~~~~~~$disable video<br>
--vcodec codec$~~~~~~~$force video codec ('copy' to copy stream)<br>
--vf filter_graph$~~~~$set video filters<br>
--ab bitrate$~~~~~~~~~$audio bitrate (please use -b:a)<br>
--b bitrate$~~~~~~~~~~$video bitrate (please use -b:v)<br>
+|:--------|:--------|
+|-vframes number    |set the number of video frames to output<br>
+|-r rate            |set frame rate (Hz value, fraction or abbreviation)<br>
+|-s size            |set frame size (WxH or abbreviation)<br>
+|-aspect aspect     |set aspect ratio (4:3, 16:9 or 1.3333, 1.7777)<br>
+|-bits_per_raw_sample |number  set the number of bits per raw sample<br>
+|-vn                |disable video<br>
+|-vcodec codec      |force video codec ('copy' to copy stream)<br>
+|-vf filter_graph   |set video filters<br>
+|-ab bitrate        |audio bitrate (please use -b:a)<br>
+|-b bitrate         |video bitrate (please use -b:v)<br>
 
 Audio options:<br>
--aframes number$~~~~~$set the number of audio frames to output<br>
--aq quality$~~~~~~~~~$set audio quality (codec-specific)<br>
--ar rate$~~~~~~~~~~~~$set audio sampling rate (in Hz)<br>
--ac channels$~~~~~~~~$set number of audio channels<br>
--an$~~~~~~~~~~~~~~~~~$disable audio<br>
--acodec codec$~~~~~~~$force audio codec ('copy' to copy stream)<br>
--vol volume$~~~~~~~~~$change audio volume (256=normal)<br>
--af filter_graph$~~~~$set audio filters<br>
+|:--------|:--------|
+|-aframes number    |set the number of audio frames to output<br>
+|-aq quality        |set audio quality (codec-specific)<br>
+|-ar rate           |set audio sampling rate (in Hz)<br>
+|-ac channels       |set number of audio channels<br>
+|-an                |disable audio<br>
+|-acodec codec      |force audio codec ('copy' to copy stream)<br>
+|-vol volume        |change audio volume (256=normal)<br>
+|-af filter_graph   |set audio filters<br>
 
 Subtitle options:<br>
--s size$~~~~~~~~~~~~~$set frame size<br>
--sn$~~~~~~~~~~~~~~~~~$disable subtitle<br>
--scodec codec$~~~~~~~$force subtitle codec ('copy' to copy stream)<br>
+|:--------|:--------|
+|-s size            |set frame size<br>
+|-sn                |disable subtitle<br>
+|-scodec codec      |force subtitle codec ('copy' to copy stream)<br>
 
 命令行整体格式：以ffmpeg开头，参数之间用空格隔开，每个参数key以"-"开头，后面跟着参数value，输出文件放在命令行最后。<br>
 
