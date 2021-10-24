@@ -6,67 +6,66 @@ ffprobe用于检测多媒体流格式；ffplay用于播放视频,包括本地与
 
 # 一、ffmpeg命令行
 ## 1、命令行参数介绍
-Print help / information / capabilities:<br>
--help&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show help<br>
--version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show version<br>
--formats&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available formats<br>
--muxers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available muxers<br>
--demuxers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available demuxers<br>
--devices&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available devices<br>
--codecs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available codecs<br>
--decoders&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available decoders<br>
--encoders&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available encoders<br>
--bsfs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available bit stream filters<br>
--protocols&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available protocols<br>
--filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available filters<br>
--pix_fmts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available pixel formats<br>
--sample_fmts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available audio sample formats<br>
--hwaccels&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show available HW acceleration methods<br>
 
-Global options (affect whole program instead of just one file:<br>
--v loglevel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set logging level<br>
--y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;overwrite output files<br>
--n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;never overwrite output files<br>
--filter_threads&nbsp;&nbsp;&nbsp;number of non-complex filter threads<br>
--stats&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print progress report during encoding<br>
--vol volume&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change audio volume (256=normal)<br>
+ | Print help/info:   | Description                    |
+ |:-------------------|:-------------------------------|
+ | --help topic       | show help                      |
+ | -version           | show version                   |
+ | -formats           | show available formats         |
+ | -muxers            | show available muxers          |
+ | -demuxers          | show available demuxers        |
+ | -devices           | show available devices         |
+ | -codecs            | show available codecs          |
+ | -decoders          | show available decoders        |
+ | -encoders          | show available encoders        |
+ | -protocols         | show available protocols       |
+ | -filters           | show available filters         |
+ | -pix_fmts          | show available pixel formats   |
+ | -sample_fmts       | show available sample formats  |
+ | -hwaccels          | show available HW acceleration |
 
-Per-file main options:<br>
--f fmt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;force format<br>
--c codec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;codec name<br>
--codec codec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;codec name<br>
--t duration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;record or transcode "duration" seconds of audio/video<br>
--to time_stop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;record or transcode stop time<br>
--fs limit_size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the limit file size in bytes<br>
--ss time_off&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the start time offset<br>
--sseof time_off&nbsp;&nbsp;&nbsp;set the start time offset relative to EOF<br>
--frames number&nbsp;&nbsp;&nbsp;set the number of frames to output<br>
+ | Global options:    | Description                    |
+ |:-------------------|:-------------------------------|
+ | -v loglevel        | set logging level              |
+ | -y                 | overwrite output files         |
+ | -n                 | never overwrite output files   |
+ | -filter_threads    | number of filter threads       |
+ | -vol volume        | change audio volume(256=normal)|
 
-Video options:<br>
--vframes number&nbsp;&nbsp;&nbsp;&nbsp;set the number of video frames to output<br>
--r rate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set frame rate (Hz value, fraction or abbreviation)<br>
--s size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set frame size (WxH or abbreviation)<br>
--aspect aspect&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set aspect ratio (4:3, 16:9 or 1.3333, 1.7777)<br>
--vn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disable video<br>
--vcodec codec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;force video codec ('copy' to copy stream)<br>
--vf filter_graph&nbsp;&nbsp;&nbsp;&nbsp;set video filters<br>
--ab bitrate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;audio bitrate (please use -b:a)<br>
--b bitrate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;video bitrate (please use -b:v)<br>
+ | main options:      | Description                    |
+ |:-------------------|:-------------------------------|
+ | -f fmt             | force format                   |
+ | -c codec           | codec name                     |
+ | -codec codec       | codec name                     |
+ | -t duration        | duration seconds of audio/video|
+ | -to time_stop      | record or transcode stop time  |
+ | -ss time_off       | set the start time offset      |
+ | -frames number     | set the number of frames       |
+ | -discard           | discard                        |
+ | -disposition       | disposition                    |
 
-Audio options:<br>
--aframes number&nbsp;&nbsp;&nbsp;set the number of audio frames to output<br>
--aq quality&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set audio quality (codec-specific)<br>
--ar rate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set audio sampling rate (in Hz)<br>
--ac channels&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set number of audio channels<br>
--an&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disable audio<br>
--acodec codec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;force audio codec ('copy' to copy stream)<br>
--vol volume&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;change audio volume (256=normal)<br>
--af filter_graph&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set audio filters<br>
+ | Video options:     | Description                    |
+ |:-------------------|:-------------------------------|
+ | -vframes number    | set the number of video frames |
+ | -r rate            | set frame rate (Hz value)      |
+ | -s size            | set frame size                 |
+ | -aspect aspect     | set aspect ratio (4:3, 16:9)   |
+ | -vn                | disable video                  |
+ | -vcodec codec      | force video codec              |
+ | -vf filter_graph   | set video filters              |
+ | -ab bitrate        | audio bitrate (please use -b:a)|
+ | -b bitrate         | video bitrate (please use -b:v)|
 
-Subtitle options:<br>
--s size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set frame size<br>
--sn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;disable subtitle<br>
--scodec codec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;force subtitle codec ('copy' to copy stream)<br>
+ | Audio options:     | Description                    |
+ |:-------------------|:-------------------------------|
+ | -aframes number    | set the number of audio frames |
+ | -aq quality        | set audio quality              |
+ | -ar rate           | set audio sampling rate (in Hz)|
+ | -ac channels       | set number of audio channels   |
+ | -an                | disable audio                  |
+ | -acodec codec      | force audio codec              |
+ | -vol volume        | change audio volume(256=normal)|
+ | -af filter_graph   | set audio filters              |
 
 命令行整体格式：以ffmpeg开头，参数之间用空格隔开，每个参数key以"-"开头，后面跟着参数value，输出文件放在命令行最后。<br>
 
@@ -183,6 +182,9 @@ ffmpeg -ss 20 -accurate_seek -t 10 -i input.mp4 -an -r 5 %3d.jpg<br>
 ### 3.11 播放速度
 使用setpts设置视频速度，atempo设置音频速度：<br>
 ffmpeg -i in.mp4 -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] out.mp4<br>
+
+### 3.12 旋转视频
+ffmpeg -i in.mp4 -c copy -metadata:s\:v:0 rotate=90 out.mp4<br>
 
 # 二、ffplay命令行
 ffplay主要用于播放视频，也可以播放网络流，示例如下：<br>
