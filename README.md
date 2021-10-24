@@ -2,6 +2,7 @@
 android端基于FFmpeg库的使用<br>
 添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 
+### [FFmpeg官方文档](https://ffmpeg.org/)
 ### [查看FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
 
 目前音视频相关处理：<br>
