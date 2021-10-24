@@ -32,111 +32,118 @@ swscale提供图像缩放与像素格式转换，swresample提供音频重采样
  | --list-protocols        | show all available protocols|
  | --list-filters          | show all available filters  |
 
-Licensing options:
-  --enable-gpl             allow use of GPL code [no]
-  --enable-version3        upgrade (L)GPL to version 3 [no]
-  --enable-nonfree         allow use of nonfree code [no]
+ | Licensing options:      | Description                 |
+ |:------------------------|:----------------------------|
+ | --enable-gpl            | allow use of GPL code       |
+ | --enable-version3       | upgrade (L)GPL to version 3 |
+ | --enable-nonfree        | allow use of nonfree code   |
 
-Configuration options:
-  --prefix=PREFIX          install in PREFIX [/usr/local]
-  --disable-static         do not build static libraries [no]
-  --enable-shared          build shared libraries [no]
-  --enable-small           optimize for size instead of speed
-  --disable-all            disable components, libraries
-  --disable-autodetect     disable detected external libraries
+ | Configuration options:  | Description                 |
+ |:------------------------|:----------------------------|
+ | --prefix=PREFIX         | install in PREFIX           |
+ | --disable-static        | do not build static libs    |
+ | --enable-shared         | build shared libraries [no] |
+ | --enable-small          | optimize for size           |
+ | --disable-all           | disable components, libs    |
+ | --disable-autodetect    | disable detect external libs|
 
-Program options:
-  --disable-programs       do not build command line programs
-  --disable-ffmpeg         disable ffmpeg build
-  --disable-ffplay         disable ffplay build
-  --disable-ffprobe        disable ffprobe build
+ | Program options:        |                             |
+ |:------------------------|:----------------------------|
+ | --disable-programs      | don't build command line    |
+ | --disable-ffmpeg        | disable ffmpeg build        |
+ | --disable-ffplay        | disable ffplay build        |
+ | --disable-ffprobe       | disable ffprobe build       |
 
-Component options:
-  --disable-avdevice       disable libavdevice build
-  --disable-avcodec        disable libavcodec build
-  --disable-avformat       disable libavformat build
-  --disable-swresample     disable libswresample build
-  --disable-swscale        disable libswscale build
-  --disable-postproc       disable libpostproc build
-  --disable-avfilter       disable libavfilter build
-  --disable-pthreads       disable pthreads
-  --disable-network        disable network support [no]
+ | Component options:      | Description                 |
+ |:------------------------|:----------------------------|
+ | --disable-avdevice      | disable libavdevice build   |
+ | --disable-avcodec       | disable libavcodec build    |
+ | --disable-avformat      | disable libavformat build   |
+ | --disable-swresample    | disable libswresample build |
+ | --disable-swscale       | disable libswscale build    |
+ | --disable-postproc      | disable libpostproc build   |
+ | --disable-avfilter      | disable libavfilter build   |
+ | --disable-pthreads      | disable pthreads            |
+ | --disable-network       | disable network support     |
 
-Individual component options:
-  --disable-everything     disable all components
-  --disable-encoder=NAME   disable encoder NAME
-  --enable-encoder=NAME    enable encoder NAME
-  --disable-encoders       disable all encoders
-  --disable-decoder=NAME   disable decoder NAME
-  --enable-decoder=NAME    enable decoder NAME
-  --disable-decoders       disable all decoders
-  --disable-muxer=NAME     disable muxer NAME
-  --enable-muxer=NAME      enable muxer NAME
-  --disable-muxers         disable all muxers
-  --disable-demuxer=NAME   disable demuxer NAME
-  --enable-demuxer=NAME    enable demuxer NAME
-  --disable-demuxers       disable all demuxers
-  --enable-parser=NAME     enable parser NAME
-  --disable-parser=NAME    disable parser NAME
-  --disable-parsers        disable all parsers
-  --enable-protocol=NAME   enable protocol NAME
-  --disable-protocol=NAME  disable protocol NAME
-  --disable-protocols      disable all protocols
-  --enable-filter=NAME     enable filter NAME
-  --disable-filter=NAME    disable filter NAME
-  --disable-filters        disable all filters
+ | Individual component:   | Description                 |
+ |:------------------------|:----------------------------|
+ | --disable-everything    | disable all components      |
+ | --disable-encoder=NAME  | disable encoder NAME        |
+ | --enable-encoder=NAME   | enable encoder NAME         |
+ | --disable-encoders      | disable all encoders        |
+ | --disable-decoder=NAME  | disable decoder NAME        |
+ | --enable-decoder=NAME   | enable decoder NAME         |
+ | --disable-decoders      | disable all decoders        |
+ | --disable-muxer=NAME    | disable muxer NAME          |
+ | --enable-muxer=NAME     | enable muxer NAME           |
+ | --disable-muxers        | disable all muxers          |
+ | --disable-demuxer=NAME  | disable demuxer NAME        |
+ | --enable-demuxer=NAME   | enable demuxer NAME         |
+ | --disable-demuxers      | disable all demuxers        |
+ | --enable-parser=NAME    | enable parser NAME          |
+ | --disable-parser=NAME   | disable parser NAME         |
+ | --disable-parsers       | disable all parsers         |
+ | --enable-protocol=NAME  | enable protocol NAME        |
+ | --disable-protocol=NAME | disable protocol NAME       |
+ | --disable-protocols     | disable all protocols       |
+ | --enable-filter=NAME    | enable filter NAME          |
+ | --disable-filter=NAME   | disable filter NAME         |
+ | --disable-filters       | disable all filters         |
 
-External library support:
-  --disable-avfoundation   disable Apple AVFoundation framework
-  --enable-jni             enable JNI support [no]
-  --enable-libaom          enable AV1 video codec via libaom [no]
-  --enable-libass          enable libass subtitles rendering [no]
-  --enable-libdav1d        enable AV1 decoding via libdav1d [no]
-  --enable-libfdk-aac      enable AAC de/encoding via libfdk-aac [no]
-  --enable-libfontconfig   enable libfontconfig [no]
-  --enable-libfreetype     enable libfreetype, needed for drawtext
-  --enable-libfribidi      enable libfribidi, improves drawtext filter
-  --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
-  --enable-libopencv       enable video filtering via libopencv [no]
-  --enable-libopenh264     enable H.264 encoding via OpenH264 [no]
-  --enable-libopus         enable Opus de/encoding via libopus [no]
-  --enable-librtmp         enable RTMP[E] support via librtmp [no]
-  --enable-libshine        enable fixed-point MP3 encoding
-  --enable-libsoxr         enable Include libsoxr resampling [no]
-  --enable-libspeex        enable Speex de/encoding via libspeex [no]
-  --enable-libtensorflow   enable TensorFlow as a DNN module [no]
-  --enable-libvorbis       enable Vorbis en/decoding via libvorbis
-  --enable-libvpx          enable VP8 and VP9 de/encoding via libvpx
-  --enable-libx264         enable H.264 encoding via x264 [no]
-  --enable-libx265         enable HEVC encoding via x265 [no]
-  --enable-mediacodec      enable Android MediaCodec support [no]
-  --enable-opengl          enable OpenGL rendering [no]
-  --enable-openssl         enable openssl, needed for https support
+ | External library:       | Description                              |
+ |:------------------------|:-----------------------------------------|
+ | --disable-avfoundation  | disable Apple AVFoundation framework     |
+ | --enable-jni            | enable JNI support [no]                  |
+ | --enable-libaom         | enable AV1 video codec via libaom [no]   |
+ | --enable-libass         | enable libass subtitles rendering [no]   |
+ | --enable-libdav1d       | enable AV1 decoding via libdav1d [no]    |
+ | --enable-libfdk-aac     | enable AAC de/encoding via libfdk-aac    |
+ | --enable-libfontconfig  | enable libfontconfig [no]                |
+ | --enable-libfreetype    | enable libfreetype, needed for drawtext  |
+ | --enable-libfribidi     | enable libfribidi, improves drawtext     |
+ | --enable-libmp3lame     | enable MP3 encoding via libmp3lame [no]  |
+ | --enable-libopencv      | enable video filtering via libopencv [no]|
+ | --enable-libopenh264    | enable H.264 encoding via OpenH264 [no]  |
+ | --enable-libopus        | enable Opus de/encoding via libopus [no] |
+ | --enable-librtmp        | enable RTMP[E] support via librtmp [no]  |
+ | --enable-libshine       | enable fixed-point MP3 encoding          |
+ | --enable-libsoxr        | enable Include libsoxr resampling [no]   |
+ | --enable-libspeex       | enable Speex de/encoding via libspeex    |
+ | --enable-libtensorflow  | enable TensorFlow as a DNN module [no]   |
+ | --enable-libvorbis      | enable Vorbis en/decoding via libvorbis  |
+ | --enable-libvpx         | enable VP8 and VP9 de/encoding via libvpx|
+ | --enable-libx264        | enable H.264 encoding via x264 [no]      |
+ | --enable-libx265        | enable HEVC encoding via x265 [no]       |
+ | --enable-mediacodec     | enable Android MediaCodec support [no]   |
+ | --enable-opengl         | enable OpenGL rendering [no]             |
+ | --enable-openssl        | enable openssl, needed for https support |
 
-Toolchain options:
-  --arch=ARCH              select architecture []
-  --cpu=CPU                select the minimum required CPU
-  --cross-prefix=PREFIX    use PREFIX for compilation tools []
-  --enable-cross-compile   assume a cross-compiler is used
-  --sysroot=PATH           root of cross-build tree
-  --target-os=OS           compiler targets OS []
-  --toolchain=NAME         set tool defaults according to name
-  --nm=NM                  use nm tool NM [nm -g]
-  --ar=AR                  use archive tool AR [ar]
-  --as=AS                  use assembler AS []
-  --strip=STRIP            use strip tool STRIP [strip]
-  --cc=CC                  use C compiler CC [gcc]
-  --cxx=CXX                use C compiler CXX [g++]
-  --ld=LD                  use linker LD []
-  --host-cc=HOSTCC         use host C compiler HOSTCC
-  --host-cflags=HCFLAGS    use HCFLAGS when compiling for host
-  --host-ld=HOSTLD         use host linker HOSTLD
-  --host-ldflags=HLDFLAGS  use HLDFLAGS when linking for host
-  --host-extralibs=HLIBS   use libs HLIBS when linking for host
-  --host-os=OS             compiler host OS []
-  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS []
-  --extra-cxxflags=ECFLAGS add ECFLAGS to CXXFLAGS []
-  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS []
+ | Toolchain options:      | Description                 |
+ |:------------------------|:----------------------------|
+ | --arch=ARCH             | select architecture         |
+ | --cpu=CPU               | select the minimum CPU      |
+ | --cross-prefix=PREFIX   | use PREFIX for compile tool |
+ | --enable-cross-compile  | assume a cross-compiler     |
+ | --sysroot=PATH          | root of cross-build tree    |
+ | --target-os=OS          | compiler targets OS         |
+ | --toolchain=NAME        | set tool according to name  |
+ | --nm=NM                 | use nm tool NM [nm -g]      |
+ | --ar=AR                 | use archive tool AR [ar]    |
+ | --as=AS                 | use assembler AS            |
+ | --strip=STRIP           | use strip tool STRIP [strip]|
+ | --cc=CC                 | use C compiler CC [gcc]     |
+ | --cxx=CXX               | use C compiler CXX [g++]    |
+ | --ld=LD                 | use linker LD               |
+ | --host-cc=HOSTCC        | use host C compiler HOSTCC  |
+ | --host-cflags=HCFLAGS   | use HCFLAGS when compiling  |
+ | --host-ld=HOSTLD        | use host linker HOSTLD      |
+ | --host-ldflags=HLDFLAGS | use HLDFLAGS when linking   |
+ | --host-extralibs=HLIBS  | use libs HLIBS when linking |
+ | --host-os=OS            | compiler host OS            |
+ | --extra-cflags=ECFLAGS  | add ECFLAGS to CFLAGS       |
+ | --extra-cxxflags=ECFLAGS| add ECFLAGS to CXXFLAGS     |
+ | --extra-ldflags=ELDFLAGS| add ELDFLAGS to LDFLAGS     |
 
 ## 2、修改so后缀
 默认编译出来的so库包括avcodec、avformat、avutil、avdevice、avfilter、swscale、</br>

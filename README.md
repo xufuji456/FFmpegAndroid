@@ -1,35 +1,8 @@
 # FFmpegAndroid
-android端基于FFmpeg库的使用<br>
-添加编译ffmpeg、shine、mp3lame、x264源码的参考脚本<br>
 
 ### [FFmpeg官方文档](https://ffmpeg.org/)
 ### [查看FFmpeg编译流程](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_compile_shell.md)
 ### [查看FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
-
-目前音视频相关处理：<br>
-#### 音频剪切
-#### 音频混音
-#### 音频转码
-#### 音频编码
-#### 视频剪切
-#### 视频转码
-#### 视频截图
-#### 视频降噪
-#### 视频抽帧
-#### 视频转GIF
-#### 视频水印
-#### 视频画面拼接
-#### 视频反序倒播
-#### 视频画中画
-#### 图片合成视频
-#### 本地直播推流
-#### 实时直播推流
-#### 音视频解码播放
-#### 音乐歌词解析
-#### 视频拖动实时预览
-#### FFmpeg的AVFilter滤镜
-#### ffprobe检测多媒体格式
-#### 使用mp3lame库进行mp3转码
 
 ### Usage:
 ### (1) Transform video format:
@@ -45,8 +18,11 @@ ffmpeg -i %s -s 1080x720 %s<br>
 Select video or audio file from your file explorer, and click the button.<br>
 When it finishes probing, the result of metadata will display on screen.<br>
 
-### Joining the group to learn FFmpeg(1群已满):
+### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
+
+### Joining QQ group to learn FFmpeg:
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_qq.png)
 
 ### Preview thumbnail when seeking:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/gif/preview.gif)
