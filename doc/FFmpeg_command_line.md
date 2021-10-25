@@ -183,8 +183,8 @@ ffmpeg -ss 20 -accurate_seek -t 10 -i input.mp4 -an -r 5 %3d.jpg<br>
 使用setpts设置视频速度，atempo设置音频速度：<br>
 ffmpeg -i in.mp4 -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] out.mp4<br>
 
-### 3.12 旋转视频
-ffmpeg -i in.mp4 -c copy -metadata:s\:v:0 rotate=90 out.mp4<br>
+### 3.12 黑白视频
+ffmpeg -i in.mp4 -vf lutyuv='u=128:v=128' out.mp4
 
 # 二、ffplay命令行
 ffplay主要用于播放视频，也可以播放网络流，示例如下：<br>

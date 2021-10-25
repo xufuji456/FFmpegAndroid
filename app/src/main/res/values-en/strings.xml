@@ -67,6 +67,7 @@
     <string name="video_thumbnail">Insert thumbnail</string>
     <string name="video_subtitle">add subtitle</string>
     <string name="video_gop">KeyFrame interval</string>
+    <string name="video_gray">Gray video</string>
 
     <string name="swap">Swap</string>
     <string name="start">Start</string>

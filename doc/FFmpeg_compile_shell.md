@@ -47,7 +47,7 @@ swscale提供图像缩放与像素格式转换，swresample提供音频重采样
  | --disable-all           | disable components, libs    |
  | --disable-autodetect    | disable detect external libs|
 
- | Program options:        |                             |
+ | Program options:        | Description                 |
  |:------------------------|:----------------------------|
  | --disable-programs      | don't build command line    |
  | --disable-ffmpeg        | disable ffmpeg build        |

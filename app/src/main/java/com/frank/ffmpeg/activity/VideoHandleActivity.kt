@@ -123,7 +123,8 @@ class VideoHandleActivity : BaseActivity() {
                 getString(R.string.video_thumbnail),
                 getString(R.string.video_subtitle),
                 getString(R.string.video_rotate),
-                getString(R.string.video_gop))
+                getString(R.string.video_gop),
+                getString(R.string.video_gray))
 
         layoutVideoHandle = findViewById(R.id.list_video_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -316,17 +317,14 @@ class VideoHandleActivity : BaseActivity() {
                 }
                 val filePath = FileUtil.getFilePath(srcFile)
                 var fileName = FileUtil.getFileName(srcFile)
-                Log.e(TAG, "moov filePath=$filePath--fileName=$fileName")
                 fileName = "moov_" + fileName!!
                 val moovPath = filePath + File.separator + fileName
                 if (useFFmpegCmd) {
                     commandLine = FFmpegUtil.moveMoovAhead(srcFile, moovPath)
                 } else {
-                    val start = System.currentTimeMillis()
                     val ffmpegCmd = FFmpegCmd()
                     val result = ffmpegCmd.moveMoovAhead(srcFile, moovPath)
                     Log.e(TAG, "result=" + (result == 0))
-                    Log.e(TAG, "move moov use time=" + (System.currentTimeMillis() - start))
                 }
             }
             14 //playing speed of video
@@ -366,6 +364,11 @@ class VideoHandleActivity : BaseActivity() {
                 val gop = 30
                 val gopPath = PATH + File.separator + "gop" + gop + suffix
                 commandLine = FFmpegUtil.changeGOP(srcFile, gop, gopPath)
+            }
+            20 // change video from RGB to gray
+            -> {
+                val grayPath = PATH + File.separator + "gray" + suffix
+                commandLine = FFmpegUtil.toGrayVideo(srcFile, grayPath)
             }
             else -> {
             }

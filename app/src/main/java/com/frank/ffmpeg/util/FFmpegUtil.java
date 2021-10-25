@@ -613,6 +613,18 @@ public class FFmpegUtil {
     }
 
     /**
+     * Change Video from RGB to gray(black & white)
+     * @param inputPath inputPath
+     * @param outputPath outputPath
+     * @return grayCmd
+     */
+    public static String[] toGrayVideo(String inputPath, String outputPath) {
+        String grayCmd = "ffmpeg -i %s -vf lutyuv='u=128:v=128' %s";
+        grayCmd = String.format(Locale.getDefault(), grayCmd, inputPath, outputPath);
+        return grayCmd.split(" ");
+    }
+
+    /**
      * using FFprobe to parse the media format
      *
      * @param inputPath  inputFile

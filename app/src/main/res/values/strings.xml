@@ -67,6 +67,7 @@
     <string name="video_thumbnail">插入封面</string>
     <string name="video_subtitle">添加字幕</string>
     <string name="video_gop">关键帧间隔</string>
+    <string name="video_gray">黑白视频</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>
