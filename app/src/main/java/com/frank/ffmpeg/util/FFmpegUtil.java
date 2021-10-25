@@ -414,7 +414,7 @@ public class FFmpegUtil {
 
     /**
      * Remove watermark from video: Suppress logo by a simple interpolation of the surrounding pixels.
-     * Just set a rectangle covering the logo and watch it disappear
+     * On the other hand, it can be used to mosaic video
      *
      * @return delogo cmd
      */
@@ -631,8 +631,6 @@ public class FFmpegUtil {
      * @return probe success or not
      */
     public static String[] probeFormat(String inputPath) {
-        //show format:ffprobe -i %s -show_format -print_format json
-        //show stream:ffprobe -i %s -show_streams
         String ffprobeCmd = "ffprobe -i %s -show_streams -show_format -print_format json";
         ffprobeCmd = String.format(Locale.getDefault(), ffprobeCmd, inputPath);
         return ffprobeCmd.split(" ");

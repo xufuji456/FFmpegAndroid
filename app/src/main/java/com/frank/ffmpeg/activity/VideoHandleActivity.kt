@@ -119,7 +119,6 @@ class VideoHandleActivity : BaseActivity() {
                 getString(R.string.video_pip),
                 getString(R.string.video_moov),
                 getString(R.string.video_speed),
-                getString(R.string.video_flv),
                 getString(R.string.video_thumbnail),
                 getString(R.string.video_subtitle),
                 getString(R.string.video_rotate),
@@ -231,7 +230,7 @@ class VideoHandleActivity : BaseActivity() {
                     }
                 }
             }
-            5 //Remove logo from video: suppress logo by a simple interpolation
+            5 //Remove logo from video, or use to mosaic video
             -> {
                 val removeLogoPath = PATH + File.separator + "removeLogo" + suffix
                 val widthL = 64
@@ -332,40 +331,31 @@ class VideoHandleActivity : BaseActivity() {
                 val speed = PATH + File.separator + "speed.mp4"
                 commandLine = FFmpegUtil.changeSpeed(srcFile, speed, 2f, false)
             }
-            15 //rebuild the keyframe index of flv
-            -> {
-                if (!".flv".equals(FileUtil.getFileSuffix(srcFile)!!, ignoreCase = true)) {
-                    Log.e(TAG, "It's not flv file, suffix=" + FileUtil.getFileSuffix(srcFile)!!)
-                    return
-                }
-                val outputPath = PATH + File.separator + "frame_index.flv"
-                commandLine = FFmpegUtil.buildFlvIndex(srcFile, outputPath)
-            }
-            16 // insert thumbnail into video
+            15 // insert thumbnail into video
             -> {
                 val thumbnailPath = PATH + File.separator + "thumb.jpg"
                 val thumbVideoPath = PATH + File.separator + "thumbnailVideo" + suffix
                 commandLine = FFmpegUtil.insertPicIntoVideo(srcFile, thumbnailPath, thumbVideoPath)
             }
-            17 //add subtitle into video
+            16 //add subtitle into video
             -> {
                 val subtitlePath = PATH + File.separator + "test.ass"
                 val addSubtitlePath = PATH + File.separator + "subtitle.mkv"
                 commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, addSubtitlePath)
             }
-            18 // set the rotate degree of video
+            17 // set the rotate degree of video
             -> {
                 val rotateDegree = 90
                 val addSubtitlePath = PATH + File.separator + "rotate" + rotateDegree + suffix
                 commandLine = FFmpegUtil.rotateVideo(srcFile, rotateDegree, addSubtitlePath)
             }
-            19 // change the gop(key frame interval) of video
+            18 // change the gop(key frame interval) of video
             -> {
                 val gop = 30
                 val gopPath = PATH + File.separator + "gop" + gop + suffix
                 commandLine = FFmpegUtil.changeGOP(srcFile, gop, gopPath)
             }
-            20 // change video from RGB to gray
+            19 // change video from RGB to gray
             -> {
                 val grayPath = PATH + File.separator + "gray" + suffix
                 commandLine = FFmpegUtil.toGrayVideo(srcFile, grayPath)
