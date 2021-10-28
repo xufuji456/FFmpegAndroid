@@ -187,23 +187,23 @@ message("hello, cmake")
 ## 8、命令行参数
 命令行参数前面统一加上-D，常用的参数：
 
-- 1) -DANRDOID_ABI :android的ABI架构平台
+* -DANRDOID_ABI :android的ABI架构平台
 
-- 2) -DANDROID_NDK :ndk路径
+* -DANDROID_NDK :ndk路径
 
-- 3) -DANDROID_ARM_MODE :arm模式/thumb模式
+* -DANDROID_ARM_MODE :arm模式/thumb模式
 
-- 4) -DANDROID_ARM_NEON :是否开启arm neon加速，针对armeabi-v7a平台
+* -DANDROID_ARM_NEON :是否开启arm neon加速，针对armeabi-v7a平台
 
-- 5) -DANDROID_TOOLCHAIN :编译工具链
+* -DANDROID_TOOLCHAIN :编译工具链
 
-- 6) -DANDROID_NATIVE_API_LEVEL :与ANDROID_PLATFORM相同，对应minSdkVersion
+* -DANDROID_NATIVE_API_LEVEL :与ANDROID_PLATFORM相同，对应minSdkVersion
 
-- 7) -DCMAKE_BUILD_TYPE :编译类型，debug或release
+* -DCMAKE_BUILD_TYPE :编译类型，debug或release
 
-- 8) -DCMAKE_MAKE_PROGRAM :编译程序
+* -DCMAKE_MAKE_PROGRAM :编译程序
 
-- 9) -DCMAKE_TOOLCHAIN_FILE :编译文件
+* -DCMAKE_TOOLCHAIN_FILE :编译文件
 
 ## 9、命令行编译
 以cmake作为关键字，后面带着指定参数，示例如下：
