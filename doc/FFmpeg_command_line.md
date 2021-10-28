@@ -3,6 +3,7 @@ FFmpeg多媒体库支持的命令行调用分为三个模块：ffmpeg、ffprobe�
 其中ffmpeg命令行常用于音视频剪切、转码、滤镜、拼接、混音、截图等；<br>
 ffprobe用于检测多媒体流格式；ffplay用于播放视频,包括本地与网络视频。<br>
 详情可查阅FFmpeg官方文档：[ffmpeg Documentation](https://ffmpeg.org/documentation.html)<br>
+更详细命令行处理可查看博客：[FFmpeg命令行汇总](https://blog.csdn.net/u011686167/article/details/120879467)<br>
 
 # 一、ffmpeg命令行
 ## 1、命令行参数介绍

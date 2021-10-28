@@ -3,6 +3,7 @@
 ### [FFmpeg官方文档](https://ffmpeg.org/)
 ### [查看FFmpeg编译流程](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_compile_shell.md)
 ### [查看FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
+### [查看NDK编译Android.mk与cmake](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
 
 ### Usage:
 ### (1) Transform video format:

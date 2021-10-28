@@ -3,6 +3,7 @@ FFmpeg是一个跨平台的多媒体库，也是目前音视频领域应用最�
 libavdevice、libavfilter、libswscale、libswresample、libpostproc等模块。其中avcodec用于编解码，</br>
 avformat用于解封装，avutil是提供工具类，avdevice用于各平台的设备接入，avfilter提供滤镜操作，</br>
 swscale提供图像缩放与像素格式转换，swresample提供音频重采样，postproc提供高级处理。</br>
+更详细编译脚本可查看博客：[FFmpeg编译脚本分析](https://blog.csdn.net/u011686167/article/details/120390739)<br>
 
 # 一、准备工作
 ## 1、下载ffmpeg源码
