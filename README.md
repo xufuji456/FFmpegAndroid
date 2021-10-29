@@ -1,9 +1,10 @@
 # FFmpegAndroid
 
 ### [FFmpeg官方文档](https://ffmpeg.org/)
-### [查看FFmpeg编译流程](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_compile_shell.md)
-### [查看FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
-### [查看NDK编译Android.mk与cmake](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
+### [FFmpeg编译流程](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_compile_shell.md)
+### [FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
+### [NDK编译脚本](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
+### [JNI开发与调试](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/JNI_develop_debug.md)
 
 ### Usage:
 ### (1) Transform video format:
