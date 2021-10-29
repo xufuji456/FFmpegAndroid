@@ -5,7 +5,7 @@
 ### [FFmpeg常用命令行](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/FFmpeg_command_line.md)
 ### [NDK编译脚本](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
 ### [JNI开发与调试](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/JNI_develop_debug.md)
-### [音视频知识汇总](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/JNI_develop_debug.md)
+### [音视频知识汇总](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_knowledge.md)
 
 ### Usage:
 ### (1) Transform video format:
