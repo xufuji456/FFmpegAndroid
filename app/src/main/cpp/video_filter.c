@@ -17,7 +17,7 @@
 #include "ffmpeg_jni_define.h"
 
 #define TAG "VideoFilter"
-#define ENABLE_MEDIACODEC 1
+#define ENABLE_MEDIACODEC 0
 
 AVFormatContext *pFormatCtx;
 AVCodecContext *pCodecCtx;
