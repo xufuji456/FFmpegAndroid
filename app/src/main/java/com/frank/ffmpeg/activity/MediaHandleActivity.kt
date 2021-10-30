@@ -49,6 +49,10 @@ class MediaHandleActivity : BaseActivity() {
                 MSG_FINISH -> {
                     layoutProgress!!.visibility = View.GONE
                     layoutMediaHandle!!.visibility = View.VISIBLE
+                    if (!outputPath.isNullOrEmpty() && !this@MediaHandleActivity.isDestroyed) {
+                        showToast("Save to:$outputPath")
+                        outputPath = ""
+                    }
                 }
                 MSG_PROGRESS -> {
                     val progress = msg.arg1
@@ -120,13 +124,13 @@ class MediaHandleActivity : BaseActivity() {
             }
             R.id.btn_extract_audio//extract audio
             -> {
-                val extractAudio = PATH + File.separator + "extractAudio.aac"
-                commandLine = FFmpegUtil.extractAudio(srcFile, extractAudio)
+                outputPath = PATH + File.separator + "extractAudio.aac"
+                commandLine = FFmpegUtil.extractAudio(srcFile, outputPath)
             }
             R.id.btn_extract_video//extract video
             -> {
-                val extractVideo = PATH + File.separator + "extractVideo.mp4"
-                commandLine = FFmpegUtil.extractVideo(srcFile, extractVideo)
+                outputPath = PATH + File.separator + "extractVideo.mp4"
+                commandLine = FFmpegUtil.extractVideo(srcFile, outputPath)
             }
             R.id.btn_dubbing//dubbing
             -> {
@@ -185,5 +189,6 @@ class MediaHandleActivity : BaseActivity() {
 
         private val TAG = MediaHandleActivity::class.java.simpleName
         private val PATH = Environment.getExternalStorageDirectory().path
+        private var outputPath :String ?= null
     }
 }

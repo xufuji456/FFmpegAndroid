@@ -73,10 +73,13 @@ class AudioHandleActivity : BaseActivity() {
                                 infoBuilder.toString(), Toast.LENGTH_LONG).show()
                         infoBuilder = null
                     }
+                    if (!outputPath.isNullOrEmpty() && !this@AudioHandleActivity.isDestroyed) {
+                        showToast("Save to:$outputPath")
+                        outputPath = ""
+                    }
                 }
                 MSG_PROGRESS -> {
                     val progress = msg.arg1
-                    val duration = msg.arg2
                     if (progress > 0) {
                         txtProgress!!.visibility = View.VISIBLE
                         txtProgress!!.text = String.format(Locale.getDefault(), "%d%%", progress)
@@ -161,17 +164,17 @@ class AudioHandleActivity : BaseActivity() {
         }
         when (currentPosition) {
             0 -> if (useFFmpeg) { //use FFmpeg to transform
-                val transformFile = PATH + File.separator + "transformAudio.mp3"
-                commandLine = FFmpegUtil.transformAudio(srcFile, transformFile)
+                outputPath = PATH + File.separator + "transformAudio.mp3"
+                commandLine = FFmpegUtil.transformAudio(srcFile, outputPath)
             } else { //use MediaCodec and libmp3lame to transform
                 Thread {
-                    val transformPath = PATH + File.separator + "transformAudio.mp3"
+                    outputPath = PATH + File.separator + "transformAudio.mp3"
                     try {
                         mHandler.obtainMessage(MSG_BEGIN).sendToTarget()
                         val clazz = Class.forName("com.frank.mp3.Mp3Converter")
                         val instance = clazz.newInstance()
                         val method = clazz.getDeclaredMethod("convertToMp3", String::class.java, String::class.java)
-                        method.invoke(instance, srcFile, transformPath)
+                        method.invoke(instance, srcFile, outputPath)
                         mHandler.obtainMessage(MSG_FINISH).sendToTarget()
                     } catch (e: Exception) {
                         Log.e("AudioHandleActivity", "convert mp3 error=" + e.message)
@@ -184,8 +187,8 @@ class AudioHandleActivity : BaseActivity() {
                 if (suffix == null || suffix.isEmpty()) {
                     return
                 }
-                val cutFile = PATH + File.separator + "cutAudio" + suffix
-                commandLine = FFmpegUtil.cutAudio(srcFile, 10.5f, 15.0f, cutFile)
+                outputPath = PATH + File.separator + "cutAudio" + suffix
+                commandLine = FFmpegUtil.cutAudio(srcFile, 10.5f, 15.0f, outputPath)
             }
             2 //concat audio
             -> {
@@ -205,11 +208,11 @@ class AudioHandleActivity : BaseActivity() {
                     return
                 }
                 commandLine = if (mixAudio) {
-                    val mixAudio = PATH + File.separator + "mix" + mixSuffix
-                    FFmpegUtil.mixAudio(srcFile, appendFile, mixAudio)
+                    outputPath = PATH + File.separator + "mix" + mixSuffix
+                    FFmpegUtil.mixAudio(srcFile, appendFile, outputPath)
                 } else {
-                    val mergeAudio = PATH + File.separator + "merge" + mixSuffix
-                    FFmpegUtil.mergeAudio(srcFile, appendFile, mergeAudio)
+                    outputPath = PATH + File.separator + "merge" + mixSuffix
+                    FFmpegUtil.mergeAudio(srcFile, appendFile, outputPath)
                 }
             }
             4 //use AudioTrack to play audio
@@ -222,26 +225,26 @@ class AudioHandleActivity : BaseActivity() {
             5 //change audio speed
             -> {
                 val speed = 2.0f // funny effect, range from 0.5 to 100.0
-                val speedPath = PATH + File.separator + "speed.mp3"
-                commandLine = FFmpegUtil.changeAudioSpeed(srcFile, speedPath, speed)
+                outputPath = PATH + File.separator + "speed.mp3"
+                commandLine = FFmpegUtil.changeAudioSpeed(srcFile, outputPath, speed)
             }
             6 // setting echo effect
             -> {
                 val echo = 1000 // echo effect, range from 0 to 90000
-                val echoPath = PATH + File.separator + "echo.mp3"
-                commandLine = FFmpegUtil.audioEcho(srcFile, echo, echoPath)
+                outputPath = PATH + File.separator + "echo.mp3"
+                commandLine = FFmpegUtil.audioEcho(srcFile, echo, outputPath)
             }
             7 //tremolo effect
             -> {
                 val frequency = 5 // range from 0.1 to 20000.0
                 val depth = 0.9f // range from 0 to 1
-                val tremoloPath = PATH + File.separator + "tremolo.mp3"
-                commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, tremoloPath)
+                outputPath = PATH + File.separator + "tremolo.mp3"
+                commandLine = FFmpegUtil.audioTremolo(srcFile, frequency, depth, outputPath)
             }
             8 //audio denoise
             -> {
-                val noisePath = PATH + File.separator + "denoise.mp3"
-                commandLine = FFmpegUtil.audioDenoise(srcFile, noisePath)
+                outputPath = PATH + File.separator + "denoise.mp3"
+                commandLine = FFmpegUtil.audioDenoise(srcFile, outputPath)
             }
             9 // equalizer plus
             -> {
@@ -253,8 +256,8 @@ class AudioHandleActivity : BaseActivity() {
                 bandList.add("12b=2")
                 bandList.add("14b=1")
                 bandList.add("16b=0")
-                val equalizePath = PATH + File.separator + "equalize.mp3"
-                commandLine = FFmpegUtil.audioEqualizer(srcFile, bandList, equalizePath)
+                outputPath = PATH + File.separator + "equalize.mp3"
+                commandLine = FFmpegUtil.audioEqualizer(srcFile, bandList, outputPath)
             }
             10 //silence detect
             -> {
@@ -263,18 +266,18 @@ class AudioHandleActivity : BaseActivity() {
             11 // modify volume
             -> {
                 val volume = 0.5f // 0.0-1.0
-                val volumePath = PATH + File.separator + "volume.mp3"
-                commandLine = FFmpegUtil.audioVolume(srcFile, volume, volumePath)
+                outputPath = PATH + File.separator + "volume.mp3"
+                commandLine = FFmpegUtil.audioVolume(srcFile, volume, outputPath)
             }
             12 //audio encode
             -> {
                 val pcmFile = PATH + File.separator + "raw.pcm"
-                val wavFile = PATH + File.separator + "convert.mp3"
+                outputPath= PATH + File.separator + "convert.mp3"
                 //sample rate, normal is 8000/16000/44100
                 val sampleRate = 44100
                 //channel num of pcm
                 val channel = 2
-                commandLine = FFmpegUtil.encodeAudio(pcmFile, wavFile, sampleRate, channel)
+                commandLine = FFmpegUtil.encodeAudio(pcmFile, outputPath, sampleRate, channel)
             }
             13 //concat PCM streams
             -> {
@@ -329,6 +332,8 @@ class AudioHandleActivity : BaseActivity() {
         private const val useFFmpeg = true
 
         private const val mixAudio = true
+
+        private var outputPath :String ?= null
     }
 
 }
