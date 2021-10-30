@@ -50,6 +50,7 @@ class VideoHandleActivity : BaseActivity() {
     private val outputPath2 = PATH + File.separator + "output2.ts"
     private val listPath = PATH + File.separator + "listFile.txt"
 
+    private var list :List<String> ?= null
     private var isJointing = false
 
     @SuppressLint("HandlerLeak")
@@ -107,7 +108,7 @@ class VideoHandleActivity : BaseActivity() {
     private fun intView() {
         layoutProgress = getView(R.id.layout_progress)
         txtProgress = getView(R.id.txt_progress)
-        val list = listOf(
+        list = listOf(
                 getString(R.string.video_transform),
                 getString(R.string.video_cut),
                 getString(R.string.video_concat),
@@ -136,7 +137,7 @@ class VideoHandleActivity : BaseActivity() {
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
                 currentPosition = position
-                if (getString(R.string.video_from_photo) == list[position]) {
+                if (getString(R.string.video_from_photo) == (list as List<String>)[position]) {
                     handlePhoto()
                 } else {
                     selectFile()
@@ -164,10 +165,11 @@ class VideoHandleActivity : BaseActivity() {
         if (!FileUtil.checkFileExist(srcFile)) {
             return
         }
-//        if (!FileUtil.isVideo(srcFile)) {
-//            showToast(getString(R.string.wrong_video_format))
-//            return
-//        }
+        if (!FileUtil.isVideo(srcFile)
+                && (list as List<String>)[currentPosition] != getString(R.string.video_zoom)) {
+            showToast(getString(R.string.wrong_video_format))
+            return
+        }
         val suffix = FileUtil.getFileSuffix(srcFile)
         if (suffix == null || suffix.isEmpty()) {
             return
