@@ -32,7 +32,7 @@ public class FFmpegHandler {
 
     public final static int MSG_INFO = 2222;
 
-    private Handler mHandler;
+    private final Handler mHandler;
 
     private boolean isContinue = false;
 
@@ -53,6 +53,8 @@ public class FFmpegHandler {
         if (commandLine == null) {
             return;
         }
+        mHandler.removeMessages(MSG_PROGRESS);
+        mHandler.removeCallbacksAndMessages(null);
         FFmpegCmd.execute(commandLine, new OnHandleListener() {
             @Override
             public void onBegin() {

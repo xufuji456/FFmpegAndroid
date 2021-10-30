@@ -168,7 +168,7 @@ public class FFmpegCmd {
         if (mProgressListener != null) {
             if (position > 0 && duration > 0) {
                 int progress = position * 100 / duration;
-                if (progress < 100 || state == STATE_FINISH || state == STATE_ERROR) {
+                if (progress < 100) {
                     mProgressListener.onProgress(progress, duration);
                 }
             } else {
