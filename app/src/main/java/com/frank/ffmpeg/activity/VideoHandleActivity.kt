@@ -121,13 +121,12 @@ class VideoHandleActivity : BaseActivity() {
                 getString(R.string.video_denoise),
                 getString(R.string.video_image),
                 getString(R.string.video_pip),
-                getString(R.string.video_moov),
                 getString(R.string.video_speed),
                 getString(R.string.video_thumbnail),
                 getString(R.string.video_subtitle),
                 getString(R.string.video_rotate),
-                getString(R.string.video_gop),
-                getString(R.string.video_gray))
+                getString(R.string.video_gray),
+                getString(R.string.video_zoom))
 
         layoutVideoHandle = findViewById(R.id.list_video_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -165,10 +164,10 @@ class VideoHandleActivity : BaseActivity() {
         if (!FileUtil.checkFileExist(srcFile)) {
             return
         }
-        if (!FileUtil.isVideo(srcFile)) {
-            showToast(getString(R.string.wrong_video_format))
-            return
-        }
+//        if (!FileUtil.isVideo(srcFile)) {
+//            showToast(getString(R.string.wrong_video_format))
+//            return
+//        }
         val suffix = FileUtil.getFileSuffix(srcFile)
         if (suffix == null || suffix.isEmpty()) {
             return
@@ -311,57 +310,38 @@ class VideoHandleActivity : BaseActivity() {
                 outputPath = PATH + File.separator + "PicInPic.mp4"
                 commandLine = FFmpegUtil.picInPicVideo(inputFile1, inputFile2, x, y, outputPath)
             }
-            13 //moov box moves ahead, which is behind mdat box of mp4 video
-            -> {
-                if (!srcFile.endsWith(FileUtil.TYPE_MP4)) {
-                    showToast(getString(R.string.tip_not_mp4_video))
-                    return
-                }
-                val filePath = FileUtil.getFilePath(srcFile)
-                var fileName = FileUtil.getFileName(srcFile)
-                fileName = "moov_" + fileName!!
-                outputPath = filePath + File.separator + fileName
-                if (useFFmpegCmd) {
-                    commandLine = FFmpegUtil.moveMoovAhead(srcFile, outputPath)
-                } else {
-                    val ffmpegCmd = FFmpegCmd()
-                    val result = ffmpegCmd.moveMoovAhead(srcFile, outputPath)
-                    Log.e(TAG, "result=" + (result == 0))
-                }
-            }
-            14 //playing speed of video
+            13 //playing speed of video
             -> {
                 outputPath = PATH + File.separator + "speed.mp4"
                 commandLine = FFmpegUtil.changeSpeed(srcFile, outputPath, 2f, false)
             }
-            15 // insert thumbnail into video
+            14 // insert thumbnail into video
             -> {
                 val thumbnailPath = PATH + File.separator + "thumb.jpg"
                 outputPath = PATH + File.separator + "thumbnailVideo" + suffix
                 commandLine = FFmpegUtil.insertPicIntoVideo(srcFile, thumbnailPath, outputPath)
             }
-            16 //add subtitle into video
+            15 //add subtitle into video
             -> {
                 val subtitlePath = PATH + File.separator + "test.ass"
                 outputPath = PATH + File.separator + "subtitle.mkv"
                 commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, outputPath)
             }
-            17 // set the rotate degree of video
+            16 // set the rotate degree of video
             -> {
                 val rotateDegree = 90
                 outputPath = PATH + File.separator + "rotate" + rotateDegree + suffix
                 commandLine = FFmpegUtil.rotateVideo(srcFile, rotateDegree, outputPath)
             }
-            18 // change the gop(key frame interval) of video
-            -> {
-                val gop = 30
-                outputPath = PATH + File.separator + "gop" + gop + suffix
-                commandLine = FFmpegUtil.changeGOP(srcFile, gop, outputPath)
-            }
-            19 // change video from RGB to gray
+            17 // change video from RGB to gray
             -> {
                 outputPath = PATH + File.separator + "gray" + suffix
                 commandLine = FFmpegUtil.toGrayVideo(srcFile, outputPath)
+            }
+            18 // zoom photo to video
+            -> {
+                outputPath = PATH + File.separator + "zoom.mp4"
+                commandLine = FFmpegUtil.photoZoomToVideo(srcFile, outputPath)
             }
             else -> {
             }
@@ -404,6 +384,25 @@ class VideoHandleActivity : BaseActivity() {
         commandList.add(transformCmd2)
         commandList.add(jointVideoCmd)
         ffmpegHandler!!.executeFFmpegCmds(commandList)
+    }
+
+    private fun moov(srcFile: String) {
+        if (!srcFile.endsWith(FileUtil.TYPE_MP4)) {
+            showToast(getString(R.string.tip_not_mp4_video))
+            return
+        }
+        val filePath = FileUtil.getFilePath(srcFile)
+        var fileName = FileUtil.getFileName(srcFile)
+        fileName = "moov_" + fileName!!
+        outputPath = filePath + File.separator + fileName
+        if (useFFmpegCmd) {
+            val commandLine = FFmpegUtil.moveMoovAhead(srcFile, outputPath)
+            ffmpegHandler!!.executeFFmpegCmd(commandLine)
+        } else {
+            val ffmpegCmd = FFmpegCmd()
+            val result = ffmpegCmd.moveMoovAhead(srcFile, outputPath)
+            Log.e(TAG, "result=" + (result == 0))
+        }
     }
 
     /**

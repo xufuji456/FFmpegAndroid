@@ -625,6 +625,18 @@ public class FFmpegUtil {
     }
 
     /**
+     * Photo zoom to video
+     * @param inputPath inputPath
+     * @param outputPath outputPath
+     * @return zoomCmd
+     */
+    public static String[] photoZoomToVideo(String inputPath, String outputPath) {
+        String grayCmd = "ffmpeg -loop 1 -i %s -vf zoompan=z='if(lte(zoom,1.0),1.5,max(1.001,zoom-0.0015))':d=125 -t 8 %s";
+        grayCmd = String.format(Locale.getDefault(), grayCmd, inputPath, outputPath);
+        return grayCmd.split(" ");
+    }
+
+    /**
      * using FFprobe to parse the media format
      *
      * @param inputPath  inputFile
