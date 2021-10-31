@@ -17,6 +17,7 @@
  */
 
 #include <string.h>
+#include "ffmpeg_hw.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,7 +25,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#include "ffmpeg.h"
 
 static int nb_hw_devices;
 static HWDevice **hw_devices;
@@ -41,16 +41,6 @@ static HWDevice *hw_device_get_by_type(enum AVHWDeviceType type)
         }
     }
     return found;
-}
-
-HWDevice *hw_device_get_by_name(const char *name)
-{
-    int i;
-    for (i = 0; i < nb_hw_devices; i++) {
-        if (!strcmp(hw_devices[i]->name, name))
-            return hw_devices[i];
-    }
-    return NULL;
 }
 
 static HWDevice *hw_device_add(void)
@@ -91,6 +81,118 @@ static char *hw_device_default_name(enum AVHWDeviceType type)
         return NULL;
     }
     return name;
+}
+
+static int hw_device_init_from_type(enum AVHWDeviceType type,
+                                    const char *device,
+                                    HWDevice **dev_out)
+{
+    AVBufferRef *device_ref = NULL;
+    HWDevice *dev;
+    char *name;
+    int err;
+
+    name = hw_device_default_name(type);
+    if (!name) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    err = av_hwdevice_ctx_create(&device_ref, type, device, NULL, 0);
+    if (err < 0) {
+        av_log(NULL, AV_LOG_ERROR,
+               "Device creation failed: %d.\n", err);
+        goto fail;
+    }
+
+    dev = hw_device_add();
+    if (!dev) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    dev->name = name;
+    dev->type = type;
+    dev->device_ref = device_ref;
+
+    if (dev_out)
+        *dev_out = dev;
+
+    return 0;
+
+    fail:
+    av_freep(&name);
+    av_buffer_unref(&device_ref);
+    return err;
+}
+
+static HWDevice *hw_device_match_by_codec(const AVCodec *codec)
+{
+    const AVCodecHWConfig *config;
+    HWDevice *dev;
+    int i;
+    for (i = 0;; i++) {
+        config = avcodec_get_hw_config(codec, i);
+        if (!config)
+            return NULL;
+        if (!(config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX))
+            continue;
+        dev = hw_device_get_by_type(config->device_type);
+        if (dev)
+            return dev;
+    }
+}
+
+static int hwaccel_retrieve_data(AVCodecContext *avctx, AVFrame *input)
+{
+    InputStream *ist = static_cast<InputStream *>(avctx->opaque);
+    AVFrame *output = NULL;
+    enum AVPixelFormat output_format = ist->hwaccel_output_format;
+    int err;
+
+    if (input->format == output_format) {
+        // Nothing to do.
+        return 0;
+    }
+
+    output = av_frame_alloc();
+    if (!output)
+        return AVERROR(ENOMEM);
+
+    output->format = output_format;
+
+    err = av_hwframe_transfer_data(output, input, 0);
+    if (err < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Failed to transfer data to "
+                                    "output frame: %d.\n", err);
+        goto fail;
+    }
+
+    err = av_frame_copy_props(output, input);
+    if (err < 0) {
+        av_frame_unref(output);
+        goto fail;
+    }
+
+    av_frame_unref(input);
+    av_frame_move_ref(input, output);
+    av_frame_free(&output);
+
+    return 0;
+
+    fail:
+    av_frame_free(&output);
+    return err;
+}
+
+HWDevice *hw_device_get_by_name(const char *name)
+{
+    int i;
+    for (i = 0; i < nb_hw_devices; i++) {
+        if (!strcmp(hw_devices[i]->name, name))
+            return hw_devices[i];
+    }
+    return NULL;
 }
 
 int hw_device_init_from_string(const char *arg, HWDevice **dev_out)
@@ -230,49 +332,6 @@ fail:
     goto done;
 }
 
-static int hw_device_init_from_type(enum AVHWDeviceType type,
-                                    const char *device,
-                                    HWDevice **dev_out)
-{
-    AVBufferRef *device_ref = NULL;
-    HWDevice *dev;
-    char *name;
-    int err;
-
-    name = hw_device_default_name(type);
-    if (!name) {
-        err = AVERROR(ENOMEM);
-        goto fail;
-    }
-
-    err = av_hwdevice_ctx_create(&device_ref, type, device, NULL, 0);
-    if (err < 0) {
-        av_log(NULL, AV_LOG_ERROR,
-               "Device creation failed: %d.\n", err);
-        goto fail;
-    }
-
-    dev = hw_device_add();
-    if (!dev) {
-        err = AVERROR(ENOMEM);
-        goto fail;
-    }
-
-    dev->name = name;
-    dev->type = type;
-    dev->device_ref = device_ref;
-
-    if (dev_out)
-        *dev_out = dev;
-
-    return 0;
-
-fail:
-    av_freep(&name);
-    av_buffer_unref(&device_ref);
-    return err;
-}
-
 void hw_device_free_all(void)
 {
     int i;
@@ -283,23 +342,6 @@ void hw_device_free_all(void)
     }
     av_freep(&hw_devices);
     nb_hw_devices = 0;
-}
-
-static HWDevice *hw_device_match_by_codec(const AVCodec *codec)
-{
-    const AVCodecHWConfig *config;
-    HWDevice *dev;
-    int i;
-    for (i = 0;; i++) {
-        config = avcodec_get_hw_config(codec, i);
-        if (!config)
-            return NULL;
-        if (!(config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX))
-            continue;
-        dev = hw_device_get_by_type(config->device_type);
-        if (dev)
-            return dev;
-    }
 }
 
 int hw_device_setup_for_decode(InputStream *ist)
@@ -432,48 +474,6 @@ int hw_device_setup_for_encode(OutputStream *ost)
         // No device required, or no device available.
         return 0;
     }
-}
-
-static int hwaccel_retrieve_data(AVCodecContext *avctx, AVFrame *input)
-{
-    InputStream *ist = static_cast<InputStream *>(avctx->opaque);
-    AVFrame *output = NULL;
-    enum AVPixelFormat output_format = ist->hwaccel_output_format;
-    int err;
-
-    if (input->format == output_format) {
-        // Nothing to do.
-        return 0;
-    }
-
-    output = av_frame_alloc();
-    if (!output)
-        return AVERROR(ENOMEM);
-
-    output->format = output_format;
-
-    err = av_hwframe_transfer_data(output, input, 0);
-    if (err < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Failed to transfer data to "
-               "output frame: %d.\n", err);
-        goto fail;
-    }
-
-    err = av_frame_copy_props(output, input);
-    if (err < 0) {
-        av_frame_unref(output);
-        goto fail;
-    }
-
-    av_frame_unref(input);
-    av_frame_move_ref(input, output);
-    av_frame_free(&output);
-
-    return 0;
-
-fail:
-    av_frame_free(&output);
-    return err;
 }
 
 int hwaccel_decode_init(AVCodecContext *avctx)
