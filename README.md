@@ -7,6 +7,9 @@
 ### [JNI开发与调试](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/JNI_develop_debug.md)
 ### [音视频知识汇总](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_knowledge.md)
 
+### 运行时序图:
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_sequence.png)
+
 ### Usage:
 ### (1) Transform video format:
 Select video file which you want to transform, and setting the output path.<br>
