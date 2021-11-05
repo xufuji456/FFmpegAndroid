@@ -10,20 +10,6 @@
 ### 运行时序图:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_sequence.png)
 
-### Usage:
-### (1) Transform video format:
-Select video file which you want to transform, and setting the output path.<br>
-The simple command like this:<br>
-ffmpeg -i %s -vcodec copy -acodec copy %s<br>
-You could appoint the encoder, like this:<br>
-ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s<br>
-You could transform the video resolution, like this:<br>
-ffmpeg -i %s -s 1080x720 %s<br>
-
-### (2) Probing media format:
-Select video or audio file from your file explorer, and click the button.<br>
-When it finishes probing, the result of metadata will display on screen.<br>
-
 ### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
 
