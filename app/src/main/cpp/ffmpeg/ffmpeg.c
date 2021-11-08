@@ -4711,6 +4711,7 @@ static int transcode(void)
         }
 
         if (cancel_execute) {
+            cancel_execute = 0;
             av_log(NULL, AV_LOG_ERROR, "cancel task by user...");
             break;
         }
