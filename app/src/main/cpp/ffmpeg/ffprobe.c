@@ -426,6 +426,7 @@ static void ffprobe_cleanup(int ret)
         av_dict_free(&(sections[i].entries_to_show));
 
     buffer_length = 0;
+    input_filename = NULL;
 #if HAVE_THREADS
     pthread_mutex_destroy(&log_mutex);
 #endif
@@ -3663,7 +3664,6 @@ char* ffprobe_run(int argc, char **argv)
     }
 #endif
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
-    register_exit(ffprobe_cleanup);
 
     options = real_options;
     parse_loglevel(argc, argv, options);
@@ -3791,6 +3791,7 @@ end:
         av_dict_free(&(sections[i].entries_to_show));
 
     avformat_network_deinit();
+    ffprobe_cleanup(ret);
 
     return print_buffer;
 }
