@@ -62,5 +62,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycle_ktx"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //implementation "libmp3" if you need mp3-lite module
-    implementation project(':libmp3')
+//    implementation project(':libmp3')
 }
