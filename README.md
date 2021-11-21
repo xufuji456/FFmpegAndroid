@@ -6,6 +6,7 @@
 ### [NDK编译脚本](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
 ### [JNI开发与调试](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/JNI_develop_debug.md)
 ### [音视频知识汇总](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_knowledge.md)
+### [ijkplayer播放器架构](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/player_framework.md)
 
 ### 运行时序图:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_sequence.png)
