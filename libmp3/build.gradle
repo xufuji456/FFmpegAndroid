@@ -40,6 +40,11 @@ android {
             jni.srcDirs = []
         }
     }
+
+    packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libmp3lame.so'
+        pickFirst 'lib/arm64-v8a/libmp3lame.so'
+    }
 }
 
 dependencies {
