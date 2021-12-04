@@ -242,8 +242,9 @@ public class FFmpegUtil {
      * @return demux audio success or not
      */
     public static String[] extractAudio(String inputPath, String outputPath) {
-        //-vn: disable video
-        String extractAudioCmd = "ffmpeg -i %s -acodec copy -vn %s";
+        // -vn: disable video
+        // multi audio track: ffmpeg -i input.mp4 -map 0:1 -vn output.mp3
+        String extractAudioCmd = "ffmpeg -i %s -vn %s";
         extractAudioCmd = String.format(extractAudioCmd, inputPath, outputPath);
         return extractAudioCmd.split(" ");
     }

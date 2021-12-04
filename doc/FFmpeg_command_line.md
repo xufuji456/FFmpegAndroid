@@ -109,8 +109,12 @@ ffmpeg -i input.mp3 -af silencedetect=noise=0.0001 -f null -<br>
 ffmpeg -i input.mp3 -af volume=0.5 volume.mp3<br>
 
 ### 2.10 抽取音频
-从视频抽取音频，也就是disable视频流、拷贝音频流：<br>
-ffmpeg -i input.mp4 -acodec copy -vn out.mp3<br>
+从视频抽取音频，直接disable视频流：<br>
+ffmpeg -i input.mp4 -vn out.mp3<br>
+从视频抽取音频，disable视频流，音频进行转码：<br>
+ffmpeg -i input.mp4 -acodec aac -vn out.m4a<br>
+从视频抽取音频，如果存在多音轨，可指定某个音轨：<br>
+ffmpeg -i input.mp4 -map 0:1 -vn out.mp3<br>
 
 ## 3、视频常见操作
 ### 3.1 视频剪切
