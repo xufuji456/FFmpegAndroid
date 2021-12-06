@@ -90,7 +90,7 @@
     <string name="video_sharp">sharp</string>
 
     <string name="select_file">Select file</string>
-    <string name="please_select">Please select a correct file</string>
+    <string name="please_select">Please select or set a correct file</string>
     <string name="file_not_found">File not found</string>
     <string name="please_click_select">Please click the right-top button to select file</string>
     <string name="wrong_audio_format">wrong audio file</string>

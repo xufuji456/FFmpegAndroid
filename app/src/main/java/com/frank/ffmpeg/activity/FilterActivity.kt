@@ -13,7 +13,6 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import android.widget.ToggleButton
 
 import com.frank.ffmpeg.FFmpegApplication
@@ -159,7 +158,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
             doFilterPlay(4)
             btnSound!!.isChecked = true
         } else {
-            Toast.makeText(this@FilterActivity, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show()
+            showSelectFile()
         }
     }
 

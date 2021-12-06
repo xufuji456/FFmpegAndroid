@@ -209,16 +209,6 @@ object FileUtil {
         return null
     }
 
-    fun ensureDir(fileDir: String): Boolean {
-        if (TextUtils.isEmpty(fileDir)) {
-            return false
-        }
-        val listFile = File(fileDir)
-        return if (!listFile.exists()) {
-            listFile.mkdirs()
-        } else true
-    }
-
     fun deleteFile(path: String): Boolean {
         if (TextUtils.isEmpty(path)) {
             return false

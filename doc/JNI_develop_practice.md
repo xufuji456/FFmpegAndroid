@@ -6,5 +6,5 @@ JNI是Java本地接口，定义Android从应用代码(以Java或kotlin编程语�
 [Android.mk与CMake编译](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/NDK_compile_shell.md)
 
 ### 相关介绍文章如下：
-[NDK编译脚本](https://blog.csdn.net/u011686167/article/details/106458899)
-[JNI开发规范](https://blog.csdn.net/u011686167/article/details/81784979)
+[NDK编译脚本](https://blog.csdn.net/u011686167/article/details/106458899)</br>
+[JNI开发规范](https://blog.csdn.net/u011686167/article/details/81784979)</br>
