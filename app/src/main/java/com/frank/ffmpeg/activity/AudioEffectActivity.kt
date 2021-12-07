@@ -4,7 +4,6 @@ import android.Manifest
 import android.media.MediaPlayer
 import android.media.audiofx.*
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -18,6 +17,7 @@ import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.format.AudioVisualizer
 import com.frank.ffmpeg.listener.OnSeeBarListener
+import com.frank.ffmpeg.util.FileUtil
 import com.frank.ffmpeg.view.VisualizerView
 import java.io.IOException
 import java.util.ArrayList
@@ -26,12 +26,12 @@ import java.util.ArrayList
  * Audio effect: equalizer, enhancer, visualizer
  * Created by frank on 2020/10/20.
  */
-class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
+class AudioEffectActivity : BaseActivity(), OnSeeBarListener {
 
     companion object {
         private val TAG = AudioEffectActivity::class.java.simpleName
 
-        private val AUDIO_PATH = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
+        private val audioPath = Environment.getExternalStorageDirectory().path + "/change.mp3"
     }
 
     private var mPlayer: MediaPlayer? = null
@@ -63,8 +63,6 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
     private val onPreparedListener = MediaPlayer.OnPreparedListener {
         setupEqualizer()
         setupPresetStyle()
-        // some mobiles throws error here
-//        setupReverberation()
         setupBassBoost()
         setLoudnessEnhancer()
         setupVisualizer()
@@ -72,11 +70,13 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
         mPlayer!!.start()
     }
 
+    override val layoutId: Int
+        get() = R.layout.activity_audio_effect
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         checkPermission()
-        setContentView(R.layout.activity_audio_effect)
         initView()
         initPlayer()
     }
@@ -102,13 +102,17 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
     }
 
     private fun initPlayer() {
+        if (!FileUtil.checkFileExist(audioPath)) {
+            visualizerView?.postDelayed(Runnable { showSelectFile() }, 500)
+            return
+        }
         try {
             mPlayer = MediaPlayer()
-            mPlayer!!.setDataSource(AUDIO_PATH)
+            mPlayer!!.setDataSource(audioPath)
             mPlayer!!.setOnPreparedListener(onPreparedListener)
             mPlayer!!.prepareAsync()
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("AudioEffect", "play error=$e")
         }
     }
 
@@ -159,26 +163,7 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
                 }
 
             }
-            override fun onNothingSelected(arg0: AdapterView<*>) {}
-        }
-    }
 
-    private fun setupReverberation() {
-        mPresetReverb = PresetReverb(0, mPlayer!!.audioSessionId)
-        mPresetReverb!!.enabled = enableEqualizer
-        mPlayer!!.attachAuxEffect(mPresetReverb!!.id)
-        //sendLevel:0-1
-        mPlayer!!.setAuxEffectSendLevel(1.0f)
-
-        spinnerReverb!!.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, presetReverb)
-        spinnerReverb!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(arg0: AdapterView<*>, arg1: View, arg2: Int, arg3: Long) {
-                try {
-                    mPresetReverb!!.preset = arg2.toShort()
-                } catch (e: Exception) {
-                    Log.e(TAG, "preset reverberation error=$e")
-                }
-            }
             override fun onNothingSelected(arg0: AdapterView<*>) {}
         }
     }
@@ -223,10 +208,9 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
         })
     }
 
-
     private fun setupVisualizer() {
         mVisualizer = AudioVisualizer()
-        mVisualizer?.initVisualizer(mPlayer!!.audioSessionId, false, true, object: Visualizer.OnDataCaptureListener{
+        mVisualizer?.initVisualizer(mPlayer!!.audioSessionId, false, true, object : Visualizer.OnDataCaptureListener {
             override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
                 if (visualizerView != null && fft != null) {
                     visualizerView!!.post { visualizerView!!.setWaveData(fft) }
@@ -236,6 +220,14 @@ class AudioEffectActivity : AppCompatActivity(), OnSeeBarListener {
             override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {
             }
         })
+    }
+
+    override fun onViewClick(view: View) {
+
+    }
+
+    override fun onSelectedFile(filePath: String) {
+
     }
 
     private fun releaseVisualizer() {
