@@ -13,3 +13,24 @@ swscale提供图像缩放与像素格式转换，swresample提供音频重采样
 
 ### 3：AVCodecContext编解码器上下文
 [AVCodecContext](https://blog.csdn.net/u011686167/article/details/121506335)
+
+### 4：AVStream码流
+[码流数组](https://blog.csdn.net/u011686167/article/details/121528354)
+
+### 5：AVFrame与AVPacket
+[AVFrame与AVPacket](https://blog.csdn.net/u011686167/article/details/121551041)
+
+### 6：avformat_open_input()打开媒体流
+[打开媒体流](https://blog.csdn.net/u011686167/article/details/121578185)
+
+### 7：avformat_find_stream_info分析码流信息
+[分析码流信息](https://blog.csdn.net/u011686167/article/details/121630969)
+
+### 8：av_read_frame()读取音视频帧
+[读取音视频帧](https://blog.csdn.net/u011686167/article/details/121642861)
+
+### 9：av_parser_parse2()解析数据包
+[解析数据包](https://blog.csdn.net/u011686167/article/details/121667755)
+
+### 10：av_register_all()注册封装器与解封装器
+[注册封装器与解封装器](https://blog.csdn.net/u011686167/article/details/121691245)
