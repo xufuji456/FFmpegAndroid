@@ -3,7 +3,7 @@
 //
 
 #include <jni.h>
-#include <string.h>
+#include <cstring>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
@@ -75,30 +75,47 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *contex
 }
 
 //create the engine of OpenSLES
-void createEngine() {
+int createEngine() {
     SLresult result;
-    result = slCreateEngine(&engineObject, 0, nullptr, 0, nullptr, nullptr);
-    LOGI(TAG, "slCreateEngine=%d", result);
+    result = slCreateEngine(&engineObject, 0, nullptr,
+                            0, nullptr, nullptr);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "slCreateEngine error=%d", result);
+        return result;
+    }
     result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
-    LOGI(TAG, "engineObject->Realize=%d", result);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "engineObject->Realize error=%d", result);
+        return result;
+    }
     result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
-    LOGI(TAG, "engineObject->GetInterface=%d", result);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "engineObject->GetInterface error=%d", result);
+        return result;
+    }
     result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
-    LOGI(TAG, "CreateOutputMix=%d", result);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "engineEngine->CreateOutputMix error=%d", result);
+        return result;
+    }
     result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
-    LOGI(TAG, "outputMixObject->Realize=%d", result);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "outputMixObject->Realize error=%d", result);
+        return result;
+    }
     result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
                                               &outputMixEnvironmentalReverb);
-    LOGI(TAG, "outputMixObject->GetInterface=%d", result);
-    if (SL_RESULT_SUCCESS == result) {
-        result = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
-                outputMixEnvironmentalReverb, &reverbSettings);
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "outputMixObject->GetInterface error=%d", result);
+        return result;
     }
-    LOGI(TAG, "SetEnvironmentalReverbProperties=%d", result);
+    result = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
+            outputMixEnvironmentalReverb, &reverbSettings);
+    return result;
 }
 
 
-void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
+int createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     SLresult result;
 
     //config audio source
@@ -124,30 +141,26 @@ void createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
                                                 3, ids, req);
-    LOGI(TAG, "CreateAudioPlayer=%d", result);
-
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "outputMixObject->GetInterface error=%d", result);
+        return result;
+    }
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
-    LOGI(TAG, "bqPlayerObject Realize=%d", result);
-
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
-    LOGI(TAG, "GetInterface bqPlayerPlay=%d", result);
-
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
-                                             &bqPlayerBufferQueue);
-    LOGI(TAG, "GetInterface bqPlayerBufferQueue=%d", result);
-
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "bqPlayerObject->Realize error=%d", result);
+        return result;
+    }
+    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
+    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE, &bqPlayerBufferQueue);
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, nullptr);
-    LOGI(TAG, "RegisterCallback=%d", result);
-
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
-                                             &bqPlayerEffectSend);
-    LOGI(TAG, "GetInterface effect=%d", result);
-
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
-    LOGI(TAG, "GetInterface volume=%d", result);
-
+    if (result != SL_RESULT_SUCCESS) {
+        LOGE(TAG, "bqPlayerBufferQueue->RegisterCallback error=%d", result);
+        return result;
+    }
+    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND, &bqPlayerEffectSend);
+    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-    LOGI(TAG, "SetPlayState=%d", result);
+    return result;
 }
 
 int createAudioPlayer(int *rate, int *channel, const char *file_name) {
@@ -219,8 +232,7 @@ int getPCM(void **pcm, size_t *pcmSize) {
 
                 if (data_size > outputBufferSize) {
                     outputBufferSize = (size_t) data_size;
-                    outputBuffer = (uint8_t *) realloc(outputBuffer,
-                                                       sizeof(uint8_t) * outputBufferSize);
+                    outputBuffer = (uint8_t *) realloc(outputBuffer,sizeof(uint8_t) * outputBufferSize);
                 }
 
                 swr_convert(swr, &outputBuffer, aFrame->nb_samples,
@@ -251,9 +263,15 @@ AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
     const char *file_name = env->GetStringUTFChars(filePath, nullptr);
     LOGI(TAG, "file_name=%s", file_name);
 
-    createAudioPlayer(&rate, &channel, file_name);
-    createEngine();
-    createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
+    int ret = createAudioPlayer(&rate, &channel, file_name);
+    if (ret < 0)
+        return;
+    ret = createEngine();
+    if (ret < 0)
+        return;
+    ret = createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
+    if (ret < 0)
+        return;
     bqPlayerCallback(bqPlayerBufferQueue, nullptr);
 }
 
