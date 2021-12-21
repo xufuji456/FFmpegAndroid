@@ -13,6 +13,28 @@ import java.util.Locale;
 
 public class FFmpegUtil {
 
+    private static String[] insert(String[] cmd, int position, String inputPath) {
+        return insert(cmd, position, inputPath, null);
+    }
+
+    /**
+     * insert inputPath and outputPath into target array
+     */
+    private static String[] insert(String[] cmd, int position, String inputPath, String outputPath) {
+        if (cmd == null || inputPath == null || position < 1) {
+            return cmd;
+        }
+        int len = (outputPath != null ? (cmd.length + 2) : (cmd.length + 1));
+        String[] result = new String[len];
+        System.arraycopy(cmd, 0, result, 0, position);
+        result[position] = inputPath;
+        System.arraycopy(cmd, position, result, position + 1, cmd.length - position);
+        if (outputPath != null) {
+            result[result.length - 1] = outputPath;
+        }
+        return result;
+    }
+
     /**
      * transform audio, according to your assigning the output format
      *
@@ -21,15 +43,18 @@ public class FFmpegUtil {
      * @return transform success or not
      */
     public static String[] transformAudio(String inputPath, String outputPath) {
-        String transformAudioCmd = "ffmpeg -i %s %s";
-        transformAudioCmd = String.format(transformAudioCmd, inputPath, outputPath);
-        return transformAudioCmd.split(" ");
+        String[] result = new String[4];
+        result[0] = "ffmpeg";
+        result[1] = "-i";
+        result[2] = inputPath;
+        result[3] = outputPath;
+        return result;
     }
 
     public static String[] transformAudio(String inputPath, String acodec, String outputPath) {
-        String transformAudioCmd = "ffmpeg -i %s -acodec %s -ac 2 -ar 44100 %s";
-        transformAudioCmd = String.format(transformAudioCmd, inputPath, acodec, outputPath);
-        return transformAudioCmd.split(" ");
+        String transformAudioCmd = "ffmpeg -i -acodec %s -ac 2 -ar 44100";
+        transformAudioCmd = String.format(transformAudioCmd, acodec);
+        return insert(transformAudioCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -42,9 +67,10 @@ public class FFmpegUtil {
      * @return cut success or not
      */
     public static String[] cutAudio(String inputPath, float startTime, float duration, String outputPath) {
-        String cutAudioCmd = "ffmpeg -i %s -ss %f -t %f -acodec copy -vn %s";
-        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, inputPath, startTime, duration, outputPath);
-        return cutAudioCmd.split(" ");
+        // "ffmpeg -i %s -ss %f -t %f -acodec copy -vn %s"
+        String cutAudioCmd = "ffmpeg -i -ss %f -t %f -acodec copy -vn";
+        cutAudioCmd = String.format(Locale.getDefault(), cutAudioCmd, startTime, duration);
+        return insert(cutAudioCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -64,9 +90,8 @@ public class FFmpegUtil {
             concatBuilder.append(file).append("|");
         }
         String concatStr = concatBuilder.substring(0, concatBuilder.length() - 1);
-        String concatAudioCmd = "ffmpeg -i %s -acodec copy %s";
-        concatAudioCmd = String.format(concatAudioCmd, concatStr, outputPath);
-        return concatAudioCmd.split(" ");
+        String concatAudioCmd = "ffmpeg -i -acodec copy"; // "ffmpeg -i -acodec libmp3lame"
+        return insert(concatAudioCmd.split(" "), 2, concatStr, outputPath);
     }
 
     /**
@@ -125,9 +150,9 @@ public class FFmpegUtil {
         // out_gain (0, 1], Default is 0.3
         // delays (0 - 90000]. Default is 1000
         // decays (0 - 1.0]. Default is 0.5
-        String echoCmd = "ffmpeg -i %s -af aecho=0.8:0.8:%d:0.5 %s";
-        echoCmd = String.format(Locale.getDefault(), echoCmd, inputPath, delay, outputPath);
-        return echoCmd.split(" ");
+        String echoCmd = "ffmpeg -i -af aecho=0.8:0.8:%d:0.5";
+        echoCmd = String.format(Locale.getDefault(), echoCmd, delay);
+        return insert(echoCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -141,9 +166,9 @@ public class FFmpegUtil {
     public static String[] audioTremolo(String inputPath, int frequency, float depth, String outputPath) {
         // frequency [0.1, 20000.0], Default is 5
         // depth (0, 1], Default is 0.5
-        String tremoloCmd = "ffmpeg -i %s -af tremolo=%d:%f %s";
-        tremoloCmd = String.format(Locale.getDefault(), tremoloCmd, inputPath, frequency, depth, outputPath);
-        return tremoloCmd.split(" ");
+        String tremoloCmd = "ffmpeg -i -af tremolo=%d:%f";
+        tremoloCmd = String.format(Locale.getDefault(), tremoloCmd, frequency, depth);
+        return insert(tremoloCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -156,9 +181,8 @@ public class FFmpegUtil {
         // nr: noise reduction in dB, [0.01 to 97], Default value is 12 dB
         // nf: noise floor in dB, [-80 to -20],  Default value is -50 dB
         // nt: noise type {w:white noise v:vinyl noise s:shellac noise}
-        String fftDenoiseCmd = "ffmpeg -i %s -af afftdn %s";
-        fftDenoiseCmd = String.format(Locale.getDefault(), fftDenoiseCmd, inputPath, outputPath);
-        return fftDenoiseCmd.split(" ");
+        String fftDenoiseCmd = "ffmpeg -i -af afftdn";
+        return insert(fftDenoiseCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -169,9 +193,8 @@ public class FFmpegUtil {
     public static String[] audioSilenceDetect(String inputPath) {
         // silence_start: 268.978
         // silence_end: 271.048 | silence_duration: 2.06975
-        String silenceCmd = "ffmpeg -i %s -af silencedetect=noise=0.0001 -f null -";
-        silenceCmd = String.format(Locale.getDefault(), silenceCmd, inputPath);
-        return silenceCmd.split(" ");
+        String silenceCmd = "ffmpeg -i -af silencedetect=noise=0.0001 -f null -";
+        return insert(silenceCmd.split(" "), 2, inputPath);
     }
 
     /**
@@ -183,9 +206,9 @@ public class FFmpegUtil {
      */
     public static String[] audioVolume(String inputPath, float volume, String outputPath) {
         // output_volume = volume * input_volume
-        String volumeCmd = "ffmpeg -i %s -af volume=%f %s";
-        volumeCmd = String.format(Locale.getDefault(), volumeCmd, inputPath, volume, outputPath);
-        return volumeCmd.split(" ");
+        String volumeCmd = "ffmpeg -i -af volume=%f";
+        volumeCmd = String.format(Locale.getDefault(), volumeCmd, volume);
+        return insert(volumeCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -208,10 +231,11 @@ public class FFmpegUtil {
         for (String band:bandList) {
             builder.append(band).append(":");
         }
-        builder.deleteCharAt(builder.length()-1);
-        String equalizerCmd = "ffmpeg -i %s -af superequalizer=%s -y %s";
-        equalizerCmd = String.format(Locale.getDefault(), equalizerCmd, inputPath, builder.toString(), outputPath);
-        return equalizerCmd.split(" ");
+        builder.deleteCharAt(builder.length() - 1);
+        // "ffmpeg -i %s -af superequalizer=%s -y %s"
+        String equalizerCmd = "ffmpeg -i -af superequalizer=%s -y";
+        equalizerCmd = String.format(Locale.getDefault(), equalizerCmd, builder.toString());
+        return insert(equalizerCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**

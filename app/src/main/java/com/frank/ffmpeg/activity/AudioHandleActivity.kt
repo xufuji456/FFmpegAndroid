@@ -228,7 +228,7 @@ class AudioHandleActivity : BaseActivity() {
                 outputPath = PATH + File.separator + "speed.mp3"
                 commandLine = FFmpegUtil.changeAudioSpeed(srcFile, outputPath, speed)
             }
-            6 // setting echo effect
+            6 //echo effect
             -> {
                 val echo = 1000 // echo effect, range from 0 to 90000
                 outputPath = PATH + File.separator + "echo.mp3"
