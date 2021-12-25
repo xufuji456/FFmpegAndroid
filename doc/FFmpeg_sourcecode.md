@@ -34,3 +34,18 @@ swscale提供图像缩放与像素格式转换，swresample提供音频重采样
 
 ### 10：av_register_all()注册封装器与解封装器
 [注册封装器与解封装器](https://blog.csdn.net/u011686167/article/details/121691245)
+
+### 11：avdevice_register_all()注册设备
+[注册设备](https://blog.csdn.net/u011686167/article/details/121716973)
+
+### 12：avfilter_register_all()注册AVFilter
+[注册AVFilter](https://blog.csdn.net/u011686167/article/details/121721099)
+
+### 13：avcodec_register_all()注册编解码器
+[注册编解码器](https://blog.csdn.net/u011686167/article/details/121723790)
+
+### 14：avcodec_find_decoder()查找编解码器
+[查找编解码器](https://blog.csdn.net/u011686167/article/details/121726609)
+
+### 15：log日志系统分析
+[log日志系统](https://blog.csdn.net/u011686167/article/details/121758769)
