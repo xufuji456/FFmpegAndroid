@@ -268,9 +268,8 @@ public class FFmpegUtil {
     public static String[] extractAudio(String inputPath, String outputPath) {
         // -vn: disable video
         // multi audio track: ffmpeg -i input.mp4 -map 0:1 -vn output.mp3
-        String extractAudioCmd = "ffmpeg -i %s -vn %s";
-        extractAudioCmd = String.format(extractAudioCmd, inputPath, outputPath);
-        return extractAudioCmd.split(" ");
+        String extractAudioCmd = "ffmpeg -i -vn";
+        return insert(extractAudioCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -282,9 +281,8 @@ public class FFmpegUtil {
      */
     public static String[] extractVideo(String inputPath, String outputPath) {
         //-an: disable audio
-        String extractVideoCmd = "ffmpeg -i %s -vcodec copy -an %s";
-        extractVideoCmd = String.format(extractVideoCmd, inputPath, outputPath);
-        return extractVideoCmd.split(" ");
+        String extractVideoCmd = "ffmpeg -i -vcodec copy -an";
+        return insert(extractVideoCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -300,9 +298,9 @@ public class FFmpegUtil {
         // assign the frameRate, bitRate and resolution
 //        String transformVideoCmd = "ffmpeg -i %s -r 25 -b 200 -s 1080x720 %s";
         // assign the encoder
-        String transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s";
-        transformVideoCmd = String.format(transformVideoCmd, inputPath, outputPath);
-        return transformVideoCmd.split(" ");
+//        ffmpeg -i %s -vcodec libx264 -acodec libmp3lame %s
+        String transformVideoCmd = "ffmpeg -i -vcodec libx264 -acodec libmp3lame";
+        return insert(transformVideoCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -329,12 +327,11 @@ public class FFmpegUtil {
         String transformVideoCmd;
         if (width > 0 && height > 0) {
             String scale = "-vf scale=" + width + ":" + height;
-            transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec aac " + scale + " %s";
+            transformVideoCmd = "ffmpeg -i -vcodec libx264 -acodec aac " + scale;
         } else {
-            transformVideoCmd = "ffmpeg -i %s -vcodec libx264 -acodec aac " + "%s";
+            transformVideoCmd = "ffmpeg -i -vcodec libx264 -acodec aac";
         }
-        transformVideoCmd = String.format(transformVideoCmd, inputPath, outputPath);
-        return transformVideoCmd.split(" ");
+        return insert(transformVideoCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -344,9 +341,9 @@ public class FFmpegUtil {
      * @return joint video success or not
      */
     public static String[] jointVideo(String fileListPath, String outputPath) {
-        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i %s -c copy %s";
-        jointVideoCmd = String.format(jointVideoCmd, fileListPath, outputPath);
-        return jointVideoCmd.split(" ");
+        // ffmpeg -f concat -safe 0 -i %s -c copy %s
+        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i -c copy";
+        return insert(jointVideoCmd.split(" "), 6, fileListPath, outputPath);
     }
 
     /**
@@ -363,9 +360,10 @@ public class FFmpegUtil {
         // -map 0:v -vcodec copy (copy track of video)
         // -map 0:a -acodec copy (copy all tracks of audio)
         // -map 0:s -scodec copy (copy all tracks of subtitle)
-        String cutVideoCmd = "ffmpeg -ss %f -accurate_seek -t %f -i %s -map 0 -codec copy -avoid_negative_ts 1 %s";
-        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration, inputPath, outputPath);
-        return cutVideoCmd.split(" ");
+        // ffmpeg -ss %f -accurate_seek -t %f -i %s -map 0 -codec copy -avoid_negative_ts 1 %s
+        String cutVideoCmd = "ffmpeg -ss %f -accurate_seek -t %f -i -map 0 -codec copy -avoid_negative_ts 1";
+        cutVideoCmd = String.format(Locale.getDefault(), cutVideoCmd, startTime, duration);
+        return insert(cutVideoCmd.split(" "), 7, inputPath, outputPath);
     }
 
     /**
@@ -377,9 +375,10 @@ public class FFmpegUtil {
      * @return screenshot success or not
      */
     public static String[] screenShot(String inputPath, float offset, String outputPath) {
-        String screenShotCmd = "ffmpeg -ss %f -i %s -f image2 -vframes 1 -an %s";
-        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, offset, inputPath, outputPath);
-        return screenShotCmd.split(" ");
+        // ffmpeg -ss %f -i %s -f image2 -vframes 1 -an %s
+        String screenShotCmd = "ffmpeg -ss %f -i -f image2 -vframes 1 -an";
+        screenShotCmd = String.format(Locale.getDefault(), screenShotCmd, offset);
+        return insert(screenShotCmd.split(" "), 4, inputPath, outputPath);
     }
 
     private static String obtainOverlay(int offsetX, int offsetY, int location) {
@@ -444,9 +443,10 @@ public class FFmpegUtil {
      * @return delogo cmd
      */
     public static String[] removeLogo(String inputPath, int x, int y, int width, int height, String outputPath) {
-        String delogoCmd = "ffmpeg -i %s -filter_complex delogo=x=%d:y=%d:w=%d:h=%d %s";
-        delogoCmd = String.format(Locale.getDefault(), delogoCmd, inputPath, x, y, width, height, outputPath);
-        return delogoCmd.split(" ");
+        // ffmpeg -i in.mp4 -filter_complex delogo=x=%d:y=%d:w=%d:h=%d out.mp4
+        String delogoCmd = "ffmpeg -i -filter_complex delogo=x=%d:y=%d:w=%d:h=%d";
+        delogoCmd = String.format(Locale.getDefault(), delogoCmd, x, y, width, height);
+        return insert(delogoCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -462,10 +462,10 @@ public class FFmpegUtil {
      */
     public static String[] generatePalette(String inputPath, int startTime, int duration,
                                            int frameRate, int width, String outputPath) {
-        String paletteCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen %s";
+        String paletteCmd = "ffmpeg -ss %d -accurate_seek -t %d -i -vf fps=%d,scale=%d:-1:flags=lanczos,palettegen";
         paletteCmd = String.format(Locale.getDefault(), paletteCmd, startTime,
-                duration, inputPath, frameRate, width, outputPath);
-        return paletteCmd.split(" ");
+                duration, frameRate, width);
+        return insert(paletteCmd.split(" "), 7, inputPath, outputPath);
     }
 
     /**
@@ -514,9 +514,9 @@ public class FFmpegUtil {
      * @return convert success or not
      */
     public static String[] convertResolution(String inputPath, String resolution, String outputPath) {
-        String convertCmd = "ffmpeg -i %s -s %s -pix_fmt yuv420p %s";
-        convertCmd = String.format(Locale.getDefault(), convertCmd, inputPath, resolution, outputPath);
-        return convertCmd.split(" ");
+        String convertCmd = "ffmpeg -i -s %s -pix_fmt yuv420p";
+        convertCmd = String.format(Locale.getDefault(), convertCmd, resolution);
+        return insert(convertCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -529,9 +529,9 @@ public class FFmpegUtil {
      * @return encode audio success or not
      */
     public static String[] encodeAudio(String inputPath, String outputPath, int sampleRate, int channel) {
-        String encodeAudioCmd = "ffmpeg -f s16le -ar %d -ac %d -i %s %s";
-        encodeAudioCmd = String.format(Locale.getDefault(), encodeAudioCmd, sampleRate, channel, inputPath, outputPath);
-        return encodeAudioCmd.split(" ");
+        String encodeAudioCmd = "ffmpeg -f s16le -ar %d -ac %d -i";
+        encodeAudioCmd = String.format(Locale.getDefault(), encodeAudioCmd, sampleRate, channel);
+        return insert(encodeAudioCmd.split(" "), 8, inputPath, outputPath);
     }
 
     /**
@@ -562,9 +562,8 @@ public class FFmpegUtil {
     public static String[] reverseVideo(String inputPath, String outputPath) {
         //-vf reverse: only video reverse, -an: disable audio
         //tip: reverse will cost a lot of time, only short video are recommended
-        String reverseVideo = "ffmpeg -i %s -vf reverse -an %s";
-        reverseVideo = String.format(reverseVideo, inputPath, outputPath);
-        return reverseVideo.split(" ");
+        String reverseVideo = "ffmpeg -i -vf reverse -an";
+        return insert(reverseVideo.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -575,9 +574,8 @@ public class FFmpegUtil {
      * @return noise reduction success or not
      */
     public static String[] denoiseVideo(String inputPath, String outputPath) {
-        String denoiseVideo = "ffmpeg -i %s -nr 500 %s";
-        denoiseVideo = String.format(denoiseVideo, inputPath, outputPath);
-        return denoiseVideo.split(" ");
+        String denoiseVideo = "ffmpeg -i -nr 500";
+        return insert(denoiseVideo.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -632,9 +630,8 @@ public class FFmpegUtil {
      * @return move success or not
      */
     public static String[] moveMoovAhead(String inputPath, String outputPath) {
-        String moovCmd = "ffmpeg -i %s -movflags faststart -acodec copy -vcodec copy %s";
-        moovCmd = String.format(Locale.getDefault(), moovCmd, inputPath, outputPath);
-        return moovCmd.split(" ");
+        String moovCmd = "ffmpeg -i -movflags faststart -acodec copy -vcodec copy";
+        return insert(moovCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -644,9 +641,8 @@ public class FFmpegUtil {
      * @return grayCmd
      */
     public static String[] toGrayVideo(String inputPath, String outputPath) {
-        String grayCmd = "ffmpeg -i %s -vf lutyuv='u=128:v=128' %s";
-        grayCmd = String.format(Locale.getDefault(), grayCmd, inputPath, outputPath);
-        return grayCmd.split(" ");
+        String grayCmd = "ffmpeg -i -vf lutyuv='u=128:v=128'";
+        return insert(grayCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -656,9 +652,8 @@ public class FFmpegUtil {
      * @return zoomCmd
      */
     public static String[] photoZoomToVideo(String inputPath, String outputPath) {
-        String grayCmd = "ffmpeg -loop 1 -i %s -vf zoompan=z='if(lte(zoom,1.0),1.5,max(1.001,zoom-0.0015))':d=125 -t 8 %s";
-        grayCmd = String.format(Locale.getDefault(), grayCmd, inputPath, outputPath);
-        return grayCmd.split(" ");
+        String zoomCmd = "ffmpeg -loop 1 -i -vf zoompan=z='if(lte(zoom,1.0),1.5,max(1.001,zoom-0.0015))':d=125 -t 8";
+        return insert(zoomCmd.split(" "), 4, inputPath, outputPath);
     }
 
     /**
@@ -668,9 +663,9 @@ public class FFmpegUtil {
      * @return probe success or not
      */
     public static String[] probeFormat(String inputPath) {
-        String ffprobeCmd = "ffprobe -i %s -show_streams -show_format -print_format json";
-        ffprobeCmd = String.format(Locale.getDefault(), ffprobeCmd, inputPath);
-        return ffprobeCmd.split(" ");
+        // ffprobe -i hello.mp4 -show_streams -show_format -print_format json"
+        String ffprobeCmd = "ffprobe -i -show_streams -show_format -print_format json";
+        return insert(ffprobeCmd.split(" "), 2, inputPath);
     }
 
     /**
@@ -697,13 +692,13 @@ public class FFmpegUtil {
         float ptsFactor = 1/speed;
         String speedCmd;
         if (pureVideo) {
-            speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v] -map [v] %s";
-            speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, ptsFactor, outputPath);
+            speedCmd = "ffmpeg -i -filter_complex [0:v]setpts=%.2f*PTS[v] -map [v]";
+            speedCmd = String.format(Locale.getDefault(), speedCmd, ptsFactor);
         } else {
-            speedCmd = "ffmpeg -i %s -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a] %s";
-            speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, ptsFactor, speed, outputPath);
+            speedCmd = "ffmpeg -i -filter_complex [0:v]setpts=%.2f*PTS[v];[0:a]atempo=%.2f[a] -map [v] -map [a]";
+            speedCmd = String.format(Locale.getDefault(), speedCmd, ptsFactor, speed);
         }
-        return speedCmd.split(" ");
+        return insert(speedCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -718,9 +713,9 @@ public class FFmpegUtil {
         if (speed > 100 || speed < 0.5) {
             throw new IllegalArgumentException("audio speed range is from 0.5 to 100");
         }
-        String speedCmd = "ffmpeg -i %s -filter_complex atempo=%.2f %s";
-        speedCmd = String.format(Locale.getDefault(), speedCmd, inputPath, speed, outputPath);
-        return speedCmd.split(" ");
+        String speedCmd = "ffmpeg -i -filter_complex atempo=%.2f";
+        speedCmd = String.format(Locale.getDefault(), speedCmd, speed);
+        return insert(speedCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -730,9 +725,8 @@ public class FFmpegUtil {
      * @return command of building flv index
      */
     public static String[] buildFlvIndex(String inputPath, String outputPath) {
-        String buildIndex = "ffmpeg -i %s -flvflags add_keyframe_index %s";
-        buildIndex = String.format(buildIndex, inputPath, outputPath);
-        return buildIndex.split(" ");
+        String buildIndex = "ffmpeg -i -flvflags add_keyframe_index";
+        return insert(buildIndex.split(" "), 2, inputPath, outputPath);
     }
 
     /**
@@ -780,15 +774,15 @@ public class FFmpegUtil {
     }
 
     public static String[] rotateVideo(String inputPath, int rotateDegree, String outputPath) {
-        String rotateCmd = "ffmpeg -i %s -c copy -metadata:s:v:0 rotate=%d %s";
-        rotateCmd = String.format(Locale.getDefault(), rotateCmd, inputPath, rotateDegree, outputPath);
-        return rotateCmd.split(" ");
+        String rotateCmd = "ffmpeg -i -c copy -metadata:s:v:0 rotate=%d";
+        rotateCmd = String.format(Locale.getDefault(), rotateCmd, rotateDegree);
+        return insert(rotateCmd.split(" "), 2, inputPath, outputPath);
     }
 
     public static String[] changeGOP(String inputPath, int gop, String outputPath) {
-        String rotateCmd = "ffmpeg -i %s -g %d %s";
-        rotateCmd = String.format(Locale.getDefault(), rotateCmd, inputPath, gop, outputPath);
-        return rotateCmd.split(" ");
+        String gopCmd = "ffmpeg -i -g %d";
+        gopCmd = String.format(Locale.getDefault(), gopCmd, gop);
+        return insert(gopCmd.split(" "), 2, inputPath, outputPath);
     }
 
 }
