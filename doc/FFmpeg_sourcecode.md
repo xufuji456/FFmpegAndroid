@@ -49,3 +49,19 @@ swscale提供图像缩放与像素格式转换，swresample提供音频重采样
 
 ### 15：log日志系统分析
 [log日志系统](https://blog.csdn.net/u011686167/article/details/121758769)
+
+### 16：内存管理系统
+[内存管理系统](https://blog.csdn.net/u011686167/article/details/121781824)
+
+### 17：图像常用操作
+[图像常用操作](https://blog.csdn.net/u011686167/article/details/121758769)
+
+### 18：SwsContext图像转换上下文
+[SwsContext](https://blog.csdn.net/u011686167/article/details/121875305)
+
+### 19：sws_scale图像缩放与图像转换
+[sws_scale](https://blog.csdn.net/u011686167/article/details/121879397)
+
+### 20：音频采样格式相关API
+[音频采样格式](https://blog.csdn.net/u011686167/article/details/121917453)
+
