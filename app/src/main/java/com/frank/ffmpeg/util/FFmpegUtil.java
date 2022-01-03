@@ -21,7 +21,7 @@ public class FFmpegUtil {
      * insert inputPath and outputPath into target array
      */
     private static String[] insert(String[] cmd, int position, String inputPath, String outputPath) {
-        if (cmd == null || inputPath == null || position < 1) {
+        if (cmd == null || inputPath == null || position < 2) {
             return cmd;
         }
         int len = (outputPath != null ? (cmd.length + 2) : (cmd.length + 1));
@@ -29,6 +29,24 @@ public class FFmpegUtil {
         System.arraycopy(cmd, 0, result, 0, position);
         result[position] = inputPath;
         System.arraycopy(cmd, position, result, position + 1, cmd.length - position);
+        if (outputPath != null) {
+            result[result.length - 1] = outputPath;
+        }
+        return result;
+    }
+
+    public static String[] insert(String[] cmd, int position1, String inputPath1,
+                                  int position2, String inputPath2, String outputPath) {
+        if (cmd == null || inputPath1 == null || position1 < 2 || inputPath2 == null || position2 < 4) {
+            return cmd;
+        }
+        int len = (outputPath != null ? (cmd.length + 3) : (cmd.length + 2));
+        String[] result = new String[len];
+        System.arraycopy(cmd, 0, result, 0, position1);
+        result[position1] = inputPath1;
+        System.arraycopy(cmd, position1, result, position1 + 1, position2 - position1 - 1);
+        result[position2] = inputPath2;
+        System.arraycopy(cmd, position2 - 1, result, position2 + 1, cmd.length - (position2 - 1));
         if (outputPath != null) {
             result[result.length - 1] = outputPath;
         }
@@ -409,9 +427,9 @@ public class FFmpegUtil {
                                            int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
         String overlay = obtainOverlay(offsetXY, offsetXY, location);
-        String waterMarkCmd = "ffmpeg -i %s -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
-        waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
-        return waterMarkCmd.split(" ");
+        String waterMarkCmd = "ffmpeg -i -i -b:v %s -filter_complex %s -preset:v superfast";
+        waterMarkCmd = String.format(waterMarkCmd, mBitRate, overlay);
+        return insert(waterMarkCmd.split(" "), 2, inputPath, 4, imgPath, outputPath);
     }
 
     /**
@@ -430,9 +448,9 @@ public class FFmpegUtil {
         String mBitRate = bitRate + "k";
         int offset = ScreenUtil.INSTANCE.dp2px(FFmpegApplication.getInstance(), offsetXY);
         String overlay = obtainOverlay(offset, offset, location) + ":shortest=1";
-        String waterMarkCmd = "ffmpeg -i %s -ignore_loop 0 -i %s -b:v %s -filter_complex %s -preset:v superfast %s";
-        waterMarkCmd = String.format(waterMarkCmd, inputPath, imgPath, mBitRate, overlay, outputPath);
-        return waterMarkCmd.split(" ");
+        String waterMarkCmd = "ffmpeg -i -ignore_loop 0 -i -b:v %s -filter_complex %s -preset:v superfast";
+        waterMarkCmd = String.format(waterMarkCmd, mBitRate, overlay);
+        return insert(waterMarkCmd.split(" "), 2, inputPath, 6, imgPath, outputPath);
     }
 
     /**
@@ -481,11 +499,11 @@ public class FFmpegUtil {
      */
     public static String[] generateGifByPalette(String inputPath, String palette, int startTime, int duration,
                                            int frameRate, int width, String outputPath) {
-        String paletteGifCmd = "ffmpeg -ss %d -accurate_seek -t %d -i %s -i %s -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
-                "paletteuse=dither=bayer:bayer_scale=3 %s";
+        String paletteGifCmd = "ffmpeg -ss %d -accurate_seek -t %d -i -i -lavfi fps=%d,scale=%d:-1:flags=lanczos[x];[x][1:v]" +
+                "paletteuse=dither=bayer:bayer_scale=3";
         paletteGifCmd = String.format(Locale.getDefault(), paletteGifCmd, startTime,
-                duration, inputPath, palette, frameRate, width, outputPath);
-        return paletteGifCmd.split(" ");
+                                      duration, frameRate, width);
+        return insert(paletteGifCmd.split(" "), 7, inputPath, 9, palette, outputPath);
     }
 
     /**
@@ -543,12 +561,11 @@ public class FFmpegUtil {
      * @return join success or not
      */
     public static String[] multiVideo(String input1, String input2, String outputPath, int videoLayout) {
-        String multiVideo = "ffmpeg -i %s -i %s -filter_complex hstack %s";//hstack: horizontal
+        String multiVideo = "ffmpeg -i -i -filter_complex hstack";//hstack: horizontal
         if (videoLayout == VideoLayout.LAYOUT_VERTICAL) {//vstack: vertical
             multiVideo = multiVideo.replace("hstack", "vstack");
         }
-        multiVideo = String.format(multiVideo, input1, input2, outputPath);
-        return multiVideo.split(" ");
+        return insert(multiVideo.split(" "), 2, input1, 4, input2, outputPath);
     }
 
     /**
@@ -608,17 +625,17 @@ public class FFmpegUtil {
     /**
      * convert videos into picture-in-picture mode
      *
-     * @param inputFile1 input one
-     * @param inputFile2 input two
+     * @param inputPath1 input one
+     * @param inputPath2 input two
      * @param outputPath output file
      * @param x          x coordinate point
      * @param y          y coordinate point
      * @return convert success or not
      */
-    public static String[] picInPicVideo(String inputFile1, String inputFile2, int x, int y, String outputPath) {
-        String pipVideo = "ffmpeg -i %s -i %s -filter_complex overlay=%d:%d %s";
-        pipVideo = String.format(Locale.getDefault(), pipVideo, inputFile1, inputFile2, x, y, outputPath);
-        return pipVideo.split(" ");
+    public static String[] picInPicVideo(String inputPath1, String inputPath2, int x, int y, String outputPath) {
+        String pipVideo = "ffmpeg -i -i -filter_complex overlay=%d:%d";
+        pipVideo = String.format(Locale.getDefault(), pipVideo, x, y);
+        return insert(pipVideo.split(" "), 2, inputPath1, 4, inputPath2, outputPath);
     }
 
     /**
@@ -736,15 +753,13 @@ public class FFmpegUtil {
      * @return command of inserting picture
      */
     public static String[] insertPicIntoVideo(String inputPath, String picturePath, String outputPath) {
-        String insertPicCmd = "ffmpeg -i %s -i %s -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic %s";
-        insertPicCmd = String.format(insertPicCmd, inputPath, picturePath, outputPath);
-        return insertPicCmd.split(" ");
+        String insertPicCmd = "ffmpeg -i -i -map 0 -map 1 -c copy -c:v:1 png -disposition:v:1 attached_pic";
+        return insert(insertPicCmd.split(" "), 2, inputPath, 4, picturePath, outputPath);
     }
 
     public static String[] addSubtitleIntoVideo(String inputPath, String subtitlePath, String outputPath) {
-        String subtitleCmd = "ffmpeg -i %s -i %s -map 0:v -map 0:a -map 1:s -c copy %s";
-        subtitleCmd = String.format(subtitleCmd, inputPath, subtitlePath, outputPath);
-        return subtitleCmd.split(" ");
+        String subtitleCmd = "ffmpeg -i -i -map 0:v -map 0:a -map 1:s -c copy";
+        return insert(subtitleCmd.split(" "), 2, inputPath, 4, subtitlePath, outputPath);
     }
 
     /**
