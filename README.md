@@ -11,9 +11,9 @@
 ### 音视频基础知识:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_baseline.png)
 
+### 音视频进阶成长:
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_main.png)
+
 ### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
-
-### Joining QQ group to learn FFmpeg:
-![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_qq.png)
 
