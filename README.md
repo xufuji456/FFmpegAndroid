@@ -17,6 +17,9 @@
 ### 音视频开源库:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_library.png)
 
+### 音视频工作方向:
+![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_work.png)
+
 ### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
 
