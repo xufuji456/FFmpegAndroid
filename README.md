@@ -15,6 +15,10 @@ WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码
 常用的视频封装格式有mp4，关于C语言标准有C11、C17等，书籍包括音视频编解码等。</br>
 详细列表可以查阅：[多媒体协议与书籍](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_protocol.md)
 
+音视频工作方向包括:直播、短视频、流媒体传输、视频播放器、音乐播放器、音视频算法、</br>
+流媒体后端、音视频编辑、图像处理(个人概括，具体方向不限于此)。</br>
+详情可查阅：[音视频工作方向](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_work.md)
+
 ### 音视频基础知识:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_baseline.png)
 
@@ -23,9 +27,6 @@ WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码
 
 ### 音视频开源库:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_library.png)
-
-### 音视频工作方向:
-![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_work.png)
 
 ### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
