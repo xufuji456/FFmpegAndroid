@@ -3,8 +3,8 @@
 欢迎大家补充其他相关协议与书籍，共同维护良好的开源社区。</br>
 
 ### 多媒体协议
-常见的流媒体传输协议包括：RTP、RTMP、RTCP、RTSP，流媒体应用协议有HLS、DASH，</br>
-WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码协议有H264，</br>
+常见的流媒体传输协议包括：RTP、SRTP、RTMP、RTCP、RTSP，流媒体应用协议有HLS、DASH，</br>
+WebRTC网络传输协议有SDP、ICE、NAT、STUN、TURN等，常用视频编码协议有H264，</br>
 常用的视频封装格式有mp4，关于C语言标准有C11、C17等，详细列表如下：
  |    protocol     |          download                               |     password    |
  |:----------------|:------------------------------------------------|:----------------|
@@ -30,7 +30,7 @@ WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码
 
 ### 多媒体书籍
 音频开发书籍包括：音乐理论、音频信号处理与编码、DSP语音降噪、3D声音环绕，</br>
-视频开发书籍包括：数字图像与视频处理、视频编码全角度解析，</br>
+视频开发书籍包括：数字图像与视频处理、视频编码全角度详解，</br>
 渲染方面是OpenGL，硬件加速指令有neon，详细列表如下：
  |    book         |          download                               |     password    |
  |:----------------|:------------------------------------------------|:----------------|
@@ -40,8 +40,10 @@ WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码
  | CodingForNeon   | https://pan.baidu.com/s/1R-Lf94AnHk_hUwZQyLuxSQ |       5iyj      |
  | HybridReverb    | https://pan.baidu.com/s/19LV36iTBKPGFDQZkoCosiw |       jjlq      |
  | 数字图像与视频处理 | https://pan.baidu.com/s/1oBAtwAFU0pfnhf_cQUs6dg |       pi17      |
- | 视频编码全角度解析 | https://pan.baidu.com/s/1WBdEFF4MWcZDnheeR4XvCA |       vyfo      |
+ | 视频编码全角度详解 | https://pan.baidu.com/s/1WBdEFF4MWcZDnheeR4XvCA |       vyfo      |
  | 音频信号处理与编码 | https://pan.baidu.com/s/1qwSrRrcs1eipph9QLxrEXg |       q9xc      |
  | DSP语音降噪      | https://pan.baidu.com/s/1z2i6vXf9xn_Uq2_T6TE8rA |       h7a1      |
  | 3D声音环绕       | https://pan.baidu.com/s/1URAnDx_eNXJhsQUSUVLKDA |       u8n0      |
+ | 音视频开发进阶指南 |                      /                          |         /       |
+ | 高效视频编码H.265 |                      /                          |         /       |
 
