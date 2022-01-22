@@ -26,8 +26,7 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     mHeight = height;
     mFps = fps;
     mBitrate = bitrate;
-    ySize = width * height;
-    uvSize = ySize / 4;
+    yLen = width * height;
     if (videoCodec) {
         x264_encoder_close(videoCodec);
         videoCodec = nullptr;
@@ -78,26 +77,25 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     pthread_mutex_unlock(&mutex);
 }
 
-void VideoStream::setVideoCallback(VideoCallback videoCallback) {
-    this->videoCallback = videoCallback;
+void VideoStream::setVideoCallback(VideoCallback callback) {
+    this->videoCallback = callback;
 }
 
 void VideoStream::encodeData(int8_t *data) {
     pthread_mutex_lock(&mutex);
     //y
-    memcpy(pic_in->img.plane[0], data, ySize);
-    for (int i = 0; i < uvSize; ++i) {
+    memcpy(pic_in->img.plane[0], data, yLen);
+    for (int i = 0; i < yLen/4; ++i) {
         //uv
-        *(pic_in->img.plane[1] + i) = *(data + ySize + i * 2 + 1);
-        *(pic_in->img.plane[2] + i) = *(data + ySize + i * 2);
+        *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);
+        *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2);
     }
 
     x264_nal_t *pp_nal;
     int pi_nal;
     x264_picture_t pic_out;
     x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
-    int sps_len = 0;
-    int pps_len = 0;
+    int pps_len, sps_len = 0;
     uint8_t sps[100];
     uint8_t pps[100];
     for (int i = 0; i < pi_nal; ++i) {
@@ -118,16 +116,15 @@ void VideoStream::encodeData(int8_t *data) {
 void VideoStream::encodeDataNew(int8_t *y_plane, int8_t *u_plane, int8_t *v_plane) {
     pthread_mutex_lock(&mutex);
 
-    memcpy(pic_in->img.plane[0], y_plane, (size_t) ySize);
-    memcpy(pic_in->img.plane[1], u_plane, (size_t) ySize / 4);
-    memcpy(pic_in->img.plane[2], v_plane, (size_t) ySize / 4);
+    memcpy(pic_in->img.plane[0], y_plane, (size_t) yLen);
+    memcpy(pic_in->img.plane[1], u_plane, (size_t) yLen / 4);
+    memcpy(pic_in->img.plane[2], v_plane, (size_t) yLen / 4);
 
     x264_nal_t *pp_nal;
     int pi_nal;
     x264_picture_t pic_out;
     x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
-    int sps_len = 0;
-    int pps_len = 0;
+    int pps_len, sps_len = 0;
     uint8_t sps[100];
     uint8_t pps[100];
     for (int i = 0; i < pi_nal; ++i) {

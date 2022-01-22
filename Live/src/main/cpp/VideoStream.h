@@ -32,8 +32,7 @@ private:
     x264_t *videoCodec = 0;
     x264_picture_t *pic_in = 0;
 
-    int ySize;
-    int uvSize;
+    int yLen;
     VideoCallback videoCallback;
 
     void sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len);
