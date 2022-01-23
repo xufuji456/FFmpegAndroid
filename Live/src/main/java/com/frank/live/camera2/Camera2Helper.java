@@ -26,6 +26,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -530,10 +531,11 @@ public class Camera2Helper {
     }
 
     private class OnImageAvailableListenerImpl implements ImageReader.OnImageAvailableListener {
+        private byte[] data = null;
         private byte[] yPlane;
         private byte[] uPlane;
         private byte[] vPlane;
-        private ReentrantLock lock = new ReentrantLock();
+        private final ReentrantLock lock = new ReentrantLock();
 
         @Override
         public void onImageAvailable(ImageReader reader) {
@@ -542,18 +544,45 @@ public class Camera2Helper {
             if (camera2Listener != null && image.getFormat() == ImageFormat.YUV_420_888) {
                 Image.Plane[] planes = image.getPlanes();
                 lock.lock();
-                if (yPlane == null || uPlane == null || vPlane == null) {
-                    yPlane = new byte[planes[0].getBuffer().limit() - planes[0].getBuffer().position()];
-                    uPlane = new byte[planes[1].getBuffer().limit() - planes[1].getBuffer().position()];
-                    vPlane = new byte[planes[2].getBuffer().limit() - planes[2].getBuffer().position()];
+
+                int width = image.getWidth();
+                int height = image.getHeight();
+                if (yPlane == null) {
+                    yPlane = new byte[width * height];
+                    uPlane = new byte[width * height / 4];
+                    vPlane = new byte[width * height / 4];
                 }
-                if (image.getPlanes()[0].getBuffer().remaining() == yPlane.length) {
-                    planes[0].getBuffer().get(yPlane);
-                    planes[1].getBuffer().get(uPlane);
-                    planes[2].getBuffer().get(vPlane);
-                    if (camera2Listener != null) {
-                        camera2Listener.onPreviewFrame(yPlane, uPlane, vPlane);
+
+                planes[0].getBuffer().get(yPlane);
+                for (int i = 1; i < planes.length; i++) {
+                    int srcIndex = 0, dstIndex = 0;
+                    int rowStride = planes[i].getRowStride();
+                    int pixelsStride = planes[i].getPixelStride();
+                    ByteBuffer buffer = planes[i].getBuffer();
+                    if (data == null || data.length != buffer.capacity()) {
+                        data = new byte[buffer.capacity()];
                     }
+                    buffer.get(data);
+
+                    for (int j = 0; j < height / 2; j++) {
+                        for (int k = 0; k < width / 2; k++) {
+                            if (i == 1) {
+                                uPlane[dstIndex++] = data[srcIndex];
+                            } else if (i == 2) {
+                                vPlane[dstIndex++] = data[srcIndex];
+                            }
+                            srcIndex += pixelsStride;
+                        }
+                        if (pixelsStride == 2) {
+                            srcIndex += rowStride - width;
+                        } else if (pixelsStride == 1) {
+                            srcIndex += rowStride - width / 2;
+                        }
+                    }
+                }
+
+                if (camera2Listener != null) {
+                    camera2Listener.onPreviewFrame(yPlane, uPlane, vPlane);
                 }
                 lock.unlock();
             }
