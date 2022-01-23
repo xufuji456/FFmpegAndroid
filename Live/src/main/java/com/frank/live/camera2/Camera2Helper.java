@@ -29,7 +29,6 @@ import android.view.TextureView;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -49,14 +48,13 @@ public class Camera2Helper {
     public static final String CAMERA_ID_FRONT = "1";
     public static final String CAMERA_ID_BACK = "0";
 
-
+    private Context context;
     private String mCameraId;
     private String specificCameraId;
-    private Camera2Listener camera2Listener;
     private TextureView mTextureView;
-    private int rotation;
-    private Point previewViewSize;
-    private Context context;
+    private final int rotation;
+    private final Point previewViewSize;
+    private Camera2Listener camera2Listener;
     /**
      * A {@link CameraCaptureSession } for camera preview.
      */
@@ -144,12 +142,11 @@ public class Camera2Helper {
 
     };
 
-    private CameraDevice.StateCallback mDeviceStateCallback = new CameraDevice.StateCallback() {
+    private final CameraDevice.StateCallback mDeviceStateCallback = new CameraDevice.StateCallback() {
 
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             Log.i(TAG, "onOpened: ");
-            // This method is called when the camera is opened.  We start camera preview here.
             mCameraOpenCloseLock.release();
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
@@ -182,7 +179,7 @@ public class Camera2Helper {
         }
 
     };
-    private CameraCaptureSession.StateCallback mCaptureStateCallback = new CameraCaptureSession.StateCallback() {
+    private final CameraCaptureSession.StateCallback mCaptureStateCallback = new CameraCaptureSession.StateCallback() {
 
         @Override
         public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
@@ -234,8 +231,7 @@ public class Camera2Helper {
     /**
      * A {@link Semaphore} to prevent the app from exiting before closing the camera.
      */
-    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-
+    private final Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
     /**
      * Orientation of the camera sensor
@@ -246,9 +242,7 @@ public class Camera2Helper {
         Size defaultSize = sizes.get(0);
         Log.e(TAG, "default width=" + defaultSize.getWidth() + "--height=" + defaultSize.getHeight());
         int defaultDelta = Math.abs(defaultSize.getWidth() * defaultSize.getHeight() - previewViewSize.x * previewViewSize.y);
-        Iterator supportIterator = sizes.iterator();
-        while (supportIterator.hasNext()) {
-            Size size = (Size) supportIterator.next();
+        for (Size size : sizes) {
             Log.e(TAG, "current width=" + defaultSize.getWidth() + "--height=" + defaultSize.getHeight());
             int currentDelta = Math.abs(size.getWidth() * size.getHeight() - previewViewSize.x * previewViewSize.y);
             if (currentDelta < defaultDelta) {
@@ -540,7 +534,6 @@ public class Camera2Helper {
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
-            // YUV_420_888
             if (camera2Listener != null && image.getFormat() == ImageFormat.YUV_420_888) {
                 Image.Plane[] planes = image.getPlanes();
                 lock.lock();
