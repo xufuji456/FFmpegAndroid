@@ -70,7 +70,7 @@ void releasePackets(RTMPPacket *&packet) {
     if (packet) {
         RTMPPacket_Free(packet);
         delete packet;
-        packet = 0;
+        packet = nullptr;
     }
 }
 
@@ -173,26 +173,23 @@ RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
     env->ReleaseStringUTFChars(path_, path);
 }
 
-RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray data_) {
+RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray yuv, jbyteArray y, jbyteArray u, jbyteArray v) {
     if (!videoStream || !readyPushing) {
         return;
     }
-    jbyte *data = env->GetByteArrayElements(data_, nullptr);
-    videoStream->encodeData(data);
-    env->ReleaseByteArrayElements(data_, data, 0);
-}
-
-RTMP_PUSHER_FUNC(void, native_1pushVideoNew, jbyteArray y, jbyteArray u, jbyteArray v) {
-    if (!videoStream || !readyPushing) {
-        return;
+    if (yuv) {
+        jbyte *yuv_plane = env->GetByteArrayElements(yuv, JNI_FALSE);
+        videoStream->encodeVideo(yuv_plane, nullptr, nullptr, nullptr);
+        env->ReleaseByteArrayElements(yuv, yuv_plane, 0);
+    } else if (y && u && v) {
+        jbyte *y_plane = env->GetByteArrayElements(y, JNI_FALSE);
+        jbyte *u_plane = env->GetByteArrayElements(u, JNI_FALSE);
+        jbyte *v_plane = env->GetByteArrayElements(v, JNI_FALSE);
+        videoStream->encodeVideo(nullptr, y_plane, u_plane, v_plane);
+        env->ReleaseByteArrayElements(y, y_plane, 0);
+        env->ReleaseByteArrayElements(u, u_plane, 0);
+        env->ReleaseByteArrayElements(v, v_plane, 0);
     }
-    jbyte *y_plane = env->GetByteArrayElements(y, nullptr);
-    jbyte *u_plane = env->GetByteArrayElements(u, nullptr);
-    jbyte *v_plane = env->GetByteArrayElements(v, nullptr);
-    videoStream->encodeDataNew(y_plane, u_plane, v_plane);
-    env->ReleaseByteArrayElements(y, y_plane, 0);
-    env->ReleaseByteArrayElements(u, u_plane, 0);
-    env->ReleaseByteArrayElements(v, v_plane, 0);
 }
 
 RTMP_PUSHER_FUNC(void, native_1setAudioCodecInfo, jint sampleRateInHz, jint channels) {

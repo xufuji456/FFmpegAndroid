@@ -4,7 +4,11 @@
 #include "VideoStream.h"
 #include "PushInterface.h"
 
-VideoStream::VideoStream() {
+VideoStream::VideoStream():yLen(0),
+                           mBitrate(0),
+                           videoCodec(nullptr),
+                           pic_in(nullptr),
+                           videoCallback(nullptr) {
     pthread_mutex_init(&mutex, nullptr);
 }
 
@@ -22,9 +26,6 @@ VideoStream::~VideoStream() {
 
 void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     pthread_mutex_lock(&mutex);
-    mWidth = width;
-    mHeight = height;
-    mFps = fps;
     mBitrate = bitrate;
     yLen = width * height;
     if (videoCodec) {
@@ -81,44 +82,24 @@ void VideoStream::setVideoCallback(VideoCallback callback) {
     this->videoCallback = callback;
 }
 
-void VideoStream::encodeData(int8_t *data) {
+void VideoStream::encodeVideo(int8_t *data, int8_t *y_plane, int8_t *u_plane, int8_t *v_plane) {
     pthread_mutex_lock(&mutex);
-    //y
-    memcpy(pic_in->img.plane[0], data, yLen);
-    for (int i = 0; i < yLen/4; ++i) {
+
+    if (data) {
+        //y
+        memcpy(pic_in->img.plane[0], data, yLen);
         //uv
-        *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);
-        *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2);
-    }
-
-    x264_nal_t *pp_nal;
-    int pi_nal;
-    x264_picture_t pic_out;
-    x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
-    int pps_len, sps_len = 0;
-    uint8_t sps[100];
-    uint8_t pps[100];
-    for (int i = 0; i < pi_nal; ++i) {
-        if (pp_nal[i].i_type == NAL_SPS) {
-            sps_len = pp_nal[i].i_payload - 4;
-            memcpy(sps, pp_nal[i].p_payload + 4, static_cast<size_t>(sps_len));
-        } else if (pp_nal[i].i_type == NAL_PPS) {
-            pps_len = pp_nal[i].i_payload - 4;
-            memcpy(pps, pp_nal[i].p_payload + 4, static_cast<size_t>(pps_len));
-            sendSpsPps(sps, pps, sps_len, pps_len);
-        } else {
-            sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
+        for (int i = 0; i < yLen/4; ++i) {
+            *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);
+            *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2);
         }
+    } else if (y_plane && u_plane && v_plane) {
+        memcpy(pic_in->img.plane[0], y_plane, (size_t) yLen);
+        memcpy(pic_in->img.plane[1], u_plane, (size_t) yLen / 4);
+        memcpy(pic_in->img.plane[2], v_plane, (size_t) yLen / 4);
+    } else {
+        return;
     }
-    pthread_mutex_unlock(&mutex);
-}
-
-void VideoStream::encodeDataNew(int8_t *y_plane, int8_t *u_plane, int8_t *v_plane) {
-    pthread_mutex_lock(&mutex);
-
-    memcpy(pic_in->img.plane[0], y_plane, (size_t) yLen);
-    memcpy(pic_in->img.plane[1], u_plane, (size_t) yLen / 4);
-    memcpy(pic_in->img.plane[2], v_plane, (size_t) yLen / 4);
 
     x264_nal_t *pp_nal;
     int pi_nal;

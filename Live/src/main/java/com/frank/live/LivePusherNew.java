@@ -150,11 +150,11 @@ public class LivePusherNew {
     }
 
     public void pushVideo(byte[] data) {
-        native_pushVideo(data);
+        native_pushVideo(data, null, null, null);
     }
 
     public void pushVideo(byte[] y, byte[] u, byte[] v) {
-        native_pushVideoNew(y, u, v);
+        native_pushVideo(null, y, u, v);
     }
 
     private native void native_init();
@@ -169,9 +169,8 @@ public class LivePusherNew {
 
     private native void native_pushAudio(byte[] data);
 
-    private native void native_pushVideo(byte[] data);
-
-    private native void native_pushVideoNew(byte[] y, byte[] u, byte[] v);
+    // compat for Camera1 and Camera2
+    private native void native_pushVideo(byte[] yuv, byte[] y, byte[] u, byte[] v);
 
     private native void native_stop();
 
