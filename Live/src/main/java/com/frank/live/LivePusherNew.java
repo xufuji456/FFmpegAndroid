@@ -5,13 +5,14 @@ import android.view.SurfaceHolder;
 import android.view.TextureView;
 
 import com.frank.live.listener.LiveStateChangeListener;
+import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.AudioParam;
 import com.frank.live.param.VideoParam;
 import com.frank.live.stream.AudioStream;
 import com.frank.live.stream.VideoStream;
 import com.frank.live.stream.VideoStreamNew;
 
-public class LivePusherNew {
+public class LivePusherNew implements OnFrameDataCallback {
 
     //error of opening video encoder
     private final static int ERROR_VIDEO_ENCODER_OPEN = 0x01;
@@ -32,7 +33,7 @@ public class LivePusherNew {
         System.loadLibrary("live");
     }
 
-    private AudioStream audioStream;
+    private final AudioStream audioStream;
     private VideoStream videoStream;
 //    private VideoStreamNew videoStream;
 
@@ -129,32 +130,63 @@ public class LivePusherNew {
         }
     }
 
-    public void setVideoCodecInfo(int width, int height, int fps, int bitrate) {
-        native_setVideoCodecInfo(width, height, fps, bitrate);
-    }
-
-    public void setAudioCodecInfo(int sampleRateInHz, int channels) {
-        native_setAudioCodecInfo(sampleRateInHz, channels);
-    }
-
     public void start(String path) {
         native_start(path);
     }
 
-    public int getInputSample() {
-        return getInputSamples();
+    private int getInputSamplesFromNative() {
+        return native_getInputSamples();
     }
 
-    public void pushAudio(byte[] data) {
+    public void setVideoCodecInfo(int width, int height, int frameRate, int bitrate) {
+        native_setVideoCodecInfo(width, height, frameRate, bitrate);
+    }
+
+    private void setAudioCodecInfo(int sampleRateInHz, int channels) {
+        native_setAudioCodecInfo(sampleRateInHz, channels);
+    }
+
+    private void pushAudio(byte[] data) {
         native_pushAudio(data);
     }
 
-    public void pushVideo(byte[] data) {
+    private void pushVideo(byte[] data) {
         native_pushVideo(data, null, null, null);
     }
 
-    public void pushVideo(byte[] y, byte[] u, byte[] v) {
+    private void pushVideo(byte[] y, byte[] u, byte[] v) {
         native_pushVideo(null, y, u, v);
+    }
+
+    @Override
+    public int getInputSamples() {
+        return getInputSamplesFromNative();
+    }
+
+    @Override
+    public void onAudioCodecInfo(int sampleRate, int channelCount) {
+        setAudioCodecInfo(sampleRate, channelCount);
+    }
+
+    @Override
+    public void onAudioFrame(byte[] pcm) {
+        if (pcm != null) {
+            pushAudio(pcm);
+        }
+    }
+
+    @Override
+    public void onVideoCodecInfo(int width, int height, int frameRate, int bitrate) {
+        setVideoCodecInfo(width, height, frameRate, bitrate);
+    }
+
+    @Override
+    public void onVideoFrame(byte[] yuv, byte[] y, byte[] u, byte[] v) {
+        if (yuv != null) {
+            pushVideo(yuv);
+        } else if (y != null && u != null && v != null) {
+            pushVideo(y, u, v);
+        }
     }
 
     private native void native_init();
@@ -165,7 +197,7 @@ public class LivePusherNew {
 
     private native void native_setAudioCodecInfo(int sampleRateInHz, int channels);
 
-    private native int getInputSamples();
+    private native int native_getInputSamples();
 
     private native void native_pushAudio(byte[] data);
 

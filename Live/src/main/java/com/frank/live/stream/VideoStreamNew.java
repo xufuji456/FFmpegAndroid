@@ -9,9 +9,9 @@ import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.TextureView;
 
-import com.frank.live.LivePusherNew;
 import com.frank.live.camera2.Camera2Helper;
 import com.frank.live.camera2.Camera2Listener;
+import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.VideoParam;
 
 /**
@@ -22,15 +22,18 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
 
     private static final String TAG = VideoStreamNew.class.getSimpleName();
 
-    private LivePusherNew mLivePusher;
-    private Camera2Helper camera2Helper;
     private boolean isLiving;
-    private TextureView mTextureView;
-    private Context mContext;
-    private VideoParam mVideoParam;
+    private final Context mContext;
+    private Camera2Helper camera2Helper;
+    private final VideoParam mVideoParam;
+    private final TextureView mTextureView;
+    private final OnFrameDataCallback mCallback;
 
-    public VideoStreamNew(LivePusherNew livePusher, TextureView textureView, VideoParam videoParam, Context context) {
-        this.mLivePusher = livePusher;
+    public VideoStreamNew(OnFrameDataCallback callback,
+                          TextureView textureView,
+                          VideoParam videoParam,
+                          Context context) {
+        this.mCallback = callback;
         this.mTextureView = textureView;
         this.mVideoParam = videoParam;
         this.mContext = context;
@@ -55,7 +58,6 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
                 .specificCameraId(Camera2Helper.CAMERA_ID_BACK)
                 .context(mContext.getApplicationContext())
                 .previewOn(mTextureView)
-//                .previewViewSize(new Point(mTextureView.getWidth(), mTextureView.getHeight()))
                 .previewViewSize(new Point(mVideoParam.getWidth(), mVideoParam.getHeight()))
                 .rotation(rotateDegree)
                 .build();
@@ -95,7 +97,7 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.e(TAG, "onSurfaceTextureAvailable...");
+        Log.i(TAG, "onSurfaceTextureAvailable...");
         startPreview();
     }
 
@@ -106,7 +108,7 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG, "onSurfaceTextureDestroyed...");
+        Log.i(TAG, "onSurfaceTextureDestroyed...");
         stopPreview();
         return false;
     }
@@ -117,7 +119,7 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
     }
 
     /**
-     * camere preview frame data
+     * Camera2 preview frame data
      *
      * @param y plane of y
      * @param u plane of u
@@ -125,23 +127,23 @@ public class VideoStreamNew implements TextureView.SurfaceTextureListener, Camer
      */
     @Override
     public void onPreviewFrame(byte[] y, byte[] u, byte[] v) {
-        if (isLiving && mLivePusher != null) {
-            mLivePusher.pushVideo(y, u, v);
+        if (isLiving && mCallback != null) {
+            mCallback.onVideoFrame(null, y, u, v);
         }
     }
 
     @Override
     public void onCameraOpened(Size previewSize, int displayOrientation) {
-        Log.e(TAG, "onCameraOpened previewSize=" + previewSize.toString());
-        if (mLivePusher != null && mVideoParam != null) {
-            mLivePusher.setVideoCodecInfo(previewSize.getWidth(), previewSize.getHeight(),
+        Log.i(TAG, "onCameraOpened previewSize=" + previewSize.toString());
+        if (mCallback != null && mVideoParam != null) {
+            mCallback.onVideoCodecInfo(previewSize.getWidth(), previewSize.getHeight(),
                     mVideoParam.getFrameRate(), mVideoParam.getBitRate());
         }
     }
 
     @Override
     public void onCameraClosed() {
-        Log.e(TAG, "onCameraClosed");
+        Log.i(TAG, "onCameraClosed");
     }
 
     @Override

@@ -198,7 +198,7 @@ RTMP_PUSHER_FUNC(void, native_1setAudioCodecInfo, jint sampleRateInHz, jint chan
     }
 }
 
-RTMP_PUSHER_FUNC(jint, getInputSamples) {
+RTMP_PUSHER_FUNC(jint, native_1getInputSamples) {
     if (audioStream) {
         return audioStream->getInputSamples();
     }

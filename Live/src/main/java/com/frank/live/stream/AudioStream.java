@@ -4,7 +4,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
-import com.frank.live.LivePusherNew;
+import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.AudioParam;
 
 import java.util.concurrent.ExecutorService;
@@ -12,15 +12,15 @@ import java.util.concurrent.Executors;
 
 public class AudioStream {
 
-    private int inputSamples;
-    private ExecutorService executor;
-    private AudioRecord audioRecord;
-    private LivePusherNew mLivePusher;
-    private boolean isLiving;
     private boolean isMute;
+    private boolean isLiving;
+    private final int inputSamples;
+    private final ExecutorService executor;
+    private final AudioRecord audioRecord;
+    private final OnFrameDataCallback mCallback;
 
-    public AudioStream(LivePusherNew livePusher, AudioParam audioParam) {
-        mLivePusher = livePusher;
+    public AudioStream(OnFrameDataCallback callback, AudioParam audioParam) {
+        mCallback = callback;
         executor = Executors.newSingleThreadExecutor();
         int channelConfig;
         if (audioParam.getNumChannels() == 2) {
@@ -29,12 +29,12 @@ public class AudioStream {
             channelConfig = AudioFormat.CHANNEL_IN_MONO;
         }
 
-        mLivePusher.setAudioCodecInfo(audioParam.getSampleRate(), audioParam.getNumChannels());
-        inputSamples = mLivePusher.getInputSample() * 2;
+        mCallback.onAudioCodecInfo(audioParam.getSampleRate(), audioParam.getNumChannels());
+        inputSamples = mCallback.getInputSamples() * 2;
 
         int minBufferSize = AudioRecord.getMinBufferSize(audioParam.getSampleRate(),
                 channelConfig, audioParam.getAudioFormat()) * 2;
-        int bufferSizeInBytes = minBufferSize > inputSamples ? minBufferSize : inputSamples;
+        int bufferSizeInBytes = Math.max(minBufferSize, inputSamples);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, audioParam.getSampleRate(),
                 channelConfig, audioParam.getAudioFormat(), bufferSizeInBytes);
     }
@@ -65,7 +65,7 @@ public class AudioStream {
                 if (!isMute) {
                     int len = audioRecord.read(bytes, 0, bytes.length);
                     if (len > 0) {
-                        mLivePusher.pushAudio(bytes);
+                        mCallback.onAudioFrame(bytes);
                     }
                 }
             }

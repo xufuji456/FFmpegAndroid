@@ -4,22 +4,28 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
 
-import com.frank.live.LivePusherNew;
+import com.frank.live.listener.OnFrameDataCallback;
 
 
 public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChangedSizeListener {
 
 
-    private LivePusherNew mLivePusher;
-    private CameraHelper cameraHelper;
-    private int mBitrate;
-    private int mFps;
+    private final OnFrameDataCallback mCallback;
+    private final CameraHelper cameraHelper;
+    private final int mBitrate;
+    private final int mFrameRate;
     private boolean isLiving;
 
-    public VideoStream(LivePusherNew livePusher, Activity activity, int width, int height, int bitrate, int fps, int cameraId) {
-        mLivePusher = livePusher;
-        mBitrate = bitrate;
-        mFps = fps;
+    public VideoStream(OnFrameDataCallback callback,
+                       Activity activity,
+                       int width,
+                       int height,
+                       int bitrate,
+                       int frameRate,
+                       int cameraId) {
+        mCallback = callback;
+        mBitrate  = bitrate;
+        mFrameRate = frameRate;
         cameraHelper = new CameraHelper(activity, cameraId, width, height);
         cameraHelper.setPreviewCallback(this);
         cameraHelper.setOnChangedSizeListener(this);
@@ -38,8 +44,8 @@ public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChang
      */
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        if (isLiving) {
-            mLivePusher.pushVideo(data);
+        if (isLiving && mCallback != null) {
+            mCallback.onVideoFrame(data, null, null, null);
         }
     }
 
@@ -49,7 +55,9 @@ public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChang
 
     @Override
     public void onChanged(int w, int h) {
-        mLivePusher.setVideoCodecInfo(w, h, mFps, mBitrate);
+        if (mCallback != null) {
+            mCallback.onVideoCodecInfo(w, h, mFrameRate, mBitrate);
+        }
     }
 
     public void startLive() {
