@@ -2,14 +2,16 @@ package com.frank.live;
 
 import android.app.Activity;
 import android.view.SurfaceHolder;
-import android.view.TextureView;
+import android.view.View;
 
 import com.frank.live.listener.LiveStateChangeListener;
 import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.AudioParam;
 import com.frank.live.param.VideoParam;
 import com.frank.live.stream.AudioStream;
+import com.frank.live.stream.CameraType;
 import com.frank.live.stream.VideoStream;
+import com.frank.live.stream.VideoStreamBase;
 import com.frank.live.stream.VideoStreamNew;
 
 public class LivePusherNew implements OnFrameDataCallback {
@@ -34,25 +36,25 @@ public class LivePusherNew implements OnFrameDataCallback {
     }
 
     private final AudioStream audioStream;
-    private VideoStream videoStream;
-//    private VideoStreamNew videoStream;
+    private VideoStreamBase videoStream;
 
     private LiveStateChangeListener liveStateChangeListener;
 
-    private Activity activity;
+    private final Activity activity;
 
-    public LivePusherNew(Activity activity, VideoParam videoParam, AudioParam audioParam) {
+    public LivePusherNew(Activity activity,
+                         VideoParam videoParam,
+                         AudioParam audioParam,
+                         View view,
+                         CameraType cameraType) {
         this.activity = activity;
         native_init();
-        videoStream = new VideoStream(this, activity, videoParam.getWidth(), videoParam.getHeight(),
-                videoParam.getBitRate(), videoParam.getFrameRate(), videoParam.getCameraId());
         audioStream = new AudioStream(this, audioParam);
-    }
-
-    public LivePusherNew(Activity activity, VideoParam videoParam, AudioParam audioParam, TextureView textureView) {
-        native_init();
-//        videoStream = new VideoStreamNew(this, textureView, videoParam, activity);
-        audioStream = new AudioStream(this, audioParam);
+        if (cameraType == CameraType.CAMERA1) {
+            videoStream = new VideoStream(this, view, videoParam, activity);
+        } else if (cameraType == CameraType.CAMERA2) {
+            videoStream = new VideoStreamNew(this, view, videoParam, activity);
+        }
     }
 
     public void setPreviewDisplay(SurfaceHolder surfaceHolder) {
@@ -130,15 +132,11 @@ public class LivePusherNew implements OnFrameDataCallback {
         }
     }
 
-    public void start(String path) {
-        native_start(path);
-    }
-
     private int getInputSamplesFromNative() {
         return native_getInputSamples();
     }
 
-    public void setVideoCodecInfo(int width, int height, int frameRate, int bitrate) {
+    private void setVideoCodecInfo(int width, int height, int frameRate, int bitrate) {
         native_setVideoCodecInfo(width, height, frameRate, bitrate);
     }
 

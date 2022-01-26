@@ -1,13 +1,17 @@
 package com.frank.live.stream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
+import android.view.View;
 
 import com.frank.live.listener.OnFrameDataCallback;
+import com.frank.live.param.VideoParam;
 
 
-public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChangedSizeListener {
+public class VideoStream extends VideoStreamBase implements Camera.PreviewCallback,
+        CameraHelper.OnChangedSizeListener {
 
 
     private final OnFrameDataCallback mCallback;
@@ -17,40 +21,50 @@ public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChang
     private boolean isLiving;
 
     public VideoStream(OnFrameDataCallback callback,
-                       Activity activity,
-                       int width,
-                       int height,
-                       int bitrate,
-                       int frameRate,
-                       int cameraId) {
-        mCallback = callback;
-        mBitrate  = bitrate;
-        mFrameRate = frameRate;
-        cameraHelper = new CameraHelper(activity, cameraId, width, height);
+                       View view,
+                       VideoParam videoParam,
+                       Context context) {
+        mCallback    = callback;
+        mBitrate     = videoParam.getBitRate();
+        mFrameRate   = videoParam.getFrameRate();
+        cameraHelper = new CameraHelper((Activity) context,
+                                        videoParam.getCameraId(),
+                                        videoParam.getWidth(),
+                                        videoParam.getHeight());
         cameraHelper.setPreviewCallback(this);
         cameraHelper.setOnChangedSizeListener(this);
     }
 
+    @Override
     public void setPreviewDisplay(SurfaceHolder surfaceHolder) {
         cameraHelper.setPreviewDisplay(surfaceHolder);
     }
 
+    @Override
+    public void switchCamera() {
+        cameraHelper.switchCamera();
+    }
 
-    /**
-     * preview data
-     *
-     * @param data   data
-     * @param camera camera
-     */
+    @Override
+    public void startLive() {
+        isLiving = true;
+    }
+
+    @Override
+    public void stopLive() {
+        isLiving = false;
+    }
+
+    @Override
+    public void release() {
+        cameraHelper.release();
+    }
+
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (isLiving && mCallback != null) {
             mCallback.onVideoFrame(data, null, null, null);
         }
-    }
-
-    public void switchCamera() {
-        cameraHelper.switchCamera();
     }
 
     @Override
@@ -60,15 +74,4 @@ public class VideoStream implements Camera.PreviewCallback, CameraHelper.OnChang
         }
     }
 
-    public void startLive() {
-        isLiving = true;
-    }
-
-    public void stopLive() {
-        isLiving = false;
-    }
-
-    public void release() {
-        cameraHelper.release();
-    }
 }

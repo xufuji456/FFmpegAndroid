@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
 import android.util.Log
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.widget.CompoundButton
@@ -23,6 +24,7 @@ import com.frank.live.listener.LiveStateChangeListener
 import com.frank.live.param.AudioParam
 import com.frank.live.param.VideoParam
 import com.frank.live.LivePusherNew
+import com.frank.live.stream.CameraType
 
 /**
  * Realtime living with rtmp stream
@@ -30,7 +32,7 @@ import com.frank.live.LivePusherNew
  */
 
 open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener, LiveStateChangeListener, OnNetworkChangeListener {
-    private var textureView: SurfaceView? = null
+    private var liveView: View? = null
     private var livePusher: LivePusherNew? = null
     private var isPushing = false
     private var connectionReceiver: ConnectionReceiver? = null
@@ -64,23 +66,28 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
         initViewsWithClick(R.id.btn_swap)
         (findViewById<View>(R.id.btn_live) as ToggleButton).setOnCheckedChangeListener(this)
         (findViewById<View>(R.id.btn_mute) as ToggleButton).setOnCheckedChangeListener(this)
-        textureView = getView(R.id.surface_camera)
+        liveView = getView(R.id.surface_camera)
     }
 
     private fun initPusher() {
-        val width = 640//resolution
+        val width = 640
         val height = 480
-        val videoBitRate = 800000//kb/s
-        val videoFrameRate = 10//fps
+        val videoBitRate = 800000 // kb/s
+        val videoFrameRate = 10 // fps
         val videoParam = VideoParam(width, height,
                 Integer.valueOf(Camera2Helper.CAMERA_ID_BACK), videoBitRate, videoFrameRate)
-        val sampleRate = 44100//sample rate: Hz
+        val sampleRate = 44100
         val channelConfig = AudioFormat.CHANNEL_IN_STEREO
         val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-        val numChannels = 2//channel number
+        val numChannels = 2
         val audioParam = AudioParam(sampleRate, channelConfig, audioFormat, numChannels)
-        livePusher = LivePusherNew(this, videoParam, audioParam)
-        livePusher!!.setPreviewDisplay(textureView!!.holder)
+        // Camera1: SurfaceView  Camera2: TextureView
+        livePusher = LivePusherNew(this, videoParam, audioParam, liveView, CameraType.CAMERA2)
+        var holder :SurfaceHolder ?= null
+        if (liveView is SurfaceView) {
+            holder = (liveView as SurfaceView).holder
+        }
+        livePusher!!.setPreviewDisplay(holder)
     }
 
     private fun registerBroadcast(networkChangeListener: OnNetworkChangeListener) {
