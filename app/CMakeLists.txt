@@ -29,8 +29,6 @@ add_library( # Sets the name of the library.
             src/main/cpp/opensl_audio_player.cpp
             src/main/cpp/video_player.cpp
             src/main/cpp/ffmpeg_pusher.cpp
-            src/main/cpp/packet_queue.cpp
-            src/main/cpp/media_player.cpp
             src/main/cpp/video_filter.c
             src/main/cpp/fast_start.c
             src/main/cpp/ffprobe_cmd.cpp
