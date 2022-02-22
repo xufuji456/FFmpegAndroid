@@ -25,47 +25,48 @@ extern "C" {
 
 //object of engine
 SLObjectItf engineObject = nullptr;
-SLEngineItf engineEngine;
+SLEngineItf engineEngine = nullptr;
 
 //object of mixer
 SLObjectItf outputMixObject = nullptr;
 SLEnvironmentalReverbItf outputMixEnvironmentalReverb = nullptr;
 
 //object of buffer
-SLObjectItf bqPlayerObject = nullptr;
-SLPlayItf bqPlayerPlay;
-SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
-SLEffectSendItf bqPlayerEffectSend;
-SLVolumeItf bqPlayerVolume;
+SLPlayItf mPlayerPlay = nullptr;
+SLVolumeItf mPlayerVolume = nullptr;
+SLObjectItf mPlayerObject = nullptr;
+SLEffectSendItf mPlayerEffectSend = nullptr;
+SLAndroidSimpleBufferQueueItf mPlayerBufferQueue = nullptr;
+
 
 //audio effect
-const SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 void *openBuffer;
 size_t bufferSize;
 uint8_t *outputBuffer;
 size_t outputBufferSize;
+const SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
 AVPacket packet;
 int audioStream;
 AVFrame *aFrame;
 SwrContext *swr;
+int frame_count = 0;
 AVFormatContext *aFormatCtx;
 AVCodecContext *aCodecCtx;
-int frame_count = 0;
-
-int createAudioPlayer(int *rate, int *channel, const char *file_name);
 
 int releaseAudioPlayer();
 
-int getPCM(void **pcm, size_t *pcmSize);
+int getPCMData(void **pcm, size_t *pcmSize);
 
-//callback by player
-void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) {
+int createAudioPlayer(int *rate, int *channel, const char *file_name);
+
+
+void audioCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) {
     bufferSize = 0;
-    getPCM(&openBuffer, &bufferSize);
+    getPCMData(&openBuffer, &bufferSize);
     if (nullptr != openBuffer && 0 != bufferSize) {
         SLresult result;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, openBuffer, bufferSize);
+        result = (*mPlayerBufferQueue)->Enqueue(mPlayerBufferQueue, openBuffer, bufferSize);
         if (result < 0) {
             LOGE(TAG, "Enqueue error...");
         } else {
@@ -93,7 +94,7 @@ int createEngine() {
         LOGE(TAG, "engineObject->GetInterface error=%d", result);
         return result;
     }
-    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
+    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, nullptr, nullptr);
     if (result != SL_RESULT_SUCCESS) {
         LOGE(TAG, "engineEngine->CreateOutputMix error=%d", result);
         return result;
@@ -139,27 +140,27 @@ int createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
-    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
+    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &mPlayerObject, &audioSrc, &audioSnk,
                                                 3, ids, req);
     if (result != SL_RESULT_SUCCESS) {
         LOGE(TAG, "outputMixObject->GetInterface error=%d", result);
         return result;
     }
-    result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
+    result = (*mPlayerObject)->Realize(mPlayerObject, SL_BOOLEAN_FALSE);
     if (result != SL_RESULT_SUCCESS) {
-        LOGE(TAG, "bqPlayerObject->Realize error=%d", result);
+        LOGE(TAG, "mPlayerObject->Realize error=%d", result);
         return result;
     }
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE, &bqPlayerBufferQueue);
-    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, nullptr);
+    (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_PLAY, &mPlayerPlay);
+    (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_BUFFERQUEUE, &mPlayerBufferQueue);
+    result = (*mPlayerBufferQueue)->RegisterCallback(mPlayerBufferQueue, audioCallback, nullptr);
     if (result != SL_RESULT_SUCCESS) {
-        LOGE(TAG, "bqPlayerBufferQueue->RegisterCallback error=%d", result);
+        LOGE(TAG, "mPlayerBufferQueue->RegisterCallback error=%d", result);
         return result;
     }
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND, &bqPlayerEffectSend);
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
-    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_EFFECTSEND, &mPlayerEffectSend);
+    (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_VOLUME, &mPlayerVolume);
+    result = (*mPlayerPlay)->SetPlayState(mPlayerPlay, SL_PLAYSTATE_PLAYING);
     return result;
 }
 
@@ -218,7 +219,7 @@ int createAudioPlayer(int *rate, int *channel, const char *file_name) {
     return 0;
 }
 
-int getPCM(void **pcm, size_t *pcmSize) {
+int getPCMData(void **pcm, size_t *pcmSize) {
     while (av_read_frame(aFormatCtx, &packet) >= 0) {
         int frameFinished = 0;
         //is audio stream
@@ -272,17 +273,17 @@ AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
     ret = createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
     if (ret < 0)
         return;
-    bqPlayerCallback(bqPlayerBufferQueue, nullptr);
+    bqPlayerCallback(mPlayerBufferQueue, nullptr);
 }
 
 AUDIO_PLAYER_FUNC(void, stop) {
-    if (bqPlayerObject != nullptr) {
-        (*bqPlayerObject)->Destroy(bqPlayerObject);
-        bqPlayerObject = nullptr;
-        bqPlayerPlay = nullptr;
-        bqPlayerBufferQueue = nullptr;
-        bqPlayerEffectSend = nullptr;
-        bqPlayerVolume = nullptr;
+    if (mPlayerObject != nullptr) {
+        (*mPlayerObject)->Destroy(mPlayerObject);
+        mPlayerObject = nullptr;
+        mPlayerPlay = nullptr;
+        mPlayerBufferQueue = nullptr;
+        mPlayerEffectSend = nullptr;
+        mPlayerVolume = nullptr;
     }
 
     if (outputMixObject != nullptr) {
