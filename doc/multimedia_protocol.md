@@ -26,7 +26,9 @@ WebRTC网络传输协议有SDP、ICE、NAT、STUN、TURN等，常用视频编码
  | MP4             | https://pan.baidu.com/s/13WrU60CYPCRshPrmLOTtKA |       fa0f      |
  | DASH            | https://pan.baidu.com/s/1-38Erd4a9mtEUKzD3GMaig |       ctz7      |
  | DASH(ISO)       | https://pan.baidu.com/s/1UnxkaPeKVIsmddaYIrADdw |       buav      |
-
+ | HEVC(ISO)       | https://pan.baidu.com/s/15rIFfNqkpD4Ssm9GpOHxxw |       unk5      |
+ | HEVC(JCT)       | https://pan.baidu.com/s/16I8eWihxzQxDQTH3ZxIbqg |       wdhv      |
+ | H265(ITU-T)     | https://pan.baidu.com/s/1SypB6m9cQbB-IYyUy4EvFg |       n8tz      |
 
 ### 多媒体书籍
 音频开发书籍包括：音乐理论、音频信号处理与编码、DSP语音降噪、3D声音环绕，</br>
