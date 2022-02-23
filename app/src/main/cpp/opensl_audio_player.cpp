@@ -273,7 +273,7 @@ AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
     ret = createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
     if (ret < 0)
         return;
-    bqPlayerCallback(mPlayerBufferQueue, nullptr);
+    audioCallback(mPlayerBufferQueue, nullptr);
 }
 
 AUDIO_PLAYER_FUNC(void, stop) {
