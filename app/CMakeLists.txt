@@ -38,6 +38,10 @@ add_library( # Sets the name of the library.
             src/main/cpp/visualizer/frank_visualizer.cpp
             src/main/cpp/visualizer/frank_visualizer_jni.cpp
             src/main/cpp/visualizer/window.cpp
+            src/main/cpp/metadata/media_retriever.cpp
+            src/main/cpp/metadata/media_retriever_jni.cpp
+            src/main/cpp/metadata/metadata_util.c
+            src/main/cpp/metadata/ffmpeg_media_retriever.c
         )
 
 add_library( ffmpeg
@@ -55,6 +59,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 include_directories(src/main/cpp)
 include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/metadata)
+
 if(${CMAKE_ANDROID_ARCH_ABI} MATCHES "armeabi-v7a")
     include_directories(src/main/cpp/include/armeabi-v7a)
     message("This is armeabi-v7a")
