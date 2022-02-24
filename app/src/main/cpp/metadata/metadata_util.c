@@ -21,12 +21,12 @@ void set_duration(AVFormatContext *ic) {
 	av_dict_set(&ic->metadata, DURATION, value, 0);
 }
 
-void set_filesize(AVFormatContext *ic) {
+void set_file_size(AVFormatContext *ic) {
 	char value[30] = "0";
 
 	int64_t size = ic->pb ? avio_size(ic->pb) : -1;
 	sprintf(value, "%"PRId64, size);
-	av_dict_set(&ic->metadata, FILESIZE, value, 0);
+	av_dict_set(&ic->metadata, FILE_SIZE, value, 0);
 }
 
 void set_mimetype(AVFormatContext *ic) {
@@ -39,7 +39,6 @@ void set_mimetype(AVFormatContext *ic) {
 
 void set_codec(AVFormatContext *ic, int i) {
     const char *codec_type = av_get_media_type_string(ic->streams[i]->codecpar->codec_type);
-
 	if (!codec_type) {
 		return;
 	}
@@ -50,6 +49,31 @@ void set_codec(AVFormatContext *ic, int i) {
 		av_dict_set(&ic->metadata, AUDIO_CODEC, codec_name, 0);
     } else if (strcmp(codec_type, "video") == 0) {
 	   	av_dict_set(&ic->metadata, VIDEO_CODEC, codec_name, 0);
+	}
+}
+
+void set_sample_rate(AVFormatContext *ic, AVStream *stream) {
+	char value[10] = "0";
+	if (stream) {
+		sprintf(value, "%d", stream->codecpar->sample_rate);
+		av_dict_set(&ic->metadata, SAMPLE_RATE, value, 0);
+	}
+}
+
+void set_channel_count(AVFormatContext *ic, AVStream *stream) {
+	char value[10] = "0";
+	if (stream) {
+		sprintf(value, "%d", stream->codecpar->channels);
+		av_dict_set(&ic->metadata, CHANNEL_COUNT, value, 0);
+	}
+}
+
+void set_channel_layout(AVFormatContext *ic, AVStream *stream) {
+	char value[10] = "0";
+	if (stream) {
+		av_get_channel_layout_string(value, 10,
+				stream->codecpar->channels, stream->codecpar->channel_layout);
+		av_dict_set(&ic->metadata, CHANNEL_LAYOUT, value, 0);
 	}
 }
 
@@ -86,7 +110,7 @@ void set_rotation(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st) {
 	}
 }
 
-void set_framerate(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st) {
+void set_frame_rate(AVFormatContext *ic, AVStream *video_st) {
 	char value[30] = "0";
 
 	if (video_st && video_st->avg_frame_rate.den && video_st->avg_frame_rate.num) {
@@ -100,7 +124,7 @@ void set_framerate(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st) 
 			sprintf(value, "%1.0fk", d / 1000);
 		}
 
-		av_dict_set(&ic->metadata, FRAMERATE, value, 0);
+		av_dict_set(&ic->metadata, FRAME_RATE, value, 0);
 	}
 }
 

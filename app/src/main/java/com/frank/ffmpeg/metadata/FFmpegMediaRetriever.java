@@ -264,48 +264,42 @@ public class FFmpegMediaRetriever {
      */
     public static String METADATA_KEY_FILENAME = "filename";
     /**
-     * The metadata key to retrieve the main language in which the work is performed, preferably
-     * in ISO 639-2 format. Multiple languages can be specified by separating them with commas.
+     * The metadata key to retrieve the main language.
      */
     public static String METADATA_KEY_LANGUAGE = "language";
     /**
-     * The metadata key to retrieve the name of the work.
+     * The metadata key to retrieve the name.
      */
     public static String METADATA_KEY_TITLE = "title";
     /**
-     * The metadata key to retrieve the number of this work in the set, can be in form current/total.
+     * The metadata key to retrieve the general bitrate.
      */
-    public static String METADATA_KEY_TRACK = "track";
+    public static String METADATA_KEY__BITRATE = "bitrate";
     /**
-     * The metadata key to retrieve the total bitrate of the bitrate variant that the current stream
-     * is part of.
-     */
-    public static String METADATA_KEY_VARIANT_BITRATE = "bitrate";
-    /**
-     * The metadata key to retrieve the duration of the work in milliseconds.
+     * The metadata key to retrieve the duration in milliseconds.
      */
     public static String METADATA_KEY_DURATION = "duration";
     /**
-     * The metadata key to retrieve the audio codec of the work.
+     * The metadata key to retrieve the audio codec.
      */
     public static String METADATA_KEY_AUDIO_CODEC = "audio_codec";
     /**
-     * The metadata key to retrieve the video codec of the work.
+     * The metadata key to retrieve the video codec.
      */
     public static String METADATA_KEY_VIDEO_CODEC = "video_codec";
     /**
-     * This key retrieves the video rotation angle in degrees, if available.
+     * This key retrieves the video degree of rotation.
      * The video rotation angle may be 0, 90, 180, or 270 degrees.
      */
     public static String METADATA_KEY_VIDEO_ROTATION = "rotate";
     /**
-     * This metadata key retrieves the average framerate (in frames/sec).
+     * This metadata key retrieves the average frame rate (in frames/sec).
      */
-    public static String METADATA_KEY_FRAMERATE = "framerate";
+    public static String METADATA_KEY_FRAME_RATE = "frame_rate";
     /**
      * The metadata key to retrieve the file size in bytes.
      */
-    public static String METADATA_KEY_FILESIZE = "filesize";
+    public static String METADATA_KEY_FILE_SIZE = "file_size";
     /**
      * The metadata key to retrieve the video width.
      */
@@ -318,5 +312,17 @@ public class FFmpegMediaRetriever {
      * The metadata key to retrieve the mime type.
      */
     public static String METADATA_KEY_MIME_TYPE = "mime_type";
+    /**
+     * The metadata key to retrieve the mime type.
+     */
+    public static String METADATA_KEY_SAMPLE_RATE = "sample_rate";
+    /**
+     * The metadata key to retrieve the mime type.
+     */
+    public static String METADATA_KEY_CHANNEL_COUNT = "channel_count";
+    /**
+     * The metadata key to retrieve the mime type.
+     */
+    public static String METADATA_KEY_CHANNEL_LAYOUT = "channel_layout";
 
 }

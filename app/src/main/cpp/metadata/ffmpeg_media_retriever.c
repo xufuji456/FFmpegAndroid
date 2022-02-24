@@ -153,7 +153,6 @@ int set_data_source_l(State **ps, const char* path) {
 	State *state = *ps;
 
     AVDictionary *options = NULL;
-    av_dict_set(&options, "icy", "1", 0);
     av_dict_set(&options, "user-agent", "FFmpegMetadataRetriever", 0);
 
     state->pFormatCtx = avformat_alloc_context();
@@ -173,8 +172,6 @@ int set_data_source_l(State **ps, const char* path) {
 		*ps = NULL;
     	return FAILURE;
 	}
-
-	set_duration(state->pFormatCtx);
 
     // Find the first audio and video stream
 	for (i = 0; i < state->pFormatCtx->nb_streams; i++) {
@@ -197,11 +194,15 @@ int set_data_source_l(State **ps, const char* path) {
 		stream_component_open(state, video_index);
 	}
 
+	set_duration(state->pFormatCtx);
 	set_mimetype(state->pFormatCtx);
-    set_filesize(state->pFormatCtx);
+    set_file_size(state->pFormatCtx);
+    set_frame_rate(state->pFormatCtx, state->video_st);
+	set_sample_rate(state->pFormatCtx, state->audio_st);
+	set_channel_count(state->pFormatCtx, state->audio_st);
+	set_channel_layout(state->pFormatCtx, state->audio_st);
 	set_video_resolution(state->pFormatCtx, state->video_st);
 	set_rotation(state->pFormatCtx, state->audio_st, state->video_st);
-	set_framerate(state->pFormatCtx, state->audio_st, state->video_st);
 
 	*ps = state;
 	return SUCCESS;
