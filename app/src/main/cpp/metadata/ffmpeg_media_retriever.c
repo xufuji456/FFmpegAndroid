@@ -146,7 +146,7 @@ int stream_component_open(State *s, int stream_index) {
 	return SUCCESS;
 }
 
-int set_data_source_l(State **state_ptr, const char* path) {
+int set_data_source_inner(State **state_ptr, const char* path) {
     int i;
 	int audio_index = -1;
 	int video_index = -1;
@@ -161,13 +161,13 @@ int set_data_source_l(State **state_ptr, const char* path) {
     }
 
     if (avformat_open_input(&state->pFormatCtx, path, NULL, &options) != 0) {
-		LOGE("Metadata could not be retrieved\n");
+		LOGE("avformat_open_input fail...");
 		*state_ptr = NULL;
     	return FAILURE;
     }
 
 	if (avformat_find_stream_info(state->pFormatCtx, NULL) < 0) {
-		LOGE("Metadata could not be retrieved\n");
+		LOGE("avformat_find_stream_info fail...");
 	    avformat_close_input(&state->pFormatCtx);
 		*state_ptr = NULL;
     	return FAILURE;
@@ -245,7 +245,7 @@ int set_data_source(State **state_ptr, const char* path) {
 	state->native_window = native_window;
 	*state_ptr = state;
 	
-	return set_data_source_l(state_ptr, path);
+	return set_data_source_inner(state_ptr, path);
 }
 
 int set_data_source_fd(State **state_ptr, int fd, int64_t offset, int64_t length) {
@@ -266,7 +266,7 @@ int set_data_source_fd(State **state_ptr, int fd, int64_t offset, int64_t length
     state->offset = offset;
 	*state_ptr = state;
     
-    return set_data_source_l(state_ptr, path);
+    return set_data_source_inner(state_ptr, path);
 }
 
 const char* extract_metadata(State **state_ptr, const char* key) {
@@ -357,7 +357,7 @@ int init_ffmpeg_filters(State *state, const char *filters_descr, AVFormatContext
 	state->buffersink_ctx = buffersink_ctx;
 	state->filter_graph   = filter_graph;
 
-	end:
+end:
 	avfilter_inout_free(&inputs);
 	avfilter_inout_free(&outputs);
 
@@ -453,7 +453,9 @@ void convert_image(State *state, AVCodecContext *pCodecCtx, AVFrame *pFrame, AVP
         }
     }
 
-	int ret = avcodec_encode_video2(codecCtx, avpkt, frame, got_packet_ptr);
+    avcodec_send_frame(codecCtx, frame);
+    int ret = avcodec_receive_packet(codecCtx, avpkt);
+    *got_packet_ptr = (ret == 0 ? 1 : 0);
 
     if (rotateDegree == 90 || rotateDegree == 270) {
         codecCtx->width = frame->height;
@@ -475,9 +477,6 @@ void convert_image(State *state, AVCodecContext *pCodecCtx, AVFrame *pFrame, AVP
 		}
 	}
 
-	if (ret < 0) {
-		*got_packet_ptr = 0;
-	}
 	av_frame_free(&frame);
 	if (buffer) {
 		free(buffer);
@@ -521,8 +520,12 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 						break;
 					}
 
-					if (avcodec_decode_video2(state->video_st->codec, frame, &got_frame, pkt) <= 0) {
-						break;
+                    avcodec_send_packet(state->video_st->codec, pkt);
+                    int ret = avcodec_receive_frame(state->video_st->codec, frame);
+					if (ret == 0) {
+                        got_frame = 1;
+					} else {
+                        break;
 					}
 
 					if (got_frame) {
@@ -536,7 +539,6 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 						av_packet_unref(pkt);
 						av_init_packet(pkt);
 						av_packet_ref(pkt, &convertedPkt);
-
 						av_packet_unref(&convertedPkt);
 
 						break;
@@ -563,7 +565,6 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 }
 
 void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_frame_number, int width, int height) {
-	*got_frame = 0;
 	AVFrame *frame = av_frame_alloc();
 	if (!frame) {
 		return;
@@ -578,22 +579,23 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
 			if (!is_supported_format(codec_id, pix_fmt)) {
 				*got_frame = 0;
 
-				if (avcodec_decode_video2(state->video_st->codec, frame, got_frame, pkt) <= 0) {
-					*got_frame = 0;
-					break;
+				avcodec_send_packet(state->video_st->codec, pkt);
+                int ret = avcodec_receive_frame(state->video_st->codec, frame);
+				if (ret == 0) {
+					*got_frame = 1;
+				} else {
+                    break;
 				}
 
-				if (*got_frame) {
-					if (desired_frame_number == -1 ||
-						(desired_frame_number != -1 && frame->pts >= desired_frame_number)) {
-						if (pkt->data) {
-							av_packet_unref(pkt);
-						}
-						av_init_packet(pkt);
-						convert_image(state, state->video_st->codec, frame, pkt, got_frame, width, height);
-						break;
-					}
-				}
+                if (desired_frame_number == -1 ||
+                    (desired_frame_number != -1 && frame->pts >= desired_frame_number)) {
+                    if (pkt->data) {
+                        av_packet_unref(pkt);
+                    }
+                    av_init_packet(pkt);
+                    convert_image(state, state->video_st->codec, frame, pkt, got_frame, width, height);
+                    break;
+                }
 			} else {
 				*got_frame = 1;
 				break;
