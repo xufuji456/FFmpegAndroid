@@ -18,8 +18,7 @@ struct fields_t {
 };
 
 static fields_t fields;
-static ANativeWindow* theNativeWindow;
-static const char* kClassPathName = "com/frank/ffmpeg/metadata/FFmpegMediaRetriever";
+static const char* mClassName = "com/frank/ffmpeg/metadata/FFmpegMediaRetriever";
 
 static jstring NewStringUTF(JNIEnv* env, const char* data) {
     jstring str = nullptr;
@@ -78,15 +77,15 @@ static void setRetriever(JNIEnv* env, jobject thiz, long retriever)
     env->SetLongField(thiz, fields.context, retriever);
 }
 
-RETRIEVER_FUNC(void, native_setup)
+RETRIEVER_FUNC(void, native_1setup)
 {
     auto* retriever = new MediaRetriever();
     setRetriever(env, thiz, (long)retriever);
 }
 
-RETRIEVER_FUNC(void, native_init)
+RETRIEVER_FUNC(void, native_1init)
 {
-    jclass clazz = env->FindClass(kClassPathName);
+    jclass clazz = env->FindClass(mClassName);
     if (!clazz) {
         return;
     }
@@ -100,7 +99,7 @@ RETRIEVER_FUNC(void, native_init)
     avformat_network_init();
 }
 
-RETRIEVER_FUNC(void, native_set_dataSource, jstring path) {
+RETRIEVER_FUNC(void, native_1setDataSource, jstring path) {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
@@ -138,7 +137,7 @@ static int getFileDescriptor(JNIEnv * env, jobject fileDescriptor) {
     return fd;
 }
 
-RETRIEVER_FUNC(void, native_set_dataSourceFD, jobject fileDescriptor, jlong offset, jlong length)
+RETRIEVER_FUNC(void, native_1setDataSourceFD, jobject fileDescriptor, jlong offset, jlong length)
 {
     if (offset < 0 || length < 0) {
         return;
@@ -162,20 +161,20 @@ RETRIEVER_FUNC(void, native_set_dataSourceFD, jobject fileDescriptor, jlong offs
             "java/lang/RuntimeException", "setDataSource failed");
 }
 
-RETRIEVER_FUNC(void, native_set_surface, jobject surface)
+RETRIEVER_FUNC(void, native_1setSurface, jobject surface)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
         return;
     }
-    theNativeWindow = ANativeWindow_fromSurface(env, surface);
-    if (theNativeWindow != nullptr) {
-        retriever->setNativeWindow(theNativeWindow);
+    ANativeWindow *mNativeWindow = ANativeWindow_fromSurface(env, surface);
+    if (mNativeWindow != nullptr) {
+        retriever->setNativeWindow(mNativeWindow);
     }
 }
 
-RETRIEVER_FUNC(jobject, native_extract_metadata, jstring jkey)
+RETRIEVER_FUNC(jobject, native_1extractMetadata, jstring jkey)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -198,7 +197,7 @@ RETRIEVER_FUNC(jobject, native_extract_metadata, jstring jkey)
     return NewStringUTF(env, value);
 }
 
-RETRIEVER_FUNC(jbyteArray, native_get_frameAtTime, jlong timeUs, jint option)
+RETRIEVER_FUNC(jbyteArray, native_1getFrameAtTime, jlong timeUs, jint option)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -230,7 +229,7 @@ RETRIEVER_FUNC(jbyteArray, native_get_frameAtTime, jlong timeUs, jint option)
     return array;
 }
 
-RETRIEVER_FUNC(jbyteArray, native_get_scaleFrameAtTime, jlong timeUs, jint option, jint width, jint height)
+RETRIEVER_FUNC(jbyteArray, native_1getScaleFrameAtTime, jlong timeUs, jint option, jint width, jint height)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -262,7 +261,7 @@ RETRIEVER_FUNC(jbyteArray, native_get_scaleFrameAtTime, jlong timeUs, jint optio
     return array;
 }
 
-RETRIEVER_FUNC(void, native_release)
+RETRIEVER_FUNC(void, native_1release)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     delete retriever;
