@@ -146,11 +146,11 @@ int stream_component_open(State *s, int stream_index) {
 	return SUCCESS;
 }
 
-int set_data_source_l(State **ps, const char* path) {
+int set_data_source_l(State **state_ptr, const char* path) {
     int i;
 	int audio_index = -1;
 	int video_index = -1;
-	State *state = *ps;
+	State *state = *state_ptr;
 
     AVDictionary *options = NULL;
     av_dict_set(&options, "user-agent", "FFmpegMetadataRetriever", 0);
@@ -162,14 +162,14 @@ int set_data_source_l(State **ps, const char* path) {
 
     if (avformat_open_input(&state->pFormatCtx, path, NULL, &options) != 0) {
 		LOGE("Metadata could not be retrieved\n");
-		*ps = NULL;
+		*state_ptr = NULL;
     	return FAILURE;
     }
 
 	if (avformat_find_stream_info(state->pFormatCtx, NULL) < 0) {
 		LOGE("Metadata could not be retrieved\n");
 	    avformat_close_input(&state->pFormatCtx);
-		*ps = NULL;
+		*state_ptr = NULL;
     	return FAILURE;
 	}
 
@@ -204,12 +204,12 @@ int set_data_source_l(State **ps, const char* path) {
 	set_video_resolution(state->pFormatCtx, state->video_st);
 	set_rotation(state->pFormatCtx, state->audio_st, state->video_st);
 
-	*ps = state;
+	*state_ptr = state;
 	return SUCCESS;
 }
 
-void init_ffmpeg(State **ps) {
-	State *state = *ps;
+void init_ffmpeg(State **state_ptr) {
+	State *state = *state_ptr;
 
 	if (state && state->pFormatCtx) {
 		avformat_close_input(&state->pFormatCtx);
@@ -230,11 +230,11 @@ void init_ffmpeg(State **ps) {
 	state->offset = 0;
 	state->headers = NULL;
 
-	*ps = state;
+	*state_ptr = state;
 }
 
-int set_data_source(State **ps, const char* path) {
-	State *state = *ps;
+int set_data_source(State **state_ptr, const char* path) {
+	State *state = *state_ptr;
 	ANativeWindow *native_window = NULL;
 
 	if (state && state->native_window) {
@@ -243,14 +243,14 @@ int set_data_source(State **ps, const char* path) {
 
 	init_ffmpeg(&state);
 	state->native_window = native_window;
-	*ps = state;
+	*state_ptr = state;
 	
-	return set_data_source_l(ps, path);
+	return set_data_source_l(state_ptr, path);
 }
 
-int set_data_source_fd(State **ps, int fd, int64_t offset, int64_t length) {
+int set_data_source_fd(State **state_ptr, int fd, int64_t offset, int64_t length) {
     char path[256] = "";
-	State *state = *ps;
+	State *state = *state_ptr;
 	ANativeWindow *native_window = NULL;
 
 	if (state && state->native_window) {
@@ -258,38 +258,26 @@ int set_data_source_fd(State **ps, int fd, int64_t offset, int64_t length) {
 	}
 	init_ffmpeg(&state);
 	state->native_window = native_window;
-	int myfd = dup(fd);
+	int dummy_fd = dup(fd);
     char str[20];
-    sprintf(str, "pipe:%d", myfd);
+    sprintf(str, "pipe:%d", dummy_fd);
     strcat(path, str);
-    state->fd = myfd;
+    state->fd = dummy_fd;
     state->offset = offset;
-	*ps = state;
+	*state_ptr = state;
     
-    return set_data_source_l(ps, path);
+    return set_data_source_l(state_ptr, path);
 }
 
-const char* extract_metadata(State **ps, const char* key) {
+const char* extract_metadata(State **state_ptr, const char* key) {
     char* value = NULL;
-	State *state = *ps;
+	State *state = *state_ptr;
     
 	if (!state || !state->pFormatCtx) {
 		return value;
 	}
 
 	return extract_metadata_internal(state->pFormatCtx, state->audio_st, state->video_st, key);
-}
-
-int get_metadata(State **ps, AVDictionary **metadata) {
-    State *state = *ps;
-    
-    if (!state || !state->pFormatCtx) {
-        return FAILURE;
-    }
-    
-    get_metadata_internal(state->pFormatCtx, metadata);
-    
-    return SUCCESS;
 }
 
 int init_ffmpeg_filters(State *state, const char *filters_descr, AVFormatContext *fmt_ctx, AVCodecContext *dec_ctx) {
@@ -499,12 +487,12 @@ void convert_image(State *state, AVCodecContext *pCodecCtx, AVFrame *pFrame, AVP
 	}
 }
 
-int get_embedded_picture(State **ps, AVPacket *pkt) {
+int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 	int i = 0;
 	int got_packet = 0;
 	AVFrame *frame = NULL;
 
-	State *state = *ps;
+	State *state = *state_ptr;
 
 	if (!state || !state->pFormatCtx) {
 		return FAILURE;
@@ -616,15 +604,15 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
 	av_frame_free(&frame);
 }
 
-int get_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt) {
-	return get_scaled_frame_at_time(ps, timeUs, option, pkt, -1, -1);
+int get_frame_at_time(State **state_ptr, int64_t timeUs, int option, AVPacket *pkt) {
+	return get_scaled_frame_at_time(state_ptr, timeUs, option, pkt, -1, -1);
 }
 
-int get_scaled_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt, int width, int height) {
+int get_scaled_frame_at_time(State **state_ptr, int64_t timeUs, int option, AVPacket *pkt, int width, int height) {
 	int flags = 0;
 	int ret = -1;
 	int got_packet = 0;
-	State *state = *ps;
+	State *state = *state_ptr;
 	Options opt = option;
 	int64_t desired_frame_number = -1;
 
@@ -679,9 +667,9 @@ int get_scaled_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *p
 	}
 }
 
-int set_native_window(State **ps, ANativeWindow* native_window) {
+int set_native_window(State **state_ptr, ANativeWindow* native_window) {
 
-	State *state = *ps;
+	State *state = *state_ptr;
 
 	if (native_window == NULL) {
 		return FAILURE;
@@ -691,14 +679,14 @@ int set_native_window(State **ps, ANativeWindow* native_window) {
 	}
 
 	state->native_window = native_window;
-	*ps = state;
+	*state_ptr = state;
 
 	return SUCCESS;
 }
 
-void release(State **ps) {
+void release(State **state_ptr) {
 
-	State *state = *ps;
+	State *state = *state_ptr;
 	
     if (state) {
         if (state->audio_st && state->audio_st->codec) {

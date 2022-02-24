@@ -35,7 +35,6 @@ void set_sample_rate(AVFormatContext *ic,    AVStream *stream);
 void set_channel_count(AVFormatContext *ic,  AVStream *stream);
 void set_channel_layout(AVFormatContext *ic, AVStream *stream);
 void set_video_resolution(AVFormatContext *ic, AVStream *video_st);
-int get_metadata_internal(AVFormatContext *ic, AVDictionary **metadata);
 void set_rotation(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st);
 void set_frame_rate(AVFormatContext *ic, AVStream *video_st);
 const char* extract_metadata_internal(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st, const char* key);

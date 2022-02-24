@@ -89,15 +89,6 @@ void set_video_resolution(AVFormatContext *ic, AVStream *video_st) {
 	}
 }
 
-int get_metadata_internal(AVFormatContext *ic, AVDictionary **metadata) {
-	if (!ic) {
-		return FAILURE;
-	}
-	av_dict_copy(metadata, ic->metadata, 0);
-
-	return SUCCESS;
-}
-
 void set_rotation(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st) {
 	if (!extract_metadata_internal(ic, audio_st, video_st, ROTATE) && video_st && video_st->metadata) {
 		AVDictionaryEntry *entry = av_dict_get(video_st->metadata, ROTATE, NULL, AV_DICT_MATCH_CASE);
