@@ -9,14 +9,9 @@
 #include "jni.h"
 
 #include <android/bitmap.h>
+#include "ffmpeg_jni_define.h"
 
-#define LOG_TAG "FFmpegMediaRetrieverJNI"
-
-extern "C" {
-	#include "ffmpeg_media_retriever.h"
-}
-
-using namespace std;
+#define LOG_TAG "FFmpegMediaRetriever"
 
 struct fields_t {
     jfieldID context;
@@ -26,16 +21,16 @@ static fields_t fields;
 static ANativeWindow* theNativeWindow;
 static const char* kClassPathName = "com/frank/ffmpeg/metadata/FFmpegMediaRetriever";
 
-static jstring NewStringUTF(JNIEnv* env, const char * data) {
+static jstring NewStringUTF(JNIEnv* env, const char* data) {
     jstring str = nullptr;
     int size = strlen(data);
     jbyteArray array = env->NewByteArray(size);
     if (!array) {
-        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "convertString: OutOfMemoryError is thrown.");
+        LOGE(LOG_TAG, "convertString: OutOfMemoryError is thrown.");
     } else {
         jbyte* bytes = env->GetByteArrayElements(array, nullptr);
         if (bytes != nullptr) {
-            memcpy(bytes, data, size);
+            strcpy((char *)bytes, data);
             env->ReleaseByteArrayElements(array, bytes, 0);
 
             jclass string_Clazz = env->FindClass("java/lang/String");
@@ -57,16 +52,16 @@ void jniThrowException(JNIEnv* env, const char* className,
     env->ThrowNew(exception, msg);
 }
 
-static void process_retriever_call(JNIEnv *env, int opStatus, const char* exception, const char *message)
+static void process_retriever_call(JNIEnv *env, int status, const char* exception, const char *message)
 {
-    if (opStatus == -2) {
+    if (status == -2) {
         jniThrowException(env, "java/lang/IllegalStateException", nullptr);
-    } else if (opStatus == -1) {
+    } else if (status == -1) {
         if (strlen(message) > 520) {
             jniThrowException( env, exception, message);
         } else {
             char msg[256];
-            sprintf(msg, "%s: status = 0x%X", message, opStatus);
+            sprintf(msg, "%s: status = 0x%X", message, status);
             jniThrowException( env, exception, msg);
         }
     }
@@ -80,17 +75,16 @@ static MediaRetriever* getRetriever(JNIEnv* env, jobject thiz)
 
 static void setRetriever(JNIEnv* env, jobject thiz, long retriever)
 {
-    auto *old = (MediaRetriever*) env->GetLongField(thiz, fields.context);
     env->SetLongField(thiz, fields.context, retriever);
 }
 
-static void native_setup(JNIEnv *env, jobject thiz)
+RETRIEVER_FUNC(void, native_setup)
 {
     auto* retriever = new MediaRetriever();
     setRetriever(env, thiz, (long)retriever);
 }
 
-static void native_init(JNIEnv *env, jobject thiz)
+RETRIEVER_FUNC(void, native_init)
 {
     jclass clazz = env->FindClass(kClassPathName);
     if (!clazz) {
@@ -106,7 +100,7 @@ static void native_init(JNIEnv *env, jobject thiz)
     avformat_network_init();
 }
 
-static void native_set_dataSource(JNIEnv *env, jobject thiz, jstring path) {
+RETRIEVER_FUNC(void, native_set_dataSource, jstring path) {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
@@ -130,7 +124,7 @@ static void native_set_dataSource(JNIEnv *env, jobject thiz, jstring path) {
     env->ReleaseStringUTFChars(path, tmp);
 }
 
-static int jniGetFDFromFileDescriptor(JNIEnv * env, jobject fileDescriptor) {
+static int getFileDescriptor(JNIEnv * env, jobject fileDescriptor) {
     jint fd = -1;
     jclass fdClass = env->FindClass("java/io/FileDescriptor");
 
@@ -144,8 +138,11 @@ static int jniGetFDFromFileDescriptor(JNIEnv * env, jobject fileDescriptor) {
     return fd;
 }
 
-static void native_set_dataSourceFD(JNIEnv *env, jobject thiz, jobject fileDescriptor, jlong offset, jlong length)
+RETRIEVER_FUNC(void, native_set_dataSourceFD, jobject fileDescriptor, jlong offset, jlong length)
 {
+    if (offset < 0 || length < 0) {
+        return;
+    }
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
@@ -155,39 +152,30 @@ static void native_set_dataSourceFD(JNIEnv *env, jobject thiz, jobject fileDescr
         jniThrowException(env, "java/lang/IllegalArgumentException", nullptr);
         return;
     }
-    int fd = jniGetFDFromFileDescriptor(env, fileDescriptor);
-    if (offset < 0 || length < 0 || fd < 0) {
-        if (offset < 0) {
-            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "negative offset (%ld)", offset);
-        }
-        if (length < 0) {
-            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "negative length (%ld)", length);
-        }
-        if (fd < 0) {
-            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "invalid file descriptor");
-        }
+    int fd = getFileDescriptor(env, fileDescriptor);
+    if (fd < 0) {
+        LOGE(LOG_TAG, "invalid file descriptor!");
         jniThrowException(env, "java/lang/IllegalArgumentException", nullptr);
         return;
     }
-    process_retriever_call(env, retriever->setDataSource(fd, offset, length), "java/lang/RuntimeException", "setDataSource failed");
+    process_retriever_call(env, retriever->setDataSource(fd, offset, length),
+            "java/lang/RuntimeException", "setDataSource failed");
 }
 
-static void native_set_surface(JNIEnv *env, jclass thiz, jobject surface)
+RETRIEVER_FUNC(void, native_set_surface, jobject surface)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
         return;
     }
-
     theNativeWindow = ANativeWindow_fromSurface(env, surface);
-
     if (theNativeWindow != nullptr) {
         retriever->setNativeWindow(theNativeWindow);
     }
 }
 
-static jobject native_extract_metadata(JNIEnv *env, jobject thiz, jstring jkey)
+RETRIEVER_FUNC(jobject, native_extract_metadata, jstring jkey)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -210,7 +198,7 @@ static jobject native_extract_metadata(JNIEnv *env, jobject thiz, jstring jkey)
     return NewStringUTF(env, value);
 }
 
-static jbyteArray native_get_frameAtTime(JNIEnv *env, jobject thiz, jlong timeUs, jint option)
+RETRIEVER_FUNC(jbyteArray, native_get_frameAtTime, jlong timeUs, jint option)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -227,7 +215,7 @@ static jbyteArray native_get_frameAtTime(JNIEnv *env, jobject thiz, jlong timeUs
         uint8_t* data = packet.data;
         array = env->NewByteArray(size);
         if (!array) {
-            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "getFrameAtTime: OutOfMemoryError is thrown.");
+            LOGE(LOG_TAG, "getFrameAtTime: OutOfMemoryError is thrown.");
         } else {
             jbyte* bytes = env->GetByteArrayElements(array, nullptr);
             if (bytes != nullptr) {
@@ -242,8 +230,7 @@ static jbyteArray native_get_frameAtTime(JNIEnv *env, jobject thiz, jlong timeUs
     return array;
 }
 
-static jbyteArray native_get_scaleFrameAtTime(JNIEnv *env, jobject thiz, jlong timeUs, jint option,
-        jint width, jint height)
+RETRIEVER_FUNC(jbyteArray, native_get_scaleFrameAtTime, jlong timeUs, jint option, jint width, jint height)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
@@ -260,7 +247,7 @@ static jbyteArray native_get_scaleFrameAtTime(JNIEnv *env, jobject thiz, jlong t
         uint8_t* data = packet.data;
         array = env->NewByteArray(size);
         if (!array) {
-            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "getFrameAtTime: OutOfMemoryError is thrown.");
+            LOGE(LOG_TAG, "getFrameAtTime: OutOfMemoryError is thrown.");
         } else {
             jbyte* bytes = env->GetByteArrayElements(array, nullptr);
             if (bytes != nullptr) {
@@ -275,7 +262,7 @@ static jbyteArray native_get_scaleFrameAtTime(JNIEnv *env, jobject thiz, jlong t
     return array;
 }
 
-static void native_release(JNIEnv *env, jobject thiz)
+RETRIEVER_FUNC(void, native_release)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     delete retriever;
