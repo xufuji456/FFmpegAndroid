@@ -19,6 +19,9 @@ struct fields_t {
 
 static fields_t fields;
 static const char* mClassName = "com/frank/ffmpeg/metadata/FFmpegMediaRetriever";
+static const char* mNoAvailableMsg = "No retriever available";
+static const char* mIllegalStateException = "java/lang/IllegalStateException";
+static const char* mIllegalArgException = "java/lang/IllegalArgumentException";
 
 static jstring NewStringUTF(JNIEnv* env, const char* data) {
     jstring str = nullptr;
@@ -54,7 +57,7 @@ void jniThrowException(JNIEnv* env, const char* className,
 static void process_retriever_call(JNIEnv *env, int status, const char* exception, const char *message)
 {
     if (status == -2) {
-        jniThrowException(env, "java/lang/IllegalStateException", nullptr);
+        jniThrowException(env, mIllegalStateException, nullptr);
     } else if (status == -1) {
         if (strlen(message) > 520) {
             jniThrowException( env, exception, message);
@@ -90,7 +93,7 @@ RETRIEVER_FUNC(void, native_1init)
         return;
     }
 
-    fields.context = env->GetFieldID(clazz, "mNativeContext", "J");
+    fields.context = env->GetFieldID(clazz, "mNativeRetriever", "J");
     if (fields.context == nullptr) {
         return;
     }
@@ -102,11 +105,11 @@ RETRIEVER_FUNC(void, native_1init)
 RETRIEVER_FUNC(void, native_1setDataSource, jstring path) {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return;
     }
     if (!path) {
-        jniThrowException(env, "java/lang/IllegalArgumentException", "Null pointer");
+        jniThrowException(env, mIllegalArgException, "Null of path");
         return;
     }
     const char *tmp = env->GetStringUTFChars(path, nullptr);
@@ -114,12 +117,8 @@ RETRIEVER_FUNC(void, native_1setDataSource, jstring path) {
         return;
     }
 
-    process_retriever_call(
-            env,
-            retriever->setDataSource(tmp),
-            "java/lang/IllegalArgumentException",
-            "setDataSource failed");
-
+    process_retriever_call(env, retriever->setDataSource(tmp),
+            mIllegalArgException,"setDataSource failed");
     env->ReleaseStringUTFChars(path, tmp);
 }
 
@@ -144,28 +143,28 @@ RETRIEVER_FUNC(void, native_1setDataSourceFD, jobject fileDescriptor, jlong offs
     }
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return;
     }
     if (!fileDescriptor) {
-        jniThrowException(env, "java/lang/IllegalArgumentException", nullptr);
+        jniThrowException(env, mIllegalArgException, nullptr);
         return;
     }
     int fd = getFileDescriptor(env, fileDescriptor);
     if (fd < 0) {
         LOGE(LOG_TAG, "invalid file descriptor!");
-        jniThrowException(env, "java/lang/IllegalArgumentException", nullptr);
+        jniThrowException(env, mIllegalArgException, nullptr);
         return;
     }
     process_retriever_call(env, retriever->setDataSource(fd, offset, length),
-            "java/lang/RuntimeException", "setDataSource failed");
+            "java/lang/IOException", "setDataSource failed");
 }
 
 RETRIEVER_FUNC(void, native_1setSurface, jobject surface)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return;
     }
     ANativeWindow *mNativeWindow = ANativeWindow_fromSurface(env, surface);
@@ -178,11 +177,11 @@ RETRIEVER_FUNC(jobject, native_1extractMetadata, jstring jkey)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return nullptr;
     }
     if (!jkey) {
-        jniThrowException(env, "java/lang/IllegalArgumentException", "Null pointer");
+        jniThrowException(env, mIllegalArgException, "Null of key");
         return nullptr;
     }
     const char *key = env->GetStringUTFChars(jkey, nullptr);
@@ -201,7 +200,7 @@ RETRIEVER_FUNC(jbyteArray, native_1getFrameAtTime, jlong timeUs, jint option)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return nullptr;
     }
 
@@ -233,7 +232,7 @@ RETRIEVER_FUNC(jbyteArray, native_1getScaleFrameAtTime, jlong timeUs, jint optio
 {
     MediaRetriever* retriever = getRetriever(env, thiz);
     if (retriever == nullptr) {
-        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
         return nullptr;
     }
 
