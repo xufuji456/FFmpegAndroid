@@ -37,7 +37,8 @@
     <string name="media_extra_audio">Audio extract</string>
     <string name="media_extract_video">Video extract</string>
     <string name="media_play">Media play</string>
-    <string name="media_probe">Media probe</string>
+    <string name="media_probe">Probe media info</string>
+    <string name="media_retrieve">Retrieve media info</string>
     <string name="media_dubbing">Media dubbing</string>
 
     <string name="video_cut">Video cut</string>

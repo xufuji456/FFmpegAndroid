@@ -49,8 +49,8 @@ int get_scaled_context(State *s, AVCodecContext *pCodecCtx, int width, int heigh
     s->scaled_codecCtx->pix_fmt       = TARGET_IMAGE_FORMAT;
     s->scaled_codecCtx->codec_type    = AVMEDIA_TYPE_VIDEO;
 	s->scaled_codecCtx->bit_rate      = codecP->bit_rate;
-    s->scaled_codecCtx->time_base.num = s->video_st->codec->time_base.num;
-    s->scaled_codecCtx->time_base.den = s->video_st->codec->time_base.den;
+    s->scaled_codecCtx->time_base.num = pCodecCtx->time_base.num;
+    s->scaled_codecCtx->time_base.den = pCodecCtx->time_base.den;
 
     if (!targetCodec || avcodec_open2(s->scaled_codecCtx, targetCodec, NULL) < 0) {
         LOGE("avcodec_open2() failed\n");
@@ -490,7 +490,6 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 	int i = 0;
 	int got_packet = 0;
 	AVFrame *frame = NULL;
-
 	State *state = *state_ptr;
 
 	if (!state || !state->pFormatCtx) {
@@ -520,8 +519,9 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 						break;
 					}
 
-                    avcodec_send_packet(state->video_st->codec, pkt);
-                    int ret = avcodec_receive_frame(state->video_st->codec, frame);
+					AVCodecContext *pCodecContext = state->video_st->codec;
+                    avcodec_send_packet(pCodecContext, pkt);
+                    int ret = avcodec_receive_frame(pCodecContext, frame);
 					if (ret == 0) {
                         got_frame = 1;
 					} else {
@@ -534,7 +534,7 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 						convertedPkt.size = 0;
 						convertedPkt.data = NULL;
 
-						convert_image(state, state->video_st->codec, frame, &convertedPkt, &got_packet, -1, -1);
+						convert_image(state, pCodecContext, frame, &convertedPkt, &got_packet, -1, -1);
 
 						av_packet_unref(pkt);
 						av_init_packet(pkt);
@@ -556,7 +556,6 @@ int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
 	}
 
 	av_frame_free(&frame);
-
 	if (got_packet) {
 		return SUCCESS;
 	} else {
@@ -579,8 +578,9 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
 			if (!is_supported_format(codec_id, pix_fmt)) {
 				*got_frame = 0;
 
-				avcodec_send_packet(state->video_st->codec, pkt);
-                int ret = avcodec_receive_frame(state->video_st->codec, frame);
+				AVCodecContext *pCodecContext = state->video_st->codec;
+				avcodec_send_packet(pCodecContext, pkt);
+                int ret = avcodec_receive_frame(pCodecContext, frame);
 				if (ret == 0) {
 					*got_frame = 1;
 				} else {
@@ -593,7 +593,7 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
                         av_packet_unref(pkt);
                     }
                     av_init_packet(pkt);
-                    convert_image(state, state->video_st->codec, frame, pkt, got_frame, width, height);
+                    convert_image(state, pCodecContext, frame, pkt, got_frame, width, height);
                     break;
                 }
 			} else {

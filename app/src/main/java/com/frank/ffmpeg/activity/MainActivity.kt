@@ -71,7 +71,6 @@ class MainActivity : BaseActivity() {
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
             8 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
-//            -> intent.setClass(this@MainActivity, MediaPlayerActivity::class.java)
             else -> {
             }
         }
