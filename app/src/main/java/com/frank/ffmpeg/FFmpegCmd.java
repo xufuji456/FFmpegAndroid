@@ -105,21 +105,6 @@ public class FFmpegCmd {
     }
 
     /**
-     * Using FastStart to moov box in front of mdat box
-     *
-     * @param inputFile  inputFile
-     * @param outputFile outputFile
-     * @return the result of moving moov box in front of mdat box
-     * 0 for success, -1 for fail
-     */
-    public int moveMoovAhead(String inputFile, String outputFile) {
-        if (TextUtils.isEmpty(inputFile) || TextUtils.isEmpty(outputFile)) {
-            return -1;
-        }
-        return fastStart(inputFile, outputFile);
-    }
-
-    /**
      * execute probe cmd internal
      *
      * @param commands commands
@@ -154,8 +139,6 @@ public class FFmpegCmd {
     private native static int handle(String[] commands);
 
     private native static void cancelTaskJni(int cancel);
-
-    private native static int fastStart(String inputFile, String outputFile);
 
     private native static String handleProbe(String[] commands);
 

@@ -397,14 +397,8 @@ class VideoHandleActivity : BaseActivity() {
         var fileName = FileUtil.getFileName(srcFile)
         fileName = "moov_" + fileName!!
         outputPath = filePath + File.separator + fileName
-        if (useFFmpegCmd) {
-            val commandLine = FFmpegUtil.moveMoovAhead(srcFile, outputPath)
-            ffmpegHandler!!.executeFFmpegCmd(commandLine)
-        } else {
-            val ffmpegCmd = FFmpegCmd()
-            val result = ffmpegCmd.moveMoovAhead(srcFile, outputPath)
-            Log.e(TAG, "result=" + (result == 0))
-        }
+        val commandLine = FFmpegUtil.moveMoovAhead(srcFile, outputPath)
+        ffmpegHandler!!.executeFFmpegCmd(commandLine)
     }
 
     /**
@@ -477,11 +471,10 @@ class VideoHandleActivity : BaseActivity() {
         private val TAG = VideoHandleActivity::class.java.simpleName
         private val PATH = Environment.getExternalStorageDirectory().path
         private var outputPath :String ?= null
-        private const val useFFmpegCmd = true
 
         private const val TYPE_IMAGE = 1
-        private const val TYPE_GIF = 2
-        private const val TYPE_TEXT = 3
+        private const val TYPE_GIF   = 2
+        private const val TYPE_TEXT  = 3
         private const val waterMarkType = TYPE_IMAGE
         private const val convertGifWithFFmpeg = false
     }
