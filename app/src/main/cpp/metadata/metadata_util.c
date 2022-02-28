@@ -6,9 +6,10 @@
 
 #include "metadata_util.h"
 #include <stdio.h>
+#include "include/libavutil/pixdesc.h"
 
 void set_duration(AVFormatContext *ic) {
-	char value[30] = "0";
+	char value[20] = "0";
 	long duration = 0;
 
 	if (ic) {
@@ -22,7 +23,7 @@ void set_duration(AVFormatContext *ic) {
 }
 
 void set_file_size(AVFormatContext *ic) {
-	char value[30] = "0";
+	char value[20] = "0";
 
 	int64_t size = ic->pb ? avio_size(ic->pb) : -1;
 	sprintf(value, "%"PRId64, size);
@@ -69,17 +70,23 @@ void set_channel_count(AVFormatContext *ic, AVStream *stream) {
 }
 
 void set_channel_layout(AVFormatContext *ic, AVStream *stream) {
-	char value[10] = "0";
+	char value[20] = "0";
 	if (stream) {
-		av_get_channel_layout_string(value, 10,
+		av_get_channel_layout_string(value, 20,
 				stream->codecpar->channels, stream->codecpar->channel_layout);
 		av_dict_set(&ic->metadata, CHANNEL_LAYOUT, value, 0);
 	}
 }
 
-void set_video_resolution(AVFormatContext *ic, AVStream *video_st) {
-	char value[30] = "0";
+void set_pixel_format(AVFormatContext *ic, AVStream *stream) {
+    if (stream) {
+        const char *name = av_get_pix_fmt_name(stream->codecpar->format);
+        av_dict_set(&ic->metadata, PIXEL_FORMAT, name, 0);
+    }
+}
 
+void set_video_resolution(AVFormatContext *ic, AVStream *video_st) {
+	char value[20] = "0";
 	if (video_st) {
 		sprintf(value, "%d", video_st->codecpar->width);
 	    av_dict_set(&ic->metadata, VIDEO_WIDTH, value, 0);
@@ -102,7 +109,7 @@ void set_rotation(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st) {
 }
 
 void set_frame_rate(AVFormatContext *ic, AVStream *video_st) {
-	char value[30] = "0";
+	char value[20] = "0";
 
 	if (video_st && video_st->avg_frame_rate.den && video_st->avg_frame_rate.num) {
 		double d = av_q2d(video_st->avg_frame_rate);

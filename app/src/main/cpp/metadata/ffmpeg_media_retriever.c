@@ -199,6 +199,7 @@ int set_data_source_inner(State **state_ptr, const char* path) {
     set_file_size(state->pFormatCtx);
     set_frame_rate(state->pFormatCtx, state->video_st);
 	set_sample_rate(state->pFormatCtx, state->audio_st);
+	set_pixel_format(state->pFormatCtx, state->video_st);
 	set_channel_count(state->pFormatCtx, state->audio_st);
 	set_channel_layout(state->pFormatCtx, state->audio_st);
 	set_video_resolution(state->pFormatCtx, state->video_st);

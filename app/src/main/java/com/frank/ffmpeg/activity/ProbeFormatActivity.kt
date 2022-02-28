@@ -177,6 +177,10 @@ class ProbeFormatActivity : BaseActivity() {
             if (channelLayout != null)
                 resultBuilder.append("channelLayout:$channelLayout\n")
 
+            val pixelFormat = retriever.extractMetadata(FFmpegMediaRetriever.METADATA_KEY_PIXEL_FORMAT)
+            if (pixelFormat != null)
+                resultBuilder.append("pixelFormat:$pixelFormat\n")
+
             mHandler.obtainMessage(MSG_INFO, resultBuilder.toString()).sendToTarget()
 
             // Retrieve frame with timeUs

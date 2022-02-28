@@ -23,6 +23,7 @@ static const char *MIME_TYPE      = "mime_type";
 static const char *SAMPLE_RATE    = "sample_rate";
 static const char *CHANNEL_COUNT  = "channel_count";
 static const char *CHANNEL_LAYOUT = "channel_layout";
+static const char *PIXEL_FORMAT   = "pixel_format";
 
 static const int SUCCESS = 0;
 static const int FAILURE = -1;
@@ -34,6 +35,7 @@ void set_codec(AVFormatContext *ic, int i);
 void set_sample_rate(AVFormatContext *ic,    AVStream *stream);
 void set_channel_count(AVFormatContext *ic,  AVStream *stream);
 void set_channel_layout(AVFormatContext *ic, AVStream *stream);
+void set_pixel_format(AVFormatContext *ic, AVStream *stream);
 void set_video_resolution(AVFormatContext *ic, AVStream *video_st);
 void set_rotation(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st);
 void set_frame_rate(AVFormatContext *ic, AVStream *video_st);

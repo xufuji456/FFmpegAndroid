@@ -313,16 +313,20 @@ public class FFmpegMediaRetriever {
      */
     public static String METADATA_KEY_MIME_TYPE = "mime_type";
     /**
-     * The metadata key to retrieve the mime type.
+     * The metadata key to retrieve sample rate.
      */
     public static String METADATA_KEY_SAMPLE_RATE = "sample_rate";
     /**
-     * The metadata key to retrieve the mime type.
+     * The metadata key to retrieve channel count.
      */
     public static String METADATA_KEY_CHANNEL_COUNT = "channel_count";
     /**
-     * The metadata key to retrieve the mime type.
+     * The metadata key to retrieve channel layout.
      */
     public static String METADATA_KEY_CHANNEL_LAYOUT = "channel_layout";
+    /**
+     * The metadata key to retrieve pixel format.
+     */
+    public static String METADATA_KEY_PIXEL_FORMAT = "pixel_format";
 
 }
