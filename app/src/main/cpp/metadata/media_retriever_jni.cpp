@@ -260,6 +260,37 @@ RETRIEVER_FUNC(jbyteArray, native_1getScaleFrameAtTime, jlong timeUs, jint optio
     return array;
 }
 
+RETRIEVER_FUNC(jbyteArray, native_1getAudioThumbnail)
+{
+    MediaRetriever* retriever = getRetriever(env, thiz);
+    if (retriever == nullptr) {
+        jniThrowException(env, mIllegalStateException, mNoAvailableMsg);
+        return nullptr;
+    }
+
+    AVPacket packet;
+    av_init_packet(&packet);
+    jbyteArray array = nullptr;
+
+    if (retriever->getAudioThumbnail(&packet) == 0) {
+        int size = packet.size;
+        uint8_t* data = packet.data;
+        array = env->NewByteArray(size);
+        if (!array) {
+            LOGE(LOG_TAG, "getAudioThumbnail: OutOfMemoryError is thrown.");
+        } else {
+            jbyte* bytes = env->GetByteArrayElements(array, nullptr);
+            if (bytes != nullptr) {
+                memcpy(bytes, data, size);
+                env->ReleaseByteArrayElements(array, bytes, 0);
+            }
+        }
+    }
+
+    av_packet_unref(&packet);
+    return array;
+}
+
 RETRIEVER_FUNC(void, native_1release)
 {
     MediaRetriever* retriever = getRetriever(env, thiz);

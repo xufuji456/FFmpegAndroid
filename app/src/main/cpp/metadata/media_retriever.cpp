@@ -47,6 +47,12 @@ int MediaRetriever::getScaledFrameAtTime(int64_t timeUs, int option, AVPacket *p
 	return ::get_scaled_frame_at_time(&state, timeUs, option, pkt, width, height);
 }
 
+int MediaRetriever::getAudioThumbnail(AVPacket *pkt)
+{
+	Mutex::Autolock lock(mLock);
+	return ::get_audio_thumbnail(&state, pkt);
+}
+
 int MediaRetriever::setNativeWindow(ANativeWindow* native_window)
 {
 	Mutex::Autolock lock(mLock);

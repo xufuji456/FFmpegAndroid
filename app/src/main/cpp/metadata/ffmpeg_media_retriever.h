@@ -54,6 +54,7 @@ int set_data_source_fd(State **ps, int fd, int64_t offset, int64_t length);
 const char* extract_metadata(State **ps, const char* key);
 int get_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt);
 int get_scaled_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt, int width, int height);
+int get_audio_thumbnail(State **state_ptr, AVPacket *pkt);
 int set_native_window(State **ps, ANativeWindow* native_window);
 void release(State **ps);
 

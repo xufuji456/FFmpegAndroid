@@ -13,9 +13,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:text="@string/media_probe"
+            android:textSize="12sp"
             android:textColor="@color/colorPrimary"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"/>
+            android:layout_marginStart="10dp"/>
 
         <Button
             android:id="@+id/btn_retrieve_format"
@@ -23,9 +24,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:text="@string/media_retrieve"
+            android:textSize="12sp"
             android:textColor="@color/colorPrimary"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="20dp"/>
+            android:layout_marginEnd="10dp"/>
 
         <TextView
             android:id="@+id/txt_probe_format"

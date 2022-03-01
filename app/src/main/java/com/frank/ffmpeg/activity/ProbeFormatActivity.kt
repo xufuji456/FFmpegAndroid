@@ -185,6 +185,8 @@ class ProbeFormatActivity : BaseActivity() {
 
             // Retrieve frame with timeUs
             val bitmap = retriever.getFrameAtTime(5 * 1000000)
+            // Retrieve audio thumbnail, if it has embedded
+//            val bitmap = retriever.audioThumbnail
             if (bitmap != null) {
                 Log.e("FFmpegRetriever", "bitmap width=${bitmap.width}--height=${bitmap.height}")
                 mHandler.obtainMessage(MSG_FRAME, bitmap).sendToTarget()

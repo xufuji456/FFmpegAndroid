@@ -30,6 +30,7 @@ public:
     const char* extractMetadata(const char* key);
     int getFrameAtTime(int64_t timeUs, int option, AVPacket *pkt);
     int getScaledFrameAtTime(int64_t timeUs, int option, AVPacket *pkt, int width, int height);
+	int getAudioThumbnail(AVPacket *pkt);
     int setNativeWindow(ANativeWindow* native_window);
 
 private:

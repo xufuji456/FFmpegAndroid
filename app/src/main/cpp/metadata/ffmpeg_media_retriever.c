@@ -487,7 +487,7 @@ void convert_image(State *state, AVCodecContext *pCodecCtx, AVFrame *pFrame, AVP
 	}
 }
 
-int get_embedded_picture(State **state_ptr, AVPacket *pkt) {
+int get_audio_thumbnail(State **state_ptr, AVPacket *pkt) {
 	int i = 0;
 	int got_packet = 0;
 	AVFrame *frame = NULL;

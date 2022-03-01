@@ -203,6 +203,15 @@ public class FFmpegMediaRetriever {
         return getScaledFrameAtTime(timeUs, OPTION_CLOSEST_SYNC, width, height);
     }
 
+    public Bitmap getAudioThumbnail() {
+        byte[] picture = native_getAudioThumbnail();
+        if (picture != null) {
+            return BitmapFactory.decodeByteArray(picture, 0, picture.length, null);
+        }
+
+        return null;
+    }
+
     public void release() {
         native_release();
     }
@@ -222,6 +231,8 @@ public class FFmpegMediaRetriever {
     private native byte[] native_getFrameAtTime(long timeUs, int option);
 
     private native byte[] native_getScaleFrameAtTime(long timeUs, int option, int width, int height);
+
+    private native byte[] native_getAudioThumbnail();
 
     private native void native_release();
 
