@@ -388,19 +388,6 @@ class VideoHandleActivity : BaseActivity() {
         ffmpegHandler!!.executeFFmpegCmds(commandList)
     }
 
-    private fun moov(srcFile: String) {
-        if (!srcFile.endsWith(FileUtil.TYPE_MP4)) {
-            showToast(getString(R.string.tip_not_mp4_video))
-            return
-        }
-        val filePath = FileUtil.getFilePath(srcFile)
-        var fileName = FileUtil.getFileName(srcFile)
-        fileName = "moov_" + fileName!!
-        outputPath = filePath + File.separator + fileName
-        val commandLine = FFmpegUtil.moveMoovAhead(srcFile, outputPath)
-        ffmpegHandler!!.executeFFmpegCmd(commandLine)
-    }
-
     /**
      * Combine pictures into video
      */
