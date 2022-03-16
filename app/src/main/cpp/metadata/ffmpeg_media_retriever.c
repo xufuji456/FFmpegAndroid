@@ -584,18 +584,23 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
                 int ret = avcodec_receive_frame(pCodecContext, frame);
 				if (ret == 0) {
 					*got_frame = 1;
+				} else if (ret == AVERROR(EAGAIN)) {
+					continue;
 				} else {
+					LOGE("decode frame fail...");
                     break;
 				}
 
-                if (desired_frame_number == -1 ||
-                    (desired_frame_number != -1 && frame->pts >= desired_frame_number)) {
-                    if (pkt->data) {
-                        av_packet_unref(pkt);
+                if (*got_frame) {
+                    if (desired_frame_number == -1 ||
+                        (desired_frame_number != -1 && frame->pts >= desired_frame_number)) {
+                        if (pkt->data) {
+                            av_packet_unref(pkt);
+                        }
+                        av_init_packet(pkt);
+                        convert_image(state, pCodecContext, frame, pkt, got_frame, width, height);
+                        break;
                     }
-                    av_init_packet(pkt);
-                    convert_image(state, pCodecContext, frame, pkt, got_frame, width, height);
-                    break;
                 }
 			} else {
 				*got_frame = 1;
