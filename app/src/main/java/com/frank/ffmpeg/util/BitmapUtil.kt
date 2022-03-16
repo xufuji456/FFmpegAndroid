@@ -1,11 +1,11 @@
 package com.frank.ffmpeg.util
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.TextUtils
-
-import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -74,15 +74,29 @@ object BitmapUtil {
         return true
     }
 
-    /**
-     * delete file
-     *
-     * @param filePath filePath
-     * @return result of deletion
-     */
-    fun deleteTextFile(filePath: String): Boolean {
-        val file = File(filePath)
-        return file.exists() && file.delete()
+    fun savePhoto(bitmap: Bitmap?, path: String?, context: Context?): Boolean {
+        if (bitmap == null || TextUtils.isEmpty(path) || context == null) {
+            return false
+        }
+        var fileOutputStream: FileOutputStream? = null
+        try {
+            fileOutputStream = FileOutputStream(path)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            fileOutputStream.flush()
+        } catch (e: FileNotFoundException) {
+            return false
+        } catch (e: IOException) {
+            return false
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        return true
     }
 
 }

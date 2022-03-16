@@ -145,11 +145,9 @@ public class FFmpegMediaRetriever {
             throw new IllegalArgumentException("Unsupported option: " + option);
         }
 
-        BitmapFactory.Options bitmapOptions= new BitmapFactory.Options();
-        bitmapOptions.inScaled = true;
         byte [] picture = native_getFrameAtTime(timeUs, option);
         if (picture != null) {
-            return BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptions);
+            return BitmapFactory.decodeByteArray(picture, 0, picture.length, null);
         }
 
         return null;
@@ -189,11 +187,9 @@ public class FFmpegMediaRetriever {
             throw new IllegalArgumentException("Unsupported option: " + option);
         }
 
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inScaled = true;
         byte [] picture = native_getScaleFrameAtTime(timeUs, option, width, height);
         if (picture != null) {
-            return BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptions);
+            return BitmapFactory.decodeByteArray(picture, 0, picture.length, null);
         }
 
         return null;

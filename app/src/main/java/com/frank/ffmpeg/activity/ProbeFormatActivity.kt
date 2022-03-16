@@ -3,6 +3,7 @@ package com.frank.ffmpeg.activity
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.util.Log
@@ -23,6 +24,7 @@ import com.frank.ffmpeg.util.FFmpegUtil
 import com.frank.ffmpeg.util.FileUtil
 
 import com.frank.ffmpeg.metadata.FFmpegMediaRetriever
+import com.frank.ffmpeg.util.BitmapUtil
 import java.lang.StringBuilder
 
 /**
@@ -40,6 +42,8 @@ class ProbeFormatActivity : BaseActivity() {
     private var view: View? = null
 
     private val MSG_FRAME = 9099
+
+    private val savePhoto = false
 
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
@@ -190,6 +194,10 @@ class ProbeFormatActivity : BaseActivity() {
             if (bitmap != null) {
                 Log.e("FFmpegRetriever", "bitmap width=${bitmap.width}--height=${bitmap.height}")
                 mHandler.obtainMessage(MSG_FRAME, bitmap).sendToTarget()
+                if (savePhoto) {
+                    val thumbPath = Environment.getExternalStorageDirectory().path + "/thumb_" + System.currentTimeMillis() + ".png"
+                    BitmapUtil.savePhoto(bitmap, thumbPath, this)
+                }
             }
 
             retriever.release()
