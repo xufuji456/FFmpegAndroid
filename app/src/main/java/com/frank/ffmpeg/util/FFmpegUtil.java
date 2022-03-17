@@ -799,4 +799,25 @@ public class FFmpegUtil {
         return insert(gopCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    /**
+     * Trim one or more segments from a single video
+     * @param inputPath  the path of input file
+     * @param start1     start time of the first segment
+     * @param end1       end time of the first segment
+     * @param start2     start time of the second segment
+     * @param end2       end time of the second segment
+     * @param outputPath the path of output file
+     * @return the command of trim video
+     */
+    public static String[] trimVideo(String inputPath, int start1, int end1, int start2, int end2, String outputPath) {
+        String trimCmd = "ffmpeg -i -filter_complex " +
+                "[0:v]trim=start=%d:end=%d,setpts=PTS-STARTPTS[v0];" +
+                "[0:a]atrim=start=%d:end=%d,asetpts=PTS-STARTPTS[a0];" +
+                "[0:v]trim=start=%d:end=%d,setpts=PTS-STARTPTS[v1];" +
+                "[0:a]atrim=start=%d:end=%d,asetpts=PTS-STARTPTS[a1];" +
+                "[v0][a0][v1][a1]concat=n=2:v=1:a=1[out] -map [out]";
+        trimCmd = String.format(Locale.getDefault(), trimCmd, start1, end1, start1, end1, start2, end2, start2, end2);
+        return insert(trimCmd.split(" "), 2, inputPath, outputPath);
+    }
+
 }
