@@ -1,4 +1,4 @@
-package com.frank.ffmpeg.hardware
+package com.frank.androidmedia.controller
 
 import android.media.MediaCodec
 import android.media.MediaExtractor
@@ -8,11 +8,74 @@ import android.util.Log
 import android.view.Surface
 
 /**
- * Extract by MediaExtractor, decode by MediaCodec, and render to Surface
- * Created by frank on 2019/11/16.
+ * The controller of MediaExtractor and MediaCodec.
+ * Use MediaExtractor to extract data of media tracks.
+ * And use MediaCodec to decode video frame from extractor.
+ *
+ * @author frank
+ * @date 2022/3/18
  */
 
-class HardwareDecode(private val mSurface: Surface, private val mFilePath: String, private val mCallback: OnDataCallback?) {
+open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, val mCallback: OnDataCallback?) {
+
+    /**
+     *
+     * MediaExtractor extractor = new MediaExtractor();
+     * extractor.setDataSource(...);
+     * int numTracks = extractor.getTrackCount();
+     * for (int i = 0; i &lt; numTracks; ++i) {
+     *   MediaFormat format = extractor.getTrackFormat(i);
+     *   String mime = format.getString(MediaFormat.KEY_MIME);
+     *   if (weAreInterestedInThisTrack) {
+     *     extractor.selectTrack(i);
+     *   }
+     * }
+     * ByteBuffer inputBuffer = ByteBuffer.allocate(...)
+     * while (extractor.readSampleData(inputBuffer, ...) != 0) {
+     *   int trackIndex = extractor.getSampleTrackIndex();
+     *   long presentationTimeUs = extractor.getSampleTime();
+     *   ...
+     *   extractor.advance();
+     * }
+     * extractor.release();
+     * extractor = null;
+     */
+
+/*
+    // MediaCodec is typically used like this in asynchronous mode:
+    MediaCodec codec = MediaCodec.createByCodecName(name);
+    MediaFormat mOutputFormat;
+    codec.setCallback(new MediaCodec.Callback() {
+        @Override
+        void onInputBufferAvailable(MediaCodec mc, int inputBufferId) {
+            ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferId);
+            codec.queueInputBuffer(inputBufferId, …);
+        }
+
+        @Override
+        void onOutputBufferAvailable(MediaCodec mc, int outputBufferId, …) {
+            ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
+            MediaFormat bufferFormat = codec.getOutputFormat(outputBufferId);
+            codec.releaseOutputBuffer(outputBufferId, …);
+        }
+
+        @Override
+        void onOutputFormatChanged(MediaCodec mc, MediaFormat format) {
+            mOutputFormat = format;
+        }
+
+        @Override
+        void onError(…) {
+
+        }
+    });
+    codec.configure(format, …);
+    mOutputFormat = codec.getOutputFormat();
+    codec.start();
+    // wait for processing to complete
+    codec.stop();
+    codec.release();
+*/
 
     private var videoDecodeThread: VideoDecodeThread? = null
 
@@ -53,11 +116,11 @@ class HardwareDecode(private val mSurface: Surface, private val mFilePath: Strin
 
         private var isPreviewing: Boolean = false
 
-        internal fun setPreviewing(previewing: Boolean) {
+        fun setPreviewing(previewing: Boolean) {
             this.isPreviewing = previewing
         }
 
-        internal fun seekTo(seekPosition: Long) {
+        fun seekTo(seekPosition: Long) {
             try {
                 if (mediaExtractor != null) {
                     mediaExtractor!!.seekTo(seekPosition, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
@@ -68,7 +131,7 @@ class HardwareDecode(private val mSurface: Surface, private val mFilePath: Strin
 
         }
 
-        internal fun release() {
+        fun release() {
             try {
                 if (mediaCodec != null) {
                     mediaCodec!!.stop()
@@ -187,7 +250,7 @@ class HardwareDecode(private val mSurface: Surface, private val mFilePath: Strin
 
     companion object {
 
-        private val TAG = HardwareDecode::class.java.simpleName
+        private val TAG = MediaPlayController::class.java.simpleName
 
         private const val DEQUEUE_TIME = (10 * 1000).toLong()
         private const val SLEEP_TIME = 10

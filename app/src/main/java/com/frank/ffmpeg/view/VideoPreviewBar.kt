@@ -11,16 +11,16 @@ import android.widget.SeekBar
 import android.widget.TextView
 
 import com.frank.ffmpeg.R
-import com.frank.ffmpeg.hardware.HardwareDecode
 import com.frank.ffmpeg.util.ScreenUtil
 import com.frank.ffmpeg.util.TimeUtil
+import com.frank.androidmedia.controller.MediaDecodeController
 
 /**
  * the custom view of preview SeekBar
  * Created by frank on 2019/11/16.
  */
 
-class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
+class VideoPreviewBar : RelativeLayout, MediaDecodeController.OnDataCallback {
 
     private var texturePreView: TextureView? = null
 
@@ -30,7 +30,7 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
 
     private var txtVideoDuration: TextView? = null
 
-    private var hardwareDecode: HardwareDecode? = null
+    private var decodeController: MediaDecodeController? = null
 
     private var mPreviewBarCallback: PreviewBarCallback? = null
 
@@ -98,8 +98,8 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
             return
         }
         release()
-        hardwareDecode = HardwareDecode(surface, filePath, this)
-        hardwareDecode!!.decode()
+        decodeController = MediaDecodeController(surface, filePath, this)
+        decodeController!!.decode()
     }
 
     private fun setListener() {
@@ -109,9 +109,9 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
                     return
                 }
                 previewBar!!.progress = progress
-                if (hardwareDecode != null && progress < duration) {
+                if (decodeController != null && progress < duration) {
                     // us to ms
-                    hardwareDecode!!.seekTo((progress * 1000).toLong())
+                    decodeController!!.seekTo((progress * 1000).toLong())
                 }
                 val percent = progress * screenWidth / duration
                 if (percent in (previewHalfWidth + 1) until moveEndPos && texturePreView != null) {
@@ -123,8 +123,8 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
                 if (texturePreView != null) {
                     texturePreView!!.visibility = View.VISIBLE
                 }
-                if (hardwareDecode != null) {
-                    hardwareDecode!!.setPreviewing(true)
+                if (decodeController != null) {
+                    decodeController!!.setPreviewing(true)
                 }
             }
 
@@ -135,8 +135,8 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
                 if (mPreviewBarCallback != null) {
                     mPreviewBarCallback!!.onStopTracking(seekBar.progress.toLong())
                 }
-                if (hardwareDecode != null) {
-                    hardwareDecode!!.setPreviewing(false)
+                if (decodeController != null) {
+                    decodeController!!.setPreviewing(false)
                 }
             }
         })
@@ -179,9 +179,9 @@ class VideoPreviewBar : RelativeLayout, HardwareDecode.OnDataCallback {
     }
 
     fun release() {
-        if (hardwareDecode != null) {
-            hardwareDecode!!.release()
-            hardwareDecode = null
+        if (decodeController != null) {
+            decodeController!!.release()
+            decodeController = null
         }
     }
 

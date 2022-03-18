@@ -10,7 +10,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
-import com.frank.androidmedia.controller.MediaPlayerController
+import com.frank.androidmedia.controller.MediaPlayController
 import com.frank.androidmedia.listener.PlayerCallback
 
 import com.frank.ffmpeg.R
@@ -25,7 +25,7 @@ import com.frank.ffmpeg.handler.FFmpegHandler.MSG_TOAST
 
 class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback, PlayerCallback {
 
-    private var playerController: MediaPlayerController? = null
+    private var playController: MediaPlayController? = null
     private var surfaceVideo: SurfaceView? = null
     private var videoPreviewBar: VideoPreviewBar? = null
 
@@ -34,8 +34,8 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback,
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             if (msg.what == MSG_UPDATE) {
-                if (videoPreviewBar != null && playerController != null) {
-                    videoPreviewBar!!.updateProgress(playerController!!.currentPosition())
+                if (videoPreviewBar != null && playController != null) {
+                    videoPreviewBar!!.updateProgress(playController!!.currentPosition())
                 }
                 this.sendEmptyMessageDelayed(MSG_UPDATE, TIME_UPDATE.toLong())
             } else if (msg.what == MSG_TOAST) {
@@ -52,7 +52,7 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback,
 
         initView()
         mHandler.sendEmptyMessageDelayed(MSG_TOAST, 500)
-        playerController = MediaPlayerController(this)
+        playController = MediaPlayController(this)
     }
 
     private fun initView() {
@@ -80,7 +80,7 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback,
         if (surface == null || TextUtils.isEmpty(filePath)) {
             return
         }
-        playerController?.initPlayer(filePath, surface)
+        playController?.initPlayer(filePath, surface)
     }
 
     override fun onViewClick(view: View) {
@@ -93,14 +93,14 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback,
     }
 
     override fun onStopTracking(progress: Long) {
-        if (playerController != null) {
-            playerController!!.seekTo(progress.toInt())
+        if (playController != null) {
+            playController!!.seekTo(progress.toInt())
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        playerController?.releasePlayer()
+        playController?.releasePlayer()
         if (videoPreviewBar != null) {
             videoPreviewBar!!.release()
         }
