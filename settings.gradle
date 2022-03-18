@@ -1,3 +1,4 @@
+include ':AndroidMedia'
 include ':app'
 include ':Live'
 include ':libmp3'
