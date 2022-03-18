@@ -6,26 +6,20 @@
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_mp3_Mp3Lite_ ## FUNC_NAME \
     (JNIEnv *env, jclass thiz, ##__VA_ARGS__)\
 
-lame_global_flags *glf;
-
-lame_global_flags *initializeDefault(JNIEnv *env) {
-    lame_global_flags *glf = lame_init();
-    lame_init_params(glf);
-    return glf;
-}
+lame_global_flags *global_flags;
 
 lame_global_flags *initialize(
         JNIEnv *env,
-        jint inSamplerate, jint outChannel,
-        jint outSamplerate, jint outBitrate, jfloat scaleInput, jint mode, jint vbrMode,
+        jint inSampleRate, jint outChannel,
+        jint outSampleRate, jint outBitrate, jfloat scaleInput, jint mode, jint vbrMode,
         jint quality, jint vbrQuality, jint abrMeanBitrate, jint lowpassFreq, jint highpassFreq,
         jstring id3tagTitle, jstring id3tagArtist, jstring id3tagAlbum,
         jstring id3tagYear, jstring id3tagComment) {
 
     lame_global_flags *glf = lame_init();
-    lame_set_in_samplerate(glf, inSamplerate);
+    lame_set_in_samplerate(glf, inSampleRate);
     lame_set_num_channels(glf, outChannel);
-    lame_set_out_samplerate(glf, outSamplerate);
+    lame_set_out_samplerate(glf, outSampleRate);
     lame_set_brate(glf, outBitrate);
     lame_set_quality(glf, quality);
     lame_set_scale(glf, scaleInput);
@@ -45,8 +39,6 @@ lame_global_flags *initialize(
             lame_set_mode(glf, MONO);
             break;
         case 4:
-            lame_set_mode(glf, NOT_SET);
-            break;
         default:
             lame_set_mode(glf, NOT_SET);
             break;
@@ -73,7 +65,6 @@ lame_global_flags *initialize(
             break;
 
     }
-
 
     const jchar *title = NULL;
     const jchar *artist = NULL;
@@ -185,8 +176,8 @@ void close_lame(lame_global_flags *glf) {
 
 
 MP3_FUNC(void, lameInitDefault) {
-
-    glf = initializeDefault(env);
+    global_flags = lame_init();
+    lame_init_params(global_flags);
 }
 
 MP3_FUNC(void, lameInit,
@@ -196,7 +187,7 @@ MP3_FUNC(void, lameInit,
                   jstring id3tagArtist, jstring id3tagAlbum, jstring id3tagYear,
                   jstring id3tagComment) {
 
-    glf = initialize(env, inSampleRate, outChannel, outSampleRate, outBitrate, scaleInput, mode,
+    global_flags = initialize(env, inSampleRate, outChannel, outSampleRate, outBitrate, scaleInput, mode,
                      vbrMode,
                      quality, vbrQuality, abrMeanBitrate, lowPassFreq, highPassFreq, id3tagTitle,
                      id3tagArtist, id3tagAlbum,
@@ -206,19 +197,19 @@ MP3_FUNC(void, lameInit,
 
 MP3_FUNC(jint, lameEncode,
                   jshortArray buffer_l, jshortArray buffer_r, jint samples, jbyteArray mp3buf) {
-    return encode(env, glf, buffer_l, buffer_r, samples, mp3buf);
+    return encode(env, global_flags, buffer_l, buffer_r, samples, mp3buf);
 }
 
 MP3_FUNC(jint, encodeBufferInterleaved,
                   jshortArray pcm, jint samples, jbyteArray mp3buf) {
-    return encodeBufferInterleaved(env, glf, pcm, samples, mp3buf);
+    return encodeBufferInterleaved(env, global_flags, pcm, samples, mp3buf);
 }
 
 MP3_FUNC(jint, lameFlush,
                   jbyteArray mp3buf) {
-    return flush(env, glf, mp3buf);
+    return flush(env, global_flags, mp3buf);
 }
 
 MP3_FUNC(void, lameClose) {
-    close_lame(glf);
+    close_lame(global_flags);
 }
