@@ -1,7 +1,6 @@
 package com.frank.ffmpeg.activity
 
 import android.annotation.SuppressLint
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -11,11 +10,11 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import com.frank.androidmedia.controller.MediaPlayerController
+import com.frank.androidmedia.listener.PlayerCallback
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.view.VideoPreviewBar
-
-import java.io.IOException
 
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_TOAST
 
@@ -24,9 +23,9 @@ import com.frank.ffmpeg.handler.FFmpegHandler.MSG_TOAST
  * Created by frank on 2019/11/16.
  */
 
-class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback {
+class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback, PlayerCallback {
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var playerController: MediaPlayerController? = null
     private var surfaceVideo: SurfaceView? = null
     private var videoPreviewBar: VideoPreviewBar? = null
 
@@ -35,8 +34,8 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback 
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             if (msg.what == MSG_UPDATE) {
-                if (videoPreviewBar != null && mediaPlayer != null) {
-                    videoPreviewBar!!.updateProgress(mediaPlayer!!.currentPosition)
+                if (videoPreviewBar != null && playerController != null) {
+                    videoPreviewBar!!.updateProgress(playerController!!.currentPosition())
                 }
                 this.sendEmptyMessageDelayed(MSG_UPDATE, TIME_UPDATE.toLong())
             } else if (msg.what == MSG_TOAST) {
@@ -53,6 +52,7 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback 
 
         initView()
         mHandler.sendEmptyMessageDelayed(MSG_TOAST, 500)
+        playerController = MediaPlayerController(this)
     }
 
     private fun initView() {
@@ -76,32 +76,11 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback 
         })
     }
 
-    private fun setPrepareListener() {
-        if (mediaPlayer == null) {
-            return
-        }
-        mediaPlayer!!.setOnPreparedListener {
-            Log.i(TAG, "onPrepared...")
-            mediaPlayer!!.start()
-            mHandler.sendEmptyMessage(MSG_UPDATE)
-        }
-    }
-
     private fun doPlay(filePath: String, surface: Surface?) {
         if (surface == null || TextUtils.isEmpty(filePath)) {
             return
         }
-        releasePlayer()
-        try {
-            mediaPlayer = MediaPlayer()
-            setPrepareListener()
-            mediaPlayer!!.setDataSource(filePath)
-            mediaPlayer!!.setSurface(surface)
-            mediaPlayer!!.prepareAsync()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        playerController?.initPlayer(filePath, surface)
     }
 
     override fun onViewClick(view: View) {
@@ -114,26 +93,37 @@ class VideoPreviewActivity : BaseActivity(), VideoPreviewBar.PreviewBarCallback 
     }
 
     override fun onStopTracking(progress: Long) {
-        if (mediaPlayer != null) {
-            Log.i(TAG, "onStopTracking progress=$progress")
-            mediaPlayer!!.seekTo(progress.toInt())
-        }
-    }
-
-    private fun releasePlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer!!.stop()
-            mediaPlayer!!.release()
-            mediaPlayer = null
+        if (playerController != null) {
+            playerController!!.seekTo(progress.toInt())
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        releasePlayer()
+        playerController?.releasePlayer()
         if (videoPreviewBar != null) {
             videoPreviewBar!!.release()
         }
+    }
+
+    /// player callback
+
+    override fun onPrepare() {
+        Log.i(TAG, "onPrepare...")
+        mHandler.sendEmptyMessage(MSG_UPDATE)
+    }
+
+    override fun onRenderFirstFrame() {
+        Log.i(TAG, "onRenderFirstFrame...")
+    }
+
+    override fun onError(what: Int, extra: Int): Boolean {
+        Log.e(TAG, "onError...")
+        return true
+    }
+
+    override fun onCompleteListener() {
+        Log.i(TAG, "onCompleteListener...")
     }
 
     companion object {
