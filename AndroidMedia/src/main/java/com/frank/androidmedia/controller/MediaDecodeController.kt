@@ -23,7 +23,7 @@ open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, v
      * MediaExtractor extractor = new MediaExtractor();
      * extractor.setDataSource(...);
      * int numTracks = extractor.getTrackCount();
-     * for (int i = 0; i &lt; numTracks; ++i) {
+     * for (int i = 0; i <= numTracks; ++i) {
      *   MediaFormat format = extractor.getTrackFormat(i);
      *   String mime = format.getString(MediaFormat.KEY_MIME);
      *   if (weAreInterestedInThisTrack) {
