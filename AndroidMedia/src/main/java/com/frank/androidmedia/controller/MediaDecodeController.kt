@@ -209,7 +209,6 @@ open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, v
                 mediaCodec!!.configure(mediaFormat, mSurface, null, 0)
                 mediaCodec!!.start()
                 val bufferInfo = MediaCodec.BufferInfo()
-                val inputBuffers = mediaCodec!!.inputBuffers
 
                 while (!isInterrupted) {
                     if (!isPreviewing) {
@@ -219,8 +218,8 @@ open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, v
                     //dequeue from input buffer
                     val inputIndex = mediaCodec!!.dequeueInputBuffer(DEQUEUE_TIME)
                     if (inputIndex >= 0) {
-                        val inputBuffer = inputBuffers[inputIndex]
-                        val sampleSize = mediaExtractor!!.readSampleData(inputBuffer, 0)
+                        val inputBuffer = mediaCodec!!.getInputBuffer(inputIndex)
+                        val sampleSize = mediaExtractor!!.readSampleData(inputBuffer!!, 0)
                         //enqueue to input buffer
                         if (sampleSize < 0) {
                             mediaCodec!!.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)

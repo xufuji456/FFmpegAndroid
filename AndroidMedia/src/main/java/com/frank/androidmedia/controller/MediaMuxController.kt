@@ -57,7 +57,6 @@ open class MediaMuxController {
 
             while (!finished) {
                 val sampleSize = mediaExtractor.readSampleData(inputBuffer, 0)
-                Log.i("MediaMuxerController", "sampleIndex=" + mediaExtractor.sampleTrackIndex + ",sampleSize=" + sampleSize)
                 if (sampleSize > 0) {
                     bufferInfo.size = sampleSize
                     bufferInfo.flags = mediaExtractor.sampleFlags
@@ -75,14 +74,14 @@ open class MediaMuxController {
             }
 
         } catch (e: Exception) {
-            Log.e("MediaMuxerController", "mux error=$e")
+            Log.e("MediaMuxController", "mux error=$e")
             happenError = true
         } finally {
             try {
                 mediaMuxer.release()
                 mediaExtractor.release()
             } catch (e1: Exception) {
-                Log.e("MediaMuxerController", "release error=$e1")
+                Log.e("MediaMuxController", "release error=$e1")
             }
             return !happenError
         }
