@@ -84,8 +84,6 @@ open class AudioTrackController {
             audioTrack = AudioTrack(audioAttributes, audioFormat,
                     bufferSize, AudioTrack.MODE_STREAM, AudioManager.AUDIO_SESSION_ID_GENERATE)
             audioTrack!!.play()
-//            audioTrack!!.audioSessionId
-//            audioTrack!!.attachAuxEffect()
         } catch (e: Exception) {
             Log.e(TAG, "initAudioTrack err=$e")
             return false
@@ -162,6 +160,18 @@ open class AudioTrackController {
 
     fun stop() {
         running?.set(false)
+    }
+
+    fun getAudioSessionId(): Int {
+        if (audioTrack == null)
+            return 0
+        return audioTrack!!.audioSessionId
+    }
+
+    fun attachAudioEffect(effectId: Int) {
+        if (audioTrack == null)
+            return
+        audioTrack!!.attachAuxEffect(effectId)
     }
 
 }

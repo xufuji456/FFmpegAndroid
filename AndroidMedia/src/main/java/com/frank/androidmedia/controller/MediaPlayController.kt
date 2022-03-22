@@ -7,7 +7,7 @@ import com.frank.androidmedia.listener.PlayerCallback
 import java.io.IOException
 
 /**
- * The controller of MediaPlayer
+ * Using MediaPlayer to play a video or audio.
  *
  * @author frank
  * @date 2022/3/18
