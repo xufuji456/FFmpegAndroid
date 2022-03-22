@@ -4,6 +4,7 @@ import android.media.*
 import android.os.SystemClock
 import android.util.Log
 import java.lang.Exception
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 1. Using MediaExtractor to demux audio.
@@ -23,6 +24,7 @@ open class AudioTrackController {
         private const val SLEEP_TIME: Long = 20
     }
 
+    private var running: AtomicBoolean? = null
     private var audioTrack: AudioTrack? = null
     private var mediaCodec: MediaCodec? = null
     private var mediaExtractor: MediaExtractor? = null
@@ -66,13 +68,23 @@ open class AudioTrackController {
         } else  {
             AudioFormat.CHANNEL_OUT_STEREO
         }
-        val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-        val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+        val encoding = AudioFormat.ENCODING_PCM_16BIT
+        val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)
         Log.e(TAG, "sampleRate=$sampleRate, channelCount=$channelCount, bufferSize=$bufferSize")
 
         try {
-            audioTrack = AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, channelConfig, audioFormat, bufferSize, AudioTrack.MODE_STREAM)
+            val audioFormat = AudioFormat.Builder()
+                    .setEncoding(encoding)
+                    .setSampleRate(sampleRate)
+                    .setChannelMask(channelConfig)
+                    .build()
+            val audioAttributes = AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .build()
+            audioTrack = AudioTrack(audioAttributes, audioFormat,
+                    bufferSize, AudioTrack.MODE_STREAM, AudioManager.AUDIO_SESSION_ID_GENERATE)
             audioTrack!!.play()
+//            audioTrack!!.audioSessionId
 //            audioTrack!!.attachAuxEffect()
         } catch (e: Exception) {
             Log.e(TAG, "initAudioTrack err=$e")
@@ -94,11 +106,13 @@ open class AudioTrackController {
             audioTrack!!.release()
             audioTrack = null
         }
+        Log.e(TAG, "release done...")
     }
 
     fun playAudio(path: String) {
-        val data = ByteArray(10 * 1024)
         var finished = false
+        val data = ByteArray(10 * 1024)
+        running = AtomicBoolean(true)
         val bufferInfo = MediaCodec.BufferInfo()
         val mediaFormat = parseAudioFormat(path) ?: return release()
         var result = initMediaCodec(mediaFormat)
@@ -111,18 +125,22 @@ open class AudioTrackController {
         }
 
         while (!finished) {
+            if (!running!!.get()) {
+                break
+            }
             val inputIndex = mediaCodec!!.dequeueInputBuffer(DEQUEUE_TIME)
             if (inputIndex >= 0) {
                 val inputBuffer = mediaCodec!!.getInputBuffer(inputIndex)
                 // demux
                 val sampleSize = mediaExtractor!!.readSampleData(inputBuffer!!, 0)
-                Log.e(TAG, "sampleSize=$sampleSize")
                 // decode
                 if (sampleSize < 0) {
-                    mediaCodec!!.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                    mediaCodec!!.queueInputBuffer(inputIndex, 0, 0,
+                            0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
                     finished = true
                 } else {
-                    mediaCodec!!.queueInputBuffer(inputIndex, 0, sampleSize, mediaExtractor!!.sampleTime, mediaExtractor!!.sampleFlags)
+                    mediaCodec!!.queueInputBuffer(inputIndex, 0, sampleSize,
+                            mediaExtractor!!.sampleTime, mediaExtractor!!.sampleFlags)
                     mediaExtractor!!.advance()
                 }
             }
@@ -132,8 +150,7 @@ open class AudioTrackController {
             if (outputIndex >= 0) {
                 val outputBuffer = mediaCodec!!.getOutputBuffer(outputIndex)
                 val size = outputBuffer!!.limit()
-                Log.e(TAG, "outputIndex=$outputIndex, position=" + outputBuffer.position() + " ,limit=" + size)
-                outputBuffer.get(data, outputBuffer.position(), size)
+                outputBuffer.get(data, outputBuffer.position(), size - outputBuffer.position())
                 audioTrack!!.write(data, 0, size)
                 mediaCodec!!.releaseOutputBuffer(outputIndex, false)
                 SystemClock.sleep(SLEEP_TIME)
@@ -141,6 +158,10 @@ open class AudioTrackController {
         }
 
         release()
+    }
+
+    fun stop() {
+        running?.set(false)
     }
 
 }
