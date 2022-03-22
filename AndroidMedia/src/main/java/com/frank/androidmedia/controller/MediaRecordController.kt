@@ -14,6 +14,7 @@ import android.view.Surface
  */
 open class MediaRecordController {
 
+    private val usingProfile = true
     private var mCamera: Camera? = null
     private var mMediaRecorder: MediaRecorder? = null
 
@@ -26,9 +27,20 @@ open class MediaRecordController {
         mMediaRecorder?.setCamera(mCamera)
         mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.CAMERA)
-        mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+        if (usingProfile) {
+            // QUALITY_480P QUALITY_720P QUALITY_1080P QUALITY_2160P
+            val profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P)
+            mMediaRecorder?.setProfile(profile)
+        } else {
+            mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
+//            mMediaRecorder?.setVideoSize(640, 480)
+//            mMediaRecorder?.setVideoEncodingBitRate(5000 * 1000)
+//            mMediaRecorder?.setVideoFrameRate(25)
+//            mMediaRecorder?.setAudioChannels(2)
+//            mMediaRecorder?.setAudioSamplingRate(48000)
+        }
         mMediaRecorder?.setOutputFile(outputPath)
         mMediaRecorder?.setPreviewDisplay(surface)
     }
