@@ -87,6 +87,9 @@ open class AudioRecordController {
                     e.printStackTrace()
                 }
             }
+            // convert pcm to wav
+            val wavPath = File(mPath).parent + "/test.wav"
+            WavUtil.makePCMToWAVFile(mPath, wavPath, true)
         }
     }
 

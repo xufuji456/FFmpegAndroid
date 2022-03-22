@@ -125,7 +125,11 @@ abstract class BaseActivity : AppCompatActivity(), View.OnClickListener {
         private val TAG = BaseActivity::class.java.simpleName
 
         private const val REQUEST_CODE = 1234
-        private val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+        private val permissions = arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO)
     }
 
 }
