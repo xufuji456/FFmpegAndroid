@@ -2,6 +2,7 @@ package com.frank.androidmedia.controller
 
 import android.R
 import android.content.Context
+import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
 import android.util.Log
@@ -32,7 +33,8 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
 
     private var mPresetReverb: PresetReverb? = null
     private val reverbValues = ArrayList<String>()
-//    private var seekBarList: List<SeekBar>? = ArrayList()
+
+    private var mBass: BassBoost? = null
 
     private var mAudioEffectCallback: AudioEffectCallback? = null
 
@@ -43,6 +45,9 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         mAudioEffectCallback = audioEffectCallback
     }
 
+    /**
+     * Setup AudioEffect of Equalizer, which has centerFrequency、band、bandLevel
+     */
     fun setupEqualizer(audioSessionId: Int) {
         val equalizerList = ArrayList<Pair<*, *>>()
         mEqualizer = Equalizer(0, audioSessionId)
@@ -59,6 +64,9 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         mAudioEffectCallback?.setEqualizerList(maxEQLevel - minEQLevel, equalizerList)
     }
 
+    /**
+     * Setup preset style, which associates to Equalizer
+     */
     fun setupPresetStyle(context: Context, spinnerStyle: Spinner) {
         for (i in 0 until mEqualizer!!.numberOfPresets) {
             reverbValues.add(mEqualizer!!.getPresetName(i.toShort()))
@@ -86,11 +94,33 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         }
     }
 
+    /**
+     * Setup AudioEffect of BassBoost
+     */
+    fun setupBassBoost(audioSessionId: Int, barBassBoost: SeekBar) {
+        mBass = BassBoost(0, audioSessionId)
+        mBass!!.enabled = true
+        // 0~1000
+        barBassBoost.max = 1000
+        barBassBoost.progress = 0
+        barBassBoost.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // set the strength of bass boost
+                mBass!!.setStrength(progress.toShort())
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+    }
+
     fun onEqualizerProgress(index: Int, progress: Int) {
         mEqualizer!!.setBandLevel(index.toShort(), (progress + minEQLevel).toShort())
     }
 
     fun release() {
+        mBass?.release()
         mEqualizer?.release()
         mPresetReverb?.release()
     }

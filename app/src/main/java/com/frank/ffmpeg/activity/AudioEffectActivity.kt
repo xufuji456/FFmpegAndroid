@@ -37,7 +37,6 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     }
 
     private var mPlayer: MediaPlayer? = null
-    private var mBass: BassBoost? = null
     private var spinnerStyle: Spinner? = null
     private var spinnerReverb: Spinner? = null
     private var barBassBoost: SeekBar? = null
@@ -58,7 +57,7 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
         audioEffectController = AudioEffectController(this)
         audioEffectController?.setupEqualizer(mPlayer!!.audioSessionId)
         audioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
-        setupBassBoost()
+        audioEffectController?.setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
         setLoudnessEnhancer()
         setupVisualizer()
 
@@ -113,24 +112,6 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
 
     override fun onProgress(index: Int, progress: Int) {
         audioEffectController?.onEqualizerProgress(index, progress)
-    }
-
-    private fun setupBassBoost() {
-        mBass = BassBoost(0, mPlayer!!.audioSessionId)
-        mBass!!.enabled = true
-        // 0--1000
-        barBassBoost!!.max = 1000
-        barBassBoost!!.progress = 0
-        barBassBoost!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                // set the strength of bass boost
-                mBass!!.setStrength(progress.toShort())
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -195,7 +176,7 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     override fun onDestroy() {
         super.onDestroy()
 
-        mBass?.release()
+        audioEffectController?.release()
         loudnessEnhancer?.release()
         releaseVisualizer()
         mPlayer?.release()
