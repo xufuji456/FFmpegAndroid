@@ -10,7 +10,6 @@ import android.util.Log
 import android.util.Pair
 import android.view.View
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.frank.androidmedia.controller.AudioEffectController
@@ -41,12 +40,11 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     private var spinnerReverb: Spinner? = null
     private var barBassBoost: SeekBar? = null
     private var equalizerAdapter: EqualizerAdapter? = null
-    private var loudnessEnhancer: LoudnessEnhancer? = null
     private var barEnhancer: SeekBar? = null
     private var visualizerView: VisualizerView? = null
     private var mVisualizer: AudioVisualizer? = null
 
-    private var audioEffectController: AudioEffectController? = null
+    private var mAudioEffectController: AudioEffectController? = null
 
     private val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -54,11 +52,11 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
             Manifest.permission.MODIFY_AUDIO_SETTINGS)
 
     private val onPreparedListener = MediaPlayer.OnPreparedListener {
-        audioEffectController = AudioEffectController(this)
-        audioEffectController?.setupEqualizer(mPlayer!!.audioSessionId)
-        audioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
-        audioEffectController?.setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
-        setLoudnessEnhancer()
+        mAudioEffectController = AudioEffectController(this)
+        mAudioEffectController?.setupEqualizer(mPlayer!!.audioSessionId)
+        mAudioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
+        mAudioEffectController?.setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
+        mAudioEffectController?.setLoudnessEnhancer(mPlayer!!.audioSessionId, barEnhancer!!)
         setupVisualizer()
 
         mPlayer!!.start()
@@ -111,29 +109,7 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     }
 
     override fun onProgress(index: Int, progress: Int) {
-        audioEffectController?.onEqualizerProgress(index, progress)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
-    private fun setLoudnessEnhancer() {
-        loudnessEnhancer = LoudnessEnhancer(mPlayer!!.audioSessionId)
-        loudnessEnhancer!!.enabled = true
-        // Unit: mB
-        loudnessEnhancer!!.setTargetGain(500)
-        barEnhancer!!.max = 1000
-        barEnhancer!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    loudnessEnhancer!!.setTargetGain(progress)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
+        mAudioEffectController?.onEqualizerProgress(index, progress)
     }
 
     private fun setupVisualizer() {
@@ -176,8 +152,7 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     override fun onDestroy() {
         super.onDestroy()
 
-        audioEffectController?.release()
-        loudnessEnhancer?.release()
+        mAudioEffectController?.release()
         releaseVisualizer()
         mPlayer?.release()
     }

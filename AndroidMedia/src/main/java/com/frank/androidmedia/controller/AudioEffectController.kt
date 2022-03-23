@@ -4,7 +4,9 @@ import android.R
 import android.content.Context
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
+import android.media.audiofx.LoudnessEnhancer
 import android.media.audiofx.PresetReverb
+import android.os.Build
 import android.util.Log
 import android.util.Pair
 import android.view.View
@@ -12,6 +14,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
 import com.frank.androidmedia.listener.AudioEffectCallback
 import java.util.ArrayList
 
@@ -27,26 +30,27 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         val TAG: String = AudioEffectController::class.java.simpleName
     }
 
-    private var bands: Short = 0
+    private var mBands: Short = 0
     private var minEQLevel: Short = 0
     private var mEqualizer: Equalizer? = null
 
-    private var mPresetReverb: PresetReverb? = null
-    private val reverbValues = ArrayList<String>()
-
     private var mBass: BassBoost? = null
+    private var mPresetReverb: PresetReverb? = null
+    private var mLoudnessEnhancer: LoudnessEnhancer? = null
 
     private var mAudioEffectCallback: AudioEffectCallback? = null
 
-    private val presetReverb = arrayOf("None", "SmallRoom", "MediumRoom", "LargeRoom",
-            "MediumHall", "LargeHall", "Plate")
+    private val presetReverb = arrayOf("None", "SmallRoom", "MediumRoom",
+            "LargeRoom", "MediumHall", "LargeHall", "Plate")
 
     init {
         mAudioEffectCallback = audioEffectCallback
     }
 
     /**
-     * Setup AudioEffect of Equalizer, which has centerFrequency、band、bandLevel
+     * Setup AudioEffect of Equalizer, which uses to adjust the gain of frequency.
+     * There are key params of band、bandLevel、centerFrequency in Equalizer.
+     * The frequency ranges from ultra-low freq、low freq、middle freq、high freq、ultra-high freq.
      */
     fun setupEqualizer(audioSessionId: Int) {
         val equalizerList = ArrayList<Pair<*, *>>()
@@ -55,8 +59,8 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         // band level: min and max
         minEQLevel = mEqualizer!!.bandLevelRange[0]//min level
         val maxEQLevel = mEqualizer!!.bandLevelRange[1]  // max level
-        bands = mEqualizer!!.numberOfBands
-        for (i in 0 until bands) {
+        mBands = mEqualizer!!.numberOfBands
+        for (i in 0 until mBands) {
             val centerFreq = (mEqualizer!!.getCenterFreq(i.toShort()) / 1000).toString() + " Hz"
             val pair = Pair.create(centerFreq, mEqualizer!!.getBandLevel(i.toShort()) - minEQLevel)
             equalizerList.add(pair)
@@ -68,18 +72,19 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
      * Setup preset style, which associates to Equalizer
      */
     fun setupPresetStyle(context: Context, spinnerStyle: Spinner) {
+        val mReverbValues = ArrayList<String>()
         for (i in 0 until mEqualizer!!.numberOfPresets) {
-            reverbValues.add(mEqualizer!!.getPresetName(i.toShort()))
+            mReverbValues.add(mEqualizer!!.getPresetName(i.toShort()))
         }
 
-        spinnerStyle.adapter = ArrayAdapter(context, R.layout.simple_spinner_item, reverbValues)
+        spinnerStyle.adapter = ArrayAdapter(context, R.layout.simple_spinner_item, mReverbValues)
         spinnerStyle.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(arg0: AdapterView<*>, arg1: View, arg2: Int, arg3: Long) {
                 try {
                     mEqualizer!!.usePreset(arg2.toShort())
                     val seekBarList: List<SeekBar>? = mAudioEffectCallback?.getSeeBarList()
-                    if (bands > 0 && seekBarList != null && mEqualizer != null) {
-                        for (band in 0 until bands) {
+                    if (mBands > 0 && seekBarList != null && mEqualizer != null) {
+                        for (band in 0 until mBands) {
                             seekBarList[band].progress = mEqualizer!!.getBandLevel(band.toShort()) - minEQLevel
                         }
                     }
@@ -115,6 +120,31 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         })
     }
 
+    /**
+     * Setup AudioEffect of LoudnessEnhancer, which use
+     */
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    fun setLoudnessEnhancer(audioSessionId: Int, barEnhancer: SeekBar) {
+        mLoudnessEnhancer = LoudnessEnhancer(audioSessionId)
+        mLoudnessEnhancer!!.enabled = true
+        // Unit: mB
+        mLoudnessEnhancer!!.setTargetGain(500)
+        barEnhancer.max = 1000
+        barEnhancer.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    mLoudnessEnhancer!!.setTargetGain(progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+        })
+    }
+
     fun onEqualizerProgress(index: Int, progress: Int) {
         mEqualizer!!.setBandLevel(index.toShort(), (progress + minEQLevel).toShort())
     }
@@ -123,6 +153,7 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         mBass?.release()
         mEqualizer?.release()
         mPresetReverb?.release()
+        mLoudnessEnhancer?.release()
     }
 
 
