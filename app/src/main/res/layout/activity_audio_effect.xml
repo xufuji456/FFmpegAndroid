@@ -43,7 +43,8 @@
         android:id="@+id/spinner_reverb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:visibility="gone">
     </Spinner>
 
     <TextView

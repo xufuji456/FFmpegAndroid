@@ -43,9 +43,7 @@ class EqualizerAdapter(private val context: Context, private val onSeeBarListene
 
         holder.barEqualizer.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-//                if (fromUser) {
-//                    onSeeBarListener?.onProgress(i, progress)
-//                }
+
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -62,7 +60,7 @@ class EqualizerAdapter(private val context: Context, private val onSeeBarListene
         return if (equalizerList != null) equalizerList!!.size else 0
     }
 
-    private inner class EqualizerHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private inner class EqualizerHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val txtFrequency: TextView = itemView.findViewById(R.id.txt_frequency)
         val barEqualizer: SeekBar = itemView.findViewById(R.id.bar_equalizer)

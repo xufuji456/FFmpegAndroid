@@ -38,7 +38,7 @@ class EqualizerActivity : BaseActivity(), OnSeeBarListener {
     private var mAudioPlayer: AudioPlayer? = null
     private var visualizerView: VisualizerView? = null
     private var equalizerAdapter: EqualizerAdapter? = null
-    private var audioPath = Environment.getExternalStorageDirectory().path + "/know_play.mp3"
+    private var audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
 
     override val layoutId: Int
         get() = R.layout.activity_equalizer

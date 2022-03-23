@@ -13,6 +13,8 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.frank.androidmedia.controller.AudioEffectController
+import com.frank.androidmedia.listener.AudioEffectCallback
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.format.AudioVisualizer
@@ -23,37 +25,29 @@ import java.io.IOException
 import java.util.ArrayList
 
 /**
- * Audio effect: equalizer, enhancer, visualizer
+ * Audio effect: equalizer, enhancer, visualizer, bassBoost
  * Created by frank on 2020/10/20.
  */
-class AudioEffectActivity : BaseActivity(), OnSeeBarListener {
+class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallback {
 
     companion object {
         private val TAG = AudioEffectActivity::class.java.simpleName
 
-        private val audioPath = Environment.getExternalStorageDirectory().path + "/change.mp3"
+        private val audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
     }
 
     private var mPlayer: MediaPlayer? = null
-    private var mEqualizer: Equalizer? = null
     private var mBass: BassBoost? = null
-    private var mPresetReverb: PresetReverb? = null
-    private val reverbValues = ArrayList<String>()
-    private var seekBarList: List<SeekBar>? = ArrayList()
-    private var bands: Short = 0
-    private var minEQLevel: Short = 0
     private var spinnerStyle: Spinner? = null
     private var spinnerReverb: Spinner? = null
     private var barBassBoost: SeekBar? = null
     private var equalizerAdapter: EqualizerAdapter? = null
-    private val enableEqualizer = true
     private var loudnessEnhancer: LoudnessEnhancer? = null
     private var barEnhancer: SeekBar? = null
     private var visualizerView: VisualizerView? = null
     private var mVisualizer: AudioVisualizer? = null
 
-    private val presetReverb = arrayOf("None", "SmallRoom", "MediumRoom", "LargeRoom",
-            "MediumHall", "LargeHall", "Plate")
+    private var audioEffectController: AudioEffectController? = null
 
     private val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -61,8 +55,9 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener {
             Manifest.permission.MODIFY_AUDIO_SETTINGS)
 
     private val onPreparedListener = MediaPlayer.OnPreparedListener {
-        setupEqualizer()
-        setupPresetStyle()
+        audioEffectController = AudioEffectController(this)
+        audioEffectController?.setupEqualizer(mPlayer!!.audioSessionId)
+        audioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
         setupBassBoost()
         setLoudnessEnhancer()
         setupVisualizer()
@@ -117,60 +112,12 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener {
     }
 
     override fun onProgress(index: Int, progress: Int) {
-        mEqualizer!!.setBandLevel(index.toShort(), (progress + minEQLevel).toShort())
-    }
-
-    private fun setupEqualizer() {
-        val equalizerList = ArrayList<Pair<*, *>>()
-        mEqualizer = Equalizer(0, mPlayer!!.audioSessionId)
-        mEqualizer!!.enabled = enableEqualizer
-        // band level: min and max
-        minEQLevel = mEqualizer!!.bandLevelRange[0]//min level
-        val maxEQLevel = mEqualizer!!.bandLevelRange[1]  // max level
-        bands = mEqualizer!!.numberOfBands
-        for (i in 0 until bands) {
-            val centerFreq = (mEqualizer!!.getCenterFreq(i.toShort()) / 1000).toString() + " Hz"
-            val pair = Pair.create(centerFreq, mEqualizer!!.getBandLevel(i.toShort()) - minEQLevel)
-            equalizerList.add(pair)
-        }
-        if (equalizerAdapter != null) {
-            equalizerAdapter!!.setMaxProgress(maxEQLevel - minEQLevel)
-            equalizerAdapter!!.setEqualizerList(equalizerList)
-        }
-    }
-
-    private fun setupPresetStyle() {
-        for (i in 0 until mEqualizer!!.numberOfPresets) {
-            reverbValues.add(mEqualizer!!.getPresetName(i.toShort()))
-        }
-
-        spinnerStyle!!.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, reverbValues)
-        spinnerStyle!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(arg0: AdapterView<*>, arg1: View, arg2: Int, arg3: Long) {
-                try {
-                    mEqualizer!!.usePreset(arg2.toShort())
-                    if (equalizerAdapter != null) {
-                        seekBarList = equalizerAdapter!!.getSeekBarList()
-                    }
-                    if (bands > 0 && seekBarList != null && mEqualizer != null) {
-                        for (band in 0 until bands) {
-                            seekBarList!![band].progress = mEqualizer!!.getBandLevel(band.toShort()) - minEQLevel
-                        }
-                    }
-
-                } catch (e: Exception) {
-                    Log.e(TAG, "preset style error=$e")
-                }
-
-            }
-
-            override fun onNothingSelected(arg0: AdapterView<*>) {}
-        }
+        audioEffectController?.onEqualizerProgress(index, progress)
     }
 
     private fun setupBassBoost() {
         mBass = BassBoost(0, mPlayer!!.audioSessionId)
-        mBass!!.enabled = enableEqualizer
+        mBass!!.enabled = true
         // 0--1000
         barBassBoost!!.max = 1000
         barBassBoost!!.progress = 0
@@ -234,11 +181,20 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener {
         mVisualizer?.releaseVisualizer()
     }
 
+    override fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>) {
+        if (equalizerAdapter != null) {
+            equalizerAdapter!!.setMaxProgress(maxProgress)
+            equalizerAdapter!!.setEqualizerList(equalizerList)
+        }
+    }
+
+    override fun getSeeBarList(): List<SeekBar>? {
+        return equalizerAdapter?.getSeekBarList()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
-        mEqualizer?.release()
-        mPresetReverb?.release()
         mBass?.release()
         loudnessEnhancer?.release()
         releaseVisualizer()

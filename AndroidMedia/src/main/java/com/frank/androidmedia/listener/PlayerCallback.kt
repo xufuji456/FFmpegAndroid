@@ -1,9 +1,9 @@
 package com.frank.androidmedia.listener
 
 /**
- * @author xufulong
- * @date 3/18/22 2:25 PM
- * @desc
+ *
+ * @author frank
+ * @date 2022/3/18
  */
 interface PlayerCallback {
 

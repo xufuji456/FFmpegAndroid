@@ -1,0 +1,19 @@
+package com.frank.androidmedia.listener
+
+import android.util.Pair
+import android.widget.SeekBar
+import java.util.ArrayList
+
+/**
+ * The callback of AudioEffect
+ *
+ * @author frank
+ * @date 2022/3/23
+ */
+interface AudioEffectCallback {
+
+    fun getSeeBarList(): List<SeekBar>?
+
+    fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>)
+
+}
