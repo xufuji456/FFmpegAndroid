@@ -46,6 +46,16 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         mAudioEffectCallback = audioEffectCallback
     }
 
+    /******************************************************************
+                           AudioEffect
+                                |
+          ______________________|___________________________
+         |           |          |            |              |
+     Equalizer  Virtualizer  BassBoost  PresetReverb  DynamicsProcessing
+
+     ******************************************************************/
+
+
     /**
      * Setup AudioEffect of Equalizer, which uses to adjust the gain of frequency.
      * There are key params of band、bandLevel、centerFrequency in Equalizer.

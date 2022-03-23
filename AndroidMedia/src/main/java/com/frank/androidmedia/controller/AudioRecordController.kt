@@ -27,6 +27,9 @@ open class AudioRecordController {
     private var mAudioRecord: AudioRecord? = null
     private var mRecordThread: RecordThread? = null
 
+    private val enableAudioProcessor = false
+    private var mAudioProcessController: AudioProcessController? = null
+
     private fun initAudioRecord() {
         val sampleRate    = 44100
         val audioFormat   = AudioFormat.ENCODING_PCM_16BIT
@@ -37,6 +40,16 @@ open class AudioRecordController {
                                     channelConfig,
                                     audioFormat,
                                     minBufferSize)
+
+        if (enableAudioProcessor) {
+            mAudioProcessController = AudioProcessController()
+            var result:Boolean? = mAudioProcessController?.initAEC(mAudioRecord?.audioSessionId!!)
+            Log.e(TAG, "init AEC result=$result")
+            result = mAudioProcessController?.initAGC(mAudioRecord?.audioSessionId!!)
+            Log.e(TAG, "init AGC result=$result")
+            result = mAudioProcessController?.initNS(mAudioRecord?.audioSessionId!!)
+            Log.e(TAG, "init NS result=$result")
+        }
     }
 
     private class RecordThread(recordPath: String, audioRecord: AudioRecord, bufferSize: Int) : Thread() {
@@ -132,6 +145,10 @@ open class AudioRecordController {
         if (mAudioRecord != null) {
             mAudioRecord!!.release()
             mAudioRecord = null
+        }
+        if (mAudioProcessController != null) {
+            mAudioProcessController!!.release()
+            mAudioProcessController = null
         }
     }
 }
