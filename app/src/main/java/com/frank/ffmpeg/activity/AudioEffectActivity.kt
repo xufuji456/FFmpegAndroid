@@ -16,7 +16,6 @@ import com.frank.androidmedia.controller.AudioEffectController
 import com.frank.androidmedia.listener.AudioEffectCallback
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
-import com.frank.ffmpeg.format.AudioVisualizer
 import com.frank.ffmpeg.listener.OnSeeBarListener
 import com.frank.ffmpeg.util.FileUtil
 import com.frank.ffmpeg.view.VisualizerView
@@ -42,7 +41,6 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     private var equalizerAdapter: EqualizerAdapter? = null
     private var barEnhancer: SeekBar? = null
     private var visualizerView: VisualizerView? = null
-    private var mVisualizer: AudioVisualizer? = null
 
     private var mAudioEffectController: AudioEffectController? = null
 
@@ -57,7 +55,7 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
         mAudioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
         mAudioEffectController?.setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
         mAudioEffectController?.setLoudnessEnhancer(mPlayer!!.audioSessionId, barEnhancer!!)
-        setupVisualizer()
+        mAudioEffectController?.setupVisualizer(mPlayer!!.audioSessionId)
 
         mPlayer!!.start()
     }
@@ -112,30 +110,12 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
         mAudioEffectController?.onEqualizerProgress(index, progress)
     }
 
-    private fun setupVisualizer() {
-        mVisualizer = AudioVisualizer()
-        mVisualizer?.initVisualizer(mPlayer!!.audioSessionId, false, true, object : Visualizer.OnDataCaptureListener {
-            override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
-                if (visualizerView != null && fft != null) {
-                    visualizerView!!.post { visualizerView!!.setWaveData(fft) }
-                }
-            }
-
-            override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {
-            }
-        })
-    }
-
     override fun onViewClick(view: View) {
 
     }
 
     override fun onSelectedFile(filePath: String) {
 
-    }
-
-    private fun releaseVisualizer() {
-        mVisualizer?.releaseVisualizer()
     }
 
     override fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>) {
@@ -149,11 +129,16 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
         return equalizerAdapter?.getSeekBarList()
     }
 
+    override fun onFFTDataCallback(fft: ByteArray?) {
+        if (fft != null && visualizerView != null) {
+            visualizerView!!.post { visualizerView!!.setWaveData(fft) }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
         mAudioEffectController?.release()
-        releaseVisualizer()
         mPlayer?.release()
     }
 

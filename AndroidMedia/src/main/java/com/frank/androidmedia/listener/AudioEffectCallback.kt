@@ -16,4 +16,6 @@ interface AudioEffectCallback {
 
     fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>)
 
+    fun onFFTDataCallback(fft: ByteArray?)
+
 }

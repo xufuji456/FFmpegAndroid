@@ -17,14 +17,11 @@ import java.util.ArrayList
  */
 class VisualizerView : View {
 
-    private var upShowStyle = ShowStyle.STYLE_HOLLOW_LUMP
-
+    private var wavePath = Path()
+    private var lumpPaint: Paint? = null
     private var waveData: ByteArray? = null
     private var pointList: MutableList<Point>? = null
-
-    private var lumpPaint: Paint? = null
-    private var wavePath = Path()
-
+    private var mShowStyle = ShowStyle.STYLE_HOLLOW_LUMP
 
     constructor(context: Context) : super(context) {
         init()
@@ -53,9 +50,8 @@ class VisualizerView : View {
         invalidate()
     }
 
-
-    fun setStyle(upShowStyle: ShowStyle) {
-        this.upShowStyle = upShowStyle
+    fun setStyle(showStyle: ShowStyle) {
+        this.mShowStyle = showStyle
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -72,11 +68,9 @@ class VisualizerView : View {
                 continue
             }
 
-            when (upShowStyle) {
+            when (mShowStyle) {
                 ShowStyle.STYLE_HOLLOW_LUMP -> drawLump(canvas, i, false)
                 ShowStyle.STYLE_WAVE -> drawWave(canvas, i, false)
-                else -> {
-                }
             }
         }
     }
@@ -118,7 +112,7 @@ class VisualizerView : View {
      * @param data data
      */
     private fun genSamplingPoint(data: ByteArray) {
-        if (upShowStyle != ShowStyle.STYLE_WAVE) {
+        if (mShowStyle != ShowStyle.STYLE_WAVE) {
             return
         }
         if (pointList == null) {
@@ -129,7 +123,7 @@ class VisualizerView : View {
         pointList!!.add(Point(0, 0))
         var i = WAVE_SAMPLING_INTERVAL
         while (i < LUMP_COUNT) {
-            pointList!!.add(Point(LUMP_SIZE * i, waveData!![i].toInt()))
+            pointList!!.add(Point(LUMP_SIZE * i, data[i].toInt()))
             i += WAVE_SAMPLING_INTERVAL
         }
         pointList!!.add(Point(LUMP_SIZE * LUMP_COUNT, 0))

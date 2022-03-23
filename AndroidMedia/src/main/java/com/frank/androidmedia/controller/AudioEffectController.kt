@@ -2,10 +2,7 @@ package com.frank.androidmedia.controller
 
 import android.R
 import android.content.Context
-import android.media.audiofx.BassBoost
-import android.media.audiofx.Equalizer
-import android.media.audiofx.LoudnessEnhancer
-import android.media.audiofx.PresetReverb
+import android.media.audiofx.*
 import android.os.Build
 import android.util.Log
 import android.util.Pair
@@ -16,10 +13,11 @@ import android.widget.SeekBar
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import com.frank.androidmedia.listener.AudioEffectCallback
+import com.frank.androidmedia.wrap.AudioVisualizer
 import java.util.ArrayList
 
 /**
- * AudioEffect: Equalizer、PresetReverb
+ * AudioEffect: Equalizer、PresetReverb、BassBoost、Visualizer、LoudnessEnhancer
  *
  * @author frank
  * @date 2022/3/23
@@ -36,6 +34,7 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
 
     private var mBass: BassBoost? = null
     private var mPresetReverb: PresetReverb? = null
+    private var mVisualizer: AudioVisualizer? = null
     private var mLoudnessEnhancer: LoudnessEnhancer? = null
 
     private var mAudioEffectCallback: AudioEffectCallback? = null
@@ -121,7 +120,7 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
     }
 
     /**
-     * Setup AudioEffect of LoudnessEnhancer, which use
+     * Setup AudioEffect of LoudnessEnhancer, which uses to enhance loudness
      */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setLoudnessEnhancer(audioSessionId: Int, barEnhancer: SeekBar) {
@@ -145,6 +144,23 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         })
     }
 
+    /**
+     * Setup AudioEffect of Visualizer, which uses to show the spectrum of audio
+     */
+    fun setupVisualizer(audioSessionId: Int) {
+        mVisualizer = AudioVisualizer()
+        mVisualizer?.initVisualizer(audioSessionId, false, true, object : Visualizer.OnDataCaptureListener {
+            override fun onFftDataCapture(visualizer: Visualizer?, fft: ByteArray?, samplingRate: Int) {
+                if (fft != null) {
+                    mAudioEffectCallback?.onFFTDataCallback(fft)
+                }
+            }
+
+            override fun onWaveFormDataCapture(visualizer: Visualizer?, waveform: ByteArray?, samplingRate: Int) {
+            }
+        })
+    }
+
     fun onEqualizerProgress(index: Int, progress: Int) {
         mEqualizer!!.setBandLevel(index.toShort(), (progress + minEQLevel).toShort())
     }
@@ -154,6 +170,7 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
         mEqualizer?.release()
         mPresetReverb?.release()
         mLoudnessEnhancer?.release()
+        mVisualizer?.releaseVisualizer()
     }
 
 

@@ -1,4 +1,4 @@
-package com.frank.ffmpeg.format;
+package com.frank.androidmedia.wrap;
 
 import android.media.audiofx.Visualizer;
 import android.util.Log;
