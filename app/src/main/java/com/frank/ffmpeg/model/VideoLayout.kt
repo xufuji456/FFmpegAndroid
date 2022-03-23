@@ -1,4 +1,4 @@
-package com.frank.ffmpeg.format
+package com.frank.ffmpeg.model
 
 /**
  * layout of video

@@ -1,7 +1,7 @@
 package com.frank.ffmpeg.util;
 
 import com.frank.ffmpeg.FFmpegApplication;
-import com.frank.ffmpeg.format.VideoLayout;
+import com.frank.ffmpeg.model.VideoLayout;
 
 import java.util.List;
 import java.util.Locale;

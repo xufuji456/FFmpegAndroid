@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.frank.ffmpeg.FFmpegCmd
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.WaterfallAdapter
-import com.frank.ffmpeg.format.VideoLayout
+import com.frank.ffmpeg.model.VideoLayout
 import com.frank.ffmpeg.gif.HighQualityGif
 import com.frank.ffmpeg.handler.FFmpegHandler
 import com.frank.ffmpeg.tool.JsonParseTool

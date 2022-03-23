@@ -81,11 +81,11 @@ class VisualizerView : View {
         }
     }
 
-    private fun drawWave(canvas: Canvas, i: Int, reversal: Boolean) {
+    private fun drawWave(canvas: Canvas, i: Int, reverse: Boolean) {
         if (pointList == null || pointList!!.size < 2) {
             return
         }
-        val ratio = SCALE * if (reversal) -1 else 1
+        val ratio = SCALE * if (reverse) -1 else 1
         if (i < pointList!!.size - 2) {
             val point = pointList!![i]
             val nextPoint = pointList!![i + 1]
@@ -101,8 +101,8 @@ class VisualizerView : View {
         }
     }
 
-    private fun drawLump(canvas: Canvas, i: Int, reversal: Boolean) {
-        val minus = if (reversal) -1 else 1
+    private fun drawLump(canvas: Canvas, i: Int, reverse: Boolean) {
+        val minus = if (reverse) -1 else 1
         val top = LUMP_MAX_HEIGHT - (LUMP_MIN_HEIGHT + waveData!![i] * SCALE) * minus
 
         canvas.drawRect((LUMP_SIZE * i).toFloat(),
@@ -137,8 +137,7 @@ class VisualizerView : View {
 
     enum class ShowStyle {
         STYLE_HOLLOW_LUMP,
-        STYLE_WAVE,
-        STYLE_NOTHING
+        STYLE_WAVE
     }
 
     companion object {
@@ -149,7 +148,7 @@ class VisualizerView : View {
         private const val LUMP_MIN_HEIGHT = LUMP_WIDTH
         private const val LUMP_MAX_HEIGHT = 200
         private const val LUMP_SIZE = LUMP_WIDTH + LUMP_SPACE
-        private val LUMP_COLOR = Color.parseColor("#6de6f6")
+        private val LUMP_COLOR = Color.parseColor("#00eeee")
 
         private const val WAVE_SAMPLING_INTERVAL = 3
 
