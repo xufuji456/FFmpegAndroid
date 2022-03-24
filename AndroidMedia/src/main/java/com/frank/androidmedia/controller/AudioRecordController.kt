@@ -35,11 +35,11 @@ open class AudioRecordController {
         val audioFormat   = AudioFormat.ENCODING_PCM_16BIT
         val channelConfig = AudioFormat.CHANNEL_IN_STEREO
         minBufferSize     = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-        mAudioRecord = AudioRecord( MediaRecorder.AudioSource.MIC,
-                                    sampleRate,
-                                    channelConfig,
-                                    audioFormat,
-                                    minBufferSize)
+        mAudioRecord      = AudioRecord( MediaRecorder.AudioSource.MIC,
+                                         sampleRate,
+                                         channelConfig,
+                                         audioFormat,
+                                         minBufferSize)
 
         if (enableAudioProcessor) {
             mAudioProcessController = AudioProcessController()

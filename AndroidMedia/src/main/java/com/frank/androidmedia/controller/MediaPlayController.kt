@@ -2,6 +2,8 @@ package com.frank.androidmedia.controller
 
 import android.media.MediaPlayer
 import android.media.PlaybackParams
+import android.media.TimedText
+import android.util.Log
 import android.view.Surface
 import com.frank.androidmedia.listener.PlayerCallback
 import java.io.IOException
@@ -29,31 +31,46 @@ open class MediaPlayController(playerCallback: PlayerCallback) {
         try {
             renderFirstFrame = false
             mediaPlayer = MediaPlayer()
-            mediaPlayer!!.setOnPreparedListener {
-                mediaPlayer!!.start()
-                playerCallback?.onPrepare()
-            }
-            mediaPlayer!!.setOnErrorListener { mp: MediaPlayer?, what: Int, extra: Int ->
-                return@setOnErrorListener playerCallback?.onError(what, extra)!!
-            }
-            mediaPlayer!!.setOnCompletionListener {
-                playerCallback?.onCompleteListener()
-            }
-            mediaPlayer!!.setOnInfoListener { mp, what, extra ->
-                (
-                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                            if (!renderFirstFrame) {
-                                renderFirstFrame = true
-                                playerCallback?.onRenderFirstFrame()
-                            }
-                        })
-                return@setOnInfoListener true
-            }
             mediaPlayer!!.setDataSource(filePath)
             mediaPlayer!!.setSurface(surface)
+            setListener()
             mediaPlayer!!.prepareAsync()
         } catch (e: IOException) {
             e.printStackTrace()
+        }
+    }
+
+    private fun setListener() {
+        mediaPlayer!!.setOnPreparedListener {
+            mediaPlayer!!.start()
+            playerCallback?.onPrepare()
+        }
+
+        mediaPlayer!!.setOnInfoListener { mp: MediaPlayer?, what: Int, extra: Int ->
+            (
+                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+                        if (!renderFirstFrame) {
+                            renderFirstFrame = true
+                            playerCallback?.onRenderFirstFrame()
+                        }
+                    })
+            return@setOnInfoListener true
+        }
+
+        mediaPlayer!!.setOnBufferingUpdateListener { mp, percent ->
+            Log.i("MediaPlayer", "buffer percent=$percent")
+        }
+
+        mediaPlayer!!.setOnTimedTextListener { mp: MediaPlayer?, text: TimedText? ->
+            Log.i("MediaPlayer", "subtitle=" + text?.text)
+        }
+
+        mediaPlayer!!.setOnErrorListener { mp: MediaPlayer?, what: Int, extra: Int ->
+            return@setOnErrorListener playerCallback?.onError(what, extra)!!
+        }
+
+        mediaPlayer!!.setOnCompletionListener {
+            playerCallback?.onCompleteListener()
         }
     }
 
