@@ -21,6 +21,7 @@ open class MediaMuxController {
             return false
         }
         var happenError = false
+        // 1、create MediaMuxer
         val mediaMuxer = MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         val mediaExtractor = MediaExtractor()
         try {
@@ -28,7 +29,11 @@ open class MediaMuxController {
             var audioIndex = 0
             var audioFormat: MediaFormat? = null
             var videoFormat: MediaFormat? = null
+            var finished = false
+            val bufferInfo = MediaCodec.BufferInfo()
+            val inputBuffer = ByteBuffer.allocate(2 * 1024 * 1024)
             mediaExtractor.setDataSource(inputPath)
+            // select track with mimetype
             for (i in 0 until mediaExtractor.trackCount) {
                 val mediaFormat = mediaExtractor.getTrackFormat(i)
                 val mimeType = mediaFormat.getString(MediaFormat.KEY_MIME)
@@ -42,25 +47,24 @@ open class MediaMuxController {
                     mediaExtractor.selectTrack(i)
                 }
             }
+            // 2、add MediaFormat into track
             if (videoFormat != null) {
                 mediaMuxer.addTrack(videoFormat)
             }
             if (audioFormat != null) {
                 mediaMuxer.addTrack(audioFormat)
             }
-
-            var finished = false
-            val bufferInfo = MediaCodec.BufferInfo()
-            val inputBuffer = ByteBuffer.allocate(2 * 1024 * 1024)
-
+            // 3、start the muxer
             mediaMuxer.start()
 
             while (!finished) {
+                // demux media stream
                 val sampleSize = mediaExtractor.readSampleData(inputBuffer, 0)
                 if (sampleSize > 0) {
                     bufferInfo.size = sampleSize
                     bufferInfo.flags = mediaExtractor.sampleFlags
                     bufferInfo.presentationTimeUs = mediaExtractor.sampleTime
+                    // 4、call MediaMuxer to mux media stream
                     if (mediaExtractor.sampleTrackIndex == videoIndex) {
                         mediaMuxer.writeSampleData(videoIndex, inputBuffer, bufferInfo)
                     } else if (mediaExtractor.sampleTrackIndex == audioIndex) {
@@ -77,12 +81,9 @@ open class MediaMuxController {
             Log.e("MediaMuxController", "mux error=$e")
             happenError = true
         } finally {
-            try {
-                mediaMuxer.release()
-                mediaExtractor.release()
-            } catch (e1: Exception) {
-                Log.e("MediaMuxController", "release error=$e1")
-            }
+            // 5、release resource
+            mediaMuxer.release()
+            mediaExtractor.release()
             return !happenError
         }
     }
