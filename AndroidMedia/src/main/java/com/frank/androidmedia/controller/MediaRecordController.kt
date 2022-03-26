@@ -1,5 +1,7 @@
 package com.frank.androidmedia.controller
 
+import android.content.Context
+import android.content.Intent
 import android.hardware.Camera
 import android.media.CamcorderProfile
 import android.media.MediaRecorder
@@ -16,17 +18,22 @@ open class MediaRecordController {
 
     private val usingProfile = true
     private var mCamera: Camera? = null
+    private var mOutputPath: String? = null
     private var mMediaRecorder: MediaRecorder? = null
+    private var mMediaProjectionController: MediaProjectionController? = null
 
-    private fun initMediaRecord(surface: Surface, outputPath: String) {
-        // open camera
-        mCamera = Camera.open()
-        mCamera!!.setDisplayOrientation(90)
-        mCamera!!.unlock()
+    private fun initMediaRecord(videoSource: Int, surface: Surface?, outputPath: String) {
+        if (videoSource == MediaRecorder.VideoSource.CAMERA
+                || videoSource == MediaRecorder.VideoSource.DEFAULT) {
+            // open camera
+            mCamera = Camera.open()
+            mCamera!!.setDisplayOrientation(90)
+            mCamera!!.unlock()
+            mMediaRecorder?.setCamera(mCamera)
+        }
         // Note: pay attention to calling order
-        mMediaRecorder?.setCamera(mCamera)
+        mMediaRecorder?.setVideoSource(videoSource)
         mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
-        mMediaRecorder?.setVideoSource(MediaRecorder.VideoSource.CAMERA)
         if (usingProfile) {
             // QUALITY_480P QUALITY_720P QUALITY_1080P QUALITY_2160P
             val profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P)
@@ -42,32 +49,72 @@ open class MediaRecordController {
             mMediaRecorder?.setAudioSamplingRate(48000)
         }
         mMediaRecorder?.setOutputFile(outputPath)
-        mMediaRecorder?.setPreviewDisplay(surface)
+        if (surface != null && (videoSource == MediaRecorder.VideoSource.CAMERA
+                        || videoSource == MediaRecorder.VideoSource.DEFAULT)) {
+            mMediaRecorder?.setPreviewDisplay(surface)
+        }
     }
 
-    fun startRecord(surface: Surface, outputPath: String) {
-        if (mMediaRecorder == null) {
-            mMediaRecorder = MediaRecorder()
-        }
-
-        initMediaRecord(surface, outputPath)
-
+    private fun startRecordInternal(videoSource: Int, surface: Surface?, outputPath: String) {
+        initMediaRecord(videoSource, surface, outputPath)
         try {
             mMediaRecorder?.prepare()
+            if (videoSource == MediaRecorder.VideoSource.SURFACE) {
+                mMediaProjectionController?.createVirtualDisplay(mMediaRecorder?.surface!!)
+            }
             mMediaRecorder?.start()
         } catch (e: Exception) {
             Log.e("MediaRecorder", "start recorder error=$e")
         }
+    }
+
+    /**
+     * Start record camera or screen
+     * @param videoSource the source of video, see {@link MediaRecorderVideoSource.CAMERA}
+     *                    or {@link MediaRecorder.VideoSource.SURFACE}
+     * @param surface     the Surface to preview, when videoSource = MediaRecorderVideoSource.CAMERA
+     * @param context     the Context of Activity
+     * @param outputPath  the output path to save media file
+     */
+    fun startRecord(videoSource: Int, surface: Surface?, context: Context, outputPath: String) {
+        if (mMediaRecorder == null) {
+            mMediaRecorder = MediaRecorder()
+        }
+
+        if (videoSource == MediaRecorder.VideoSource.SURFACE) {
+            mOutputPath = outputPath
+            mMediaProjectionController = MediaProjectionController(MediaProjectionController.TYPE_SCREEN_RECORD)
+            mMediaProjectionController?.startScreenRecord(context)
+            return
+        }
+
+        startRecordInternal(videoSource, surface, outputPath)
         Log.i("MediaRecorder", "startRecord...")
     }
 
+    /**
+     * Stop recording camera or screen,
+     * and release everything.
+     */
     fun stopRecord() {
         if (mMediaRecorder != null) {
             mMediaRecorder?.stop()
             mMediaRecorder?.reset()
         }
-        mCamera?.stopPreview()
+        if (mCamera != null) {
+            mCamera!!.stopPreview()
+        }
+        if (mMediaProjectionController != null) {
+            mMediaProjectionController!!.stopScreenRecord()
+        }
         Log.i("MediaRecorder", "stopRecord...")
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (requestCode == mMediaProjectionController?.getRequestCode()) {
+            mMediaProjectionController?.onActivityResult(resultCode, data)
+            startRecordInternal(MediaRecorder.VideoSource.SURFACE, mMediaRecorder?.surface, mOutputPath!!)
+        }
     }
 
     fun release() {
