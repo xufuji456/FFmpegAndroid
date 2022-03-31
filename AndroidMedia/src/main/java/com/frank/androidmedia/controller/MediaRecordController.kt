@@ -5,8 +5,10 @@ import android.content.Intent
 import android.hardware.Camera
 import android.media.CamcorderProfile
 import android.media.MediaRecorder
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Surface
+import android.view.WindowManager
 
 /**
  * Using MediaRecorder to record a media file.
@@ -20,6 +22,7 @@ open class MediaRecordController {
     private var mCamera: Camera? = null
     private var mOutputPath: String? = null
     private var mMediaRecorder: MediaRecorder? = null
+    private var mDisplayMetrics: DisplayMetrics? = null
     private var mMediaProjectionController: MediaProjectionController? = null
 
     private fun initMediaRecord(videoSource: Int, surface: Surface?, outputPath: String) {
@@ -34,7 +37,8 @@ open class MediaRecordController {
         // Note: pay attention to calling order
         mMediaRecorder?.setVideoSource(videoSource)
         mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
-        if (usingProfile) {
+        if (usingProfile && (videoSource == MediaRecorder.VideoSource.CAMERA
+                        || videoSource == MediaRecorder.VideoSource.DEFAULT)) {
             // QUALITY_480P QUALITY_720P QUALITY_1080P QUALITY_2160P
             val profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P)
             mMediaRecorder?.setProfile(profile)
@@ -42,7 +46,7 @@ open class MediaRecordController {
             mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-            mMediaRecorder?.setVideoSize(640, 480)
+            mMediaRecorder?.setVideoSize(mDisplayMetrics!!.widthPixels, mDisplayMetrics!!.heightPixels)
             mMediaRecorder?.setVideoEncodingBitRate(5000 * 1000)
             mMediaRecorder?.setVideoFrameRate(25)
             mMediaRecorder?.setAudioChannels(2)
@@ -53,12 +57,16 @@ open class MediaRecordController {
                         || videoSource == MediaRecorder.VideoSource.DEFAULT)) {
             mMediaRecorder?.setPreviewDisplay(surface)
         }
+        try {
+            mMediaRecorder?.prepare()
+        } catch (e: Exception) {
+            Log.e("MediaRecorder", "prepare recorder error=$e")
+        }
     }
 
     private fun startRecordInternal(videoSource: Int, surface: Surface?, outputPath: String) {
         initMediaRecord(videoSource, surface, outputPath)
         try {
-            mMediaRecorder?.prepare()
             if (videoSource == MediaRecorder.VideoSource.SURFACE) {
                 mMediaProjectionController?.createVirtualDisplay(mMediaRecorder?.surface!!)
             }
@@ -79,6 +87,9 @@ open class MediaRecordController {
     fun startRecord(videoSource: Int, surface: Surface?, context: Context, outputPath: String) {
         if (mMediaRecorder == null) {
             mMediaRecorder = MediaRecorder()
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            mDisplayMetrics = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(mDisplayMetrics)
         }
 
         if (videoSource == MediaRecorder.VideoSource.SURFACE) {
@@ -113,7 +124,7 @@ open class MediaRecordController {
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (requestCode == mMediaProjectionController?.getRequestCode()) {
             mMediaProjectionController?.onActivityResult(resultCode, data)
-            startRecordInternal(MediaRecorder.VideoSource.SURFACE, mMediaRecorder?.surface, mOutputPath!!)
+            startRecordInternal(MediaRecorder.VideoSource.SURFACE, null, mOutputPath!!)
         }
     }
 
