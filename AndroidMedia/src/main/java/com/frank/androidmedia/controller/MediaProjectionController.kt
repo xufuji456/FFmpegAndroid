@@ -8,12 +8,17 @@ import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.ImageReader
+import android.media.MediaCodec
+import android.media.MediaCodecInfo
+import android.media.MediaFormat
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Environment
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
+import com.frank.androidmedia.listener.VideoEncodeCallback
 import java.io.FileOutputStream
 import java.lang.Exception
 
@@ -39,8 +44,18 @@ open class MediaProjectionController(type: Int) {
     private var mediaProjection: MediaProjection? = null
     private var mediaProjectionManager: MediaProjectionManager? = null
 
+    private var encodeThread: Thread? = null
+    private var videoEncoder: MediaCodec? = null
+    private var isVideoEncoding = false
+    private var videoEncodeData: ByteArray? = null
+    private var videoEncodeCallback: VideoEncodeCallback? = null
+
     init {
         this.type = type
+    }
+
+    fun setVideoEncodeListener(encodeCallback: VideoEncodeCallback) {
+        videoEncodeCallback = encodeCallback
     }
 
     fun startScreenRecord(context: Context) {
@@ -95,10 +110,61 @@ open class MediaProjectionController(type: Int) {
         }, null)
     }
 
+    private fun initMediaCodec(width: Int, height: Int) {
+        val mediaFormat = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height)
+        mediaFormat.setInteger(MediaFormat.KEY_WIDTH, width)
+        mediaFormat.setInteger(MediaFormat.KEY_HEIGHT, height)
+        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 20)
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height)
+        mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 3)
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+
+        videoEncoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+        videoEncoder?.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        createVirtualDisplay(videoEncoder!!.createInputSurface())
+    }
+
+    private fun startVideoEncoder() {
+        if (videoEncoder == null || isVideoEncoding)
+            return
+        encodeThread = Thread {
+            try {
+                val bufferInfo = MediaCodec.BufferInfo()
+                videoEncoder?.start()
+
+                while (isVideoEncoding && !Thread.currentThread().isInterrupted) {
+                    val outputIndex = videoEncoder!!.dequeueOutputBuffer(bufferInfo, 30 * 1000)
+                    if (outputIndex >= 0) {
+                        val byteBuffer = videoEncoder!!.getOutputBuffer(outputIndex)
+                        if (videoEncodeData == null || videoEncodeData!!.size < bufferInfo.size) {
+                            videoEncodeData = ByteArray(bufferInfo.size)
+                        }
+                        if (videoEncodeCallback != null && byteBuffer != null) {
+                            byteBuffer.get(videoEncodeData, bufferInfo.offset, bufferInfo.size)
+                            videoEncodeCallback!!.onVideoEncodeData(videoEncodeData!!, bufferInfo.size,
+                                    bufferInfo.flags,  bufferInfo.presentationTimeUs)
+                        }
+                        videoEncoder!!.releaseOutputBuffer(outputIndex, false)
+                    } else {
+                        Log.e("EncodeThread", "invalid index=$outputIndex")
+                    }
+                }
+            } catch (e: Exception) {
+                isVideoEncoding = false
+                Log.e("EncodeThread", "encode error=$e")
+            }
+        }
+        isVideoEncoding = true
+        encodeThread?.start()
+    }
+
     fun onActivityResult(resultCode: Int, data: Intent) {
         mediaProjection = mediaProjectionManager?.getMediaProjection(resultCode, data)
         if (type == TYPE_SCREEN_SHOT) {
             getBitmap()
+        } else if (type == TYPE_SCREEN_LIVING) {
+            initMediaCodec(displayMetrics!!.widthPixels, displayMetrics!!.heightPixels)
+            startVideoEncoder()
         }
     }
 
@@ -110,6 +176,7 @@ open class MediaProjectionController(type: Int) {
     fun stopScreenRecord() {
         mediaProjection?.stop()
         virtualDisplay?.release()
+        videoEncoder?.release()
     }
 
 }
