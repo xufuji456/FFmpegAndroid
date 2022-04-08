@@ -1,4 +1,4 @@
-package com.frank.live.camera2;
+package com.frank.live.camera;
 
 import android.Manifest;
 import android.annotation.TargetApi;

@@ -176,6 +176,8 @@ open class MediaProjectionController(type: Int) {
     fun stopScreenRecord() {
         mediaProjection?.stop()
         virtualDisplay?.release()
+        isVideoEncoding = false
+        encodeThread?.interrupt()
         videoEncoder?.release()
     }
 

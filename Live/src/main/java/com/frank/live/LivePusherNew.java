@@ -9,7 +9,7 @@ import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.AudioParam;
 import com.frank.live.param.VideoParam;
 import com.frank.live.stream.AudioStream;
-import com.frank.live.stream.CameraType;
+import com.frank.live.camera.CameraType;
 import com.frank.live.stream.VideoStream;
 import com.frank.live.stream.VideoStreamBase;
 import com.frank.live.stream.VideoStreamNew;

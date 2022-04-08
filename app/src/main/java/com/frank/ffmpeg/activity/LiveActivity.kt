@@ -19,12 +19,12 @@ import android.widget.ToggleButton
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.ConnectionReceiver
 import com.frank.ffmpeg.listener.OnNetworkChangeListener
-import com.frank.live.camera2.Camera2Helper
+import com.frank.live.camera.Camera2Helper
 import com.frank.live.listener.LiveStateChangeListener
 import com.frank.live.param.AudioParam
 import com.frank.live.param.VideoParam
 import com.frank.live.LivePusherNew
-import com.frank.live.stream.CameraType
+import com.frank.live.camera.CameraType
 
 /**
  * Realtime living with rtmp stream

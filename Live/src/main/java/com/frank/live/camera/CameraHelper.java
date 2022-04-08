@@ -1,4 +1,4 @@
-package com.frank.live.stream;
+package com.frank.live.camera;
 
 import android.app.Activity;
 import android.graphics.ImageFormat;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
-    private Activity mActivity;
+    private final Activity mActivity;
     private int mHeight;
     private int mWidth;
     private int mCameraId;
@@ -22,14 +22,14 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
     private OnChangedSizeListener mOnChangedSizeListener;
     private byte[] bytes;
 
-    CameraHelper(Activity activity, int cameraId, int width, int height) {
+    public CameraHelper(Activity activity, int cameraId, int width, int height) {
         mActivity = activity;
         mCameraId = cameraId;
         mWidth = width;
         mHeight = height;
     }
 
-    void switchCamera() {
+    public void switchCamera() {
         if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
             mCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
         } else {
@@ -115,12 +115,12 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
     }
 
 
-    void setPreviewDisplay(SurfaceHolder surfaceHolder) {
+    public void setPreviewDisplay(SurfaceHolder surfaceHolder) {
         mSurfaceHolder = surfaceHolder;
         mSurfaceHolder.addCallback(this);
     }
 
-    void setPreviewCallback(Camera.PreviewCallback previewCallback) {
+    public void setPreviewCallback(Camera.PreviewCallback previewCallback) {
         mPreviewCallback = previewCallback;
     }
 
@@ -199,7 +199,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
     }
 
 
-    void setOnChangedSizeListener(OnChangedSizeListener listener) {
+    public void setOnChangedSizeListener(OnChangedSizeListener listener) {
         mOnChangedSizeListener = listener;
     }
 

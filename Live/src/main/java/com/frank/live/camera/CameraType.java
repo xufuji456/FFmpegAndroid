@@ -1,4 +1,4 @@
-package com.frank.live.stream;
+package com.frank.live.camera;
 
 public enum CameraType {
     CAMERA1,

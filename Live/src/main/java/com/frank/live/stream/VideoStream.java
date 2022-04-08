@@ -6,13 +6,12 @@ import android.hardware.Camera;
 import android.view.SurfaceHolder;
 import android.view.View;
 
+import com.frank.live.camera.CameraHelper;
 import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.VideoParam;
 
-
 public class VideoStream extends VideoStreamBase implements Camera.PreviewCallback,
         CameraHelper.OnChangedSizeListener {
-
 
     private final OnFrameDataCallback mCallback;
     private final CameraHelper cameraHelper;

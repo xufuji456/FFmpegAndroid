@@ -10,8 +10,8 @@ import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 
-import com.frank.live.camera2.Camera2Helper;
-import com.frank.live.camera2.Camera2Listener;
+import com.frank.live.camera.Camera2Helper;
+import com.frank.live.camera.Camera2Listener;
 import com.frank.live.listener.OnFrameDataCallback;
 import com.frank.live.param.VideoParam;
 
