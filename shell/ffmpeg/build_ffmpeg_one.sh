@@ -17,7 +17,7 @@ API=21
 ARCH='arm'
 ANDROID='androideabi'
 NATIVE_CPU='armv7-a'
-OPTIMIZE_CFLAGS="-march=$NATIVE_CPU -mcpu=cortex-a8 -mfpu=vfpv3-d16 -mfloat-abi=softfp -mthumb"
+OPTIMIZE_CFLAGS="-march=$NATIVE_CPU -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
 else
 #64bit
 echo "build for 64bit"
@@ -48,11 +48,11 @@ build_one(){
 --cc=$TOOLCHAIN/bin/$CPU-linux-$ANDROID-gcc \
 --cross-prefix=$TOOLCHAIN/bin/$CPU-linux-$ANDROID- \
 --sysroot=$PLATFORM \
---enable-neon \
 --enable-hwaccels \
 --enable-static \
 --disable-shared \
 --disable-doc \
+--enable-neon \
 --enable-asm \
 --enable-small \
 --disable-ffmpeg \
@@ -63,7 +63,6 @@ build_one(){
 --disable-avdevice \
 --disable-indevs \
 --disable-outdevs \
---disable-avresample \
 --extra-cflags="$EXTRA_CFLAGS" \
 --extra-ldflags="$EXTRA_LDFLAGS" \
 --enable-avcodec \
