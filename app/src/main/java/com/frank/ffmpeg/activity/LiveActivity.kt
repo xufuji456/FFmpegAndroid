@@ -83,11 +83,10 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
         val audioParam = AudioParam(sampleRate, channelConfig, audioFormat, numChannels)
         // Camera1: SurfaceView  Camera2: TextureView
         livePusher = LivePusherNew(this, videoParam, audioParam, liveView, CameraType.CAMERA2)
-        var holder :SurfaceHolder ?= null
         if (liveView is SurfaceView) {
-            holder = (liveView as SurfaceView).holder
+            val holder: SurfaceHolder = (liveView as SurfaceView).holder
+            livePusher!!.setPreviewDisplay(holder)
         }
-        livePusher!!.setPreviewDisplay(holder)
     }
 
     private fun registerBroadcast(networkChangeListener: OnNetworkChangeListener) {

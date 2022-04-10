@@ -114,7 +114,6 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
         parameters.setPreviewSize(mWidth, mHeight);
     }
 
-
     public void setPreviewDisplay(SurfaceHolder surfaceHolder) {
         mSurfaceHolder = surfaceHolder;
         mSurfaceHolder.addCallback(this);
@@ -160,7 +159,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
         int index = 0;
         int ySize = mWidth * mHeight;
         int uvHeight = mHeight / 2;
-        //back camera rotate 90 deree
+        //back camera
         if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
 
             for (int i = 0; i < mWidth; i++) {
@@ -177,8 +176,7 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
                     bytes[index++] = data[ySize + mWidth * j + i + 1];
                 }
             }
-        } else {
-            //rotate 90 degree
+        } else { // front camera
             for (int i = 0; i < mWidth; i++) {
                 int nPos = mWidth - 1;
                 for (int j = 0; j < mHeight; j++) {
