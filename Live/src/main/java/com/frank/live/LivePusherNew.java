@@ -148,12 +148,8 @@ public class LivePusherNew implements OnFrameDataCallback {
         native_pushAudio(data);
     }
 
-    private void pushVideo(byte[] data) {
-        native_pushVideo(data, null, null, null);
-    }
-
-    private void pushVideo(byte[] y, byte[] u, byte[] v) {
-        native_pushVideo(null, y, u, v);
+    private void pushVideo(byte[] data, int cameraType) {
+        native_pushVideo(data, cameraType);
     }
 
     @Override
@@ -179,11 +175,9 @@ public class LivePusherNew implements OnFrameDataCallback {
     }
 
     @Override
-    public void onVideoFrame(byte[] yuv, byte[] y, byte[] u, byte[] v) {
+    public void onVideoFrame(byte[] yuv, int cameraType) {
         if (yuv != null) {
-            pushVideo(yuv);
-        } else if (y != null && u != null && v != null) {
-            pushVideo(y, u, v);
+            pushVideo(yuv, cameraType);
         }
     }
 
@@ -199,8 +193,7 @@ public class LivePusherNew implements OnFrameDataCallback {
 
     private native void native_pushAudio(byte[] data);
 
-    // compat for Camera1 and Camera2
-    private native void native_pushVideo(byte[] yuv, byte[] y, byte[] u, byte[] v);
+    private native void native_pushVideo(byte[] yuv, int cameraType);
 
     private native void native_stop();
 

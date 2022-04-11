@@ -82,21 +82,22 @@ void VideoStream::setVideoCallback(VideoCallback callback) {
     this->videoCallback = callback;
 }
 
-void VideoStream::encodeVideo(int8_t *data, int8_t *y_plane, int8_t *u_plane, int8_t *v_plane) {
+void VideoStream::encodeVideo(int8_t *data, int8_t camera_type) {
     pthread_mutex_lock(&mutex);
 
-    if (data) {
-        //y
-        memcpy(pic_in->img.plane[0], data, yLen);
-        //uv
+    if (camera_type == 1) {
+        memcpy(pic_in->img.plane[0], data, yLen); // y
         for (int i = 0; i < yLen/4; ++i) {
-            *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);
-            *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2);
+            *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);  // u
+            *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2); // v
         }
-    } else if (y_plane && u_plane && v_plane) {
-        memcpy(pic_in->img.plane[0], y_plane, (size_t) yLen);
-        memcpy(pic_in->img.plane[1], u_plane, (size_t) yLen / 4);
-        memcpy(pic_in->img.plane[2], v_plane, (size_t) yLen / 4);
+    } else if (camera_type == 2) {
+        int offset = 0;
+        memcpy(pic_in->img.plane[0], data, (size_t) yLen); // y
+        offset += yLen;
+        memcpy(pic_in->img.plane[1], data + offset, (size_t) yLen / 4); // u
+        offset += yLen / 4;
+        memcpy(pic_in->img.plane[2], data + offset, (size_t) yLen / 4); // v
     } else {
         return;
     }

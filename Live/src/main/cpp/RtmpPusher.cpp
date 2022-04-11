@@ -173,23 +173,13 @@ RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
     env->ReleaseStringUTFChars(path_, path);
 }
 
-RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray yuv, jbyteArray y, jbyteArray u, jbyteArray v) {
+RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray yuv, jint camera_type) {
     if (!videoStream || !readyPushing) {
         return;
     }
-    if (yuv) {
-        jbyte *yuv_plane = env->GetByteArrayElements(yuv, JNI_FALSE);
-        videoStream->encodeVideo(yuv_plane, nullptr, nullptr, nullptr);
-        env->ReleaseByteArrayElements(yuv, yuv_plane, 0);
-    } else if (y && u && v) {
-        jbyte *y_plane = env->GetByteArrayElements(y, JNI_FALSE);
-        jbyte *u_plane = env->GetByteArrayElements(u, JNI_FALSE);
-        jbyte *v_plane = env->GetByteArrayElements(v, JNI_FALSE);
-        videoStream->encodeVideo(nullptr, y_plane, u_plane, v_plane);
-        env->ReleaseByteArrayElements(y, y_plane, 0);
-        env->ReleaseByteArrayElements(u, u_plane, 0);
-        env->ReleaseByteArrayElements(v, v_plane, 0);
-    }
+    jbyte *yuv_plane = env->GetByteArrayElements(yuv, JNI_FALSE);
+    videoStream->encodeVideo(yuv_plane, camera_type);
+    env->ReleaseByteArrayElements(yuv, yuv_plane, 0);
 }
 
 RTMP_PUSHER_FUNC(void, native_1setAudioCodecInfo, jint sampleRateInHz, jint channels) {

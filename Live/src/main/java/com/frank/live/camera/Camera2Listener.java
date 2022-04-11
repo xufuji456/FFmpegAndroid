@@ -7,7 +7,7 @@ public interface Camera2Listener {
 
     void onCameraOpened(Size previewSize, int displayOrientation);
 
-    void onPreviewFrame(byte[] y, byte[] u, byte[] v);
+    void onPreviewFrame(byte[] yuvData);
 
     void onCameraClosed();
 

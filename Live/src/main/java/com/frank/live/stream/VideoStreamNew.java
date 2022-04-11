@@ -128,14 +128,12 @@ public class VideoStreamNew extends VideoStreamBase
     /**
      * Camera2 preview frame data
      *
-     * @param y plane of y
-     * @param u plane of u
-     * @param v plane of v
+     * @param yuvData data of yuv
      */
     @Override
-    public void onPreviewFrame(byte[] y, byte[] u, byte[] v) {
+    public void onPreviewFrame(byte[] yuvData) {
         if (isLiving && mCallback != null) {
-            mCallback.onVideoFrame(null, y, u, v);
+            mCallback.onVideoFrame(yuvData, 2);
         }
     }
 

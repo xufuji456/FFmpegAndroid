@@ -13,7 +13,7 @@ public interface OnFrameDataCallback {
 
     void onAudioCodecInfo(int sampleRate, int channelCount);
 
-    void onVideoFrame(byte[] yuv, byte[] y, byte[] u, byte[] v);
+    void onVideoFrame(byte[] yuv, int cameraType);
 
     void onVideoCodecInfo(int width, int height, int frameRate, int bitrate);
 }

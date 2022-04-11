@@ -525,10 +525,8 @@ public class Camera2Helper {
     }
 
     private class OnImageAvailableListenerImpl implements ImageReader.OnImageAvailableListener {
-        private byte[] data = null;
-        private byte[] yPlane;
-        private byte[] uPlane;
-        private byte[] vPlane;
+        private byte[] temp = null;
+        private byte[] yuvData = null;
         private final ReentrantLock lock = new ReentrantLock();
 
         @Override
@@ -538,32 +536,28 @@ public class Camera2Helper {
                 Image.Plane[] planes = image.getPlanes();
                 lock.lock();
 
-                int width = image.getWidth();
+                int offset = 0;
+                int width  = image.getWidth();
                 int height = image.getHeight();
-                if (yPlane == null) {
-                    yPlane = new byte[width * height];
-                    uPlane = new byte[width * height / 4];
-                    vPlane = new byte[width * height / 4];
+                int len    = width * height;
+                if (yuvData == null) {
+                    yuvData = new byte[len * 3 / 2];
                 }
-
-                planes[0].getBuffer().get(yPlane);
+                planes[0].getBuffer().get(yuvData, offset, len);
+                offset += len;
                 for (int i = 1; i < planes.length; i++) {
                     int srcIndex = 0, dstIndex = 0;
                     int rowStride = planes[i].getRowStride();
                     int pixelsStride = planes[i].getPixelStride();
                     ByteBuffer buffer = planes[i].getBuffer();
-                    if (data == null || data.length != buffer.capacity()) {
-                        data = new byte[buffer.capacity()];
+                    if (temp == null || temp.length != buffer.capacity()) {
+                        temp = new byte[buffer.capacity()];
                     }
-                    buffer.get(data);
+                    buffer.get(temp);
 
                     for (int j = 0; j < height / 2; j++) {
                         for (int k = 0; k < width / 2; k++) {
-                            if (i == 1) {
-                                uPlane[dstIndex++] = data[srcIndex];
-                            } else if (i == 2) {
-                                vPlane[dstIndex++] = data[srcIndex];
-                            }
+                            yuvData[offset + dstIndex++] = temp[srcIndex];
                             srcIndex += pixelsStride;
                         }
                         if (pixelsStride == 2) {
@@ -572,10 +566,11 @@ public class Camera2Helper {
                             srcIndex += rowStride - width / 2;
                         }
                     }
+                    offset += len / 4;
                 }
 
                 if (camera2Listener != null) {
-                    camera2Listener.onPreviewFrame(yPlane, uPlane, vPlane);
+                    camera2Listener.onPreviewFrame(yuvData);
                 }
                 lock.unlock();
             }

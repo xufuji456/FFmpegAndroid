@@ -62,7 +62,7 @@ public class VideoStream extends VideoStreamBase implements Camera.PreviewCallba
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (isLiving && mCallback != null) {
-            mCallback.onVideoFrame(data, null, null, null);
+            mCallback.onVideoFrame(data, 1);
         }
     }
 
