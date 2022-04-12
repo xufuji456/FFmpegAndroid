@@ -38,16 +38,13 @@
         <activity android:name=".activity.PushActivity" />
         <activity
             android:name=".activity.LiveActivity"
-            android:configChanges="orientation" />
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.FilterActivity"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.VideoPreviewActivity" />
-        <activity
-            android:name=".activity.ProbeFormatActivity" />
-        <activity
-            android:name=".activity.AudioEffectActivity" />
+        <activity android:name=".activity.VideoPreviewActivity" />
+        <activity android:name=".activity.ProbeFormatActivity" />
+        <activity android:name=".activity.AudioEffectActivity" />
         <activity android:name=".activity.AudioPlayActivity" />
         <activity android:name=".activity.EqualizerActivity" />
     </application>

@@ -36,6 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 
+import com.frank.live.util.YUVUtil;
+
 /**
  * Camera2: open, preview and close
  * Created by frank on 2019/12/18.
@@ -67,11 +69,14 @@ public class Camera2Helper {
 
     private Size mPreviewSize;
 
+    private int rotateDegree = 0;
+
     private Camera2Helper(Builder builder) {
         mTextureView = builder.previewDisplayView;
         specificCameraId = builder.specificCameraId;
         camera2Listener = builder.camera2Listener;
         rotation = builder.rotation;
+        rotateDegree = builder.rotateDegree;
         previewViewSize = builder.previewViewSize;
         context = builder.context;
     }
@@ -479,11 +484,12 @@ public class Camera2Helper {
 
         private int rotation;
 
+        private int rotateDegree;
+
         private Context context;
 
         public Builder() {
         }
-
 
         public Builder previewOn(TextureView val) {
             previewDisplayView = val;
@@ -500,6 +506,10 @@ public class Camera2Helper {
             return this;
         }
 
+        public Builder rotateDegree(int val) {
+            rotateDegree = val;
+            return this;
+        }
 
         public Builder specificCameraId(String val) {
             specificCameraId = val;
@@ -527,6 +537,7 @@ public class Camera2Helper {
     private class OnImageAvailableListenerImpl implements ImageReader.OnImageAvailableListener {
         private byte[] temp = null;
         private byte[] yuvData = null;
+        private byte[] dstData = null;
         private final ReentrantLock lock = new ReentrantLock();
 
         @Override
@@ -569,9 +580,20 @@ public class Camera2Helper {
                     offset += len / 4;
                 }
 
-                if (camera2Listener != null) {
-                    camera2Listener.onPreviewFrame(yuvData);
+                if (rotateDegree == 90) {
+                    if (dstData == null) {
+                        dstData = new byte[len * 3 / 2];
+                    }
+                    YUVUtil.YUV420pRotate90(dstData, yuvData, width, height);
+                    if (camera2Listener != null) {
+                        camera2Listener.onPreviewFrame(dstData);
+                    }
+                } else {
+                    if (camera2Listener != null) {
+                        camera2Listener.onPreviewFrame(yuvData);
+                    }
                 }
+
                 lock.unlock();
             }
             image.close();

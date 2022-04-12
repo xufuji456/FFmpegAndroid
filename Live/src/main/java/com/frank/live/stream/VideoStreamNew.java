@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.util.Size;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
@@ -24,6 +25,7 @@ public class VideoStreamNew extends VideoStreamBase
 
     private static final String TAG = VideoStreamNew.class.getSimpleName();
 
+    private int rotation = 0;
     private boolean isLiving;
     private final Context mContext;
     private Camera2Helper camera2Helper;
@@ -47,9 +49,8 @@ public class VideoStreamNew extends VideoStreamBase
      * start previewing
      */
     private void startPreview() {
-        int rotateDegree = 0;
         if (mContext instanceof Activity) {
-            rotateDegree = ((Activity) mContext).getWindowManager().getDefaultDisplay().getRotation();
+            rotation = ((Activity) mContext).getWindowManager().getDefaultDisplay().getRotation();
         }
         camera2Helper = new Camera2Helper.Builder()
                 .cameraListener(this)
@@ -57,7 +58,8 @@ public class VideoStreamNew extends VideoStreamBase
                 .context(mContext.getApplicationContext())
                 .previewOn(mTextureView)
                 .previewViewSize(new Point(mVideoParam.getWidth(), mVideoParam.getHeight()))
-                .rotation(rotateDegree)
+                .rotation(rotation)
+                .rotateDegree(getPreviewDegree(rotation))
                 .build();
         camera2Helper.start();
     }
@@ -137,12 +139,33 @@ public class VideoStreamNew extends VideoStreamBase
         }
     }
 
+    private int getPreviewDegree(int rotation) {
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                return 90;
+            case Surface.ROTATION_90:
+                return 0;
+            case Surface.ROTATION_180:
+                return 270;
+                case Surface.ROTATION_270:
+                    return 180;
+            default:
+                return -1;
+        }
+    }
+
     @Override
     public void onCameraOpened(Size previewSize, int displayOrientation) {
         Log.i(TAG, "onCameraOpened previewSize=" + previewSize.toString());
         if (mCallback != null && mVideoParam != null) {
-            mCallback.onVideoCodecInfo(previewSize.getWidth(), previewSize.getHeight(),
-                    mVideoParam.getFrameRate(), mVideoParam.getBitRate());
+            int width = previewSize.getWidth();
+            int height = previewSize.getHeight();
+            if (getPreviewDegree(rotation) == 90 || getPreviewDegree(rotation) == 270) {
+                int temp = width;
+                width = height;
+                height = temp;
+            }
+            mCallback.onVideoCodecInfo(width, height, mVideoParam.getFrameRate(), mVideoParam.getBitRate());
         }
     }
 
