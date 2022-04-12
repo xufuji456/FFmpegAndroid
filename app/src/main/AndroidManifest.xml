@@ -20,7 +20,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:name">
@@ -39,7 +38,7 @@
         <activity android:name=".activity.PushActivity" />
         <activity
             android:name=".activity.LiveActivity"
-            android:screenOrientation="landscape" />
+            android:configChanges="orientation" />
         <activity
             android:name=".activity.FilterActivity"
             android:screenOrientation="landscape" />

@@ -2,6 +2,7 @@ package com.frank.ffmpeg.activity
 
 import android.annotation.SuppressLint
 import android.content.IntentFilter
+import android.content.res.Configuration
 import android.media.AudioFormat
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -151,6 +152,11 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
             livePusher?.stopPush()
             isPushing = false
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Log.i(TAG, "onConfigurationChanged, orientation=" + newConfig.orientation)
     }
 
     companion object {

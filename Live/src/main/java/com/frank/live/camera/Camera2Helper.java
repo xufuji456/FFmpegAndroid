@@ -86,32 +86,32 @@ public class Camera2Helper {
         start();
     }
 
-    private int getCameraOri(int rotation, String cameraId) {
-        int degrees = rotation * 90;
+    private int getCameraOrientation(int rotation, String cameraId) {
+        int degree = rotation * 90;
         switch (rotation) {
             case Surface.ROTATION_0:
-                degrees = 0;
+                degree = 0;
                 break;
             case Surface.ROTATION_90:
-                degrees = 90;
+                degree = 90;
                 break;
             case Surface.ROTATION_180:
-                degrees = 180;
+                degree = 180;
                 break;
             case Surface.ROTATION_270:
-                degrees = 270;
+                degree = 270;
                 break;
             default:
                 break;
         }
         int result;
         if (CAMERA_ID_FRONT.equals(cameraId)) {
-            result = (mSensorOrientation + degrees) % 360;
+            result = (mSensorOrientation + degree) % 360;
             result = (360 - result) % 360;
         } else {
-            result = (mSensorOrientation - degrees + 360) % 360;
+            result = (mSensorOrientation - degree + 360) % 360;
         }
-        Log.i(TAG, "getCameraOri: " + rotation + " " + result + " " + mSensorOrientation);
+        Log.i(TAG, "getCameraOrientation, result=" + result);
         return result;
     }
 
@@ -120,19 +120,19 @@ public class Camera2Helper {
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
-            Log.i(TAG, "onSurfaceTextureAvailable: ");
+            Log.i(TAG, "onSurfaceTextureAvailable...");
             openCamera();
         }
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
-            Log.i(TAG, "onSurfaceTextureSizeChanged: ");
+            Log.i(TAG, "onSurfaceTextureSizeChanged, width=" + width + "--height=" + height);
             configureTransform(width, height);
         }
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture texture) {
-            Log.i(TAG, "onSurfaceTextureDestroyed: ");
+            Log.i(TAG, "onSurfaceTextureDestroyed...");
             return true;
         }
 
@@ -151,7 +151,7 @@ public class Camera2Helper {
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
             if (camera2Listener != null) {
-                camera2Listener.onCameraOpened(mPreviewSize, getCameraOri(rotation, mCameraId));
+                camera2Listener.onCameraOpened(mPreviewSize, getCameraOrientation(rotation, mCameraId));
             }
         }
 
@@ -179,6 +179,7 @@ public class Camera2Helper {
         }
 
     };
+
     private final CameraCaptureSession.StateCallback mCaptureStateCallback = new CameraCaptureSession.StateCallback() {
 
         @Override
@@ -286,7 +287,7 @@ public class Camera2Helper {
         context = null;
     }
 
-    private void setUpCameraOutputs(CameraManager cameraManager) {
+    private void setUpCameraOutput(CameraManager cameraManager) {
         try {
             if (configCameraParams(cameraManager, specificCameraId)) {
                 return;
@@ -330,7 +331,7 @@ public class Camera2Helper {
 
     private void openCamera() {
         CameraManager cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-        setUpCameraOutputs(cameraManager);
+        setUpCameraOutput(cameraManager);
         configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
         try {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
@@ -463,7 +464,6 @@ public class Camera2Helper {
         } else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180, centerX, centerY);
         }
-        Log.i(TAG, "configureTransform: " + getCameraOri(rotation, mCameraId) + "  " + rotation * 90);
         mTextureView.setTransform(matrix);
     }
 
