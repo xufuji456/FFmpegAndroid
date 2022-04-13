@@ -19,6 +19,7 @@ import android.widget.ToggleButton
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.ConnectionReceiver
+import com.frank.ffmpeg.handler.OrientationHandler
 import com.frank.ffmpeg.listener.OnNetworkChangeListener
 import com.frank.live.camera.Camera2Helper
 import com.frank.live.listener.LiveStateChangeListener
@@ -37,6 +38,7 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
     private var livePusher: LivePusherNew? = null
     private var isPushing = false
     private var connectionReceiver: ConnectionReceiver? = null
+    private var orientationHandler: OrientationHandler? = null
 
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
@@ -61,6 +63,14 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
         initView()
         initPusher()
         registerBroadcast(this)
+        orientationHandler = OrientationHandler(this)
+        orientationHandler?.enable()
+        orientationHandler?.setOnOrientationListener(object :OrientationHandler.OnOrientationListener {
+            override fun onOrientation(orientation: Int) {
+                val previewDegree = (orientation + 90) % 360
+                livePusher?.setPreviewDegree(previewDegree)
+            }
+        })
     }
 
     private fun initView() {
@@ -124,6 +134,7 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
 
     override fun onDestroy() {
         super.onDestroy()
+        orientationHandler?.disable()
         if (livePusher != null) {
             if (isPushing) {
                 isPushing = false

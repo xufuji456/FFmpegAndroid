@@ -277,6 +277,10 @@ public class Camera2Helper {
         }
     }
 
+    public void updatePreviewDegree(int degree) {
+        rotateDegree = degree;
+    }
+
     public synchronized void stop() {
         if (mCameraDevice == null) {
             return;

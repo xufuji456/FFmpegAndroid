@@ -27,6 +27,7 @@ public class VideoStreamNew extends VideoStreamBase
 
     private int rotation = 0;
     private boolean isLiving;
+    private Size previewSize;
     private final Context mContext;
     private Camera2Helper camera2Helper;
     private final VideoParam mVideoParam;
@@ -157,16 +158,8 @@ public class VideoStreamNew extends VideoStreamBase
     @Override
     public void onCameraOpened(Size previewSize, int displayOrientation) {
         Log.i(TAG, "onCameraOpened previewSize=" + previewSize.toString());
-        if (mCallback != null && mVideoParam != null) {
-            int width = previewSize.getWidth();
-            int height = previewSize.getHeight();
-            if (getPreviewDegree(rotation) == 90 || getPreviewDegree(rotation) == 270) {
-                int temp = width;
-                width = height;
-                height = temp;
-            }
-            mCallback.onVideoCodecInfo(width, height, mVideoParam.getFrameRate(), mVideoParam.getBitRate());
-        }
+        this.previewSize = previewSize;
+        updateVideoCodecInfo(getPreviewDegree(rotation));
     }
 
     @Override
@@ -177,6 +170,25 @@ public class VideoStreamNew extends VideoStreamBase
     @Override
     public void onCameraError(Exception e) {
         Log.e(TAG, "onCameraError=" + e.toString());
+    }
+
+    @Override
+    public void onPreviewDegreeChanged(int degree) {
+        updateVideoCodecInfo(degree);
+    }
+
+    private void updateVideoCodecInfo(int degree) {
+        camera2Helper.updatePreviewDegree(degree);
+        if (mCallback != null && mVideoParam != null) {
+            int width = previewSize.getWidth();
+            int height = previewSize.getHeight();
+            if (degree == 90 || degree == 270) {
+                int temp = width;
+                width = height;
+                height = temp;
+            }
+            mCallback.onVideoCodecInfo(width, height, mVideoParam.getFrameRate(), mVideoParam.getBitRate());
+        }
     }
 
 }

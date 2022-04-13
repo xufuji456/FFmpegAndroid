@@ -65,6 +65,10 @@ public class LivePusherNew implements OnFrameDataCallback {
         videoStream.switchCamera();
     }
 
+    public void setPreviewDegree(int degree) {
+        videoStream.onPreviewDegreeChanged(degree);
+    }
+
     /**
      * setting mute
      *

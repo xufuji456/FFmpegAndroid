@@ -18,6 +18,9 @@ public class VideoStream extends VideoStreamBase implements Camera.PreviewCallba
     private final int mBitrate;
     private final int mFrameRate;
     private boolean isLiving;
+    private int previewWidth;
+    private int previewHeight;
+    private int rotateDegree = 90;
 
     public VideoStream(OnFrameDataCallback callback,
                        View view,
@@ -68,8 +71,24 @@ public class VideoStream extends VideoStreamBase implements Camera.PreviewCallba
 
     @Override
     public void onChanged(int w, int h) {
+        previewWidth = w;
+        previewHeight = h;
+        updateVideoCodecInfo(w, h, rotateDegree);
+    }
+
+    @Override
+    public void onPreviewDegreeChanged(int degree) {
+        updateVideoCodecInfo(previewWidth, previewHeight, degree);
+    }
+
+    private void updateVideoCodecInfo(int width, int height, int degree) {
+        if (degree == 90 || degree == 270) {
+            int temp = width;
+            width = height;
+            height = temp;
+        }
         if (mCallback != null) {
-            mCallback.onVideoCodecInfo(w, h, mFrameRate, mBitrate);
+            mCallback.onVideoCodecInfo(width, height, mFrameRate, mBitrate);
         }
     }
 

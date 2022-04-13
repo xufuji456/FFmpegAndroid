@@ -19,4 +19,6 @@ public abstract class VideoStreamBase {
 
     public abstract void release();
 
+    public abstract void onPreviewDegreeChanged(int degree);
+
 }
