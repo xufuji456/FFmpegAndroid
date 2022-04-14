@@ -584,11 +584,15 @@ public class Camera2Helper {
                     offset += len / 4;
                 }
 
-                if (rotateDegree == 90) {
+                if (rotateDegree == 90 || rotateDegree == 180) {
                     if (dstData == null) {
                         dstData = new byte[len * 3 / 2];
                     }
-                    YUVUtil.YUV420pRotate90(dstData, yuvData, width, height);
+                    if (rotateDegree == 90) {
+                        YUVUtil.YUV420pRotate90(dstData, yuvData, width, height);
+                    } else {
+                        YUVUtil.YUV420pRotate180(dstData, yuvData, width, height);
+                    }
                     if (camera2Listener != null) {
                         camera2Listener.onPreviewFrame(dstData);
                     }
