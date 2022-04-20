@@ -36,7 +36,7 @@ export PREFIX=../ffmpeg-android/$ABI
 export ADDITIONAL_CONFIGURE_FLAG="--cpu=$NATIVE_CPU"
 
 LAMEDIR=$PREFIX
-export EXTRA_CFLAGS="-Os -fpic $OPTIMIZE_CFLAGS -I$LAMEDIR/include"
+export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$LAMEDIR/include"
 export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$LAMEDIR/lib"
 
 build_one(){

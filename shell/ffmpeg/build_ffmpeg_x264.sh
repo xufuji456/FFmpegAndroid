@@ -36,7 +36,7 @@ export PREFIX=../ffmpeg-android/$ABI
 export ADDITIONAL_CONFIGURE_FLAG="--cpu=$NATIVE_CPU"
 
 X264DIR=$PREFIX
-export EXTRA_CFLAGS="-Os -fpic $OPTIMIZE_CFLAGS -I$X264DIR/include"
+export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$X264DIR/include"
 export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$X264DIR/lib"
 
 build_one(){
