@@ -22,7 +22,7 @@ WebRTC网络传输协议有SDP、ICE、NAT、STUN、TURN等，常用视频编码
  | ICE             | https://pan.baidu.com/s/1AEJxzf1Nflg98u35Eg3Yyg |       1u1w      |
  | NAT             | https://pan.baidu.com/s/1Kcup8UZhnF15lqgSIkNAWw |       w3oz      |
  | C11             | https://pan.baidu.com/s/1AH7-cT6jPpgkN-fcsxZiqQ |       p0ay      |
- | C17             | https://pan.baidu.com/s/1wSgao-pq5hXuzyqu4-8lLg |       pb84      |
+ | C++11           | https://pan.baidu.com/s/1Wp7qXn4KoO2IZ_Nj41e_6Q |       3jhe      |
  | MP4             | https://pan.baidu.com/s/13WrU60CYPCRshPrmLOTtKA |       fa0f      |
  | DASH            | https://pan.baidu.com/s/1-38Erd4a9mtEUKzD3GMaig |       ctz7      |
  | DASH(ISO)       | https://pan.baidu.com/s/1UnxkaPeKVIsmddaYIrADdw |       buav      |
@@ -42,8 +42,8 @@ WebRTC网络传输协议有SDP、ICE、NAT、STUN、TURN等，常用视频编码
  | 数字图像与视频处理 | https://pan.baidu.com/s/1oBAtwAFU0pfnhf_cQUs6dg |       pi17      |
  | 视频编码全角度详解 | https://pan.baidu.com/s/1WBdEFF4MWcZDnheeR4XvCA |       vyfo      |
  | 音频信号处理与编码 | https://pan.baidu.com/s/1qwSrRrcs1eipph9QLxrEXg |       q9xc      |
- | DSP语音降噪      | https://pan.baidu.com/s/1z2i6vXf9xn_Uq2_T6TE8rA |       h7a1      |
- | 3D声音环绕       | https://pan.baidu.com/s/1URAnDx_eNXJhsQUSUVLKDA |       u8n0      |
+ | DSP语音降噪       | https://pan.baidu.com/s/1z2i6vXf9xn_Uq2_T6TE8rA |       h7a1      |
+ | 3D声音环绕        | https://pan.baidu.com/s/1URAnDx_eNXJhsQUSUVLKDA |       u8n0      |
  | 音视频开发进阶指南 |                      /                          |         /       |
- | 高效视频编码H.265 |                      /                          |         /       |
+ | HEVC算法与架构    | https://pan.baidu.com/s/1l8IwSACejk4ZZe10Dh6OdQ |       kgfg      |
 
