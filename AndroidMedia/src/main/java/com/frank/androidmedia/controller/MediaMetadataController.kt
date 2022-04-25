@@ -57,7 +57,9 @@ open class MediaMetadataController {
             try {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                     val frameRateStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)
-                    frameRate = frameRateStr.toFloat()
+                    if (frameRateStr != null) {
+                        frameRate = frameRateStr.toFloat()
+                    }
                     Log.i(TAG, "frameRate=$frameRate")
                 }
             } catch (e: Exception) {
@@ -69,7 +71,9 @@ open class MediaMetadataController {
                 thumbnail = retriever.getFrameAtTime(0)
             } else if (hasAudioStr != null && "yes" == hasAudioStr) {
                 val byteArray = retriever.embeddedPicture
-                thumbnail = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, null)
+                if (byteArray != null) {
+                    thumbnail = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, null)
+                }
             }
             if (thumbnail != null) {
                 Log.i(TAG, "thumbnail width=${thumbnail?.width}, height=${thumbnail?.height}")

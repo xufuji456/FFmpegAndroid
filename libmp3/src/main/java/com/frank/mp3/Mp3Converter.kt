@@ -227,13 +227,15 @@ open class Mp3Converter {
                 Log.i(TAG, "prepareDecode get mMediaFormat=$mMediaFormat")
 
                 val mime = mMediaFormat.getString(MediaFormat.KEY_MIME)
-                if (mime.startsWith("audio")) {
-                    mMediaCodec = MediaCodec.createDecoderByType(mime)
-                    mMediaCodec!!.configure(mMediaFormat, null, null, 0)
-                    mediaExtractor!!.selectTrack(i)
-                    inSampleRate = mMediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-                    channels = mMediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                    break
+                if (mime != null) {
+                    if (mime.startsWith("audio")) {
+                        mMediaCodec = MediaCodec.createDecoderByType(mime)
+                        mMediaCodec!!.configure(mMediaFormat, null, null, 0)
+                        mediaExtractor!!.selectTrack(i)
+                        inSampleRate = mMediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+                        channels = mMediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+                        break
+                    }
                 }
             }
             mMediaCodec!!.start()

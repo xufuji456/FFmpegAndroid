@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">FFmpegAndroid</string>
+    <string name="compose">compose</string>
     <string name="audio_transform">音频转码</string>
     <string name="audio_cut">音频剪切</string>
     <string name="audio_concat">音频拼接</string>

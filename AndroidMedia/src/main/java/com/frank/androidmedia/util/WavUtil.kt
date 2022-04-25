@@ -31,7 +31,7 @@ object WavUtil {
         val h: ByteArray = try {
             header.header
         } catch (e1: IOException) {
-            Log.e("WavUtil", e1.message)
+            Log.e("WavUtil", e1.message.toString())
             return false
         }
         if (h.size != 44) return false
@@ -52,7 +52,7 @@ object WavUtil {
             inStream.close()
             ouStream.close()
         } catch (e: IOException) {
-            Log.e("WavUtil", e.message)
+            Log.e("WavUtil", e.message.toString())
             return false
         }
         if (deletePcmFile) {

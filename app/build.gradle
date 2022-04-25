@@ -20,6 +20,9 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
     buildTypes {
         release {
@@ -51,6 +54,21 @@ android {
         pickFirst 'lib/arm64-v8a/libmp3lame.so'
         pickFirst 'lib/armeabi-v7a/libffmpeg.so'
         pickFirst 'lib/arm64-v8a/libffmpeg.so'
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_version
     }
 }
 
@@ -65,4 +83,30 @@ dependencies {
     implementation project(':AndroidMedia')
     //implementation "libmp3" if you need mp3-lite module
 //    implementation project(':libmp3')
+
+
+    // compose  start
+    implementation 'androidx.compose.ui:ui:1.1.1'
+    // Tooling support (Previews, etc.)
+    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
+    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
+    implementation 'androidx.compose.foundation:foundation:1.1.1'
+    // Material Design
+    implementation 'androidx.compose.material:material:1.1.1'
+    // Material design icons
+    implementation 'androidx.compose.material:material-icons-core:1.1.1'
+    implementation 'androidx.compose.material:material-icons-extended:1.1.1'
+    // Integration with activities
+    implementation 'androidx.activity:activity-compose:1.4.0'
+    // Integration with ViewModels
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1'
+    // Integration with observables
+    implementation 'androidx.compose.runtime:runtime-livedata:1.1.1'
+    implementation 'androidx.compose.runtime:runtime-rxjava2:1.1.1'
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
+
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.1.1'
+    // compose  end
 }

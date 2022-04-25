@@ -87,7 +87,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
         registerLister()
 
         hideRunnable = HideRunnable()
-        mHandler.postDelayed(hideRunnable, DELAY_TIME.toLong())
+        mHandler.postDelayed(hideRunnable!!, DELAY_TIME.toLong())
     }
 
     private fun initView() {
@@ -126,7 +126,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
             btnSelect!!.visibility = View.VISIBLE
             btnSound!!.visibility = View.VISIBLE
             recyclerView!!.visibility = View.VISIBLE
-            mHandler.postDelayed(hideRunnable, DELAY_TIME.toLong())
+            hideRunnable?.let { it1 -> mHandler.postDelayed(it1, DELAY_TIME.toLong()) }
         }
 
         btnSound!!.setOnCheckedChangeListener { buttonView, isChecked -> setPlayAudio() }

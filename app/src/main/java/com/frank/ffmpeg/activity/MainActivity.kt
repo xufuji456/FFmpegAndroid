@@ -27,15 +27,17 @@ class MainActivity : BaseActivity() {
 
     private fun initView() {
         val list = listOf(
-                getString(R.string.audio_handle),
-                getString(R.string.video_handle),
-                getString(R.string.media_handle),
-                getString(R.string.video_push),
-                getString(R.string.video_live),
-                getString(R.string.video_filter),
-                getString(R.string.video_preview),
-                getString(R.string.media_probe),
-                getString(R.string.audio_effect))
+            getString(R.string.audio_handle),
+            getString(R.string.video_handle),
+            getString(R.string.media_handle),
+            getString(R.string.video_push),
+            getString(R.string.video_live),
+            getString(R.string.video_filter),
+            getString(R.string.video_preview),
+            getString(R.string.media_probe),
+            getString(R.string.audio_effect),
+            getString(R.string.compose)
+        )
 
         val viewWaterfall: RecyclerView = findViewById(R.id.list_main_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -71,6 +73,8 @@ class MainActivity : BaseActivity() {
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
             8 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
+            9
+            -> intent.setClass(this@MainActivity, ComposeActivity::class.java)
             else -> {
             }
         }

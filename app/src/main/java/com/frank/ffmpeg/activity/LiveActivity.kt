@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.Toast
 import android.widget.ToggleButton
+import androidx.compose.runtime.Composable
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.handler.ConnectionReceiver
