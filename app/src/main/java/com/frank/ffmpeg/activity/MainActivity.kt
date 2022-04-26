@@ -36,6 +36,7 @@ class MainActivity : BaseActivity() {
             getString(R.string.video_preview),
             getString(R.string.media_probe),
             getString(R.string.audio_effect),
+            getString(R.string.encoder_list),
             getString(R.string.compose)
         )
 
@@ -74,6 +75,8 @@ class MainActivity : BaseActivity() {
             8 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
             9
+            -> intent.setClass(this@MainActivity, EncoderListActivity::class.java)
+            10
             -> intent.setClass(this@MainActivity, ComposeActivity::class.java)
             else -> {
             }

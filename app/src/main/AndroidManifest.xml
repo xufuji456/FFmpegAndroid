@@ -12,10 +12,14 @@
         android:theme="@style/AppTheme"
         tools:replace="android:name">
         <activity
+            android:name=".activity.EncoderListActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.ComposeActivity"
             android:exported="false"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,12 +45,12 @@
         <activity android:name=".activity.EqualizerActivity" />
     </application>
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
 

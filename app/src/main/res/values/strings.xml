@@ -17,6 +17,7 @@
     <string name="audio_volume">修改音量</string>
     <string name="audio_add_equalizer">均衡器+</string>
     <string name="audio_effect">音效</string>
+    <string name="encoder_list">编码器列表</string>
     <string name="audio_equalizer">均衡器:</string>
     <string name="audio_style">风格:</string>
     <string name="audio_reverb">混响:</string>
