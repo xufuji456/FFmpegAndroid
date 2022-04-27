@@ -77,6 +77,10 @@ build_one(){
 --enable-encoders \
 --enable-libmp3lame \
 --enable-encoder=libmp3lame \
+--disable-encoder=a64multi,a64multi5,alias_pix,amv,apng,aptx,aptx_hd,asv1,asv2,avrp,avui,cinepak,cljr,\
+comfortnoise,dpx,ffvhuff,fits,hap,ilbc_at,mlp,nellymoser,pam,pbm,pcx,pgm,pgmyuv,ppm,prores,prores_aw,\
+prores_ks,qtrle,r10k,r210,ra_144,roq,roq_dpcm,rv10,rv20,s302m,sbc,sgi,snow,sunrast,svq1,targa,tta,utvideo,\
+v210,v308,v408,v410,vc2,wrapped_avframe,xbm,xface,xsub,xwd,y41p,zmbv \
 --disable-decoders \
 --enable-decoder=mjpeg,mpeg4,h263,h264,flv,hevc,wmv3,msmpeg4v3,msmpeg4v2,msvideo1,vc1,mpeg1video,mpeg2video,\
 aac,ac3,ac3_fixed,m4a,amrnb,amrwb,vorbis,wmav2,truehd,tscc,tscc2,dvvideo,msrle,cinepak,indeo5,vp8,vp9,\
