@@ -6,7 +6,7 @@ cd ../
 
 set -e
 
-archbit=32
+archbit=64
 
 if [ $archbit -eq 32 ];then
 echo "build for 32bit"
@@ -35,9 +35,9 @@ export TOOLCHAIN=$PREBUILT/darwin-x86_64
 export PREFIX=../ffmpeg-android/$ABI
 export ADDITIONAL_CONFIGURE_FLAG="--cpu=$NATIVE_CPU"
 
-X264DIR=$PREFIX
-export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$X264DIR/include"
-export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$X264DIR/lib"
+THIRD_LIB=$PREFIX
+export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$THIRD_LIB/include"
+export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -L$THIRD_LIB/lib"
 
 build_one(){
   ./configure --target-os=android --prefix=$PREFIX \
