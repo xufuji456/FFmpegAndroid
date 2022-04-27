@@ -76,9 +76,6 @@ build_one(){
 --enable-postproc \
 --enable-filters \
 --enable-encoders \
---enable-libmp3lame \
---enable-libx264 \
---enable-encoder=libmp3lame,libx264 \
 --disable-encoder=a64multi,a64multi5,alias_pix,amv,apng,aptx,aptx_hd,asv1,asv2,avrp,avui,cinepak,cljr,\
 comfortnoise,dpx,ffvhuff,fits,hap,ilbc_at,mlp,nellymoser,pam,pbm,pcx,pgm,pgmyuv,ppm,prores,prores_aw,\
 prores_ks,qtrle,r10k,r210,ra_144,roq,roq_dpcm,rv10,rv20,s302m,sbc,sgi,snow,sunrast,svq1,targa,tta,utvideo,\
@@ -121,8 +118,6 @@ $PREFIX/lib/libswresample.a \
 $PREFIX/lib/libavformat.a \
 $PREFIX/lib/libavutil.a \
 $PREFIX/lib/libswscale.a \
-$PREFIX/lib/libmp3lame.a \
-$PREFIX/lib/libx264.a \
 $PREFIX/lib/libssl.a \
 $PREFIX/lib/libcrypto.a \
 -lc -lm -lz -ldl -llog --dynamic-linker=/system/bin/linker $TOOLCHAIN/lib/gcc/$CPU-linux-$ANDROID/4.9.x/libgcc.a
