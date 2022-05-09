@@ -46,4 +46,8 @@ WebRTC网络传输协议有SDP、ICE、NAT、STUN、TURN等，常用视频编码
  | 3D声音环绕        | https://pan.baidu.com/s/1URAnDx_eNXJhsQUSUVLKDA |       u8n0      |
  | 音视频开发进阶指南 |                      /                          |         /       |
  | HEVC算法与架构    | https://pan.baidu.com/s/1l8IwSACejk4ZZe10Dh6OdQ |       kgfg      |
+ | A Tour of C++    | https://pan.baidu.com/s/16mg_1aafhcM68-NYHT6XhQ |       ycvm      |
+ | C++标准库         | https://pan.baidu.com/s/1QPXbjnYArNmwZY4TCZ5aWA |       3xyv      |
+ | C程序语言         | https://pan.baidu.com/s/132cTecL7RArkx2eaGGZOmw |       wzrj      |
+ | C++程序语言       | https://pan.baidu.com/s/1joKa0qt_xl57QdRRL7Ud9g |       br5q      |
 
