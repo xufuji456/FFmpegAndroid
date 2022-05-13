@@ -14,9 +14,6 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
 #include "ffmpeg_jni_define.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define TAG "VideoPlayer"
 
@@ -141,3 +138,7 @@ VIDEO_PLAYER_FUNC(void, setPlayRate, jfloat playRate) {
 VIDEO_PLAYER_FUNC(jint, getDuration) {
     return duration;
 }
+
+#ifdef __cplusplus
+}
+#endif
