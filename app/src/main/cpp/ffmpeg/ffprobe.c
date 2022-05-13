@@ -48,7 +48,7 @@
 #include "libavutil/timestamp.h"
 #include "libswscale/swscale.h"
 #include "libswresample/swresample.h"
-#include "libpostproc/postprocess.h"
+//#include "libpostproc/postprocess.h"
 #include "cmdutils.h"
 
 #include "libavutil/thread.h"
@@ -3169,7 +3169,7 @@ static void ffprobe_show_library_versions(WriterContext *w)
     SHOW_LIB_VERSION(avfilter,   AVFILTER);
     SHOW_LIB_VERSION(swscale,    SWSCALE);
     SHOW_LIB_VERSION(swresample, SWRESAMPLE);
-    SHOW_LIB_VERSION(postproc,   POSTPROC);
+//    SHOW_LIB_VERSION(postproc,   POSTPROC);
     writer_print_section_footer(w);
 }
 
