@@ -53,6 +53,11 @@ int CutVideo::open_output_file(AVFormatContext *ifmt_ctx, const char *filename)
     return 0;
 }
 
+void CutVideo:: setParam(int64_t start_time, int64_t duration) {
+    m_startTime = start_time;
+    m_duration  = duration;
+}
+
 AVPacket* CutVideo::copy_packet(AVFormatContext *ifmt_ctx, AVPacket *packet) {
     AVStream* in_stream;
     AVStream* out_stream;
@@ -95,7 +100,7 @@ int CutVideo::write_internal(AVFormatContext *ifmt_ctx, AVPacket *packet)
 
 void CutVideo::write_output_file(AVFormatContext *ifmt_ctx, AVPacket *packet) {
     int64_t timestamp = packet->pts * av_q2d(ifmt_ctx->streams[packet->stream_index]->time_base);
-    if (timestamp >= start_time && timestamp < start_time + duration) {
+    if (timestamp >= m_startTime && timestamp < m_startTime + m_duration) {
 //        if (start_pts == 0 && start_dts == 0) {
 //            start_pts = packet->pts;
 //            start_dts = packet->dts;

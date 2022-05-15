@@ -16,8 +16,8 @@ extern "C" {
 class CutVideo {
 private:
 
-    int64_t start_time = 15;
-    int64_t duration   = 10;
+    int64_t m_startTime = 15;
+    int64_t m_duration  = 10;
 
     int64_t start_dts = 0;
     int64_t start_pts = 0;
@@ -30,6 +30,8 @@ private:
 public:
 
     int open_output_file(AVFormatContext *ifmt_ctx, const char *filename);
+
+    void setParam(int64_t start_time, int64_t duration);
 
     void write_output_file(AVFormatContext *ifmt_ctx, AVPacket *packet);
 
