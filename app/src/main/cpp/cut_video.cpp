@@ -21,6 +21,11 @@ int CutVideo::open_output_file(AVFormatContext *ifmt_ctx, const char *filename)
         return AVERROR_UNKNOWN;
     }
 
+    dts_start_offset = new int64_t [ifmt_ctx->nb_streams];
+    memset(dts_start_offset, -1, sizeof(int64_t) * ifmt_ctx->nb_streams);
+    pts_start_offset = new int64_t [ifmt_ctx->nb_streams];
+    memset(pts_start_offset, -1, sizeof(int64_t) * ifmt_ctx->nb_streams);
+
     for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
         AVStream* in_stream = ifmt_ctx->streams[i];
         AVCodecParameters* codecpar = in_stream->codecpar;
@@ -59,20 +64,21 @@ void CutVideo:: setParam(int64_t start_time, int64_t duration) {
 }
 
 AVPacket* CutVideo::copy_packet(AVFormatContext *ifmt_ctx, AVPacket *packet) {
-    AVStream* in_stream;
-    AVStream* out_stream;
     auto* pkt = (AVPacket*)av_malloc(sizeof(AVPacket));
     av_new_packet(pkt, 0);
     if (0 == av_packet_ref(pkt, packet)) {
-        in_stream  = ifmt_ctx->streams[pkt->stream_index];
-        out_stream = ofmt_ctx->streams[pkt->stream_index];
-        // 转换pts与dts
+        AVStream* in_stream  = ifmt_ctx->streams[pkt->stream_index];
+        AVStream* out_stream = ofmt_ctx->streams[pkt->stream_index];
+        if (pts_start_offset[pkt->stream_index] == -1) {
+            pts_start_offset[pkt->stream_index] = pkt->pts;
+            dts_start_offset[pkt->stream_index] = pkt->dts;
+        }
+
+        // convert pts and dts
         pkt->pts = av_rescale_q_rnd(pkt->pts, in_stream->time_base, out_stream->time_base,
-                                    static_cast<AVRounding>(AV_ROUND_NEAR_INF |
-                                                            AV_ROUND_PASS_MINMAX));
+                                    static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
         pkt->dts = av_rescale_q_rnd(pkt->dts, in_stream->time_base, out_stream->time_base,
-                                    static_cast<AVRounding>(AV_ROUND_NEAR_INF |
-                                                            AV_ROUND_PASS_MINMAX));
+                                    static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
         pkt->duration = av_rescale_q(pkt->duration, in_stream->time_base, out_stream->time_base);
         return pkt;
     }
@@ -87,12 +93,14 @@ int CutVideo::write_internal(AVFormatContext *ifmt_ctx, AVPacket *packet)
         LOGE("packet is NULL\n");
         return -1;
     }
-    // sub the first timestamp offset
-    pkt->pts = pkt->pts - start_pts;
-    pkt->dts = pkt->dts - start_dts;
+    pkt->pts = pkt->pts - pts_start_offset[pkt->stream_index];
+    pkt->dts = pkt->dts - dts_start_offset[pkt->stream_index];
+//    LOGE("pts=%ld, dts=%ld, stream_index=%d", pkt->pts, pkt->dts, pkt->stream_index);
     // write packet into file
+    //TODO:when pts < dts, it occurs error.
+    // Therefore, wo need to cache packet queue, and ascend sort by dts
     if ((ret = av_interleaved_write_frame(ofmt_ctx, pkt)) < 0) {
-        LOGE("Error muxing packet\n");
+        LOGE("Error to mux packet, stream_index=%d, pts=%ld, dts=%ld\n", pkt->stream_index, pkt->pts, pkt->dts);
     }
     av_packet_unref(pkt);
     return ret;
@@ -101,11 +109,6 @@ int CutVideo::write_internal(AVFormatContext *ifmt_ctx, AVPacket *packet)
 void CutVideo::write_output_file(AVFormatContext *ifmt_ctx, AVPacket *packet) {
     int64_t timestamp = packet->pts * av_q2d(ifmt_ctx->streams[packet->stream_index]->time_base);
     if (timestamp >= m_startTime && timestamp < m_startTime + m_duration) {
-//        if (start_pts == 0 && start_dts == 0) {
-//            start_pts = packet->pts;
-//            start_dts = packet->dts;
-//        }
-        LOGE("write frame timestamp=%ld\n", timestamp);
         write_internal(ifmt_ctx, packet);
     }
 }
@@ -118,4 +121,6 @@ void CutVideo::close_output_file() {
         avio_close(ofmt_ctx->pb);
     }
     avformat_free_context(ofmt_ctx);
+    delete pts_start_offset;
+    delete dts_start_offset;
 }

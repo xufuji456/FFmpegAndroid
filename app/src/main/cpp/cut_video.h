@@ -19,8 +19,9 @@ private:
     int64_t m_startTime = 15;
     int64_t m_duration  = 10;
 
-    int64_t start_dts = 0;
-    int64_t start_pts = 0;
+    int64_t *dts_start_offset;
+    int64_t *pts_start_offset;
+
     AVFormatContext *ofmt_ctx = nullptr;
 
     AVPacket* copy_packet(AVFormatContext *ifmt_ctx, AVPacket *packet);
