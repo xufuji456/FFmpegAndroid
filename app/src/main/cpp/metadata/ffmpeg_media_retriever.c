@@ -192,6 +192,8 @@ int set_data_source_inner(State **state_ptr, const char* path) {
 
 	if (video_index >= 0) {
 		stream_component_open(state, video_index);
+		state->codecCtx->thread_count = 3; // using multi-thread to decode
+		state->codecCtx->thread_type  = FF_THREAD_FRAME; // FF_THREAD_SLICE
 	}
 
 	set_duration(state->pFormatCtx);
