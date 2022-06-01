@@ -4,8 +4,7 @@
 #include "VideoStream.h"
 #include "PushInterface.h"
 
-VideoStream::VideoStream():yLen(0),
-                           mBitrate(0),
+VideoStream::VideoStream():m_frameLen(0),
                            videoCodec(nullptr),
                            pic_in(nullptr),
                            videoCallback(nullptr) {
@@ -26,8 +25,7 @@ VideoStream::~VideoStream() {
 
 void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     pthread_mutex_lock(&mutex);
-    mBitrate = bitrate;
-    yLen = width * height;
+    m_frameLen = width * height;
     if (videoCodec) {
         x264_encoder_close(videoCodec);
         videoCodec = nullptr;
@@ -86,18 +84,18 @@ void VideoStream::encodeVideo(int8_t *data, int8_t camera_type) {
     pthread_mutex_lock(&mutex);
 
     if (camera_type == 1) {
-        memcpy(pic_in->img.plane[0], data, yLen); // y
-        for (int i = 0; i < yLen/4; ++i) {
-            *(pic_in->img.plane[1] + i) = *(data + yLen + i * 2 + 1);  // u
-            *(pic_in->img.plane[2] + i) = *(data + yLen + i * 2); // v
+        memcpy(pic_in->img.plane[0], data, m_frameLen); // y
+        for (int i = 0; i < m_frameLen/4; ++i) {
+            *(pic_in->img.plane[1] + i) = *(data + m_frameLen + i * 2 + 1);  // u
+            *(pic_in->img.plane[2] + i) = *(data + m_frameLen + i * 2); // v
         }
     } else if (camera_type == 2) {
         int offset = 0;
-        memcpy(pic_in->img.plane[0], data, (size_t) yLen); // y
-        offset += yLen;
-        memcpy(pic_in->img.plane[1], data + offset, (size_t) yLen / 4); // u
-        offset += yLen / 4;
-        memcpy(pic_in->img.plane[2], data + offset, (size_t) yLen / 4); // v
+        memcpy(pic_in->img.plane[0], data, (size_t) m_frameLen); // y
+        offset += m_frameLen;
+        memcpy(pic_in->img.plane[1], data + offset, (size_t) m_frameLen / 4); // u
+        offset += m_frameLen / 4;
+        memcpy(pic_in->img.plane[2], data + offset, (size_t) m_frameLen / 4); // v
     } else {
         return;
     }

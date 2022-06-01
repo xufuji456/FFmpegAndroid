@@ -24,8 +24,7 @@ public:
 private:
     pthread_mutex_t mutex{};
 
-    int yLen;
-    int mBitrate;
+    int m_frameLen;
     x264_t *videoCodec = 0;
     x264_picture_t *pic_in = 0;
     VideoCallback videoCallback;
