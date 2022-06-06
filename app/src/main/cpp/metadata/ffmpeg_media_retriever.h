@@ -56,6 +56,6 @@ int get_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt);
 int get_scaled_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt, int width, int height);
 int get_audio_thumbnail(State **state_ptr, AVPacket *pkt);
 int set_native_window(State **ps, ANativeWindow* native_window);
-void release(State **ps);
+void release_retriever(State **ps);
 
 #endif /*FFMPEG_MEDIA_RETRIEVER_H_*/

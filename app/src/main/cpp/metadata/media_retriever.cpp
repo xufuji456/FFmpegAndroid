@@ -14,7 +14,7 @@ MediaRetriever::MediaRetriever()
 MediaRetriever::~MediaRetriever()
 {
 	Mutex::Autolock lock(mLock);
-	::release(&state);
+	::release_retriever(&state);
 }
 
 int MediaRetriever::setDataSource(const char *srcUrl)

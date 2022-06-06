@@ -691,7 +691,7 @@ int set_native_window(State **state_ptr, ANativeWindow* native_window) {
 	return SUCCESS;
 }
 
-void release(State **state_ptr) {
+void release_retriever(State **state_ptr) {
 
 	State *state = *state_ptr;
 	
