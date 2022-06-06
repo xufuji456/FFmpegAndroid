@@ -162,14 +162,11 @@ int set_data_source_inner(State **state_ptr, const char* path) {
 
     if (avformat_open_input(&state->pFormatCtx, path, NULL, &options) != 0) {
 		LOGE("avformat_open_input fail...");
-		*state_ptr = NULL;
     	return FAILURE;
     }
 
 	if (avformat_find_stream_info(state->pFormatCtx, NULL) < 0) {
 		LOGE("avformat_find_stream_info fail...");
-	    avformat_close_input(&state->pFormatCtx);
-		*state_ptr = NULL;
     	return FAILURE;
 	}
 
