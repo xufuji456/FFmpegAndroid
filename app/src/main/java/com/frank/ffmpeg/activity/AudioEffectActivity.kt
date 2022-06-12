@@ -2,7 +2,6 @@ package com.frank.ffmpeg.activity
 
 import android.Manifest
 import android.media.MediaPlayer
-import android.media.audiofx.*
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -29,7 +28,6 @@ import java.util.ArrayList
 class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallback {
 
     companion object {
-        private val TAG = AudioEffectActivity::class.java.simpleName
 
         private val audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
     }
