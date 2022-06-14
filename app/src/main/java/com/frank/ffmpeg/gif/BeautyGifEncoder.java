@@ -24,7 +24,7 @@ public class BeautyGifEncoder {
 
     private int transIndex; // transparent index in color table
 
-    private int repeat = -1; // no repeat
+    private int repeat = 0; // repeat infinitely
 
     private int delay = 0; // frame delay
 

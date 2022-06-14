@@ -74,6 +74,7 @@ class HighQualityGif(width: Int, height: Int, rotateDegree: Int) {
 
         val outputStream = ByteArrayOutputStream()
         val gifEncoder = BeautyGifEncoder()
+        gifEncoder.setRepeat(0)
         gifEncoder.setFrameRate(10f)
         gifEncoder.start(outputStream)
 
