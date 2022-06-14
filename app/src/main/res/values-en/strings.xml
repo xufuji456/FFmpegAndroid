@@ -68,6 +68,7 @@
     <string name="video_subtitle">add subtitle</string>
     <string name="video_zoom">Zoom video</string>
     <string name="video_gray">Gray video</string>
+    <string name="video_stereo3d">stereo 3d</string>
 
     <string name="swap">Swap</string>
     <string name="start">Start</string>

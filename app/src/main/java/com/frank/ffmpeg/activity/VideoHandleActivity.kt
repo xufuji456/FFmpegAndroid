@@ -115,7 +115,7 @@ class VideoHandleActivity : BaseActivity() {
                 getString(R.string.video_screen_shot),
                 getString(R.string.video_water_mark),
                 getString(R.string.video_remove_logo),
-                getString(R.string.video_from_photo),
+                getString(R.string.video_stereo3d),
                 getString(R.string.video_to_gif),
                 getString(R.string.video_multi),
                 getString(R.string.video_reverse),
@@ -175,28 +175,25 @@ class VideoHandleActivity : BaseActivity() {
             return
         }
         when (currentPosition) {
-            0 //transform format
-            -> {
+            0 -> { //transform format
                 outputPath = PATH + File.separator + "transformVideo.mp4"
                 commandLine = FFmpegUtil.transformVideo(srcFile, outputPath)
             }
-            1 //cut video
-            -> {
+            1 -> { //cut video
                 outputPath = PATH + File.separator + "cutVideo" + suffix
                 val startTime = 5.5f
                 val duration = 20.0f
                 commandLine = FFmpegUtil.cutVideo(srcFile, startTime, duration, outputPath)
             }
-            2 //concat video together
-            -> concatVideo(srcFile)
-            3 //video snapshot
-            -> {
+            2 -> { //concat video together
+                concatVideo(srcFile)
+            }
+            3 -> { //video snapshot
                 outputPath = PATH + File.separator + "screenShot.jpg"
                 val time = 10.5f
                 commandLine = FFmpegUtil.screenShot(srcFile, time, outputPath)
             }
-            4 //add watermark to video
-            -> {
+            4 -> { //add watermark to video
                 // the unit of bitRate is kb
                 var bitRate = 500
                 val retriever = MediaMetadataRetriever()
@@ -234,15 +231,17 @@ class VideoHandleActivity : BaseActivity() {
                     }
                 }
             }
-            5 //Remove logo from video, or use to mosaic video
-            -> {
+            5 -> { //Remove logo from video, or use to mosaic video
                 outputPath = PATH + File.separator + "removeLogo" + suffix
                 val widthL = 64
                 val heightL = 40
                 commandLine = FFmpegUtil.removeLogo(srcFile, 10, 10, widthL, heightL, outputPath)
             }
-            7 //convert video into gif
-            -> {
+            6 -> { // VR video: convert to stereo3d video
+                outputPath = PATH + File.separator + "stereo3d" + suffix
+                commandLine = FFmpegUtil.videoStereo3D(srcFile, outputPath)
+            }
+            7 -> { //convert video into gif
                 outputPath = PATH + File.separator + "video2Gif.gif"
                 val gifStart = 10
                 val gifDuration = 3
@@ -264,8 +263,7 @@ class VideoHandleActivity : BaseActivity() {
                     convertGifInHighQuality(outputPath!!, srcFile, gifStart, gifDuration, frameRate)
                 }
             }
-            8 //combine video which layout could be horizontal of vertical
-            -> {
+            8 -> { //combine video which layout could be horizontal of vertical
                 val input1 = PATH + File.separator + "input1.mp4"
                 val input2 = PATH + File.separator + "input2.mp4"
                 outputPath = PATH + File.separator + "multi.mp4"
@@ -274,18 +272,15 @@ class VideoHandleActivity : BaseActivity() {
                 }
                 commandLine = FFmpegUtil.multiVideo(input1, input2, outputPath, VideoLayout.LAYOUT_HORIZONTAL)
             }
-            9 //video reverse
-            -> {
+            9 -> { //video reverse
                 outputPath = PATH + File.separator + "reverse.mp4"
                 commandLine = FFmpegUtil.reverseVideo(srcFile, outputPath)
             }
-            10 //noise reduction of video
-            -> {
+            10 -> { //noise reduction of video
                 outputPath = PATH + File.separator + "denoise.mp4"
                 commandLine = FFmpegUtil.denoiseVideo(srcFile, outputPath)
             }
-            11 //convert video to picture
-            -> {
+            11 -> { //convert video to picture
                 outputPath = PATH + File.separator + "Video2Image/"
                 val imageFile = File(outputPath)
                 if (!imageFile.exists()) {
@@ -298,8 +293,7 @@ class VideoHandleActivity : BaseActivity() {
                 val mFrameRate = 10//frameRate
                 commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, outputPath)
             }
-            12 //combine into picture-in-picture video
-            -> {
+            12 -> { //combine into picture-in-picture video
                 val inputFile1 = PATH + File.separator + "beyond.mp4"
                 val inputFile2 = PATH + File.separator + "small_girl.mp4"
                 if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)) {
@@ -312,36 +306,30 @@ class VideoHandleActivity : BaseActivity() {
                 outputPath = PATH + File.separator + "PicInPic.mp4"
                 commandLine = FFmpegUtil.picInPicVideo(inputFile1, inputFile2, x, y, outputPath)
             }
-            13 //playing speed of video
-            -> {
+            13 -> { //playing speed of video
                 outputPath = PATH + File.separator + "speed.mp4"
                 commandLine = FFmpegUtil.changeSpeed(srcFile, outputPath, 2f, false)
             }
-            14 // insert thumbnail into video
-            -> {
+            14 -> { // insert thumbnail into video
                 val thumbnailPath = PATH + File.separator + "thumb.jpg"
                 outputPath = PATH + File.separator + "thumbnailVideo" + suffix
                 commandLine = FFmpegUtil.insertPicIntoVideo(srcFile, thumbnailPath, outputPath)
             }
-            15 //add subtitle into video
-            -> {
+            15 -> { //add subtitle into video
                 val subtitlePath = PATH + File.separator + "test.ass"
                 outputPath = PATH + File.separator + "subtitle.mkv"
                 commandLine = FFmpegUtil.addSubtitleIntoVideo(srcFile, subtitlePath, outputPath)
             }
-            16 // set the rotate degree of video
-            -> {
+            16 -> { // set the rotate degree of video
                 val rotateDegree = 90
                 outputPath = PATH + File.separator + "rotate" + rotateDegree + suffix
                 commandLine = FFmpegUtil.rotateVideo(srcFile, rotateDegree, outputPath)
             }
-            17 // change video from RGB to gray
-            -> {
+            17 -> { // change video from RGB to gray
                 outputPath = PATH + File.separator + "gray" + suffix
                 commandLine = FFmpegUtil.toGrayVideo(srcFile, outputPath)
             }
-            18 // zoom photo to video
-            -> {
+            18 -> { // zoom photo to video
                 outputPath = PATH + File.separator + "zoom.mp4"
                 commandLine = FFmpegUtil.photoZoomToVideo(srcFile, outputPath)
             }

@@ -68,6 +68,7 @@
     <string name="video_subtitle">添加字幕</string>
     <string name="video_zoom">图片缩放</string>
     <string name="video_gray">黑白视频</string>
+    <string name="video_stereo3d">3D视频</string>
 
     <string name="swap">切换</string>
     <string name="start">开始</string>

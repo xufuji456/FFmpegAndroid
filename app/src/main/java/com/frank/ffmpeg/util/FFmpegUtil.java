@@ -826,5 +826,23 @@ public class FFmpegUtil {
         return insert(waveformCmd.split(" "), 2, inputPath, outputPath);
     }
 
-    // ffmpeg -i beyond.mp4 -vf stereo3d=sbsl:arbg -y left3d.mp4
+    /**
+     * Convert video into stereo3d mode(VR video)
+     * @param inputPath  inputPath
+     * @param outputPath outputPath
+     * @return the command of stereo3d
+     */
+    public static String[] videoStereo3D(String inputPath, String outputPath) {
+        /* *
+         * sbsl: side by side parallel (left eye left, right eye right)
+         * sbsr: side by side crosseye (right eye left, left eye right)
+         * abl : above-below (left eye above, right eye below)
+         * al  : alternating frames (left eye first, right eye second)
+         * irl : interleaved rows (left eye has top row, right eye next)
+         * icl : interleaved columns, left eye first
+         */
+        String stereo3dCmd = "ffmpeg -i -filter_complex stereo3d=sbsl:arbg";
+        return insert(stereo3dCmd.split(" "), 2, inputPath, outputPath);
+    }
+
 }
