@@ -6,8 +6,8 @@
     <string name="audio_mix">音乐混音</string>
     <string name="audio_play">音频播放</string>
     <string name="audio_opensl">OpenSL播放</string>
+    <string name="audio_waveform">波形图</string>
     <string name="audio_encode">PCM编码</string>
-    <string name="pcm_concat">PCM合并</string>
     <string name="audio_speed">音频速度</string>
     <string name="audio_echo">空灵效果</string>
     <string name="audio_tremolo">惊悚效果</string>

@@ -359,7 +359,7 @@ public class FFmpegUtil {
      */
     public static String[] jointVideo(String fileListPath, String outputPath) {
         // ffmpeg -f concat -safe 0 -i %s -c copy %s
-        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i -c copy";
+        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i file.txt -c copy %s";
         return insert(jointVideoCmd.split(" "), 6, fileListPath, outputPath);
     }
 
@@ -820,4 +820,11 @@ public class FFmpegUtil {
         return insert(trimCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    public static String[] showAudioWaveform(String inputPath, String resolution, String outputPath) {
+        String waveformCmd = "ffmpeg -i -filter_complex showwavespic=s=%s";
+        waveformCmd = String.format(Locale.getDefault(), waveformCmd, resolution);
+        return insert(waveformCmd.split(" "), 2, inputPath, outputPath);
+    }
+
+    // ffmpeg -i beyond.mp4 -vf stereo3d=sbsl:arbg -y left3d.mp4
 }

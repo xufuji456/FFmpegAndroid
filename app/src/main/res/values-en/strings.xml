@@ -6,8 +6,8 @@
     <string name="audio_mix">Audio mix</string>
     <string name="audio_play">Audio play</string>
     <string name="audio_opensl">OpenSL play</string>
+    <string name="audio_waveform">Waveform</string>
     <string name="audio_encode">PCM encode</string>
-    <string name="pcm_concat">PCM concat</string>
     <string name="audio_speed">Audio speed</string>
     <string name="audio_echo">Echo effect</string>
     <string name="audio_tremolo">Tremolo effect</string>

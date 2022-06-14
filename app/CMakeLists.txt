@@ -31,7 +31,7 @@ add_library( # Sets the name of the library.
             src/main/cpp/ffmpeg_pusher.cpp
             src/main/cpp/video_filter.c
             src/main/cpp/ffprobe_cmd.cpp
-            src/main/cpp/cut_video.cpp
+            src/main/cpp/video_cutting.cpp
             src/main/cpp/visualizer/fft.cpp
             src/main/cpp/visualizer/fixed_fft.cpp
             src/main/cpp/visualizer/block_queue.c

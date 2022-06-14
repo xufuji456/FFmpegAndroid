@@ -65,14 +65,6 @@
             android:visibility="gone"/>
 
         <Button
-            android:id="@+id/btn_pcm_concat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pcm_concat"
-            android:layout_marginTop="10dp"
-            android:visibility="gone"/>
-
-        <Button
             android:id="@+id/btn_audio_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -119,6 +111,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/audio_volume"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/btn_audio_waveform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/audio_waveform"
             android:layout_marginTop="10dp" />
 
     </LinearLayout>
