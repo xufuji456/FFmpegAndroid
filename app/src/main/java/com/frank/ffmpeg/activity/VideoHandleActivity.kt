@@ -203,6 +203,7 @@ class VideoHandleActivity : BaseActivity() {
                     val probeBitrate = Integer.valueOf(mBitRate)
                     bitRate = probeBitrate / 1000 / 100 * 100
                 }
+                retriever.release()
                 //1:top left 2:top right 3:bottom left 4:bottom right
                 val location = 1
                 val offsetXY = 10
