@@ -392,7 +392,7 @@ class VideoHandleActivity : BaseActivity() {
         val files = photoFile.listFiles()
         val cmdList = ArrayList<Array<String>>()
         //the resolution of photo which you want to convert
-        val resolution = "640x320"
+        val resolution = "640x480"
         for (file in files) {
             val inputPath = file.absolutePath
             val outputPath = tempPath + file.name
