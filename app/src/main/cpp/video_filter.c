@@ -1,23 +1,26 @@
 //
 // Created by frank on 2018/6/4.
 //
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdbool.h>
+
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
+
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
-#include <android/native_window.h>
-#include <android/native_window_jni.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <libavutil/imgutils.h>
-#include <libavfilter/buffersink.h>
-#include <libavfilter/buffersrc.h>
-#include <libavfilter/avfiltergraph.h>
-#include <libavutil/opt.h>
+#include "libavutil/imgutils.h"
+#include "libavfilter/buffersink.h"
+#include "libavfilter/buffersrc.h"
+#include "libavfilter/avfiltergraph.h"
+#include "libavutil/opt.h"
 #include "libswresample/swresample.h"
 #include "ffmpeg_jni_define.h"
 
 #define TAG "VideoFilter"
-#define ENABLE_MEDIACODEC 0
 
 AVFormatContext *pFormatCtx;
 AVCodecContext *pCodecCtx;
@@ -32,20 +35,22 @@ AVFrame *filter_frame;
 struct SwsContext *sws_ctx;
 int video_stream_index = -1;
 
-#define MAX_AUDIO_FRAME_SIZE 48000 * 4
-jmethodID audio_track_write_mid;
+int pos;
+int got_frame;
+int out_channel_nb;
 uint8_t *out_buffer;
 jobject audio_track;
+bool playAudio = true;
 SwrContext *audio_swr_ctx;
-int out_channel_nb;
-enum AVSampleFormat out_sample_fmt;
 int audio_stream_index = -1;
-int got_frame;
 AVCodecContext *audioCodecCtx;
-jboolean playAudio = JNI_TRUE;
-int pos;
+jmethodID audio_track_write_mid;
+enum AVSampleFormat out_sample_fmt;
 
-char* filters[] = {"lutyuv='u=128:v=128'",
+
+#define MAX_AUDIO_FRAME_SIZE (48000 * 4)
+
+const char* filters[] = {"lutyuv='u=128:v=128'",
                    "hue='h=60:s=-3'",
                    "edgedetect=low=0.1:high=0.4",
                    "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
@@ -56,11 +61,10 @@ char* filters[] = {"lutyuv='u=128:v=128'",
                    "rotate=180*PI/180",
                    "unsharp"};
 
-//init filter
 int init_filters(const char *filters_descr, AVRational time_base, AVCodecContext *codecCtx,
         AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
     char args[512];
-    int ret = 0;
+    int ret;
     AVFilterContext *buffersrc_ctx;
     AVFilterContext *buffersink_ctx;
     const AVFilter *buffersrc = avfilter_get_by_name("buffer");
@@ -151,17 +155,7 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
     }
 
     pCodecCtx = pFormatCtx->streams[video_stream_index]->codec;
-    AVCodec *pCodec;
-    if (ENABLE_MEDIACODEC && pCodecCtx->codec_id == AV_CODEC_ID_H264) {
-        // note: Some devices will bring blurred screen, when using mediacodec
-        pCodec = avcodec_find_decoder_by_name("h264_mediacodec");
-        if (pCodec == NULL) {
-            pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-        }
-        LOGE(TAG, "codec name=%s", pCodec->name);
-    } else {
-        pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-    }
+    AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if (pCodec == NULL) {
         LOGE(TAG, "couldn't find Codec.");
         return -1;
