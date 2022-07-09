@@ -11,6 +11,8 @@ static void rgba_to_yuv420p(int *argb, int8_t *yuv, int width, int height);
 
 static void yuv420p_to_argb(int8_t *yuv, int *argb, int width, int height);
 
+static void yuv420p_rotate(int8_t *dst, int8_t *src, int width, int height, int degree);
+
 /**
  * convert NV21 to YUV420P
  * @param dst data of yuv420p

@@ -96,9 +96,9 @@ static void yuv420p_to_argb(int8_t *yuv, int *argb, int width, int height) {
         u = u - 128;
         v = v - 128;
 
-        argb[i]             = yuv2argb(y1, u, v);
-        argb[i + 1]         = yuv2argb(y2, u, v);
-        argb[width + i]     = yuv2argb(y3, u, v);
+        argb[i] = yuv2argb(y1, u, v);
+        argb[i + 1] = yuv2argb(y2, u, v);
+        argb[width + i] = yuv2argb(y3, u, v);
         argb[width + i + 1] = yuv2argb(y4, u, v);
 
         if (i != 0 && (i + 2) % width == 0)
@@ -108,8 +108,102 @@ static void yuv420p_to_argb(int8_t *yuv, int *argb, int width, int height) {
 
 static void nv21_to_yuv420p(int8_t *dst, int8_t *src, int len) {
     memcpy(dst, src, len); // y
-    for (int i = 0; i < len/4; ++i) {
+    for (int i = 0; i < len / 4; ++i) {
         *(dst + len + i) = *(src + len + i * 2 + 1);  // u
         *(dst + len * 5 / 4 + i) = *(src + len + i * 2); // v
+    }
+}
+
+static void yuv420p_rotate90(int8_t *dst, int8_t *src, int width, int height) {
+    int n = 0;
+    int wh = width * height;
+    int half_width = width / 2;
+    int half_height = height / 2;
+    // y
+    for (int j = 0; j < width; j++) {
+        for (int i = height - 1; i >= 0; i--) {
+            dst[n++] = src[width * i + j];
+        }
+    }
+    // u
+    for (int i = 0; i < half_width; i++) {
+        for (int j = 1; j <= half_height; j++) {
+            dst[n++] = src[wh + ((half_height - j) * half_width + i)];
+        }
+    }
+    // v
+    for (int i = 0; i < half_width; i++) {
+        for (int j = 1; j <= half_height; j++) {
+            dst[n++] = src[wh + wh / 4 + ((half_height - j) * half_width + i)];
+        }
+    }
+}
+
+static void yuv420p_rotate180(int8_t *dst, int8_t *src, int width, int height) {
+    int n = 0;
+    int half_width = width / 2;
+    int half_height = height / 2;
+    // y
+    for (int j = height - 1; j >= 0; j--) {
+        for (int i = width; i > 0; i--) {
+            dst[n++] = src[width * j + i - 1];
+        }
+    }
+    // u
+    int offset = width * height;
+    for (int j = half_height - 1; j >= 0; j--) {
+        for (int i = half_width; i > 0; i--) {
+            dst[n++] = src[offset + half_width * j + i - 1];
+        }
+    }
+    // v
+    offset += half_width * half_height;
+    for (int j = half_height - 1; j >= 0; j--) {
+        for (int i = half_width; i > 0; i--) {
+            dst[n++] = src[offset + half_width * j + i - 1];
+        }
+    }
+}
+
+static void yuv420p_rotate270(int8_t *dst, int8_t *src, int width, int height) {
+
+    for (int j = 0; j < width; j++) {
+        for (int i = 1; i <= height; i++) {
+            *dest++ = *(src + i * width - j);
+        }
+    }
+
+    char *src_u = src + width * height;
+    for (int j = 0; j < width / 2; j++) {
+        for (int i = 1; i <= height / 2; i++) {
+            *dest++ = *(src_u + i * width / 2 - j);
+
+        }
+    }
+
+    char *src_v = src + width * height * 5 / 4;
+    for (int j = 0; j < width / 2; j++) {
+        for (int i = 1; i <= height / 2; i++) {
+            *dest++ = *(src_v + i * width / 2 - j);
+        }
+    }
+}
+
+static void yuv420p_rotate(int8_t *dst, int8_t *src, int width, int height, int degree) {
+    switch(degree) {
+        case 0:
+            memcpy(dst, src, width * height * 3 / 2);
+            break;
+        case 90:
+            yuv420p_rotate90(dst, src, width, height);
+            break;
+        case 180:
+            yuv420p_rotate180(dst, src, width, height);
+            break;
+        case 270:
+            yuv420p_rotate270(dst, src, width, height);
+            break;
+        default:
+            break;
     }
 }
