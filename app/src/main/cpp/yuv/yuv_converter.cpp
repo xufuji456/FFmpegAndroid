@@ -165,26 +165,25 @@ static void yuv420p_rotate180(int8_t *dst, int8_t *src, int width, int height) {
     }
 }
 
-static void yuv420p_rotate270(int8_t *dst, int8_t *src, int width, int height) {
+static void yuv420p_rotate270(int8_t *dst, const int8_t *src, int width, int height) {
 
     for (int j = 0; j < width; j++) {
         for (int i = 1; i <= height; i++) {
-            *dest++ = *(src + i * width - j);
+            *dst++ = *(src + i * width - j);
         }
     }
 
-    char *src_u = src + width * height;
+    auto *src_u = const_cast<int8_t *>(src + width * height);
     for (int j = 0; j < width / 2; j++) {
         for (int i = 1; i <= height / 2; i++) {
-            *dest++ = *(src_u + i * width / 2 - j);
-
+            *dst++ = *(src_u + i * width / 2 - j);
         }
     }
 
-    char *src_v = src + width * height * 5 / 4;
+    auto *src_v = const_cast<int8_t *>(src + width * height * 5 / 4);
     for (int j = 0; j < width / 2; j++) {
         for (int i = 1; i <= height / 2; i++) {
-            *dest++ = *(src_v + i * width / 2 - j);
+            *dst++ = *(src_v + i * width / 2 - j);
         }
     }
 }
