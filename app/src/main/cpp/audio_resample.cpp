@@ -47,11 +47,56 @@ static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat samp
     return AVERROR(EINVAL);
 }
 
+int init_audio_decoder(AVFormatContext *fmt_ctx, AVCodecContext *codec_ctx) {
+    AVCodec *codec = avcodec_find_decoder(fmt_ctx->audio_codec_id);
+    if (!codec) {
+        ALOGE("can't found codec id=%d\n", fmt_ctx->audio_codec_id);
+        return -1;
+    }
+    codec_ctx = avcodec_alloc_context3(codec);
+    if (!codec_ctx) {
+        ALOGE("avcodec_alloc_context3 fail!\n");
+        return -2;
+    }
+    return avcodec_open2(codec_ctx, codec, nullptr);
+}
+
+int init_audio_encoder(AVFormatContext *fmt_ctx, AVCodecContext *codec_ctx) {
+    AVCodec *codec = avcodec_find_encoder(fmt_ctx->audio_codec_id);
+    if (!codec) {
+        ALOGE("can't found codec id=%d\n", fmt_ctx->audio_codec_id);
+        return -1;
+    }
+    codec_ctx = avcodec_alloc_context3(codec);
+    if (!codec_ctx) {
+        ALOGE("avcodec_alloc_context3 fail!\n");
+        return -2;
+    }
+    return avcodec_open2(codec_ctx, codec, nullptr);
+}
+
+int init_audio_muxer(AVFormatContext *fmt_ctx, const char* filename) {
+    int ret;
+    avformat_alloc_output_context2(&fmt_ctx, nullptr, nullptr, filename);
+    av_dump_format(fmt_ctx, 0, filename, 1);
+    if (!(fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
+        ret = avio_open(&fmt_ctx->pb, filename, AVIO_FLAG_WRITE);
+        if (ret < 0) {
+            ALOGE("Could not open output file %s\n", filename);
+            return ret;
+        }
+    }
+    /* init muxer, write output file header */
+    ret = avformat_write_header(fmt_ctx, nullptr);
+    if (ret < 0) {
+        ALOGE("Error occurred when opening output file\n");
+    }
+    return ret;
+}
+
 int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
 {
     int src_rate = 0;
-    int src_linesize;
-    int src_nb_channels;
     int src_nb_samples = 0;
     int64_t src_ch_layout = AV_CH_LAYOUT_STEREO;
     enum AVSampleFormat src_sample_fmt = AV_SAMPLE_FMT_S16;
@@ -67,17 +112,24 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
     int ret;
     const char *fmt;
     AVPacket packet;
+    AVPacket *opacket;
     AVFrame *frame;
     int got_frame_ptr;
+    int got_packet_ptr;
     struct SwrContext *swr_ctx;
     AVFormatContext *iformat_ctx = nullptr;
     AVFormatContext *oformat_ctx = nullptr;
+    AVCodecContext  *icodec_ctx  = nullptr;
+    AVCodecContext  *ocodec_ctx  = nullptr;
 
     ret = avformat_open_input(&iformat_ctx, src_filename, nullptr, nullptr);
     if (ret < 0) {
         ALOGE("open input fail, path=%s, ret=%d", src_filename, ret);
         goto end;
     }
+    avformat_find_stream_info(iformat_ctx, nullptr);
+    frame = av_frame_alloc();
+    opacket = av_packet_alloc();
 
     /* create resample context */
     swr_ctx = swr_alloc();
@@ -102,9 +154,6 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         goto end;
     }
 
-    /* allocate source and destination samples buffers */
-    src_nb_channels = av_get_channel_layout_nb_channels(src_ch_layout);
-
     /* compute the number of converted samples: buffering is avoided
      * ensuring that the output buffer will contain at least all the
      * converted input samples */
@@ -120,21 +169,9 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         goto end;
     }
 
-    avformat_alloc_output_context2(&oformat_ctx, nullptr, nullptr, dst_filename);
-    av_dump_format(oformat_ctx, 0, dst_filename, 1);
-    if (!(oformat_ctx->oformat->flags & AVFMT_NOFILE)) {
-        ret = avio_open(&oformat_ctx->pb, dst_filename, AVIO_FLAG_WRITE);
-        if (ret < 0) {
-            ALOGE("Could not open output file %s\n", dst_filename);
-            return ret;
-        }
-    }
-    /* init muxer, write output file header */
-    ret = avformat_write_header(oformat_ctx, nullptr);
-    if (ret < 0) {
-        ALOGE("Error occurred when opening output file\n");
-        return ret;
-    }
+    init_audio_decoder(iformat_ctx, icodec_ctx);
+    init_audio_encoder(oformat_ctx, ocodec_ctx);
+    init_audio_muxer(oformat_ctx, dst_filename);
 
     while (av_read_frame(iformat_ctx, &packet) >= 0) {
         /* compute destination number of samples */
@@ -149,7 +186,7 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
             max_dst_nb_samples = dst_nb_samples;
         }
 
-        ret = avcodec_decode_audio4(iformat_ctx, frame, &got_frame_ptr, packet);
+        ret = avcodec_decode_audio4(icodec_ctx, frame, &got_frame_ptr, &packet);
         if (ret < 0) {
             ALOGE("decode audio error:%d\n", ret);
             continue;
@@ -168,17 +205,24 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
             goto end;
         }
 
+        ret = avcodec_encode_audio2(ocodec_ctx, opacket, frame, &got_packet_ptr);
+        if (ret < 0) {
+            ALOGE("encode audio error=%d\n", ret);
+            continue;
+        }
+
         AVStream *in_stream = iformat_ctx->streams[0];
         AVStream *out_stream = oformat_ctx->streams[0];
-        pkt->pts = av_rescale_q_rnd(packet.pts, in_stream->time_base, out_stream->time_base,
+        opacket->pts = av_rescale_q_rnd(packet.pts, in_stream->time_base, out_stream->time_base,
                                     static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-        pkt->dts = av_rescale_q_rnd(packet.dts, in_stream->time_base, out_stream->time_base,
+        opacket->dts = av_rescale_q_rnd(packet.dts, in_stream->time_base, out_stream->time_base,
                                     static_cast<AVRounding>(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-        pkt->duration = av_rescale_q(packet.duration, in_stream->time_base, out_stream->time_base);
-        pkt->pos = -1;
+        opacket->duration = av_rescale_q(packet.duration, in_stream->time_base, out_stream->time_base);
+        opacket->pos = -1;
 
-        av_interleaved_write_frame(oformat_ctx, pkt);
+        av_interleaved_write_frame(oformat_ctx, opacket);
 
+        av_packet_unref(opacket);
         av_packet_unref(&packet);
     }
 
@@ -189,6 +233,9 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
             fmt, dst_ch_layout, dst_nb_channels, dst_rate, dst_filename);
 
 end:
+
+    av_packet_free(&opacket);
+    av_frame_free(&frame);
 
     if (dst_data)
         av_freep(&dst_data[0]);
