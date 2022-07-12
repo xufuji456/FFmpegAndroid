@@ -21,4 +21,12 @@ static void yuv420p_rotate(int8_t *dst, int8_t *src, int width, int height, int 
  */
 static void nv21_to_yuv420p(int8_t *dst, int8_t *src, int len);
 
+/**
+ * convert NV12 to YUV420P
+ * @param dst data of yuv420p
+ * @param src data of nv12
+ * @param len width*height
+ */
+static void nv12_to_yuv420p(int8_t *dst, int8_t *src, int len);
+
 #endif //FFMPEGANDROID_YUV_CONVERTER_H

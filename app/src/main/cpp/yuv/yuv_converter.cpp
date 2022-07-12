@@ -114,7 +114,15 @@ static void nv21_to_yuv420p(int8_t *dst, int8_t *src, int len) {
     }
 }
 
-static void yuv420p_rotate90(int8_t *dst, int8_t *src, int width, int height) {
+static void nv12_to_yuv420p(int8_t *dst, int8_t *src, int len) {
+    memcpy(dst, src, len); // y
+    for (int i = 0; i < len / 4; ++i) {
+        *(dst + len + i) = *(src + len + i * 2);  // u
+        *(dst + len * 5 / 4 + i) = *(src + len + i * 2 + 1); // v
+    }
+}
+
+static void yuv420p_rotate90(int8_t *dst, const int8_t *src, int width, int height) {
     int n = 0;
     int wh = width * height;
     int half_width = width / 2;
@@ -139,7 +147,7 @@ static void yuv420p_rotate90(int8_t *dst, int8_t *src, int width, int height) {
     }
 }
 
-static void yuv420p_rotate180(int8_t *dst, int8_t *src, int width, int height) {
+static void yuv420p_rotate180(int8_t *dst, const int8_t *src, int width, int height) {
     int n = 0;
     int half_width = width / 2;
     int half_height = height / 2;
