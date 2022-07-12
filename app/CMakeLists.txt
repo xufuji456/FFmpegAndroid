@@ -43,6 +43,7 @@ add_library( # Sets the name of the library.
             src/main/cpp/metadata/metadata_util.c
             src/main/cpp/metadata/ffmpeg_media_retriever.c
             src/main/cpp/yuv/yuv_converter.cpp
+            src/main/cpp/media_transcode.cpp
         )
 
 add_library( ffmpeg

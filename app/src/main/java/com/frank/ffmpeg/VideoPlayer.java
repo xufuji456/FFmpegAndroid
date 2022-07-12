@@ -26,6 +26,8 @@ public class VideoPlayer {
 
     public native void playAudio(boolean play);
 
+    public native int executeTranscode(String inputFile, String outputFile);
+
     /**
      * Create an AudioTrack instance for JNI calling
      *
