@@ -19,7 +19,7 @@ extern "C" {
 
 #include "ffmpeg_jni_define.h"
 
-#define ALOGE(Format, ...) LOGE("Transcde", Format, ##__VA_ARGS__)
+#define ALOGE(Format, ...) LOGE("Transcode", Format, ##__VA_ARGS__)
 
 static AVFormatContext *ifmt_ctx;
 static AVFormatContext *ofmt_ctx;
@@ -597,7 +597,7 @@ end:
     if (ret < 0)
         ALOGE("Error occurred: %s\n", av_err2str(ret));
 
-    return ret ? 1 : 0;
+    return ret;
 }
 
 #ifdef __cplusplus
