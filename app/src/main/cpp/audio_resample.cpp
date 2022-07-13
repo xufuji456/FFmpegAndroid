@@ -48,18 +48,21 @@ static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat samp
 }
 
 int init_audio_codec(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx, bool is_encoder) {
-    AVCodec *codec = is_encoder ? avcodec_find_encoder(fmt_ctx->audio_codec_id)
-            : avcodec_find_decoder(fmt_ctx->audio_codec_id);
+    AVCodecContext *codec_ctx = nullptr;
+    for (int i = 0; i < fmt_ctx->nb_streams; ++i) {
+        if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            codec_ctx = fmt_ctx->streams[i]->codec;
+        }
+    }
+    AVCodec *codec = is_encoder ? avcodec_find_encoder(codec_ctx->codec_id)
+            : avcodec_find_decoder(codec_ctx->codec_id);
     if (!codec) {
-        ALOGE("can't found codec id=%d\n", fmt_ctx->audio_codec_id);
+        ALOGE("can't found codec id=%d\n", codec_ctx->codec_id);
         return -1;
     }
-    AVCodecContext *codec_ctx = avcodec_alloc_context3(codec);
-    if (!codec_ctx) {
-        ALOGE("avcodec_alloc_context3 fail!\n");
-        return -2;
-    }
     int ret = avcodec_open2(codec_ctx, codec, nullptr);
+    if (ret < 0)
+        ALOGE("avcodec_open2 fail:%d", ret);
     *avcodec_ctx = codec_ctx;
     return ret;
 }
@@ -95,10 +98,9 @@ int init_audio_muxer(AVFormatContext **ofmt_ctx, const char* filename) {
 
 int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
 {
-    int src_rate = 0;
-    int src_nb_samples = 0;
+    int src_rate;
     int64_t src_ch_layout = AV_CH_LAYOUT_STEREO;
-    enum AVSampleFormat src_sample_fmt = AV_SAMPLE_FMT_S16;
+    enum AVSampleFormat src_sample_fmt;
 
     int dst_bufsize;
     int dst_linesize;
@@ -129,6 +131,10 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
     avformat_find_stream_info(iformat_ctx, nullptr);
     frame = av_frame_alloc();
     opacket = av_packet_alloc();
+    init_audio_decoder(iformat_ctx, &icodec_ctx);
+    src_rate       = icodec_ctx->sample_rate;
+    src_ch_layout  = (int64_t) icodec_ctx->channel_layout;
+    src_sample_fmt = icodec_ctx->sample_fmt;
 
     /* create resample context */
     swr_ctx = swr_alloc();
@@ -153,12 +159,6 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         goto end;
     }
 
-    /* compute the number of converted samples: buffering is avoided
-     * ensuring that the output buffer will contain at least all the
-     * converted input samples */
-    max_dst_nb_samples = dst_nb_samples =
-            (int) av_rescale_rnd(src_nb_samples, dst_rate, src_rate, AV_ROUND_UP);
-
     /* buffer is going to be directly written to a raw-audio file, no alignment */
     dst_nb_channels = av_get_channel_layout_nb_channels(dst_ch_layout);
     ret = av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels,
@@ -172,13 +172,20 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
     if (ret < 0) {
         goto end;
     }
-    init_audio_decoder(iformat_ctx, &icodec_ctx);
     init_audio_encoder(oformat_ctx, &ocodec_ctx);
 
     while (av_read_frame(iformat_ctx, &packet) >= 0) {
+
+        ret = avcodec_decode_audio4(icodec_ctx, frame, &got_frame_ptr, &packet);
+        if (ret < 0) {
+            ALOGE("decode audio error:%d\n", ret);
+            continue;
+        }
+        ALOGE("decode succ, pts=%ld\n", frame->pts);
+
         /* compute destination number of samples */
         dst_nb_samples = (int) av_rescale_rnd(swr_get_delay(swr_ctx, src_rate) +
-                                        src_nb_samples, dst_rate, src_rate, AV_ROUND_UP);
+                                        frame->nb_samples, dst_rate, src_rate, AV_ROUND_UP);
         if (dst_nb_samples > max_dst_nb_samples) {
             av_freep(&dst_data[0]);
             ret = av_samples_alloc(dst_data, &dst_linesize, dst_nb_channels,
@@ -186,12 +193,6 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
             if (ret < 0)
                 break;
             max_dst_nb_samples = dst_nb_samples;
-        }
-
-        ret = avcodec_decode_audio4(icodec_ctx, frame, &got_frame_ptr, &packet);
-        if (ret < 0) {
-            ALOGE("decode audio error:%d\n", ret);
-            continue;
         }
 
         /* convert to destination format */
