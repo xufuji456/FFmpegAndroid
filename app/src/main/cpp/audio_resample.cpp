@@ -75,7 +75,7 @@ int init_audio_encoder(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx) {
     return init_audio_codec(fmt_ctx, avcodec_ctx, true);
 }
 
-int init_audio_muxer(AVFormatContext **ofmt_ctx, const char* filename) {
+int init_audio_muxer(AVFormatContext *ifmt_ctx, AVFormatContext **ofmt_ctx, const char* filename) {
     int ret;
     AVFormatContext *fmt_ctx = *ofmt_ctx;
     avformat_alloc_output_context2(&fmt_ctx, nullptr, nullptr, filename);
@@ -87,7 +87,21 @@ int init_audio_muxer(AVFormatContext **ofmt_ctx, const char* filename) {
             return ret;
         }
     }
-    /* init muxer, write output file header */
+
+    for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
+        AVStream* in_stream = ifmt_ctx->streams[i];
+        AVCodecParameters* codecpar = in_stream->codecpar;
+
+        AVCodec* dec = avcodec_find_decoder(codecpar->codec_id);
+        AVStream* out_stream = avformat_new_stream(fmt_ctx, dec);
+        if (!out_stream) {
+            ALOGE("Failed allocating output stream\n");
+            ret = AVERROR_UNKNOWN;
+            return ret;
+        }
+        avcodec_parameters_copy(out_stream->codecpar, codecpar);
+    }
+
     ret = avformat_write_header(fmt_ctx, nullptr);
     if (ret < 0) {
         ALOGE("Error occurred when opening output file\n");
@@ -168,7 +182,7 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         goto end;
     }
 
-    ret = init_audio_muxer(&oformat_ctx, dst_filename);
+    ret = init_audio_muxer(iformat_ctx, &oformat_ctx, dst_filename);
     if (ret < 0) {
         goto end;
     }
@@ -207,6 +221,7 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
             ALOGE("Could not get sample buffer size:%s\n", strerror(errno));
             goto end;
         }
+        ALOGE("resample size=%d", dst_bufsize);
 
         ret = avcodec_encode_audio2(ocodec_ctx, opacket, frame, &got_packet_ptr);
         if (ret < 0) {
