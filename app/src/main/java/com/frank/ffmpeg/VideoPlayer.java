@@ -28,7 +28,7 @@ public class VideoPlayer {
 
     public native int executeTranscode(String inputFile, String outputFile);
 
-    public native int audioResample(String outputFile, int sampleRate);
+    public native int audioResample(String inputFile, String outputFile, int sampleRate);
 
     /**
      * Create an AudioTrack instance for JNI calling

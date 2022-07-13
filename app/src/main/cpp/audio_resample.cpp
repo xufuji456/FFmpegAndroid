@@ -47,36 +47,34 @@ static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat samp
     return AVERROR(EINVAL);
 }
 
-int init_audio_decoder(AVFormatContext *fmt_ctx, AVCodecContext *codec_ctx) {
-    AVCodec *codec = avcodec_find_decoder(fmt_ctx->audio_codec_id);
+int init_audio_codec(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx, bool is_encoder) {
+    AVCodec *codec = is_encoder ? avcodec_find_encoder(fmt_ctx->audio_codec_id)
+            : avcodec_find_decoder(fmt_ctx->audio_codec_id);
     if (!codec) {
         ALOGE("can't found codec id=%d\n", fmt_ctx->audio_codec_id);
         return -1;
     }
-    codec_ctx = avcodec_alloc_context3(codec);
+    AVCodecContext *codec_ctx = avcodec_alloc_context3(codec);
     if (!codec_ctx) {
         ALOGE("avcodec_alloc_context3 fail!\n");
         return -2;
     }
-    return avcodec_open2(codec_ctx, codec, nullptr);
+    int ret = avcodec_open2(codec_ctx, codec, nullptr);
+    *avcodec_ctx = codec_ctx;
+    return ret;
 }
 
-int init_audio_encoder(AVFormatContext *fmt_ctx, AVCodecContext *codec_ctx) {
-    AVCodec *codec = avcodec_find_encoder(fmt_ctx->audio_codec_id);
-    if (!codec) {
-        ALOGE("can't found codec id=%d\n", fmt_ctx->audio_codec_id);
-        return -1;
-    }
-    codec_ctx = avcodec_alloc_context3(codec);
-    if (!codec_ctx) {
-        ALOGE("avcodec_alloc_context3 fail!\n");
-        return -2;
-    }
-    return avcodec_open2(codec_ctx, codec, nullptr);
+int init_audio_decoder(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx) {
+    return init_audio_codec(fmt_ctx, avcodec_ctx, false);
 }
 
-int init_audio_muxer(AVFormatContext *fmt_ctx, const char* filename) {
+int init_audio_encoder(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx) {
+    return init_audio_codec(fmt_ctx, avcodec_ctx, true);
+}
+
+int init_audio_muxer(AVFormatContext **ofmt_ctx, const char* filename) {
     int ret;
+    AVFormatContext *fmt_ctx = *ofmt_ctx;
     avformat_alloc_output_context2(&fmt_ctx, nullptr, nullptr, filename);
     av_dump_format(fmt_ctx, 0, filename, 1);
     if (!(fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
@@ -91,6 +89,7 @@ int init_audio_muxer(AVFormatContext *fmt_ctx, const char* filename) {
     if (ret < 0) {
         ALOGE("Error occurred when opening output file\n");
     }
+    *ofmt_ctx = fmt_ctx;
     return ret;
 }
 
@@ -169,9 +168,12 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         goto end;
     }
 
-    init_audio_decoder(iformat_ctx, icodec_ctx);
-    init_audio_encoder(oformat_ctx, ocodec_ctx);
-    init_audio_muxer(oformat_ctx, dst_filename);
+    ret = init_audio_muxer(&oformat_ctx, dst_filename);
+    if (ret < 0) {
+        goto end;
+    }
+    init_audio_decoder(iformat_ctx, &icodec_ctx);
+    init_audio_encoder(oformat_ctx, &ocodec_ctx);
 
     while (av_read_frame(iformat_ctx, &packet) >= 0) {
         /* compute destination number of samples */
@@ -242,14 +244,15 @@ end:
     av_freep(&dst_data);
 
     swr_free(&swr_ctx);
-
-    av_write_trailer(oformat_ctx);
-    if (!(oformat_ctx->oformat->flags & AVFMT_NOFILE)) {
-        avio_close(oformat_ctx->pb);
-    }
-    avformat_free_context(oformat_ctx);
     avformat_close_input(&iformat_ctx);
 
+    if (oformat_ctx) {
+        av_write_trailer(oformat_ctx);
+        if (!(oformat_ctx->oformat->flags & AVFMT_NOFILE)) {
+            avio_close(oformat_ctx->pb);
+        }
+        avformat_free_context(oformat_ctx);
+    }
     return ret;
 }
 
