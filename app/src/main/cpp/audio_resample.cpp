@@ -20,6 +20,14 @@ extern "C" {
 
 #define ALOGE(Format, ...) LOGE("audio_resample", Format, ##__VA_ARGS__)
 
+static void log_error(const char *functionName, int errorNumber) {
+    int buffer_len = 1024;
+    char *buffer = new char [buffer_len];
+    av_strerror(errorNumber, buffer, buffer_len);
+    ALOGE("%s: %s", functionName, buffer);
+    delete []buffer;
+}
+
 static int get_format_from_sample_fmt(const char **fmt, enum AVSampleFormat sample_fmt)
 {
     *fmt = nullptr;
@@ -75,11 +83,11 @@ int init_audio_encoder(AVFormatContext *fmt_ctx, AVCodecContext **avcodec_ctx) {
     return init_audio_codec(fmt_ctx, avcodec_ctx, true);
 }
 
-int init_audio_muxer(AVFormatContext *ifmt_ctx, AVFormatContext **ofmt_ctx, const char* filename) {
+int init_audio_muxer(AVFormatContext *ifmt_ctx, AVFormatContext **ofmt_ctx, const char* filename,
+                     int sample_rate, int channels, int64_t channel_layout, AVSampleFormat sampleFormat) {
     int ret;
     AVFormatContext *fmt_ctx = *ofmt_ctx;
     avformat_alloc_output_context2(&fmt_ctx, nullptr, nullptr, filename);
-    av_dump_format(fmt_ctx, 0, filename, 1);
     if (!(fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
         ret = avio_open(&fmt_ctx->pb, filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
@@ -87,41 +95,59 @@ int init_audio_muxer(AVFormatContext *ifmt_ctx, AVFormatContext **ofmt_ctx, cons
             return ret;
         }
     }
+    av_dump_format(fmt_ctx, 0, filename, 1);
 
     for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
         AVStream* in_stream = ifmt_ctx->streams[i];
         AVCodecParameters* codecpar = in_stream->codecpar;
-
-        AVCodec* dec = avcodec_find_decoder(codecpar->codec_id);
-        AVStream* out_stream = avformat_new_stream(fmt_ctx, dec);
-        if (!out_stream) {
-            ALOGE("Failed allocating output stream\n");
-            ret = AVERROR_UNKNOWN;
-            return ret;
-        }
+        AVCodec* encoder = avcodec_find_encoder(codecpar->codec_id);
+        AVStream* out_stream = avformat_new_stream(fmt_ctx, encoder);
         avcodec_parameters_copy(out_stream->codecpar, codecpar);
+
+        if(out_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            out_stream->codecpar->channels = channels;
+            out_stream->codecpar->sample_rate = sample_rate;
+            out_stream->codecpar->channel_layout = channel_layout;
+            out_stream->codec->sample_fmt = sampleFormat;
+            avcodec_parameters_to_context(out_stream->codec, out_stream->codecpar);
+            out_stream->time_base = in_stream->codec->time_base;
+            out_stream->duration = in_stream->duration;
+            break;
+        }
     }
 
     ret = avformat_write_header(fmt_ctx, nullptr);
     if (ret < 0) {
-        ALOGE("Error occurred when opening output file\n");
+        log_error("Error occurred when opening output file", ret);
     }
     *ofmt_ctx = fmt_ctx;
     return ret;
 }
 
+void init_out_frame(AVFrame **frame, AVCodecContext *codec_ctx, int nb_samples) {
+    AVFrame *out_frame = *frame;
+    av_frame_free(&out_frame);
+    out_frame = av_frame_alloc();
+    out_frame->nb_samples = nb_samples;
+    out_frame->format = codec_ctx->sample_fmt;
+    out_frame->sample_rate = codec_ctx->sample_rate;
+    out_frame->channel_layout = codec_ctx->channel_layout;
+    av_frame_get_buffer(out_frame,0);
+    av_frame_make_writable(out_frame);
+    *frame = out_frame;
+}
+
 int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
 {
     int src_rate;
-    int64_t src_ch_layout = AV_CH_LAYOUT_STEREO;
+    int64_t src_ch_layout;
     enum AVSampleFormat src_sample_fmt;
 
     int dst_bufsize;
     int dst_linesize;
     int dst_nb_channels;
-    uint8_t **dst_data = nullptr;
     int dst_nb_samples, max_dst_nb_samples;
-    int64_t dst_ch_layout = AV_CH_LAYOUT_SURROUND;
+    int64_t dst_ch_layout = AV_CH_LAYOUT_STEREO;
     enum AVSampleFormat dst_sample_fmt = AV_SAMPLE_FMT_S16;
 
     int ret;
@@ -153,7 +179,7 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
     /* create resample context */
     swr_ctx = swr_alloc();
     if (!swr_ctx) {
-        ALOGE("Could not allocate resample context:%s\n", strerror(errno));
+        ALOGE("Could not allocate resample context...\n");
         ret = AVERROR(ENOMEM);
         goto end;
     }
@@ -169,20 +195,15 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
 
     /* initialize the resampling context */
     if ((ret = swr_init(swr_ctx)) < 0) {
-        ALOGE("Failed to initialize the resampling context:%s\n", strerror(errno));
+        log_error("Failed to initialize the resampling context", ret);
         goto end;
     }
 
-    /* buffer is going to be directly written to a raw-audio file, no alignment */
+    dst_nb_samples = (int) av_rescale_rnd(src_rate, dst_rate, src_rate, AV_ROUND_UP);
+    max_dst_nb_samples = dst_nb_samples;
     dst_nb_channels = av_get_channel_layout_nb_channels(dst_ch_layout);
-    ret = av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels,
-                                             dst_nb_samples, dst_sample_fmt, 0);
-    if (ret < 0) {
-        ALOGE("Could not allocate destination samples:%s\n", strerror(errno));
-        goto end;
-    }
 
-    ret = init_audio_muxer(iformat_ctx, &oformat_ctx, dst_filename);
+    ret = init_audio_muxer(iformat_ctx, &oformat_ctx, dst_filename, dst_rate, dst_nb_channels, dst_ch_layout, dst_sample_fmt);
     if (ret < 0) {
         goto end;
     }
@@ -201,31 +222,27 @@ int resampling(const char *src_filename, const char *dst_filename, int dst_rate)
         dst_nb_samples = (int) av_rescale_rnd(swr_get_delay(swr_ctx, src_rate) +
                                         frame->nb_samples, dst_rate, src_rate, AV_ROUND_UP);
         if (dst_nb_samples > max_dst_nb_samples) {
-            av_freep(&dst_data[0]);
-            ret = av_samples_alloc(dst_data, &dst_linesize, dst_nb_channels,
-                                   dst_nb_samples, dst_sample_fmt, 1);
-            if (ret < 0)
-                break;
+            init_out_frame(&frame, ocodec_ctx, dst_nb_samples);
             max_dst_nb_samples = dst_nb_samples;
         }
 
         /* convert to destination format */
-        ret = swr_convert(swr_ctx, dst_data, dst_nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
-        if (ret < 0) {
-            ALOGE("Error while converting:%s\n", strerror(errno));
+        int samples_result = swr_convert(swr_ctx, frame->data, dst_nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+        if (samples_result < 0) {
+            ALOGE("Error while converting...");
             goto end;
         }
         dst_bufsize = av_samples_get_buffer_size(&dst_linesize, dst_nb_channels,
-                                                 ret, dst_sample_fmt, 1);
+                                                 samples_result, dst_sample_fmt, 1);
         if (dst_bufsize < 0) {
-            ALOGE("Could not get sample buffer size:%s\n", strerror(errno));
+            ALOGE("Could not get sample buffer size...");
             goto end;
         }
         ALOGE("resample size=%d", dst_bufsize);
 
         ret = avcodec_encode_audio2(ocodec_ctx, opacket, frame, &got_packet_ptr);
         if (ret < 0) {
-            ALOGE("encode audio error=%d\n", ret);
+            log_error("encode audio error", ret);
             continue;
         }
 
@@ -254,10 +271,6 @@ end:
 
     av_packet_free(&opacket);
     av_frame_free(&frame);
-
-    if (dst_data)
-        av_freep(&dst_data[0]);
-    av_freep(&dst_data);
 
     swr_free(&swr_ctx);
     avformat_close_input(&iformat_ctx);
