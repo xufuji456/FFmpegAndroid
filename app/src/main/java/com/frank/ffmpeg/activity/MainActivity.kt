@@ -2,11 +2,13 @@ package com.frank.ffmpeg.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.frank.ffmpeg.R
+import com.frank.ffmpeg.VideoPlayer
 import com.frank.ffmpeg.adapter.WaterfallAdapter
 import com.frank.ffmpeg.listener.OnItemClickListener
 
@@ -70,7 +72,25 @@ class MainActivity : BaseActivity() {
             7 //probe media format
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
             8 //audio effect
-            -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
+//            -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
+            -> {
+                val videoPlayer = VideoPlayer()
+//                val input = "sdcard/what.mp4"
+//                val output = "sdcard/haha.avi"
+//                Thread {
+//                    val ret = videoPlayer.executeTranscode(input, output)
+//                    Log.e("Main", "transcode result=$ret")
+//                }.start()
+
+                val input = "sdcard/okok.aac"
+                val output = "sdcard/haha48000.aac"
+                Thread {
+                    val ret = videoPlayer.audioResample(input, output, 48000)
+                    Log.e("Main", "transcode result=$ret")
+                }.start()
+
+                return
+            }
             else -> {
             }
         }
