@@ -80,7 +80,7 @@ static int open_input_file(const char *filename,
         goto cleanup;
     }
 
-    error = avcodec_parameters_to_context(avctx, (audio_stream->codecpar));
+    error = avcodec_parameters_to_context(avctx, audio_stream->codecpar);
     if (error < 0) {
         goto cleanup;
     }
@@ -317,7 +317,6 @@ static int decode_audio_frame(AVFrame *frame,
     AVPacket input_packet;
     init_packet(&input_packet);
 
-    /* Read one audio frame from the input file into a temporary packet. */
     if ((error = av_read_frame(input_format_context, &input_packet)) < 0) {
         /* If we are at the end of the file, flush the decoder below. */
         if (error == AVERROR_EOF)
@@ -326,6 +325,13 @@ static int decode_audio_frame(AVFrame *frame,
             ALOGE("Could not read frame (error:%s)\n", av_err2str(error));
             return error;
         }
+    }
+
+    if (input_format_context->streams[input_packet.stream_index]->codecpar->codec_type
+        != AVMEDIA_TYPE_AUDIO) {
+        error = 0;
+        ALOGE("isn't audio packet, skip it...");
+        goto cleanup;
     }
 
     /* Send the audio frame stored in the temporary packet to the decoder.
