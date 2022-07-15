@@ -76,7 +76,7 @@ void audioCallback(SLAndroidSimpleBufferQueueItf bufferQueueItf, void *context) 
 }
 
 //create the engine of OpenSLES
-int createEngine() {
+SLresult createEngine() {
     SLresult result;
     result = slCreateEngine(&engineObject, 0, nullptr,
                             0, nullptr, nullptr);
@@ -116,7 +116,7 @@ int createEngine() {
 }
 
 
-int createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
+SLresult createBufferQueueAudioPlayer(int rate, int channel, int bitsPerSample) {
     SLresult result;
 
     //config audio source
@@ -267,11 +267,11 @@ AUDIO_PLAYER_FUNC(void, playAudio, jstring filePath) {
     int ret = createAudioPlayer(&rate, &channel, file_name);
     if (ret < 0)
         return;
-    ret = createEngine();
-    if (ret < 0)
+    SLresult result = createEngine();
+    if (result != SL_RESULT_SUCCESS)
         return;
-    ret = createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
-    if (ret < 0)
+    result = createBufferQueueAudioPlayer(rate, channel, SL_PCMSAMPLEFORMAT_FIXED_16);
+    if (result != SL_RESULT_SUCCESS)
         return;
     audioCallback(mPlayerBufferQueue, nullptr);
 }

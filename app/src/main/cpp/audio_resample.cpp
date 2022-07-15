@@ -43,9 +43,10 @@ static int open_input_file(const char *filename,
                            AVFormatContext **input_format_context,
                            AVCodecContext **input_codec_context)
 {
-    AVCodecContext *avctx;
-    AVCodec *input_codec;
     int error;
+    AVCodec *input_codec;
+    AVCodecContext *avctx = nullptr;
+    AVStream *audio_stream = nullptr;
 
     /* Open the input file to read from it. */
     if ((error = avformat_open_input(input_format_context, filename, nullptr,
@@ -58,52 +59,48 @@ static int open_input_file(const char *filename,
     /* Get information on the input file (number of streams etc.). */
     if ((error = avformat_find_stream_info(*input_format_context, nullptr)) < 0) {
         ALOGE("Could not open find stream info (error:%s)\n", av_err2str(error));
-        avformat_close_input(input_format_context);
-        return error;
-    }
-
-    /* Make sure that there is only one stream in the input file. */
-    if ((*input_format_context)->nb_streams != 1) {
-        ALOGE("Expected one audio input stream, but found %d\n", (*input_format_context)->nb_streams);
-        avformat_close_input(input_format_context);
-        return AVERROR_EXIT;
+        goto cleanup;
     }
 
     /* Find a decoder for the audio stream. */
-    if (!(input_codec = avcodec_find_decoder((*input_format_context)->streams[0]->codecpar->codec_id))) {
+    for (int i = 0; i < (*input_format_context)->nb_streams; ++i) {
+        if ((*input_format_context)->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio_stream = (*input_format_context)->streams[i];
+        }
+    }
+    if (!(input_codec = avcodec_find_decoder(audio_stream->codecpar->codec_id))) {
         ALOGE("Could not find input codec\n");
-        avformat_close_input(input_format_context);
-        return AVERROR_EXIT;
+        goto cleanup;
     }
 
     /* Allocate a new decoding context. */
     avctx = avcodec_alloc_context3(input_codec);
     if (!avctx) {
         ALOGE("Could not allocate a decoding context\n");
-        avformat_close_input(input_format_context);
-        return AVERROR(ENOMEM);
+        goto cleanup;
     }
 
-    /* Initialize the stream parameters with demuxer information. */
-    error = avcodec_parameters_to_context(avctx, (*input_format_context)->streams[0]->codecpar);
+    error = avcodec_parameters_to_context(avctx, (audio_stream->codecpar));
     if (error < 0) {
-        avformat_close_input(input_format_context);
-        avcodec_free_context(&avctx);
-        return error;
+        goto cleanup;
     }
 
     /* Open the decoder for the audio stream to use it later. */
     if ((error = avcodec_open2(avctx, input_codec, nullptr)) < 0) {
         ALOGE("Could not open input codec (error:%s)\n", av_err2str(error));
-        avcodec_free_context(&avctx);
-        avformat_close_input(input_format_context);
-        return error;
+        goto cleanup;
     }
 
     /* Save the decoder context for easier access later. */
     *input_codec_context = avctx;
 
     return 0;
+
+cleanup:
+    if (avctx)
+        avcodec_free_context(&avctx);
+    avformat_close_input(input_format_context);
+    return -1;
 }
 
 /**
@@ -669,8 +666,10 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate)
     int ret = AVERROR_EXIT;
     AVAudioFifo *fifo = nullptr;
     SwrContext *resample_context = nullptr;
-    AVCodecContext *input_codec_context = nullptr, *output_codec_context = nullptr;
-    AVFormatContext *input_format_context = nullptr, *output_format_context = nullptr;
+    AVCodecContext *input_codec_context = nullptr;
+    AVCodecContext *output_codec_context = nullptr;
+    AVFormatContext *input_format_context = nullptr;
+    AVFormatContext *output_format_context = nullptr;
 
     /* Open the input file for reading. */
     if (open_input_file(src_file, &input_format_context, &input_codec_context))
@@ -696,9 +695,7 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate)
         const int output_frame_size = output_codec_context->frame_size;
         int finished                = 0;
 
-        /* Make sure that there is one frame worth of samples in the FIFO
-         * buffer so that the encoder can do its work.
-         * Since the decoder's and the encoder's frame size may differ, we
+        /* Since the decoder's and the encoder's frame size may differ, we
          * need to FIFO buffer to store as many frames worth of input samples
          * that they make up at least one frame worth of output samples. */
         while (av_audio_fifo_size(fifo) < output_frame_size) {
