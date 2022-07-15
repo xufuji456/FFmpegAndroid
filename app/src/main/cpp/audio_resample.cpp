@@ -114,6 +114,7 @@ static int open_input_file(const char *filename,
  */
 static int open_output_file(const char *filename,
                             int sample_rate,
+                            AVCodecContext *input_codec_context,
                             AVFormatContext **output_format_context,
                             AVCodecContext **output_codec_context)
 {
@@ -153,8 +154,8 @@ static int open_output_file(const char *filename,
     }
 
     /* Find the encoder to be used by its name. */
-    if (!(output_codec = avcodec_find_encoder(AV_CODEC_ID_AAC))) {
-        ALOGE( "Could not find an AAC encoder.\n");
+    if (!(output_codec = avcodec_find_encoder(input_codec_context->codec_id))) {
+        ALOGE( "Could not find encoder=%s\n", input_codec_context->codec->name);
         goto cleanup;
     }
 
@@ -665,17 +666,17 @@ static int write_output_file_trailer(AVFormatContext *output_format_context)
 
 int resampling(const char *src_file, const char *dst_file, int sampleRate)
 {
-    AVFormatContext *input_format_context = nullptr, *output_format_context = nullptr;
-    AVCodecContext *input_codec_context = nullptr, *output_codec_context = nullptr;
-    SwrContext *resample_context = nullptr;
-    AVAudioFifo *fifo = nullptr;
     int ret = AVERROR_EXIT;
+    AVAudioFifo *fifo = nullptr;
+    SwrContext *resample_context = nullptr;
+    AVCodecContext *input_codec_context = nullptr, *output_codec_context = nullptr;
+    AVFormatContext *input_format_context = nullptr, *output_format_context = nullptr;
 
     /* Open the input file for reading. */
     if (open_input_file(src_file, &input_format_context, &input_codec_context))
         goto cleanup;
     /* Open the output file for writing. */
-    if (open_output_file(dst_file, sampleRate, &output_format_context, &output_codec_context))
+    if (open_output_file(dst_file, sampleRate, input_codec_context, &output_format_context, &output_codec_context))
         goto cleanup;
     /* Initialize the re-sampler to be able to convert audio sample formats. */
     if (init_resampler(input_codec_context, output_codec_context,
