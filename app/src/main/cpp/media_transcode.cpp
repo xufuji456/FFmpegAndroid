@@ -39,7 +39,6 @@ static StreamContext *stream_ctx;
 static int open_input_file(const char *filename)
 {
     int ret;
-    unsigned int i;
     ifmt_ctx = nullptr;
 
     if ((ret = avformat_open_input(&ifmt_ctx, filename, nullptr, nullptr)) < 0) {
@@ -57,7 +56,7 @@ static int open_input_file(const char *filename)
     if (!stream_ctx)
         return AVERROR(ENOMEM);
 
-    for (i = 0; i < ifmt_ctx->nb_streams; i++) {
+    for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
         AVStream *stream = ifmt_ctx->streams[i];
         AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
         AVCodecContext *codec_ctx;
@@ -76,7 +75,7 @@ static int open_input_file(const char *filename)
                                        "for stream #%u\n", i);
             return ret;
         }
-        /* Reencode video & audio and remux subtitles etc. */
+        /* encode video & audio and remux subtitles etc. */
         if (codec_ctx->codec_type == AVMEDIA_TYPE_VIDEO
             || codec_ctx->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (codec_ctx->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -102,7 +101,6 @@ static int open_output_file(const char *filename)
     AVCodecContext *dec_ctx, *enc_ctx;
     AVCodec *encoder;
     int ret;
-    unsigned int i;
 
     ofmt_ctx = nullptr;
     avformat_alloc_output_context2(&ofmt_ctx, nullptr, nullptr, filename);
@@ -111,7 +109,7 @@ static int open_output_file(const char *filename)
         return AVERROR_UNKNOWN;
     }
 
-    for (i = 0; i < ifmt_ctx->nb_streams; i++) {
+    for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
         out_stream = avformat_new_stream(ofmt_ctx, nullptr);
         if (!out_stream) {
             ALOGE("Failed allocating output stream\n");
@@ -135,9 +133,8 @@ static int open_output_file(const char *filename)
                 return AVERROR(ENOMEM);
             }
 
-            /* In this example, we transcode to same properties (picture size,
-             * sample rate etc.). These properties can be changed for output
-             * streams easily using filters */
+            /* we transcode to same properties (picture size, sample rate etc.).
+             * These properties can be changed for output streams using filters */
             if (dec_ctx->codec_type == AVMEDIA_TYPE_VIDEO) {
                 enc_ctx->height = dec_ctx->height;
                 enc_ctx->width = dec_ctx->width;
@@ -179,7 +176,6 @@ static int open_output_file(const char *filename)
             ALOGE("Elementary stream #%d is of unknown type, cannot proceed\n", i);
             return AVERROR_INVALIDDATA;
         } else {
-            /* if this stream must be remuxed */
             ret = avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
             if (ret < 0) {
                 ALOGE("Copying parameters for stream #%u failed\n", i);
@@ -389,7 +385,7 @@ static int init_filters()
     return 0;
 }
 
-static int encode_write_frame(AVFrame *filt_frame, unsigned int stream_index, int *got_frame) {
+static int encode_write_frame(AVFrame *filt_frame, int stream_index, int *got_frame) {
     int ret;
     int got_frame_local;
     AVPacket enc_pkt;
@@ -400,13 +396,10 @@ static int encode_write_frame(AVFrame *filt_frame, unsigned int stream_index, in
     if (!got_frame)
         got_frame = &got_frame_local;
 
-    ALOGE("Encoding frame\n");
-    /* encode filtered frame */
     enc_pkt.data = nullptr;
     enc_pkt.size = 0;
     av_init_packet(&enc_pkt);
-    ret = enc_func(stream_ctx[stream_index].enc_ctx, &enc_pkt,
-                   filt_frame, got_frame);
+    ret = enc_func(stream_ctx[stream_index].enc_ctx, &enc_pkt, filt_frame, got_frame);
     av_frame_free(&filt_frame);
     if (ret < 0)
         return ret;
@@ -419,18 +412,16 @@ static int encode_write_frame(AVFrame *filt_frame, unsigned int stream_index, in
                          stream_ctx[stream_index].enc_ctx->time_base,
                          ofmt_ctx->streams[stream_index]->time_base);
 
-    ALOGE("Muxing frame\n");
     /* mux encoded frame */
     ret = av_interleaved_write_frame(ofmt_ctx, &enc_pkt);
     return ret;
 }
 
-static int filter_encode_write_frame(AVFrame *frame, unsigned int stream_index)
+static int filter_encode_write_frame(AVFrame *frame, int stream_index)
 {
     int ret;
-    AVFrame *filt_frame;
+    AVFrame *filter_frame;
 
-    ALOGE("Pushing decoded frame to filters\n");
     /* push the decoded frame into the filtergraph */
     ret = av_buffersrc_add_frame_flags(filter_ctx[stream_index].buffersrc_ctx,
                                        frame, 0);
@@ -441,27 +432,21 @@ static int filter_encode_write_frame(AVFrame *frame, unsigned int stream_index)
 
     /* pull filtered frames from the filtergraph */
     while (1) {
-        filt_frame = av_frame_alloc();
-        if (!filt_frame) {
+        filter_frame = av_frame_alloc();
+        if (!filter_frame) {
             ret = AVERROR(ENOMEM);
             break;
         }
-        ALOGE("Pulling filtered frame from filters\n");
-        ret = av_buffersink_get_frame(filter_ctx[stream_index].buffersink_ctx,
-                                      filt_frame);
+        ret = av_buffersink_get_frame(filter_ctx[stream_index].buffersink_ctx, filter_frame);
         if (ret < 0) {
-            /* if no more frames for output - returns AVERROR(EAGAIN)
-             * if flushed and no more frames for output - returns AVERROR_EOF
-             * rewrite retcode to 0 to show it as normal procedure completion
-             */
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 ret = 0;
-            av_frame_free(&filt_frame);
+            av_frame_free(&filter_frame);
             break;
         }
 
-        filt_frame->pict_type = AV_PICTURE_TYPE_NONE;
-        ret = encode_write_frame(filt_frame, stream_index, nullptr);
+        filter_frame->pict_type = AV_PICTURE_TYPE_NONE;
+        ret = encode_write_frame(filter_frame, stream_index, nullptr);
         if (ret < 0)
             break;
     }
@@ -469,7 +454,7 @@ static int filter_encode_write_frame(AVFrame *frame, unsigned int stream_index)
     return ret;
 }
 
-static int flush_encoder(unsigned int stream_index)
+static int flush_encoder(int stream_index)
 {
     int ret;
     int got_frame;
@@ -479,7 +464,7 @@ static int flush_encoder(unsigned int stream_index)
         return 0;
 
     while (1) {
-        ALOGE("Flushing stream #%u encoder\n", stream_index);
+        ALOGE("Flushing stream #%d encoder\n", stream_index);
         ret = encode_write_frame(nullptr, stream_index, &got_frame);
         if (ret < 0)
             break;
@@ -495,8 +480,8 @@ int transcode(const char *input_file, const char *output_file)
     AVPacket packet = { .data = nullptr, .size = 0 };
     AVFrame *frame = nullptr;
     enum AVMediaType type;
-    unsigned int stream_index;
-    unsigned int i;
+    int stream_index;
+    int i;
     int got_frame;
     int (*dec_func)(AVCodecContext *, AVFrame *, int *, const AVPacket *);
 
@@ -513,11 +498,8 @@ int transcode(const char *input_file, const char *output_file)
             break;
         stream_index = packet.stream_index;
         type = ifmt_ctx->streams[packet.stream_index]->codecpar->codec_type;
-        ALOGE("Demuxer gave frame of stream_index %u\n",
-               stream_index);
 
-        if (filter_ctx[stream_index].filter_graph) {
-            ALOGE("Going to re-encode&filter the frame\n");
+        if (filter_ctx && filter_ctx[stream_index].filter_graph) {
             frame = av_frame_alloc();
             if (!frame) {
                 ret = AVERROR(ENOMEM);
@@ -559,8 +541,7 @@ int transcode(const char *input_file, const char *output_file)
 
     /* flush filters and encoders */
     for (i = 0; i < ifmt_ctx->nb_streams; i++) {
-        /* flush filter */
-        if (!filter_ctx[i].filter_graph)
+        if (!filter_ctx || !filter_ctx[i].filter_graph)
             continue;
         ret = filter_encode_write_frame(nullptr, i);
         if (ret < 0) {
@@ -568,7 +549,6 @@ int transcode(const char *input_file, const char *output_file)
             goto end;
         }
 
-        /* flush encoder */
         ret = flush_encoder(i);
         if (ret < 0) {
             ALOGE("Flushing encoder failed\n");
@@ -587,7 +567,8 @@ end:
         if (filter_ctx && filter_ctx[i].filter_graph)
             avfilter_graph_free(&filter_ctx[i].filter_graph);
     }
-    av_free(filter_ctx);
+    if (filter_ctx)
+        av_free(filter_ctx);
     av_free(stream_ctx);
     avformat_close_input(&ifmt_ctx);
     if (ofmt_ctx && !(ofmt_ctx->oformat->flags & AVFMT_NOFILE))
