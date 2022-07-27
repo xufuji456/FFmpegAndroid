@@ -13,10 +13,27 @@
 // R = 1.164 * (Y - 16) + 1.596 * (V - 128)
 // G = 1.164 * (Y - 16) - 0.392 * (U - 128) - 0.812 * (V - 128)
 // B = 1.164 * (Y - 16) + 2.016 * (U - 128)
+// or (RGB:[0, 1])(UV:[-0.5, 0.5])
+// R = Y + 1.407 * V
+// G = Y - 0.345 * U - 0.716 * V
+// B = Y + 1.779 * U
 
 // Y = 0.257 * R + 0.504 * G + 0.098 * B + 16
 // U = -0.148 * R - 0.291 * G + 0.439 * B + 128
 // V = 0.439 * R - 0.368 * G - 0.072 * B + 128
+// or
+// Y = 0.299 * R + 0.587 * G + 0.114 * B
+// U = -0.169 * R - 0.331 * G + 0.5 * B
+// V = 0.5 * R - 0.419 * G - 0.081 * B
+
+// normalize (Y:[16, 235] UV:[16, 240])(RGB:[0, 255])
+// R = (298 * Y + 411 * V - 57344) >> 8
+// G = (298 * Y - 101 * U - 211 * V + 34739) >> 8
+// B = (298 * Y + 519 * U - 71117) >> 8
+
+// Y = (66 * R + 129 * G + 25 * B) >> 8 + 16
+// U = (-38 * R - 74 * G + 112 * B) >> 8 + 128
+// V = (112 * R - 94 * G - 18 * B) >> 8 + 128
 
 // BT.709 YUV to RGB
 // R = 1.1644 * (Y - 16) + 1.7928 * (V - 128)
@@ -71,16 +88,16 @@ static int yuv2argb(int y, int u, int v) {
 
     int r, g, b;
 
-    r = y + (int) (1.402f * u);
-    g = y - (int) (0.344f * v + 0.714f * u);
-    b = y + (int) (1.772f * v);
+    r = y + (int) (1.407f * u);
+    g = y - (int) (0.345f * v + 0.716f * u);
+    b = y + (int) (1.779f * v);
     r = r > 255 ? 255 : max(r, 0);
     g = g > 255 ? 255 : max(g, 0);
     b = b > 255 ? 255 : max(b, 0);
     return 0xff000000 | (r << 16) | (g << 8) | b;
 }
 
-static void yuv420p_to_argb(int8_t *yuv, int *argb, int width, int height) {
+static void yuv420p_to_argb(const int8_t *yuv, int *argb, int width, int height) {
     int size = width * height;
     int offset = size;
     int u, v, y1, y2, y3, y4;
