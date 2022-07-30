@@ -9,22 +9,15 @@
 // https://mymusing.co/bt601-yuv-to-rgb-conversion-color/
 // https://www.color.org/chardata/rgb/rgb_registry.xalter
 
-// BT.601 YUV to RGB
-// R = 1.164 * (Y - 16) + 1.596 * (V - 128)
-// G = 1.164 * (Y - 16) - 0.392 * (U - 128) - 0.812 * (V - 128)
-// B = 1.164 * (Y - 16) + 2.016 * (U - 128)
+// YUV to RGB
 // or (RGB:[0, 1])(UV:[-0.5, 0.5])
 // R = Y + 1.407 * V
 // G = Y - 0.345 * U - 0.716 * V
 // B = Y + 1.779 * U
 
-// Y = 0.257 * R + 0.504 * G + 0.098 * B + 16
-// U = -0.148 * R - 0.291 * G + 0.439 * B + 128
-// V = 0.439 * R - 0.368 * G - 0.072 * B + 128
-// or
 // Y = 0.299 * R + 0.587 * G + 0.114 * B
-// U = -0.169 * R - 0.331 * G + 0.5 * B
-// V = 0.5 * R - 0.419 * G - 0.081 * B
+// U = -0.147 * R - 0.289 * G + 0.436 * B
+// V = 0.615 * R - 0.515 * G - 0.100 * B
 
 // normalize (Y:[16, 235] UV:[16, 240])(RGB:[0, 255])
 // R = (298 * Y + 411 * V - 57344) >> 8
@@ -34,24 +27,6 @@
 // Y = (66 * R + 129 * G + 25 * B) >> 8 + 16
 // U = (-38 * R - 74 * G + 112 * B) >> 8 + 128
 // V = (112 * R - 94 * G - 18 * B) >> 8 + 128
-
-// BT.709 YUV to RGB
-// R = 1.1644 * (Y - 16) + 1.7928 * (V - 128)
-// G = 1.1644 * (Y - 16) - 0.2133 * (U - 128) - 0.533 * (V - 128)
-// B = 1.1644 * (Y - 16) + 2.1124 * (U - 128)
-
-// Y = 0.1826 * R + 0.6142 * G + 0.0620 * B + 16
-// U = -0.1006 * R - 0.3386 * G + 0.4392 * B + 128
-// V = 0.4392 * B - 0.3989 * G - 0.0403 * B + 128
-
-// BT.2020 YUV to RGB
-// R = Y - 16 + 1.4746 * (V - 128)
-// G = Y - 16 - 0.1645 * (U - 128) - 0.5713 * (V - 128)
-// B = Y - 16 + 1.881 * (U - 128)
-
-// Y = 0.2627 * R + 0.6780 * G + 0.0593 * B + 16
-// U = -0.1396 * R - 0.3604 * G + 0.5 * B + 128
-// V = 0.5 * R - 0.4598 * G - 0.0402 * B + 128
 
 static void rgba_to_yuv420p(int *argb, int8_t *yuv, int width, int height) {
     int frameSize = width * height;
@@ -102,14 +77,14 @@ static void yuv420p_to_argb(const int8_t *yuv, int *argb, int width, int height)
     int offset = size;
     int u, v, y1, y2, y3, y4;
 
-    for (int i = 0, k = 0; i < size; i += 2, k += 2) {
+    for (int i = 0, k = 0; i < size; i += 2, k++) {
         y1 = yuv[i] & 0xff;
         y2 = yuv[i + 1] & 0xff;
         y3 = yuv[width + i] & 0xff;
         y4 = yuv[width + i + 1] & 0xff;
 
         u = yuv[offset + k] & 0xff;
-        v = yuv[offset + k + 1] & 0xff;
+        v = yuv[offset * 5 / 4 + k] & 0xff;
         u = u - 128;
         v = v - 128;
 
