@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-static void rgba_to_yuv420p(int *argb, int8_t *yuv, int width, int height);
+static void rgba_to_yuv420p(const int *argb, int8_t *yuv, int width, int height);
 
 static void yuv420p_to_argb(const int8_t *yuv, int *argb, int width, int height);
 

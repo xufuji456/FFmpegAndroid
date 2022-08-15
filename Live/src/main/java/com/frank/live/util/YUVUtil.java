@@ -126,4 +126,29 @@ public class YUVUtil {
         }
     }
 
+    private static void swap(byte[] a, int i, int j) {
+        byte temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+    }
+
+    public static void flipYUV(byte[] dst, int width, int height, boolean flipX, boolean flipY) {
+        if (dst == null || width <= 0 || height <= 0)
+            return;
+        if (flipY) {
+            for (int i=0; i<height; i++) {
+                for (int j=0; j<width/2; j++) {
+                    swap(dst, j, width - j - 1);
+                }
+            }
+        }
+        if (flipX) {
+            for (int i=0; i<width; i++) {
+                for (int j=0; j<height/2; j++) {
+                    swap(dst, j, height - j - 1);
+                }
+            }
+        }
+    }
+
 }

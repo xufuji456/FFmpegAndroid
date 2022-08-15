@@ -28,7 +28,7 @@
 // U = (-38 * R - 74 * G + 112 * B) >> 8 + 128
 // V = (112 * R - 94 * G - 18 * B) >> 8 + 128
 
-static void rgba_to_yuv420p(int *argb, int8_t *yuv, int width, int height) {
+static void rgba_to_yuv420p(const int *argb, int8_t *yuv, int width, int height) {
     int frameSize = width * height;
     int index = 0;
     int yIndex = 0;
