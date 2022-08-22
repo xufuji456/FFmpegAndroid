@@ -126,27 +126,29 @@ public class YUVUtil {
         }
     }
 
-    private static void swap(byte[] a, int i, int j) {
-        byte temp = a[i];
-        a[i] = a[j];
-        a[j] = temp;
-    }
-
-    public static void flipYUV(byte[] dst, int width, int height, boolean flipX, boolean flipY) {
+    public static void flipYUV(byte[] dst, byte[] src, int width, int height) {
         if (dst == null || width <= 0 || height <= 0)
             return;
-        if (flipY) {
-            for (int i=0; i<height; i++) {
-                for (int j=0; j<width/2; j++) {
-                    swap(dst, j, width - j - 1);
-                }
+
+        int idx = 0;
+        // Y
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+					dst[idx++] = src[width - i + (height - j) * width];
             }
         }
-        if (flipX) {
-            for (int i=0; i<width; i++) {
-                for (int j=0; j<height/2; j++) {
-                    swap(dst, j, height - j - 1);
-                }
+        // U
+        int offset = width * height;
+        for (int i = 0; i < width / 2; i++) {
+            for (int j = 0; j < height / 2; j++) {
+                dst[idx++] = src[offset + width - i + (height / 2 - j) * width / 2];
+            }
+        }
+        // V
+        offset += width * height / 4;
+        for (int i = 0; i < width / 2; i++) {
+            for (int j = 0; j < height / 2; j++) {
+                dst[idx++] = src[offset + width - i + (height / 2 - j) * width / 2];
             }
         }
     }
