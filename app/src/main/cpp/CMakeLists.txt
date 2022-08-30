@@ -18,33 +18,33 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
 
-            src/main/cpp/ffmpeg/cmdutils.c
-            src/main/cpp/ffmpeg/ffmpeg.c
-            src/main/cpp/ffmpeg/ffmpeg_filter.c
-            src/main/cpp/ffmpeg/ffmpeg_opt.c
-            src/main/cpp/ffmpeg_cmd.c
-            src/main/cpp/ffmpeg/ffprobe.c
-            src/main/cpp/ffmpeg/ffmpeg_hw.c
-            src/main/cpp/audio_player.cpp
-            src/main/cpp/video_player.cpp
-            src/main/cpp/ffmpeg_pusher.cpp
-            src/main/cpp/video_filter.c
-            src/main/cpp/ffprobe_cmd.cpp
-            src/main/cpp/video_cutting.cpp
-            src/main/cpp/visualizer/fft.cpp
-            src/main/cpp/visualizer/fixed_fft.cpp
-            src/main/cpp/visualizer/block_queue.c
-            src/main/cpp/visualizer/frank_visualizer.cpp
-            src/main/cpp/visualizer/frank_visualizer_jni.cpp
-            src/main/cpp/visualizer/window.cpp
-            src/main/cpp/metadata/media_retriever.cpp
-            src/main/cpp/metadata/media_retriever_jni.cpp
-            src/main/cpp/metadata/metadata_util.c
-            src/main/cpp/metadata/ffmpeg_media_retriever.c
-            src/main/cpp/yuv/yuv_converter.cpp
-            src/main/cpp/media_transcode.cpp
-            src/main/cpp/audio_resample.cpp
-            src/main/cpp/pcm/pcm_process.cpp
+        ffmpeg/cmdutils.c
+        ffmpeg/ffmpeg.c
+        ffmpeg/ffmpeg_filter.c
+        ffmpeg/ffmpeg_opt.c
+        ffmpeg_cmd.c
+        ffmpeg/ffprobe.c
+        ffmpeg/ffmpeg_hw.c
+        audio_player.cpp
+        video_player.cpp
+        ffmpeg_pusher.cpp
+        video_filter.c
+        ffprobe_cmd.cpp
+        video_cutting.cpp
+        visualizer/fft.cpp
+        visualizer/fixed_fft.cpp
+        visualizer/block_queue.c
+        visualizer/frank_visualizer.cpp
+        visualizer/frank_visualizer_jni.cpp
+        visualizer/window.cpp
+        metadata/media_retriever.cpp
+        metadata/media_retriever_jni.cpp
+        metadata/metadata_util.c
+        metadata/ffmpeg_media_retriever.c
+        yuv/yuv_converter.cpp
+        media_transcode.cpp
+        audio_resample.cpp
+        pcm/pcm_process.cpp
         )
 
 add_library( ffmpeg
@@ -60,15 +60,15 @@ set_target_properties( ffmpeg
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
-include_directories(src/main/cpp)
-include_directories(src/main/cpp/include)
-include_directories(src/main/cpp/metadata)
+include_directories(.)
+include_directories(include)
+include_directories(metadata)
 
 if(${CMAKE_ANDROID_ARCH_ABI} MATCHES "armeabi-v7a")
-    include_directories(src/main/cpp/include/armeabi-v7a)
+    include_directories(include/armeabi-v7a)
     message("This is armeabi-v7a")
 elseif(${CMAKE_ANDROID_ARCH_ABI} MATCHES "arm64-v8a")
-    include_directories(src/main/cpp/include/arm64-v8a)
+    include_directories(include/arm64-v8a)
     message("This is arm64-v8a")
 endif()
 
