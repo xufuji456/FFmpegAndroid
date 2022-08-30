@@ -2,13 +2,11 @@ package com.frank.ffmpeg.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
 import com.frank.ffmpeg.R
-import com.frank.ffmpeg.VideoPlayer
 import com.frank.ffmpeg.adapter.WaterfallAdapter
 import com.frank.ffmpeg.listener.OnItemClickListener
 
