@@ -23,11 +23,6 @@ public class AudioPlayer {
 
     public native void release();
 
-    //using OpenSL ES to play
-    public native void playAudio(String audioPath);
-
-    public native void stop();
-
     /**
      * Create an AudioTrack instance for JNI calling
      *
