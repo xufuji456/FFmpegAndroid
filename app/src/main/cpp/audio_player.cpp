@@ -26,8 +26,8 @@ extern "C" {
 
 #define TAG "AudioPlayer"
 #define VOLUME_VAL 0.50
-#define SLEEP_TIME 1000 * 16
-#define MAX_AUDIO_FRAME_SIZE 48000 * 4
+#define SLEEP_TIME (1000 * 16)
+#define MAX_AUDIO_FRAME_SIZE (48000 * 4)
 
 int filter_again = 0;
 int filter_release = 0;
@@ -134,7 +134,7 @@ int init_volume_filter(AVFilterGraph **graph, AVFilterContext **src, AVFilterCon
     return 0;
 }
 
-int init_equalizer_filter(const char *filter_desc, AVCodecContext *codecCtx, AVFilterGraph **graph,
+int init_equalizer_filter(const char *filter_description, AVCodecContext *codecCtx, AVFilterGraph **graph,
         AVFilterContext **src, AVFilterContext **sink) {
     int ret = 0;
     char args[512];
@@ -184,7 +184,7 @@ int init_equalizer_filter(const char *filter_desc, AVCodecContext *codecCtx, AVF
     inputs->pad_idx = 0;
     inputs->next = nullptr;
 
-    if ((ret = avfilter_graph_parse_ptr(filter_graph, filter_desc,
+    if ((ret = avfilter_graph_parse_ptr(filter_graph, filter_description,
                                         &inputs, &outputs, nullptr)) < 0) {
         LOGE(TAG, "avfilter_graph_parse_ptr error:%d", ret);
         goto end;
@@ -212,7 +212,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     LOGI(TAG, "input url=%s", input_cstr);
     filter_desc = env->GetStringUTFChars(filter_jstr, nullptr);
     LOGE(TAG, "filter_desc=%s", filter_desc);
-    av_register_all();
     AVFormatContext *pFormatCtx = avformat_alloc_context();
     if (avformat_open_input(&pFormatCtx, input_cstr, nullptr, nullptr) != 0) {
         LOGE(TAG, "Couldn't open the audio file!");
@@ -249,9 +248,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     uint64_t in_ch_layout = codecCtx->channel_layout;
     uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
 
-    swr_alloc_set_opts(swrCtx,
-                       out_ch_layout, out_sample_fmt, out_sample_rate,
-                       in_ch_layout, in_sample_fmt, in_sample_rate, 0, nullptr);
+    swr_alloc_set_opts(swrCtx, (int64_t)out_ch_layout, out_sample_fmt, out_sample_rate,
+                       (int64_t)in_ch_layout, in_sample_fmt, in_sample_rate, 0, nullptr);
     swr_init(swrCtx);
     int out_channel = av_get_channel_layout_nb_channels(out_ch_layout);
     jclass player_class = env->GetObjectClass(thiz);
@@ -280,7 +278,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     ret = init_equalizer_filter(filter_desc, codecCtx, &audioFilterGraph, &audioSrcContext, &audioSinkContext);
     if (ret < 0) {
         LOGE(TAG, "Unable to init filter graph:%d", ret);
-//        goto end;
     }
 
     jmethodID fft_method = env->GetMethodID(player_class, "fftCallbackFromJNI", "([B)V");
