@@ -55,8 +55,8 @@ set_target_properties( ffmpeg
                        ../../../../libs/${CMAKE_ANDROID_ARCH_ABI}/libffmpeg.so )
 
 # third-party library: sox
-#add_subdirectory(src/main/cpp/sox)
-#include_directories(src/main/cpp/sox)
+#add_subdirectory(sox)
+#include_directories(sox)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 

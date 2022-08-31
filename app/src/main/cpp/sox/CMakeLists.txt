@@ -21,91 +21,25 @@ if (NOT EXTERNAL_GSM)
 endif (NOT EXTERNAL_GSM)
 
 set(effects_srcs
-        bend.c
-        biquad.c
-        biquads.c
-        chorus.c
-        compand.c
-        compandt.c
-        contrast.c
-        dcshift.c
         delay.c
-        dft_filter.c
-        dither.c
-        divide.c
         downsample.c
-        earwax.c
         echo.c
         echos.c
-        fade.c
         fft4g.c
-        fir.c
-        firfit.c
-        flanger.c
-        gain.c
-        hilbert.c
         input.c
-        loudness.c
-        mcompand.c
-        noiseprof.c
-        noisered.c
         output.c
-        overdrive.c
-        pad.c
-        phaser.c
-        rate.c
-        remix.c
-        repeat.c
         reverb.c
-        reverse.c
-        silence.c
-        sinc.c
-        skeleff.c
         speed.c
-        splice.c
-        stat.c
-        stats.c
-        stretch.c
-        swap.c
-        synth.c
         tempo.c
-        tremolo.c
-        trim.c
         upsample.c
         vad.c
         vol.c
         )
 set(formats_srcs
         adpcm.c
-        adpcms.c
-        al-fmt.c
-        coreaudio.c
-        f4-fmt.c
-        f8-fmt.c
         g711.c
-        g721.c
-        g723_24.c
-        g723_40.c
-        g72x.c
-        ima-fmt.c
         ima_rw.c
-        la-fmt.c
-        lu-fmt.c
         raw.c
-        raw-fmt.c
-        s1-fmt.c
-        s2-fmt.c
-        s3-fmt.c
-        s4-fmt.c
-        sox-fmt.c
-        u1-fmt.c
-        u2-fmt.c
-        u3-fmt.c
-        u4-fmt.c
-        ul-fmt.c
-        voc.c
-        vox.c
-        vox-fmt.c
         wav.c
         )
 
