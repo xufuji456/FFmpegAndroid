@@ -70,10 +70,15 @@ int main(int argc, char * argv[])
   assert(sox_add_effect(chain, e, &in->signal, &in->signal) == SOX_SUCCESS);
   free(e);
 
-  /* Create the `flanger' effect, and initialise it with default parameters: */
-  e = sox_create_effect(sox_find_effect("flanger"));
-  assert(sox_effect_options(e, 0, NULL) == SOX_SUCCESS);
-  /* Add the effect to the end of the effects processing chain: */
+  args[0] = "--wet-only";
+  args[1] = "50";  // reverberance [0, 100] 50%
+  args[2] = "50";  // hf_damping [0, 100] 50%
+  args[3] = "100"; // room_scale [0, 100] 100%
+  args[4] = "100"; // stereo_depth [0, 100] 100%
+  args[5] = "0";   // pre_delay_ms [0, 500] 0ms
+  args[6] = "0";   // wet_gain_dB [-10, 10] 0dB
+  e = sox_create_effect(sox_find_effect("reverb"));
+  assert(sox_effect_options(e, 7, args) == SOX_SUCCESS);
   assert(sox_add_effect(chain, e, &in->signal, &in->signal) == SOX_SUCCESS);
   free(e);
 
