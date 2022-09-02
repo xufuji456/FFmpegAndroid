@@ -204,6 +204,7 @@ end:
 
 AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     int got_frame = 0, ret = 0;
+    AVPacket packet;
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
     AVFilterContext *audioSinkContext;
@@ -238,7 +239,6 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
         LOGE(TAG, "Couldn't open audio decoder");
         return;
     }
-    auto *packet = (AVPacket *) av_malloc(sizeof(AVPacket));
     AVFrame *frame = av_frame_alloc();
     SwrContext *swrCtx = swr_alloc();
     enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;
@@ -286,9 +286,9 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
     mVisualizer->init_visualizer();
 
     //read audio frame
-    while (av_read_frame(pFormatCtx, packet) >= 0 && !filter_release) {
-        if (packet->stream_index != audio_stream_idx) {
-            av_packet_unref(packet);
+    while (av_read_frame(pFormatCtx, &packet) >= 0 && !filter_release) {
+        if (packet.stream_index != audio_stream_idx) {
+            av_packet_unref(&packet);
             continue;
         }
         if (filter_again) {
@@ -300,7 +300,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
             }
             LOGE(TAG, "play again,filter_descr=_=%s", filter_desc);
         }
-        ret = avcodec_decode_audio4(codecCtx, frame, &got_frame, packet);
+        ret = avcodec_decode_audio4(codecCtx, frame, &got_frame, &packet);
         if (ret < 0) {
             break;
         }
@@ -343,7 +343,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
                 usleep(SLEEP_TIME);
             }
         }
-        av_packet_unref(packet);
+        av_packet_unref(&packet);
     }
 end:
     av_free(out_buffer);
