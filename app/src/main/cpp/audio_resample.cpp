@@ -767,9 +767,7 @@ cleanup:
     return ret;
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern "C"
 VIDEO_PLAYER_FUNC(int, audioResample, jstring srcFile, jstring dstFile, int sampleRate) {
     const char *src_file = env->GetStringUTFChars(srcFile, JNI_FALSE);
     const char *dst_file = env->GetStringUTFChars(dstFile, JNI_FALSE);
@@ -778,6 +776,3 @@ VIDEO_PLAYER_FUNC(int, audioResample, jstring srcFile, jstring dstFile, int samp
     env->ReleaseStringUTFChars(srcFile, src_file);
     return ret;
 }
-#ifdef __cplusplus
-}
-#endif
