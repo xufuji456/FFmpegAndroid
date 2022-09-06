@@ -39,6 +39,8 @@ static AVPacket input_packet;
 
 static AVPacket output_packet;
 
+static AVFrame *output_frame;
+
 /**
  * Open an input file and the required decoder.
  *
@@ -451,32 +453,18 @@ cleanup:
     return ret;
 }
 
-/**
- * Initialize one input frame for writing to the output file.
- *
- */
-static int init_output_frame(AVFrame **frame,
-                             AVCodecContext *output_codec_context,
-                             int frame_size) {
-    int error;
-
-    if (!(*frame = av_frame_alloc())) {
-        ALOGE("Could not allocate output frame\n");
-        return AVERROR_EXIT;
-    }
-
-    (*frame)->nb_samples     = frame_size;
+static int init_output_frame(AVFrame **frame, AVCodecContext *output_codec_context) {
+    *frame = av_frame_alloc();
+    (*frame)->nb_samples     = output_codec_context->frame_size;
     (*frame)->channel_layout = output_codec_context->channel_layout;
     (*frame)->format         = output_codec_context->sample_fmt;
     (*frame)->sample_rate    = output_codec_context->sample_rate;
 
-    if ((error = av_frame_get_buffer(*frame, 0)) < 0) {
-        ALOGE("Could not allocate output frame samples (error:%s)\n", av_err2str(error));
-        av_frame_free(frame);
-        return error;
+    int ret = av_frame_get_buffer(*frame, 0);
+    if (ret < 0) {
+        ALOGE("Could not allocate output frame samples (error:%s)\n", av_err2str(ret));
     }
-
-    return 0;
+    return ret;
 }
 
 /**
@@ -541,25 +529,19 @@ static int load_encode_and_write(AVAudioFifo *fifo,
                                  AVFormatContext *output_format_context,
                                  AVCodecContext *output_codec_context) {
     int data_written;
-    AVFrame *output_frame;
     const int frame_size = FFMIN(av_audio_fifo_size(fifo),
                                  output_codec_context->frame_size);
 
-    if (init_output_frame(&output_frame, output_codec_context, frame_size))
-        return AVERROR_EXIT;
-
+    output_frame->nb_samples = frame_size;
     if (av_audio_fifo_read(fifo, (void **)output_frame->data, frame_size) < frame_size) {
         ALOGE("Could not read data from FIFO\n");
-        av_frame_free(&output_frame);
         return AVERROR_EXIT;
     }
 
     if (encode_audio_frame(output_frame, output_format_context,
                            output_codec_context, &data_written)) {
-        av_frame_free(&output_frame);
         return AVERROR_EXIT;
     }
-    av_frame_free(&output_frame);
     return 0;
 }
 
@@ -597,6 +579,8 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
         goto cleanup;
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
     if (init_fifo(&fifo, output_codec_context))
+        goto cleanup;
+    if (init_output_frame(&output_frame, output_codec_context))
         goto cleanup;
     /* Write the header of the output file container. */
     if (write_output_file_header(output_format_context))
@@ -656,6 +640,8 @@ cleanup:
         avcodec_free_context(&input_codec_context);
     if (input_format_context)
         avformat_close_input(&input_format_context);
+    if (output_frame)
+        av_frame_free(&output_frame);
 
     return ret;
 }
