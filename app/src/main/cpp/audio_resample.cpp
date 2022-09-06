@@ -27,11 +27,6 @@ extern "C" {
 
 #define ALOGE(Format, ...) LOGE("audio_resample", Format, ##__VA_ARGS__)
 
-/* The output bit rate in bit/s */
-#define OUTPUT_BIT_RATE 96000
-/* The number of output channels */
-#define OUTPUT_CHANNELS 2
-
 /* Global timestamp for the audio frames. */
 static int64_t pts = 0;
 
@@ -166,11 +161,10 @@ static int open_output_file(const char *filename,
     }
 
     /* Set the basic encoder parameters.*/
-    avctx->channels       = OUTPUT_CHANNELS;
-    avctx->channel_layout = av_get_default_channel_layout(OUTPUT_CHANNELS);
+    avctx->channels       = input_codec_context->channels;
+    avctx->channel_layout = av_get_default_channel_layout(input_codec_context->channels);
     avctx->sample_rate    = sample_rate;
     avctx->sample_fmt     = output_codec->sample_fmts[0];
-    avctx->bit_rate       = OUTPUT_BIT_RATE;
 
     /* Allow the use of the experimental AAC encoder. */
     avctx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
