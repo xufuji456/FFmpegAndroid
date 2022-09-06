@@ -204,13 +204,12 @@ cleanup:
 }
 
 /**
- * Initialize the audio resampler based on the input and output codec settings.
+ * Initialize the audio resample based on the input and output codec settings.
  *
  */
 static int init_resampler(AVCodecContext *input_codec_context,
                           AVCodecContext *output_codec_context,
                           SwrContext **resample_context) {
-    int error;
     *resample_context = swr_alloc_set_opts(nullptr,
                                            av_get_default_channel_layout(output_codec_context->channels),
                                            output_codec_context->sample_fmt,
@@ -219,31 +218,7 @@ static int init_resampler(AVCodecContext *input_codec_context,
                                            input_codec_context->sample_fmt,
                                            input_codec_context->sample_rate,
                                            0, nullptr);
-    if (!*resample_context) {
-        ALOGE("Could not allocate resample context\n");
-        return AVERROR(ENOMEM);
-    }
-
-    /* Open the re-sampler with the specified parameters. */
-    if ((error = swr_init(*resample_context)) < 0) {
-        ALOGE("Could not open resample context\n");
-        swr_free(resample_context);
-        return error;
-    }
-    return 0;
-}
-
-/**
- * Initialize a FIFO buffer for the audio samples to be encoded.
- *
- */
-static int init_fifo(AVAudioFifo **fifo, AVCodecContext *output_codec_context) {
-    if (!(*fifo = av_audio_fifo_alloc(output_codec_context->sample_fmt,
-                                      output_codec_context->channels, 1))) {
-        ALOGE("Could not allocate FIFO\n");
-        return AVERROR(ENOMEM);
-    }
-    return 0;
+    return swr_init(*resample_context);
 }
 
 /**
@@ -327,47 +302,6 @@ static int init_converted_samples(uint8_t ***converted_input_samples,
 }
 
 /**
- * Convert the input audio samples into the output sample format.
- * The size of which is specified by frame_size.
- *
- */
-static int convert_samples(const uint8_t **input_data, const int input_size,
-                           uint8_t **converted_data, const int output_size,
-                           SwrContext *resample_context) {
-    int error;
-    if ((error = swr_convert(resample_context, converted_data, output_size,
-                             input_data, input_size)) < 0) {
-        ALOGE("Could not convert input samples (error:%s)\n", av_err2str(error));
-        return error;
-    }
-
-    return 0;
-}
-
-/**
- * Add converted input audio samples to the FIFO buffer for later processing.
- *
- */
-static int add_samples_to_fifo(AVAudioFifo *fifo,
-                               uint8_t **converted_input_samples,
-                               const int frame_size) {
-    int error;
-    /* Make the FIFO as large as it needs to be to hold both, the old and the new samples. */
-    if ((error = av_audio_fifo_realloc(fifo, av_audio_fifo_size(fifo) + frame_size)) < 0) {
-        ALOGE("Could not reallocate FIFO\n");
-        return error;
-    }
-
-    /* Store the new samples in the FIFO buffer. */
-    if (av_audio_fifo_write(fifo, (void **)converted_input_samples,
-                            frame_size) < frame_size) {
-        ALOGE("Could not write data to FIFO\n");
-        return AVERROR_EXIT;
-    }
-    return 0;
-}
-
-/**
  * Read one audio frame from the input file, decode, convert and store
  * it in the FIFO buffer.
  *
@@ -376,7 +310,7 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
                                          AVFormatContext *input_format_context,
                                          AVCodecContext *input_codec_context,
                                          AVCodecContext *output_codec_context,
-                                         SwrContext *resampler_context,
+                                         SwrContext *resample_context,
                                          int *finished) {
     uint8_t **converted_dst_samples = nullptr;
     int data_present = 0;
@@ -395,17 +329,17 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
         int dst_nb_samples = (int) av_rescale_rnd(input_frame->nb_samples, output_codec_context->sample_rate,
                                             input_codec_context->sample_rate, AV_ROUND_UP);
 
-        if (init_converted_samples(&converted_dst_samples, output_codec_context,
-                                   dst_nb_samples))
+        if (init_converted_samples(&converted_dst_samples, output_codec_context, dst_nb_samples))
             goto cleanup;
 
-        if (convert_samples((const uint8_t**)input_frame->extended_data,
-                            input_frame->nb_samples, converted_dst_samples,
-                            dst_nb_samples, resampler_context))
+        ret = swr_convert(resample_context, converted_dst_samples, dst_nb_samples,
+                          (const uint8_t**)input_frame->extended_data, input_frame->nb_samples);
+        if (ret < 0) {
+            ALOGE("Could not convert input samples (error:%s)\n", av_err2str(ret));
             goto cleanup;
+        }
 
-        if (add_samples_to_fifo(fifo, converted_dst_samples,
-                                dst_nb_samples))
+        if (av_audio_fifo_write(fifo, (void **)converted_dst_samples, dst_nb_samples) < dst_nb_samples)
             goto cleanup;
     }
     ret = 0;
@@ -531,8 +465,7 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
                        &resample_context))
         goto cleanup;
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
-    if (init_fifo(&fifo, output_codec_context))
-        goto cleanup;
+    fifo = av_audio_fifo_alloc(output_codec_context->sample_fmt, output_codec_context->channels, 1024 * 10);
     input_frame = av_frame_alloc();
     if (init_output_frame(&output_frame, output_codec_context))
         goto cleanup;
