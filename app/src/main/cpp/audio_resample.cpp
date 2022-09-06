@@ -34,6 +34,8 @@ static AVPacket input_packet;
 
 static AVPacket output_packet;
 
+static AVFrame *input_frame;
+
 static AVFrame *output_frame;
 
 /**
@@ -202,18 +204,6 @@ cleanup:
 }
 
 /**
- * Initialize one audio frame for reading from the input file.
- *
- */
-static int init_input_frame(AVFrame **frame) {
-    if (!(*frame = av_frame_alloc())) {
-        ALOGE("Could not allocate input frame\n");
-        return AVERROR(ENOMEM);
-    }
-    return 0;
-}
-
-/**
  * Initialize the audio resampler based on the input and output codec settings.
  *
  */
@@ -252,19 +242,6 @@ static int init_fifo(AVAudioFifo **fifo, AVCodecContext *output_codec_context) {
                                       output_codec_context->channels, 1))) {
         ALOGE("Could not allocate FIFO\n");
         return AVERROR(ENOMEM);
-    }
-    return 0;
-}
-
-/**
- * Write the header of the output file container.
- *
- */
-static int write_output_file_header(AVFormatContext *output_format_context) {
-    int error;
-    if ((error = avformat_write_header(output_format_context, nullptr)) < 0) {
-        ALOGE("Could not write output file header (error:%s)\n", av_err2str(error));
-        return error;
     }
     return 0;
 }
@@ -401,14 +378,10 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
                                          AVCodecContext *output_codec_context,
                                          SwrContext *resampler_context,
                                          int *finished) {
-    AVFrame *input_frame = nullptr;
     uint8_t **converted_dst_samples = nullptr;
     int data_present = 0;
     int ret = AVERROR_EXIT;
 
-    /* Initialize temporary storage for one input frame. */
-    if (init_input_frame(&input_frame))
-        goto cleanup;
     /* Decode one frame worth of audio samples. */
     if (decode_audio_frame(input_frame, input_format_context,
                            input_codec_context, &data_present, finished))
@@ -442,7 +415,6 @@ cleanup:
         av_freep(&converted_dst_samples[0]);
         free(converted_dst_samples);
     }
-    av_frame_free(&input_frame);
 
     return ret;
 }
@@ -539,19 +511,6 @@ static int load_encode_and_write(AVAudioFifo *fifo,
     return 0;
 }
 
-/**
- * Write the trailer of the output file container.
- *
- */
-static int write_output_file_trailer(AVFormatContext *output_format_context) {
-    int error;
-    if ((error = av_write_trailer(output_format_context)) < 0) {
-        ALOGE("Could not write output file trailer (error:%s)\n", av_err2str(error));
-        return error;
-    }
-    return 0;
-}
-
 int resampling(const char *src_file, const char *dst_file, int sampleRate) {
     int ret = AVERROR_EXIT;
     AVAudioFifo *fifo = nullptr;
@@ -574,11 +533,13 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
     if (init_fifo(&fifo, output_codec_context))
         goto cleanup;
+    input_frame = av_frame_alloc();
     if (init_output_frame(&output_frame, output_codec_context))
         goto cleanup;
     /* Write the header of the output file container. */
-    if (write_output_file_header(output_format_context))
-        goto cleanup;
+    if ((ret = avformat_write_header(output_format_context, nullptr)) < 0) {
+        ALOGE("write header error=%s", av_err2str(ret));
+    }
 
     while (1) {
         const int output_frame_size = output_codec_context->frame_size;
@@ -616,8 +577,9 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
     }
 
     /* Write the trailer of the output file container. */
-    if (write_output_file_trailer(output_format_context))
-        goto cleanup;
+    if (av_write_trailer(output_format_context)) {
+        ALOGE("write trailer error...");
+    }
     ret = 0;
 
 cleanup:
@@ -636,6 +598,8 @@ cleanup:
         avformat_close_input(&input_format_context);
     if (output_frame)
         av_frame_free(&output_frame);
+    if (input_frame)
+        av_frame_free(&input_frame);
 
     return ret;
 }
