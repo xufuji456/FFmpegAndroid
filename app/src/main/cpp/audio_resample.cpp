@@ -35,6 +35,10 @@ extern "C" {
 /* Global timestamp for the audio frames. */
 static int64_t pts = 0;
 
+static AVPacket input_packet;
+
+static AVPacket output_packet;
+
 /**
  * Open an input file and the required decoder.
  *
@@ -202,16 +206,6 @@ cleanup:
 }
 
 /**
- * Initialize one data packet for reading or writing.
- * @param packet Packet to be initialized
- */
-static void init_packet(AVPacket *packet) {
-    av_init_packet(packet);
-    packet->data = nullptr;
-    packet->size = 0;
-}
-
-/**
  * Initialize one audio frame for reading from the input file.
  *
  */
@@ -288,8 +282,6 @@ static int decode_audio_frame(AVFrame *frame,
                               AVCodecContext *input_codec_context,
                               int *data_present, int *finished) {
     int error;
-    AVPacket input_packet;
-    init_packet(&input_packet);
 
     if ((error = av_read_frame(input_format_context, &input_packet)) < 0) {
         if (error == AVERROR_EOF)
@@ -496,8 +488,6 @@ static int encode_audio_frame(AVFrame *frame,
                               AVCodecContext *output_codec_context,
                               int *data_present) {
     int error;
-    AVPacket output_packet;
-    init_packet(&output_packet);
 
     /* Set a timestamp based on the sample rate for the container. */
     if (frame) {
