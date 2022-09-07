@@ -73,6 +73,6 @@ class PushActivity : BaseActivity() {
 
         private val TAG = PushActivity::class.java.simpleName
         private const val FILE_PATH = "storage/emulated/0/hello.flv"
-        private const val LIVE_URL = "rtmp://192.168.1.104/live/stream"
+        private const val LIVE_URL = "rtmp://192.168.17.168/live/stream"
     }
 }

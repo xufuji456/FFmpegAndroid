@@ -18,32 +18,30 @@ extern "C" {
 
 PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
 
-    AVFormatContext *in_format = nullptr, *out_format = nullptr;
+    int ret;
     AVPacket packet;
-    const char *file_path, *live_url;
+    int64_t start_time;
     int video_index = -1;
-    int ret = 0, i;
     int frame_index = 0;
-    int64_t start_time = 0;
+    const char *file_path;
+    const char *live_url;
+    AVFormatContext *in_format = nullptr;
+    AVFormatContext *out_format = nullptr;
 
     file_path = env->GetStringUTFChars(filePath, nullptr);
     live_url = env->GetStringUTFChars(liveUrl, nullptr);
 
-    LOGE(TAG, "file_path=%s", file_path);
-    LOGE(TAG, "live_url=%s", live_url);
-
-    av_register_all();
     avformat_network_init();
-    if ((ret = avformat_open_input(&in_format, file_path, 0, 0)) < 0) {
+    if ((ret = avformat_open_input(&in_format, file_path, nullptr, nullptr)) < 0) {
         LOGE(TAG, "could not open input file...");
         goto end;
     }
-    if ((ret = avformat_find_stream_info(in_format, 0)) < 0) {
+    if ((ret = avformat_find_stream_info(in_format, nullptr)) < 0) {
         LOGE(TAG, "could not find stream info...");
         goto end;
     }
-    for (i = 0; i < in_format->nb_streams; i++) {
-        if (in_format->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+    for (int i = 0; i < in_format->nb_streams; i++) {
+        if (in_format->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             video_index = i;
             break;
         }
@@ -56,7 +54,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         goto end;
     }
     //Create output stream according to input stream
-    for (i = 0; i < in_format->nb_streams; i++) {
+    for (int i = 0; i < in_format->nb_streams; i++) {
         AVStream *in_stream = in_format->streams[i];
         AVStream *out_stream = avformat_new_stream(out_format, in_stream->codec->codec);
         if (!out_stream) {
@@ -65,14 +63,14 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
             goto end;
         }
         //Copy context
-        ret = avcodec_copy_context(out_stream->codec, in_stream->codec);
+        ret = avcodec_parameters_from_context(out_stream->codecpar, in_stream->codec);
         if (ret < 0) {
             LOGE(TAG, "could not copy context...");
             goto end;
         }
-        out_stream->codec->codec_tag = 0;
+        out_stream->codecpar->codec_tag = 0;
         if (out_format->oformat->flags & AVFMT_GLOBALHEADER) {
-//            out_stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+            out_stream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
     }
 
@@ -90,7 +88,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         goto end;
     }
     start_time = av_gettime();
-    while (1) {
+    while (true) {
         AVStream *in_stream, *out_stream;
         ret = av_read_frame(in_format, &packet);
         if (ret < 0) {
@@ -99,10 +97,9 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         // calculate pts and dts
         if (packet.pts == AV_NOPTS_VALUE) {
             AVRational time_base = in_format->streams[video_index]->time_base;
-            int64_t cal_duration = (int64_t) (AV_TIME_BASE /
-                                              av_q2d(in_format->streams[video_index]->r_frame_rate));
-            packet.pts = (int64_t) ((frame_index * cal_duration) /
-                                    (av_q2d(time_base) * AV_TIME_BASE));
+            double frame_rate = av_q2d(in_format->streams[video_index]->r_frame_rate);
+            int64_t cal_duration = (int64_t) (AV_TIME_BASE / frame_rate);
+            packet.pts = (int64_t) ((frame_index * cal_duration) / (av_q2d(time_base) * AV_TIME_BASE));
             packet.dts = packet.pts;
             packet.duration = (int64_t) (cal_duration / (av_q2d(time_base) * AV_TIME_BASE));
         }
@@ -138,7 +135,6 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
             LOGE(TAG, "could not write frame...");
             break;
         }
-        //Release packet
         av_packet_unref(&packet);
     }
     //Write tail
@@ -152,10 +148,8 @@ end:
     avformat_close_input(&in_format);
     env->ReleaseStringUTFChars(filePath, file_path);
     env->ReleaseStringUTFChars(liveUrl, live_url);
-    if (ret < 0 && ret != AVERROR_EOF) {
-        return -1;
-    }
-    return 0;
+
+    return (ret < 0 && ret != AVERROR_EOF) ? -1 : 0;
 }
 
 #ifdef __cplusplus
