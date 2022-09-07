@@ -2,46 +2,12 @@
 // Created by xu fulong on 2022/7/12.
 //
 
-#include <jni.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-
-#include "libavcodec/avcodec.h"
-
-#include "libavutil/audio_fifo.h"
-#include "libavutil/avassert.h"
-#include "libavutil/avstring.h"
-#include "libavutil/frame.h"
-#include "libavutil/opt.h"
-
-#include "libswresample/swresample.h"
-#ifdef __cplusplus
-}
-#endif
-
-#include "ffmpeg_jni_define.h"
+#include "ff_audio_resample.h"
 
 #define ALOGE(Format, ...) LOGE("audio_resample", Format, ##__VA_ARGS__)
 
-static int64_t pts = 0;
 
-static AVPacket input_packet;
-
-static AVPacket output_packet;
-
-static AVFrame *input_frame;
-
-static AVFrame *output_frame;
-
-/**
- * Open an input file and the required decoder.
- *
- */
-static int open_input_file(const char *filename,
+int FFAudioResample::openInputFile(const char *filename,
                            AVFormatContext **input_format_context,
                            AVCodecContext **input_codec_context) {
     int ret;
@@ -74,11 +40,7 @@ static int open_input_file(const char *filename,
     return 0;
 }
 
-/**
- * Open an output file and the required encoder.
- *
- */
-static int open_output_file(const char *filename,
+int FFAudioResample::openOutputFile(const char *filename,
                             int sample_rate,
                             AVCodecContext *input_codec_context,
                             AVFormatContext **output_format_context,
@@ -142,11 +104,7 @@ static int open_output_file(const char *filename,
     return 0;
 }
 
-/**
- * Initialize the audio resample based on the input and output codec settings.
- *
- */
-static int init_resampler(AVCodecContext *input_codec_context,
+int FFAudioResample::initResample(AVCodecContext *input_codec_context,
                           AVCodecContext *output_codec_context,
                           SwrContext **resample_context) {
     *resample_context = swr_alloc_set_opts(nullptr,
@@ -160,11 +118,7 @@ static int init_resampler(AVCodecContext *input_codec_context,
     return swr_init(*resample_context);
 }
 
-/**
- * Decode one audio frame from the input file.
- *
- */
-static int decode_audio_frame(AVFrame *frame,
+int FFAudioResample::decodeAudioFrame(AVFrame *frame,
                               AVFormatContext *input_format_context,
                               AVCodecContext *input_codec_context,
                               int *data_present, int *finished) {
@@ -210,13 +164,8 @@ cleanup:
     return ret;
 }
 
-/**
- * Initialize a temporary storage for the specified number of audio samples.
- *
- */
-static int init_converted_samples(uint8_t ***converted_input_samples,
-                                  AVCodecContext *output_codec_context,
-                                  int frame_size) {
+int FFAudioResample::initConvertedSamples(uint8_t ***converted_input_samples,
+                                  AVCodecContext *output_codec_context, int frame_size) {
     int ret;
     if (!(*converted_input_samples = (uint8_t **) calloc(output_codec_context->channels,
                                             sizeof(**converted_input_samples)))) {
@@ -241,7 +190,7 @@ static int init_converted_samples(uint8_t ***converted_input_samples,
  * it in the FIFO buffer.
  *
  */
-static int read_decode_convert_and_store(AVAudioFifo *fifo,
+int FFAudioResample::decodeAndConvert(AVAudioFifo *fifo,
                                          AVFormatContext *input_format_context,
                                          AVCodecContext *input_codec_context,
                                          AVCodecContext *output_codec_context,
@@ -252,7 +201,7 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
     int ret = AVERROR_EXIT;
 
     /* Decode one frame worth of audio samples. */
-    if (decode_audio_frame(input_frame, input_format_context,
+    if (decodeAudioFrame(input_frame, input_format_context,
                            input_codec_context, &data_present, finished))
         goto cleanup;
     if (*finished) {
@@ -264,7 +213,7 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
         int dst_nb_samples = (int) av_rescale_rnd(input_frame->nb_samples, output_codec_context->sample_rate,
                                             input_codec_context->sample_rate, AV_ROUND_UP);
 
-        if (init_converted_samples(&converted_dst_samples, output_codec_context, dst_nb_samples))
+        if (initConvertedSamples(&converted_dst_samples, output_codec_context, dst_nb_samples))
             goto cleanup;
 
         ret = swr_convert(resample_context, converted_dst_samples, dst_nb_samples,
@@ -302,11 +251,7 @@ static int init_output_frame(AVFrame **frame, AVCodecContext *output_codec_conte
     return ret;
 }
 
-/**
- * Encode one frame worth of audio to the output file.
- *
- */
-static int encode_audio_frame(AVFrame *frame,
+int FFAudioResample::encodeAudioFrame(AVFrame *frame,
                               AVFormatContext *output_format_context,
                               AVCodecContext *output_codec_context,
                               int *data_present) {
@@ -357,7 +302,7 @@ cleanup:
  * output file.
  *
  */
-static int load_encode_and_write(AVAudioFifo *fifo,
+int FFAudioResample::encodeAndWrite(AVAudioFifo *fifo,
                                  AVFormatContext *output_format_context,
                                  AVCodecContext *output_codec_context) {
     int data_written;
@@ -370,14 +315,14 @@ static int load_encode_and_write(AVAudioFifo *fifo,
         return AVERROR_EXIT;
     }
 
-    if (encode_audio_frame(output_frame, output_format_context,
+    if (encodeAudioFrame(output_frame, output_format_context,
                            output_codec_context, &data_written)) {
         return AVERROR_EXIT;
     }
     return 0;
 }
 
-int resampling(const char *src_file, const char *dst_file, int sampleRate) {
+int FFAudioResample::resampling(const char *src_file, const char *dst_file, int sampleRate) {
     int ret = AVERROR_EXIT;
     AVAudioFifo *fifo = nullptr;
     SwrContext *resample_context = nullptr;
@@ -387,13 +332,13 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
     AVFormatContext *output_format_context = nullptr;
 
     /* Open the input file for reading. */
-    if (open_input_file(src_file, &input_format_context, &input_codec_context))
+    if (openInputFile(src_file, &input_format_context, &input_codec_context))
         goto cleanup;
     /* Open the output file for writing. */
-    if (open_output_file(dst_file, sampleRate, input_codec_context, &output_format_context, &output_codec_context))
+    if (openOutputFile(dst_file, sampleRate, input_codec_context, &output_format_context, &output_codec_context))
         goto cleanup;
     /* Initialize the re-sampler to be able to convert audio sample formats. */
-    if (init_resampler(input_codec_context, output_codec_context,
+    if (initResample(input_codec_context, output_codec_context,
                        &resample_context))
         goto cleanup;
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
@@ -412,7 +357,7 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
 
         while (av_audio_fifo_size(fifo) < output_frame_size) {
             /* Decode one frame, convert sample format and put it into the FIFO buffer. */
-            if (read_decode_convert_and_store(fifo, input_format_context,
+            if (decodeAndConvert(fifo, input_format_context,
                                               input_codec_context,
                                               output_codec_context,
                                               resample_context, &finished))
@@ -425,7 +370,7 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
         /* If we have enough samples for the encoder, we encode them.*/
         while (av_audio_fifo_size(fifo) >= output_frame_size ||
                (finished && av_audio_fifo_size(fifo) > 0))
-            if (load_encode_and_write(fifo, output_format_context, output_codec_context))
+            if (encodeAndWrite(fifo, output_format_context, output_codec_context))
                 goto cleanup;
 
         /* encode all the remaining samples. */
@@ -433,7 +378,7 @@ int resampling(const char *src_file, const char *dst_file, int sampleRate) {
             int data_written;
             do {
                 data_written = 0;
-                if (encode_audio_frame(nullptr, output_format_context,
+                if (encodeAudioFrame(nullptr, output_format_context,
                                        output_codec_context, &data_written))
                     goto cleanup;
             } while (data_written);
@@ -466,15 +411,5 @@ cleanup:
     if (input_frame)
         av_frame_free(&input_frame);
 
-    return ret;
-}
-
-extern "C"
-VIDEO_PLAYER_FUNC(int, audioResample, jstring srcFile, jstring dstFile, int sampleRate) {
-    const char *src_file = env->GetStringUTFChars(srcFile, JNI_FALSE);
-    const char *dst_file = env->GetStringUTFChars(dstFile, JNI_FALSE);
-    int ret = resampling(src_file, dst_file, sampleRate);
-    env->ReleaseStringUTFChars(dstFile, dst_file);
-    env->ReleaseStringUTFChars(srcFile, src_file);
     return ret;
 }

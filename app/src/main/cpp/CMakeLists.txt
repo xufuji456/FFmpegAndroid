@@ -43,8 +43,9 @@ add_library( # Sets the name of the library.
         metadata/ffmpeg_media_retriever.c
         yuv/yuv_converter.cpp
         media_transcode.cpp
-        audio_resample.cpp
+        ff_audio_resample.cpp
         pcm/pcm_process.cpp
+        common_media_jni.cpp
         )
 
 add_library( ffmpeg
