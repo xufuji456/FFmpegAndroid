@@ -26,56 +26,48 @@ extern "C" {
 }
 #endif
 
-class FFAudioResample {
-private:
+struct AudioResample {
     int64_t pts = 0;
 
-    AVPacket input_packet;
+    AVPacket inPacket;
+    AVPacket outPacket;
+    AVFrame  *inFrame;
+    AVFrame  *outFrame;
 
-    AVPacket output_packet;
+    SwrContext *resampleCtx;
+    AVAudioFifo *fifo = nullptr;
 
-    AVFrame *input_frame;
+    AVFormatContext *inFormatCtx;
+    AVCodecContext  *inCodecCtx;
+    AVFormatContext *outFormatCtx;
+    AVCodecContext  *outCodecCtx;
+};
 
-    AVFrame *output_frame;
+class FFAudioResample {
+private:
 
-    int openInputFile(const char *filename,
-                    AVFormatContext **input_format_context,
-                    AVCodecContext **input_codec_context);
+    AudioResample *resample;
 
-    int openOutputFile(const char *filename,
-                         int sample_rate,
-                         AVCodecContext *input_codec_context,
-                         AVFormatContext **output_format_context,
-                         AVCodecContext **output_codec_context);
+    int openInputFile(const char *filename);
 
-    int initResample(AVCodecContext *input_codec_context,
-                      AVCodecContext *output_codec_context,
-                      SwrContext **resample_context);
+    int openOutputFile(const char *filename, int sample_rate);
 
-    int decodeAudioFrame(AVFrame *frame,
-                           AVFormatContext *input_format_context,
-                           AVCodecContext *input_codec_context,
-                           int *data_present, int *finished);
+    int initResample();
 
-    int initConvertedSamples(uint8_t ***converted_input_samples,
-                               AVCodecContext *output_codec_context, int frame_size);
+    int decodeAudioFrame(AVFrame *frame, int *data_present, int *finished);
 
-    int decodeAndConvert(AVAudioFifo *fifo,
-                                      AVFormatContext *input_format_context,
-                                      AVCodecContext *input_codec_context,
-                                      AVCodecContext *output_codec_context,
-                                      SwrContext *resample_context,
-                                      int *finished);
+    int initConvertedSamples(uint8_t ***converted_input_samples, int frame_size);
 
-    int encodeAudioFrame(AVFrame *frame,
-                           AVFormatContext *output_format_context,
-                           AVCodecContext *output_codec_context,
-                           int *data_present);
+    int decodeAndConvert(int *finished);
 
-    int encodeAndWrite(AVAudioFifo *fifo,
-                              AVFormatContext *output_format_context,
-                              AVCodecContext *output_codec_context);
+    int encodeAudioFrame(AVFrame *frame, int *data_present);
+
+    int encodeAndWrite();
 public:
+
+    FFAudioResample();
+
+    ~FFAudioResample();
 
     int resampling(const char *src_file, const char *dst_file, int sampleRate);
 

@@ -16,6 +16,5 @@ COMMON_MEDIA_FUNC(int, audioResample, jstring srcFile, jstring dstFile, int samp
     delete audioResample;
     env->ReleaseStringUTFChars(dstFile, dst_file);
     env->ReleaseStringUTFChars(srcFile, src_file);
-    LOGE("AudioResample", "done......");
     return ret;
 }
