@@ -27,7 +27,6 @@ extern "C" {
 
 #define ALOGE(Format, ...) LOGE("audio_resample", Format, ##__VA_ARGS__)
 
-/* Global timestamp for the audio frames. */
 static int64_t pts = 0;
 
 static AVPacket input_packet;
@@ -45,22 +44,15 @@ static AVFrame *output_frame;
 static int open_input_file(const char *filename,
                            AVFormatContext **input_format_context,
                            AVCodecContext **input_codec_context) {
-    int error;
+    int ret;
     const AVCodec *input_codec;
-    AVCodecContext *avctx = nullptr;
     AVStream *audio_stream = nullptr;
 
-    if ((error = avformat_open_input(input_format_context, filename, nullptr,
-                                     nullptr)) < 0) {
-        ALOGE("Could not open input file:%s (error:%s)\n", filename, av_err2str(error));
-        *input_format_context = nullptr;
-        return error;
+    if ((ret = avformat_open_input(input_format_context, filename, nullptr,nullptr)) < 0) {
+        ALOGE("Could not open input file:%s\n", av_err2str(ret));
+        return ret;
     }
-
-    if ((error = avformat_find_stream_info(*input_format_context, nullptr)) < 0) {
-        ALOGE("Could not open find stream info (error:%s)\n", av_err2str(error));
-        goto cleanup;
-    }
+    avformat_find_stream_info(*input_format_context, nullptr);
 
     for (int i = 0; i < (*input_format_context)->nb_streams; ++i) {
         if ((*input_format_context)->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -68,34 +60,18 @@ static int open_input_file(const char *filename,
         }
     }
     if (!(input_codec = avcodec_find_decoder(audio_stream->codecpar->codec_id))) {
-        ALOGE("Could not find input codec\n");
-        goto cleanup;
+        ALOGE("Could not find input codec:%s\n", avcodec_get_name(audio_stream->codecpar->codec_id));
+        return -1;
     }
 
-    avctx = avcodec_alloc_context3(input_codec);
-    if (!avctx) {
-        ALOGE("Could not allocate a decoding context\n");
-        goto cleanup;
-    }
+    *input_codec_context = avcodec_alloc_context3(input_codec);
+    avcodec_parameters_to_context(*input_codec_context, audio_stream->codecpar);
 
-    error = avcodec_parameters_to_context(avctx, audio_stream->codecpar);
-    if (error < 0) {
-        goto cleanup;
+    if ((ret = avcodec_open2(*input_codec_context, input_codec, nullptr)) < 0) {
+        ALOGE("Could not open input codec (error:%s)\n", av_err2str(ret));
     }
-
-    if ((error = avcodec_open2(avctx, input_codec, nullptr)) < 0) {
-        ALOGE("Could not open input codec (error:%s)\n", av_err2str(error));
-        goto cleanup;
-    }
-    *input_codec_context = avctx;
 
     return 0;
-
-cleanup:
-    if (avctx)
-        avcodec_free_context(&avctx);
-    avformat_close_input(input_format_context);
-    return -1;
 }
 
 /**
@@ -107,60 +83,35 @@ static int open_output_file(const char *filename,
                             AVCodecContext *input_codec_context,
                             AVFormatContext **output_format_context,
                             AVCodecContext **output_codec_context) {
-    AVCodecContext *avctx          = nullptr;
+    AVCodecContext *avctx;
     AVIOContext *output_io_context = nullptr;
-    AVStream *stream;
     const AVCodec *output_codec;
-    int error;
+    int ret;
 
-    /* Open the output file to write to it. */
-    if ((error = avio_open(&output_io_context, filename,
-                           AVIO_FLAG_WRITE)) < 0) {
-        ALOGE("Could not open output file:%s (error:%s)\n", filename, av_err2str(error));
-        return error;
+    if ((ret = avio_open(&output_io_context, filename, AVIO_FLAG_WRITE)) < 0) {
+        ALOGE("Could not open output file:%s\n", av_err2str(ret));
+        return ret;
     }
 
-    /* Create a new format context for the output container format. */
-    if (!(*output_format_context = avformat_alloc_context())) {
-        ALOGE("Could not allocate output format context\n");
-        return AVERROR(ENOMEM);
-    }
-
-    /* Associate the output file (pointer) with the container format context. */
-    (*output_format_context)->pb = output_io_context;
-
-    /* Guess the desired container format based on the file extension. */
-    if (!((*output_format_context)->oformat = av_guess_format(nullptr, filename,
-                                                              nullptr))) {
+    *output_format_context            = avformat_alloc_context();
+    (*output_format_context)->pb      = output_io_context;
+    (*output_format_context)->url     = av_strdup(filename);
+    (*output_format_context)->oformat = av_guess_format(nullptr, filename,nullptr);
+    if (!(*output_format_context)->oformat) {
         ALOGE("Could not find output file format\n");
-        goto cleanup;
-    }
-
-    if (!((*output_format_context)->url = av_strdup(filename))) {
-        ALOGE("Could not allocate url.\n");
-        error = AVERROR(ENOMEM);
-        goto cleanup;
+        return -1;
     }
 
     /* Find the encoder to be used by its name. */
     if (!(output_codec = avcodec_find_encoder(input_codec_context->codec_id))) {
         ALOGE( "Could not find encoder=%s\n", input_codec_context->codec->name);
-        goto cleanup;
+        return -1;
     }
 
     /* Create a new audio stream in the output file container. */
-    if (!(stream = avformat_new_stream(*output_format_context, nullptr))) {
-        ALOGE("Could not create new stream\n");
-        error = AVERROR(ENOMEM);
-        goto cleanup;
-    }
+    AVStream *stream = avformat_new_stream(*output_format_context, nullptr);
 
     avctx = avcodec_alloc_context3(output_codec);
-    if (!avctx) {
-        ALOGE("Could not allocate an encoding context\n");
-        error = AVERROR(ENOMEM);
-        goto cleanup;
-    }
 
     /* Set the basic encoder parameters.*/
     avctx->channels       = input_codec_context->channels;
@@ -181,26 +132,14 @@ static int open_output_file(const char *filename,
         avctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     /* Open the encoder for the audio stream to use it later. */
-    if ((error = avcodec_open2(avctx, output_codec, nullptr)) < 0) {
-        ALOGE("Could not open output codec (error:%s)\n", av_err2str(error));
-        goto cleanup;
+    if ((ret = avcodec_open2(avctx, output_codec, nullptr)) < 0) {
+        ALOGE("Could not open output codec (error:%s)\n", av_err2str(ret));
+        return ret;
     }
 
-    error = avcodec_parameters_from_context(stream->codecpar, avctx);
-    if (error < 0) {
-        ALOGE("Could not initialize stream parameters\n");
-        goto cleanup;
-    }
-
+    avcodec_parameters_from_context(stream->codecpar, avctx);
     *output_codec_context = avctx;
     return 0;
-
-cleanup:
-    avcodec_free_context(&avctx);
-    avio_closep(&(*output_format_context)->pb);
-    avformat_free_context(*output_format_context);
-    *output_format_context = nullptr;
-    return error < 0 ? error : AVERROR_EXIT;
 }
 
 /**
@@ -229,41 +168,37 @@ static int decode_audio_frame(AVFrame *frame,
                               AVFormatContext *input_format_context,
                               AVCodecContext *input_codec_context,
                               int *data_present, int *finished) {
-    int error;
+    int ret;
 
-    if ((error = av_read_frame(input_format_context, &input_packet)) < 0) {
-        if (error == AVERROR_EOF)
+    if ((ret = av_read_frame(input_format_context, &input_packet)) < 0) {
+        if (ret == AVERROR_EOF)
             *finished = 1;
         else {
-            ALOGE("Could not read frame (error:%s)\n", av_err2str(error));
-            return error;
+            ALOGE("Could not read frame (error:%s)\n", av_err2str(ret));
+            return ret;
         }
     }
-
-    if (input_format_context->streams[input_packet.stream_index]->codecpar->codec_type
-        != AVMEDIA_TYPE_AUDIO) {
-        error = 0;
+    if (input_format_context->streams[input_packet.stream_index]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO) {
+        ret = 0;
         ALOGE("isn't audio packet, skip it...");
         goto cleanup;
     }
-
     /* Send the audio frame stored in the temporary packet to the decoder.*/
-    if ((error = avcodec_send_packet(input_codec_context, &input_packet)) < 0) {
-        ALOGE("Could not send packet for decoding (error:%s)\n", av_err2str(error));
-        return error;
+    if ((ret = avcodec_send_packet(input_codec_context, &input_packet)) < 0) {
+        ALOGE("Could not send packet for decoding (error:%s)\n", av_err2str(ret));
+        return ret;
     }
-
     /* Receive one frame from the decoder. */
-    error = avcodec_receive_frame(input_codec_context, frame);
-    if (error == AVERROR(EAGAIN)) {
-        error = 0;
+    ret = avcodec_receive_frame(input_codec_context, frame);
+    if (ret == AVERROR(EAGAIN)) {
+        ret = 0;
         goto cleanup;
-    } else if (error == AVERROR_EOF) {
+    } else if (ret == AVERROR_EOF) {
         *finished = 1;
-        error = 0;
+        ret = 0;
         goto cleanup;
-    } else if (error < 0) {
-        ALOGE("Could not decode frame (error:%s)\n", av_err2str(error));
+    } else if (ret < 0) {
+        ALOGE("Could not decode frame (error:%s)\n", av_err2str(ret));
         goto cleanup;
     } else {
         *data_present = 1;
@@ -272,7 +207,7 @@ static int decode_audio_frame(AVFrame *frame,
 
 cleanup:
     av_packet_unref(&input_packet);
-    return error;
+    return ret;
 }
 
 /**
@@ -282,21 +217,21 @@ cleanup:
 static int init_converted_samples(uint8_t ***converted_input_samples,
                                   AVCodecContext *output_codec_context,
                                   int frame_size) {
-    int error;
+    int ret;
     if (!(*converted_input_samples = (uint8_t **) calloc(output_codec_context->channels,
                                             sizeof(**converted_input_samples)))) {
         ALOGE("Could not allocate converted input sample pointers\n");
         return AVERROR(ENOMEM);
     }
 
-    if ((error = av_samples_alloc(*converted_input_samples, nullptr,
+    if ((ret = av_samples_alloc(*converted_input_samples, nullptr,
                                   output_codec_context->channels,
                                   frame_size,
                                   output_codec_context->sample_fmt, 0)) < 0) {
-        ALOGE("Could not allocate converted input samples (error:%s)\n", av_err2str(error));
+        ALOGE("Could not allocate converted input samples (error:%s)\n", av_err2str(ret));
         av_freep(&(*converted_input_samples)[0]);
         free(*converted_input_samples);
-        return error;
+        return ret;
     }
     return 0;
 }
@@ -375,7 +310,7 @@ static int encode_audio_frame(AVFrame *frame,
                               AVFormatContext *output_format_context,
                               AVCodecContext *output_codec_context,
                               int *data_present) {
-    int error;
+    int ret;
 
     /* Set a timestamp based on the sample rate for the container. */
     if (frame) {
@@ -383,26 +318,24 @@ static int encode_audio_frame(AVFrame *frame,
         pts += frame->nb_samples;
     }
 
-    /* Send frame stored in the temporary packet to the encoder.*/
-    error = avcodec_send_frame(output_codec_context, frame);
-    if (error == AVERROR_EOF) {
-        error = 0;
+    ret = avcodec_send_frame(output_codec_context, frame);
+    if (ret == AVERROR_EOF) {
+        ret = 0;
         goto cleanup;
-    } else if (error < 0) {
-        ALOGE("Could not send packet for encoding (error:%s)\n", av_err2str(error));
-        return error;
+    } else if (ret < 0) {
+        ALOGE("Could not send packet for encoding (error:%s)\n", av_err2str(ret));
+        return ret;
     }
 
-    /* Receive one encoded frame from the encoder. */
-    error = avcodec_receive_packet(output_codec_context, &output_packet);
-    if (error == AVERROR(EAGAIN)) {
-        error = 0;
+    ret = avcodec_receive_packet(output_codec_context, &output_packet);
+    if (ret == AVERROR(EAGAIN)) {
+        ret = 0;
         goto cleanup;
-    } else if (error == AVERROR_EOF) {
-        error = 0;
+    } else if (ret == AVERROR_EOF) {
+        ret = 0;
         goto cleanup;
-    } else if (error < 0) {
-        ALOGE("Could not encode frame (error:%s)\n", av_err2str(error));
+    } else if (ret < 0) {
+        ALOGE("Could not encode frame (error:%s)\n", av_err2str(ret));
         goto cleanup;
     } else {
         *data_present = 1;
@@ -410,14 +343,13 @@ static int encode_audio_frame(AVFrame *frame,
 
     /* Write one audio frame from the temporary packet to the output file. */
     if (*data_present &&
-        (error = av_write_frame(output_format_context, &output_packet)) < 0) {
-        ALOGE("Could not write frame (error:%s)\n", av_err2str(error));
-        goto cleanup;
+        (ret = av_write_frame(output_format_context, &output_packet)) < 0) {
+        ALOGE("Could not write frame (error:%s)\n", av_err2str(ret));
     }
 
 cleanup:
     av_packet_unref(&output_packet);
-    return error;
+    return ret;
 }
 
 /**
