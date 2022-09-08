@@ -86,6 +86,8 @@ AUDIO_PLAYER_FUNC(void, native_1again, long context, jstring filter_jstr) {
 
 AUDIO_PLAYER_FUNC(void, native_1release, long context) {
     auto *audioPlayer = (FFAudioPlayer*) context;
+    if (!audioPlayer)
+        return;
     audioPlayer->setExit(true);
 }
 
