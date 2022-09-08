@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 
-import com.frank.ffmpeg.Pusher
+import com.frank.ffmpeg.FFmpegPusher
 import com.frank.ffmpeg.R
 
 import java.io.File
@@ -51,7 +51,7 @@ class PushActivity : BaseActivity() {
             val file = File(filePath)
             if (file.exists()) {
                 Thread(Runnable {
-                    Pusher().pushStream(filePath, liveUrl)
+                    FFmpegPusher().pushStream(filePath, liveUrl)
                 }).start()
             } else {
                 showToast(getString(R.string.file_not_found))

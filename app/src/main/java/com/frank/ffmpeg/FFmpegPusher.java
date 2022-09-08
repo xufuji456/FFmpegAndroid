@@ -5,7 +5,7 @@ package com.frank.ffmpeg;
  * Created by frank on 2018/2/2.
  */
 
-public class Pusher {
+public class FFmpegPusher {
     static {
         System.loadLibrary("media-handle");
     }

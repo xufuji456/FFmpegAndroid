@@ -33,7 +33,7 @@
 -keep public class com.frank.ffmpeg.FFmpegCmd {
 }
 
--keep public class com.frank.ffmpeg.Pusher {
+-keep public class com.frank.ffmpeg.FFmpegPusher {
 }
 
 -keep public class com.frank.ffmpeg.VideoPlayer {
