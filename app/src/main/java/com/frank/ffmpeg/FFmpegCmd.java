@@ -160,7 +160,7 @@ public class FFmpegCmd {
         }
     }
 
-    public static void onMsgCallback(String msg) {
+    public static void onMsgCallback(String msg, int level) {
         if (msg != null && !msg.isEmpty()) {
             Log.e(TAG, "from native msg=" + msg);
 
