@@ -67,3 +67,7 @@ AUDIO_PLAYER_FUNC(void, again, jstring filter_jstr) {
     audioPlayer->setFilterDesc(desc);
 }
 
+AUDIO_PLAYER_FUNC(void, release) {
+    audioPlayer->setExit(true);
+}
+

@@ -2,9 +2,10 @@
 // Created by xu fulong on 2022/9/4.
 //
 
-#ifndef LEARNINGMEDIA_FF_AUDIO_PLAYER_H
-#define LEARNINGMEDIA_FF_AUDIO_PLAYER_H
+#ifndef FF_AUDIO_PLAYER_H
+#define FF_AUDIO_PLAYER_H
 
+#include <stdatomic.h>
 #include "ffmpeg_jni_define.h"
 
 #ifdef __cplusplus
@@ -37,8 +38,9 @@ private:
     AVFrame *filterFrame;
     uint8_t *out_buffer;
 
-    bool filterAgain;
     const char *filterDesc;
+    std::atomic_bool filterAgain;
+    std::atomic_bool exitPlaying;
 
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
@@ -59,6 +61,8 @@ public:
 
     void setFilterDesc(const char *filterDescription);
 
+    void setExit(bool exit);
+
     void close();
 };
-#endif //LEARNINGMEDIA_FF_AUDIO_PLAYER_H
+#endif //FF_AUDIO_PLAYER_H

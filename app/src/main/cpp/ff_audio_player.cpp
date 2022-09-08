@@ -146,6 +146,9 @@ int FFAudioPlayer::getSampleRate() const {
 
 int FFAudioPlayer::decodeAudio() {
     int ret;
+    if (exitPlaying.load()) {
+        return -1;
+    }
     // demux: read a frame(should be demux thread)
     ret = av_read_frame(formatContext, packet);
     if (ret < 0) {
@@ -209,7 +212,6 @@ int FFAudioPlayer::decodeAudio() {
     return buffer_size;
 }
 
-
 uint8_t *FFAudioPlayer::getDecodeFrame() const {
     return out_buffer;
 }
@@ -220,6 +222,10 @@ void FFAudioPlayer::setFilterAgain(bool again) {
 
 void FFAudioPlayer::setFilterDesc(const char *filterDescription) {
     filterDesc = filterDescription;
+}
+
+void FFAudioPlayer::setExit(bool exit) {
+    exitPlaying = exit;
 }
 
 void FFAudioPlayer::close() {
