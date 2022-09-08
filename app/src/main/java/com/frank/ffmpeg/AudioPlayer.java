@@ -14,14 +14,38 @@ public class AudioPlayer {
         System.loadLibrary("media-handle");
     }
 
+    private long audioContext = 0;
+
     private AudioTrack mAudioTrack;
 
-    //using AudioTrack to play
-    public native void play(String audioPath, String filterDesc);
+    private native long native_init();
 
-    public native void again(String filterDesc);
+    private native void native_play(long context, String audioPath, String filter);
 
-    public native void release();
+    private native void native_again(long context, String filterDesc);
+
+    private native void native_release(long context);
+
+    public void play(String audioPath, String filter) {
+        audioContext = native_init();
+        native_play(audioContext, audioPath, filter);
+    }
+
+    public void again(String filterDesc) {
+        if (audioContext == 0) {
+            return;
+        }
+        native_again(audioContext, filterDesc);
+    }
+
+    public void release() {
+        if (audioContext == 0) {
+            return;
+        }
+        native_release(audioContext);
+        audioContext = 0;
+    }
+
 
     /**
      * Create an AudioTrack instance for JNI calling

@@ -23,21 +23,21 @@ extern "C" {
 }
 #endif
 
-class FFAudioPlayer {
-private:
-
-    AVFormatContext *formatContext;
-    AVCodecContext *codecContext;
-    int audio_index = -1;
-    SwrContext *swrContext;
-    int out_sample_rate;
-    int out_ch_layout;
+struct AudioPlayerState {
     int out_channel;
+    int out_ch_layout;
+    int out_sample_rate;
     enum AVSampleFormat out_sample_fmt;
+
     AVPacket *packet;
     AVFrame *inputFrame;
     AVFrame *filterFrame;
-    uint8_t *out_buffer;
+    int audioIndex = -1;
+    uint8_t *outBuffer;
+    SwrContext *swrContext;
+
+    AVFormatContext *formatContext;
+    AVCodecContext *codecContext;
 
     const char *filterDesc;
     std::atomic_bool filterAgain;
@@ -46,11 +46,22 @@ private:
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
     AVFilterContext *audioSinkContext;
+};
+
+class FFAudioPlayer {
+private:
+
+    AudioPlayerState *m_state;
 
     bool m_enableVisualizer = false;
-    FrankVisualizer *mVisualizer;
+    FrankVisualizer *m_visualizer;
 
 public:
+
+    FFAudioPlayer();
+
+    ~FFAudioPlayer();
+
     int open(const char* path);
 
     int getSampleRate() const;

@@ -8,8 +8,6 @@
 
 #define SLEEP_TIME (16000)
 
-FFAudioPlayer *audioPlayer;
-
 void fftCallback(JNIEnv *env, jobject thiz, jmethodID fft_method, int8_t *data, int size) {
     jbyteArray dataArray = env->NewByteArray(size);
     env->SetByteArrayRegion(dataArray, 0, size, data);
@@ -17,13 +15,18 @@ void fftCallback(JNIEnv *env, jobject thiz, jmethodID fft_method, int8_t *data, 
     env->DeleteLocalRef(dataArray);
 }
 
-AUDIO_PLAYER_FUNC(void, play, jstring path) {
+AUDIO_PLAYER_FUNC(long, native_1init) {
+    auto *audioPlayer = new FFAudioPlayer();
+    return (long)audioPlayer;
+}
+
+AUDIO_PLAYER_FUNC(void, native_1play, long context, jstring path, jstring filter) {
     if (path == nullptr)
         return;
 
     int result = 0;
     const char* native_path = env->GetStringUTFChars(path, JNI_FALSE);
-    audioPlayer = new FFAudioPlayer();
+    auto *audioPlayer = (FFAudioPlayer*) context;
     // open stream, and init work
     audioPlayer->open(native_path);
     // init AudioTrack
@@ -73,14 +76,16 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
     delete audioPlayer;
 }
 
-AUDIO_PLAYER_FUNC(void, again, jstring filter_jstr) {
+AUDIO_PLAYER_FUNC(void, native_1again, long context, jstring filter_jstr) {
     if (!filter_jstr) return;
+    auto *audioPlayer = (FFAudioPlayer*) context;
     audioPlayer->setFilterAgain(true);
     const char *desc = env->GetStringUTFChars(filter_jstr, nullptr);
     audioPlayer->setFilterDesc(desc);
 }
 
-AUDIO_PLAYER_FUNC(void, release) {
+AUDIO_PLAYER_FUNC(void, native_1release, long context) {
+    auto *audioPlayer = (FFAudioPlayer*) context;
     audioPlayer->setExit(true);
 }
 

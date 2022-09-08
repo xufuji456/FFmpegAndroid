@@ -151,11 +151,11 @@ release:
 }
 
 FrankVisualizer::FrankVisualizer() {
-    LOGE("FrankVisualizer init...");
+
 }
 
 FrankVisualizer::~FrankVisualizer() {
-    LOGE("FrankVisualizer release...");
+
 }
 
 int8_t* FrankVisualizer::fft_run(uint8_t *input_buffer, int nb_samples) {

@@ -77,96 +77,105 @@ end:
     return ret;
 }
 
+FFAudioPlayer::FFAudioPlayer() {
+    m_state = new AudioPlayerState();
+    m_visualizer = nullptr;
+}
+
+FFAudioPlayer::~FFAudioPlayer() {
+    delete m_state;
+}
+
 int FFAudioPlayer::open(const char *path) {
     if (!path)
         return -1;
 
     int ret;
     const AVCodec *codec;
-    inputFrame = av_frame_alloc();
-    packet     = av_packet_alloc();
-    out_buffer = new uint8_t [BUFFER_SIZE];
+    m_state->inputFrame = av_frame_alloc();
+    m_state->packet     = av_packet_alloc();
+    m_state->outBuffer  = new uint8_t [BUFFER_SIZE];
 
     // open input stream
-    ret = avformat_open_input(&formatContext, path, nullptr, nullptr);
+    ret = avformat_open_input(&m_state->formatContext, path, nullptr, nullptr);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avformat_open_input error=%s", av_err2str(ret));
         return ret;
     }
     // (if need)find info: width、height、sample_rate、duration
-    avformat_find_stream_info(formatContext, nullptr);
+    avformat_find_stream_info(m_state->formatContext, nullptr);
     // find audio index
-    for (int i=0; i<formatContext->nb_streams; i++) {
-        if (AVMEDIA_TYPE_AUDIO == formatContext->streams[i]->codecpar->codec_type) {
-            audio_index = i;
+    for (int i=0; i<m_state->formatContext->nb_streams; i++) {
+        if (AVMEDIA_TYPE_AUDIO == m_state->formatContext->streams[i]->codecpar->codec_type) {
+            m_state->audioIndex = i;
             break;
         }
     }
-    if (audio_index == -1) {
+    if (m_state->audioIndex == -1) {
         return -1;
     }
     // find audio decoder
-    codec = avcodec_find_decoder(formatContext->streams[audio_index]->codecpar->codec_id);
-    codecContext = avcodec_alloc_context3(codec);
-    avcodec_parameters_to_context(codecContext, formatContext->streams[audio_index]->codecpar);
+    codec = avcodec_find_decoder(m_state->formatContext->streams[m_state->audioIndex]->codecpar->codec_id);
+    m_state->codecContext = avcodec_alloc_context3(codec);
+    avcodec_parameters_to_context(m_state->codecContext, m_state->formatContext->streams[m_state->audioIndex]->codecpar);
     // open decoder
-    ret = avcodec_open2(codecContext, codec, nullptr);
+    ret = avcodec_open2(m_state->codecContext, codec, nullptr);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avcodec_open2 error=%s", av_err2str(ret));
         return ret;
     }
     // input and output params
-    int in_sample_rate = codecContext->sample_rate;
-    auto in_sample_fmt = codecContext->sample_fmt;
-    int in_ch_layout   = (int)codecContext->channel_layout;
-    out_sample_rate    = in_sample_rate;
-    out_sample_fmt     = AV_SAMPLE_FMT_S16;
-    out_ch_layout      = AV_CH_LAYOUT_STEREO;
-    out_channel        = codecContext->channels;
+    int in_sample_rate       = m_state->codecContext->sample_rate;
+    auto in_sample_fmt       = m_state->codecContext->sample_fmt;
+    int in_ch_layout         = (int)m_state->codecContext->channel_layout;
+    m_state->out_sample_rate = in_sample_rate;
+    m_state->out_sample_fmt  = AV_SAMPLE_FMT_S16;
+    m_state->out_ch_layout   = AV_CH_LAYOUT_STEREO;
+    m_state->out_channel     = m_state->codecContext->channels;
     // init resample context
-    swrContext = swr_alloc();
-    swr_alloc_set_opts(swrContext, out_ch_layout, out_sample_fmt, out_sample_rate,
+    m_state->swrContext = swr_alloc();
+    swr_alloc_set_opts(m_state->swrContext, m_state->out_ch_layout, m_state->out_sample_fmt, m_state->out_sample_rate,
                        in_ch_layout, in_sample_fmt, in_sample_rate, 0, nullptr);
-    swr_init(swrContext);
+    swr_init(m_state->swrContext);
     // init filter graph
-    filterFrame = av_frame_alloc();
-    initFilter(FILTER_DESC, codecContext, &audioFilterGraph,
-                   &audioSrcContext, &audioSinkContext);
+    m_state->filterFrame = av_frame_alloc();
+    initFilter(FILTER_DESC, m_state->codecContext, &m_state->audioFilterGraph,
+                   &m_state->audioSrcContext, &m_state->audioSinkContext);
     // init visualizer
-    mVisualizer = new FrankVisualizer();
-    mVisualizer->init_visualizer();
+    m_visualizer = new FrankVisualizer();
+    m_visualizer->init_visualizer();
 
     return 0;
 }
 
 int FFAudioPlayer::getChannel() const {
-    return out_channel;
+    return m_state->out_channel;
 }
 
 int FFAudioPlayer::getSampleRate() const {
-    return out_sample_rate;
+    return m_state->out_sample_rate;
 }
 
 int FFAudioPlayer::decodeAudio() {
     int ret;
-    if (exitPlaying.load()) {
+    if (m_state->exitPlaying.load()) {
         return -1;
     }
     // demux: read a frame(should be demux thread)
-    ret = av_read_frame(formatContext, packet);
+    ret = av_read_frame(m_state->formatContext, m_state->packet);
     if (ret < 0) {
         return ret;
     }
     // see if audio packet
-    if (packet->stream_index != audio_index) {
+    if (m_state->packet->stream_index != m_state->audioIndex) {
         return 0;
     }
     // decode audio frame(should be decode thread)
-    ret = avcodec_send_packet(codecContext, packet);
+    ret = avcodec_send_packet(m_state->codecContext, m_state->packet);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avcodec_send_packet=%s", av_err2str(ret));
     }
-    ret = avcodec_receive_frame(codecContext, inputFrame);
+    ret = avcodec_receive_frame(m_state->codecContext, m_state->inputFrame);
     if (ret < 0) {
         if (ret == AVERROR(EAGAIN)) {
             return 0;
@@ -176,29 +185,29 @@ int FFAudioPlayer::decodeAudio() {
     }
 
     // visualizer: do fft
-    int nb_samples = inputFrame->nb_samples < MAX_FFT_SIZE ? inputFrame->nb_samples : MAX_FFT_SIZE;
+    int nb_samples = m_state->inputFrame->nb_samples < MAX_FFT_SIZE ? m_state->inputFrame->nb_samples : MAX_FFT_SIZE;
     if (m_enableVisualizer && nb_samples >= MIN_FFT_SIZE) {
-        mVisualizer->fft_run(inputFrame->data[0], nb_samples);
+        m_visualizer->fft_run(m_state->inputFrame->data[0], nb_samples);
     }
 
     // change filter
-    if (filterAgain) {
-        filterAgain = false;
-        avfilter_graph_free(&audioFilterGraph);
-        if ((ret = initFilter(filterDesc, codecContext, &audioFilterGraph, &audioSrcContext, &audioSinkContext)) < 0) {
+    if (m_state->filterAgain) {
+        m_state->filterAgain = false;
+        avfilter_graph_free(&m_state->audioFilterGraph);
+        if ((ret = initFilter(m_state->filterDesc, m_state->codecContext, &m_state->audioFilterGraph,
+                              &m_state->audioSrcContext, &m_state->audioSinkContext)) < 0) {
             LOGE(AUDIO_TAG, "init_filter error, ret=%d\n", ret);
             return ret;
         }
-        LOGE(AUDIO_TAG, "play again,filter_descr=_=%s", filterDesc);
     }
 
     // put into filter
-    ret = av_buffersrc_add_frame(audioSrcContext, inputFrame);
+    ret = av_buffersrc_add_frame(m_state->audioSrcContext, m_state->inputFrame);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "av_buffersrc_add_frame error=%s", av_err2str(ret));
     }
     // drain from filter
-    ret = av_buffersink_get_frame(audioSinkContext, filterFrame);
+    ret = av_buffersink_get_frame(m_state->audioSinkContext, m_state->filterFrame);
     if (ret == AVERROR(EAGAIN)) {
         return 0;
     } else if (ret == AVERROR_EOF) {
@@ -210,20 +219,20 @@ int FFAudioPlayer::decodeAudio() {
     }
 
     // convert audio format and sample_rate
-    swr_convert(swrContext, &out_buffer, BUFFER_SIZE,
-            (const uint8_t **)(filterFrame->data), filterFrame->nb_samples);
+    swr_convert(m_state->swrContext, &m_state->outBuffer, BUFFER_SIZE,
+            (const uint8_t **)(m_state->filterFrame->data), m_state->filterFrame->nb_samples);
     // get buffer size after converting
-    int buffer_size = av_samples_get_buffer_size(nullptr, out_channel,
-                                                 filterFrame->nb_samples, out_sample_fmt, 1);
+    int buffer_size = av_samples_get_buffer_size(nullptr, m_state->out_channel,
+                                                 m_state->filterFrame->nb_samples, m_state->out_sample_fmt, 1);
 
-    av_frame_unref(inputFrame);
-    av_frame_unref(filterFrame);
-    av_packet_unref(packet);
+    av_frame_unref(m_state->inputFrame);
+    av_frame_unref(m_state->filterFrame);
+    av_packet_unref(m_state->packet);
     return buffer_size;
 }
 
 uint8_t *FFAudioPlayer::getDecodeFrame() const {
-    return out_buffer;
+    return m_state->outBuffer;
 }
 
 void FFAudioPlayer::setEnableVisualizer(bool enable) {
@@ -235,52 +244,54 @@ bool FFAudioPlayer::enableVisualizer() const {
 }
 
 int8_t* FFAudioPlayer::getFFTData() const {
-    if (!mVisualizer)
+    if (!m_visualizer)
         return nullptr;
-    return mVisualizer->getFFTData();
+    return m_visualizer->getFFTData();
 }
 
 int FFAudioPlayer::getFFTSize() const {
-    if (!mVisualizer)
+    if (!m_visualizer)
         return 0;
-    return mVisualizer->getOutputSample();
+    return m_visualizer->getOutputSample();
 }
 
 void FFAudioPlayer::setFilterAgain(bool again) {
-    filterAgain = again;
+    m_state->filterAgain = again;
 }
 
 void FFAudioPlayer::setFilterDesc(const char *filterDescription) {
-    filterDesc = filterDescription;
+    m_state->filterDesc = filterDescription;
 }
 
 void FFAudioPlayer::setExit(bool exit) {
-    exitPlaying = exit;
+    m_state->exitPlaying = exit;
 }
 
 void FFAudioPlayer::close() {
-    if (formatContext) {
-        avformat_close_input(&formatContext);
+    if (!m_state)
+        return;
+    if (m_state->formatContext) {
+        avformat_close_input(&m_state->formatContext);
     }
-    if (codecContext) {
-        avcodec_free_context(&codecContext);
+    if (m_state->codecContext) {
+        avcodec_free_context(&m_state->codecContext);
     }
-    if (packet) {
-        av_packet_free(&packet);
+    if (m_state->packet) {
+        av_packet_free(&m_state->packet);
     }
-    if (inputFrame) {
-        av_frame_free(&inputFrame);
+    if (m_state->inputFrame) {
+        av_frame_free(&m_state->inputFrame);
     }
-    if (swrContext) {
-        swr_close(swrContext);
+    if (m_state->swrContext) {
+        swr_close(m_state->swrContext);
     }
-    avfilter_free(audioSrcContext);
-    avfilter_free(audioSinkContext);
-    if (audioFilterGraph) {
-        avfilter_graph_free(&audioFilterGraph);
+    avfilter_free(m_state->audioSrcContext);
+    avfilter_free(m_state->audioSinkContext);
+    if (m_state->audioFilterGraph) {
+        avfilter_graph_free(&m_state->audioFilterGraph);
     }
-    delete[] out_buffer;
-    if (mVisualizer) {
-        mVisualizer->release_visualizer();
+    delete[] m_state->outBuffer;
+    if (m_visualizer) {
+        m_visualizer->release_visualizer();
     }
 }

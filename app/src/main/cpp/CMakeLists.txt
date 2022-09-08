@@ -25,7 +25,6 @@ add_library( # Sets the name of the library.
         ffmpeg_cmd.c
         ffmpeg/ffprobe.c
         ffmpeg/ffmpeg_hw.c
-        audio_player.cpp
         video_player.cpp
         ffmpeg_pusher.cpp
         video_filter.c
