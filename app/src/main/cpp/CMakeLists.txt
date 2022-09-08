@@ -33,7 +33,6 @@ add_library( # Sets the name of the library.
         video_cutting.cpp
         visualizer/fft.cpp
         visualizer/fixed_fft.cpp
-        visualizer/block_queue.c
         visualizer/frank_visualizer.cpp
         visualizer/frank_visualizer_jni.cpp
         visualizer/window.cpp

@@ -47,6 +47,8 @@ public:
 
     int getOutputSample();
 
+    int8_t* getFFTData();
+
     int8_t* fft_run(uint8_t *input_buffer, int nb_samples);
 
     int init_visualizer();

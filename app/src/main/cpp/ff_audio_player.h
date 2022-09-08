@@ -7,6 +7,7 @@
 
 #include <stdatomic.h>
 #include "ffmpeg_jni_define.h"
+#include "visualizer/frank_visualizer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,9 @@ private:
     AVFilterContext *audioSrcContext;
     AVFilterContext *audioSinkContext;
 
+    bool m_enableVisualizer = false;
+    FrankVisualizer *mVisualizer;
+
 public:
     int open(const char* path);
 
@@ -60,6 +64,14 @@ public:
     void setFilterAgain(bool again);
 
     void setFilterDesc(const char *filterDescription);
+
+    void setEnableVisualizer(bool enable);
+
+    bool enableVisualizer() const;
+
+    int8_t* getFFTData() const;
+
+    int getFFTSize() const;
 
     void setExit(bool exit);
 

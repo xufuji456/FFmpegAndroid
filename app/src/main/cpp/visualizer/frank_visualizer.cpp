@@ -160,6 +160,8 @@ FrankVisualizer::~FrankVisualizer() {
 
 int8_t* FrankVisualizer::fft_run(uint8_t *input_buffer, int nb_samples) {
     mFftLock.lock();
+    if (!fft_context)
+        return nullptr;
     fft_context->nb_samples = nb_samples;
     memcpy(fft_context->data, input_buffer, static_cast<size_t>(nb_samples));
     filter_sys_t *p_sys = fft_context;
@@ -179,11 +181,13 @@ int FrankVisualizer::getOutputSample() {
     return 0;
 }
 
+int8_t *FrankVisualizer::getFFTData() {
+    return fft_context ? fft_context->output : nullptr;
+}
+
 int FrankVisualizer::init_visualizer() {
     fft_context = new filter_sys_t();
     filter_sys_t *p_filter = fft_context;
-    if (!p_filter)
-        return -1;
 
     p_filter->convert_to_float = false;
     p_filter->i_channels = 1;

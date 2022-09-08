@@ -10,6 +10,13 @@
 
 FFAudioPlayer *audioPlayer;
 
+void fftCallback(JNIEnv *env, jobject thiz, jmethodID fft_method, int8_t *data, int size) {
+    jbyteArray dataArray = env->NewByteArray(size);
+    env->SetByteArrayRegion(dataArray, 0, size, data);
+    env->CallVoidMethod(thiz, fft_method, dataArray);
+    env->DeleteLocalRef(dataArray);
+}
+
 AUDIO_PLAYER_FUNC(void, play, jstring path) {
     if (path == nullptr)
         return;
@@ -32,6 +39,8 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
     // method if of write
     jmethodID write_method = env->GetMethodID(audio_track_class, "write", "([BII)I");
 
+    jmethodID fft_method = env->GetMethodID(audio_class, "fftCallbackFromJNI", "([B)V");
+
     // demux decode and play
     while (result >= 0) {
         result = audioPlayer->decodeAudio();
@@ -48,6 +57,10 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
         env->ReleaseByteArrayElements(audio_array, data_address, 0);
         env->CallIntMethod(audio_track, write_method, audio_array, 0, size);
         env->DeleteLocalRef(audio_array);
+
+        if (audioPlayer->enableVisualizer()) {
+            fftCallback(env, thiz, fft_method, audioPlayer->getFFTData(), audioPlayer->getFFTSize());
+        }
 
         // audio sync
         usleep(SLEEP_TIME);

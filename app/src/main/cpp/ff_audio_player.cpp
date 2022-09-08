@@ -132,6 +132,9 @@ int FFAudioPlayer::open(const char *path) {
     filterFrame = av_frame_alloc();
     initFilter(FILTER_DESC, codecContext, &audioFilterGraph,
                    &audioSrcContext, &audioSinkContext);
+    // init visualizer
+    mVisualizer = new FrankVisualizer();
+    mVisualizer->init_visualizer();
 
     return 0;
 }
@@ -172,6 +175,13 @@ int FFAudioPlayer::decodeAudio() {
         }
     }
 
+    // visualizer: do fft
+    int nb_samples = inputFrame->nb_samples < MAX_FFT_SIZE ? inputFrame->nb_samples : MAX_FFT_SIZE;
+    if (m_enableVisualizer && nb_samples >= MIN_FFT_SIZE) {
+        mVisualizer->fft_run(inputFrame->data[0], nb_samples);
+    }
+
+    // change filter
     if (filterAgain) {
         filterAgain = false;
         avfilter_graph_free(&audioFilterGraph);
@@ -216,6 +226,26 @@ uint8_t *FFAudioPlayer::getDecodeFrame() const {
     return out_buffer;
 }
 
+void FFAudioPlayer::setEnableVisualizer(bool enable) {
+    m_enableVisualizer = enable;
+}
+
+bool FFAudioPlayer::enableVisualizer() const {
+    return m_enableVisualizer;
+}
+
+int8_t* FFAudioPlayer::getFFTData() const {
+    if (!mVisualizer)
+        return nullptr;
+    return mVisualizer->getFFTData();
+}
+
+int FFAudioPlayer::getFFTSize() const {
+    if (!mVisualizer)
+        return 0;
+    return mVisualizer->getOutputSample();
+}
+
 void FFAudioPlayer::setFilterAgain(bool again) {
     filterAgain = again;
 }
@@ -250,4 +280,7 @@ void FFAudioPlayer::close() {
         avfilter_graph_free(&audioFilterGraph);
     }
     delete[] out_buffer;
+    if (mVisualizer) {
+        mVisualizer->release_visualizer();
+    }
 }
