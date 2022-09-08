@@ -8,28 +8,31 @@
 
 #define SLEEP_TIME (16000)
 
+FFAudioPlayer *audioPlayer;
+
 AUDIO_PLAYER_FUNC(void, play, jstring path) {
     if (path == nullptr)
         return;
 
     int result = 0;
     const char* native_path = env->GetStringUTFChars(path, JNI_FALSE);
-    auto *audioPlayer = new FFAudioPlayer();
-    // 打开输入流
+    audioPlayer = new FFAudioPlayer();
+    // open stream, and init work
     audioPlayer->open(native_path);
-    // 初始化AudioTrack
+    // init AudioTrack
     jclass audio_class = env->GetObjectClass(thiz);
     jmethodID audio_track_method = env->GetMethodID(audio_class,
                                                     "createAudioTrack", "(II)Landroid/media/AudioTrack;");
-    jobject audio_track = env->CallObjectMethod(thiz, audio_track_method, audioPlayer->getSampleRate(), audioPlayer->getChannel());
-    // 调用play函数
+    jobject audio_track = env->CallObjectMethod(thiz, audio_track_method,
+                                                audioPlayer->getSampleRate(), audioPlayer->getChannel());
+    // play function
     jclass audio_track_class = env->GetObjectClass(audio_track);
     jmethodID play_method = env->GetMethodID(audio_track_class, "play", "()V");
     env->CallVoidMethod(audio_track, play_method);
-    // 获取write方法id
+    // method if of write
     jmethodID write_method = env->GetMethodID(audio_track_class, "write", "([BII)I");
 
-    // 解码音频zhen
+    // demux decode and play
     while (result >= 0) {
         result = audioPlayer->decodeAudio();
         if (result == 0) {
@@ -38,7 +41,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
             break;
         }
         int size = result;
-        // 调用AudioTrack播放(可优化：数组复用)
+        // call AudioTrack to play(should be reused array)
         jbyteArray audio_array = env->NewByteArray(size);
         jbyte *data_address = env->GetByteArrayElements(audio_array, JNI_FALSE);
         memcpy(data_address, audioPlayer->getDecodeFrame(), size);
@@ -46,7 +49,7 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
         env->CallIntMethod(audio_track, write_method, audio_array, 0, size);
         env->DeleteLocalRef(audio_array);
 
-        // 延时等待
+        // audio sync
         usleep(SLEEP_TIME);
     }
 
@@ -56,3 +59,11 @@ AUDIO_PLAYER_FUNC(void, play, jstring path) {
     audioPlayer->close();
     delete audioPlayer;
 }
+
+AUDIO_PLAYER_FUNC(void, again, jstring filter_jstr) {
+    if (!filter_jstr) return;
+    audioPlayer->setFilterAgain(true);
+    const char *desc = env->GetStringUTFChars(filter_jstr, nullptr);
+    audioPlayer->setFilterDesc(desc);
+}
+

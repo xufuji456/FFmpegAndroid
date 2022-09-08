@@ -37,6 +37,9 @@ private:
     AVFrame *filterFrame;
     uint8_t *out_buffer;
 
+    bool filterAgain;
+    const char *filterDesc;
+
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
     AVFilterContext *audioSinkContext;
@@ -51,6 +54,10 @@ public:
     int decodeAudio();
 
     uint8_t *getDecodeFrame() const;
+
+    void setFilterAgain(bool again);
+
+    void setFilterDesc(const char *filterDescription);
 
     void close();
 };

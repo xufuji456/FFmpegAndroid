@@ -103,7 +103,7 @@ end:
     return ret;
 }
 
-AUDIO_PLAYER_FUNC(void, play, jstring input_jstr, jstring filter_jstr) {
+AUDIO_PLAYER_FUNC(void, play111, jstring input_jstr, jstring filter_jstr) {
     int got_frame = 0, ret;
     AVPacket packet;
     AVFilterGraph *audioFilterGraph;
@@ -262,13 +262,13 @@ end:
     LOGE(TAG, "audio release...");
 }
 
-AUDIO_PLAYER_FUNC(void, again, jstring filter_jstr) {
+AUDIO_PLAYER_FUNC(void, again111, jstring filter_jstr) {
     if (!filter_jstr) return;
     filter_again = 1;
     filter_desc = env->GetStringUTFChars(filter_jstr, nullptr);
 }
 
-AUDIO_PLAYER_FUNC(void, release) {
+AUDIO_PLAYER_FUNC(void, release111) {
     filter_release = 1;
 }
 

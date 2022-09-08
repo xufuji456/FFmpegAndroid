@@ -87,15 +87,15 @@ int FFAudioPlayer::open(const char *path) {
     packet     = av_packet_alloc();
     out_buffer = new uint8_t [BUFFER_SIZE];
 
-    // 打开输入流
+    // open input stream
     ret = avformat_open_input(&formatContext, path, nullptr, nullptr);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avformat_open_input error=%s", av_err2str(ret));
         return ret;
     }
-    // 查找stream信息
+    // (if need)find info: width、height、sample_rate、duration
     avformat_find_stream_info(formatContext, nullptr);
-    // 找到音频index
+    // find audio index
     for (int i=0; i<formatContext->nb_streams; i++) {
         if (AVMEDIA_TYPE_AUDIO == formatContext->streams[i]->codecpar->codec_type) {
             audio_index = i;
@@ -105,30 +105,30 @@ int FFAudioPlayer::open(const char *path) {
     if (audio_index == -1) {
         return -1;
     }
-    // 找到codec
+    // find audio decoder
     codec = avcodec_find_decoder(formatContext->streams[audio_index]->codecpar->codec_id);
     codecContext = avcodec_alloc_context3(codec);
     avcodec_parameters_to_context(codecContext, formatContext->streams[audio_index]->codecpar);
-    // 打开解码器
+    // open decoder
     ret = avcodec_open2(codecContext, codec, nullptr);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avcodec_open2 error=%s", av_err2str(ret));
         return ret;
     }
-    // 输入：采样率、声道布局、音频格式
+    // input and output params
     int in_sample_rate = codecContext->sample_rate;
     auto in_sample_fmt = codecContext->sample_fmt;
     int in_ch_layout   = (int)codecContext->channel_layout;
-    out_sample_rate    = in_sample_rate; // 输出采样率等于输入采样率
-    out_sample_fmt     = AV_SAMPLE_FMT_S16; // 16位
-    out_ch_layout      = AV_CH_LAYOUT_STEREO; // 双声道
+    out_sample_rate    = in_sample_rate;
+    out_sample_fmt     = AV_SAMPLE_FMT_S16;
+    out_ch_layout      = AV_CH_LAYOUT_STEREO;
     out_channel        = codecContext->channels;
-    // 初始化音频格式转换上下文swrContext
+    // init resample context
     swrContext = swr_alloc();
     swr_alloc_set_opts(swrContext, out_ch_layout, out_sample_fmt, out_sample_rate,
                        in_ch_layout, in_sample_fmt, in_sample_rate, 0, nullptr);
     swr_init(swrContext);
-
+    // init filter graph
     filterFrame = av_frame_alloc();
     initFilter(FILTER_DESC, codecContext, &audioFilterGraph,
                    &audioSrcContext, &audioSinkContext);
@@ -146,16 +146,16 @@ int FFAudioPlayer::getSampleRate() const {
 
 int FFAudioPlayer::decodeAudio() {
     int ret;
-    // 读取音频数据(解封装)
+    // demux: read a frame(should be demux thread)
     ret = av_read_frame(formatContext, packet);
     if (ret < 0) {
         return ret;
     }
-    // 判断是否位音频帧
+    // see if audio packet
     if (packet->stream_index != audio_index) {
         return 0;
     }
-    // 解码音频帧
+    // decode audio frame(should be decode thread)
     ret = avcodec_send_packet(codecContext, packet);
     if (ret < 0) {
         LOGE(AUDIO_TAG, "avcodec_send_packet=%s", av_err2str(ret));
@@ -168,6 +168,17 @@ int FFAudioPlayer::decodeAudio() {
             return ret;
         }
     }
+
+    if (filterAgain) {
+        filterAgain = false;
+        avfilter_graph_free(&audioFilterGraph);
+        if ((ret = initFilter(filterDesc, codecContext, &audioFilterGraph, &audioSrcContext, &audioSinkContext)) < 0) {
+            LOGE(AUDIO_TAG, "init_filter error, ret=%d\n", ret);
+            return ret;
+        }
+        LOGE(AUDIO_TAG, "play again,filter_descr=_=%s", filterDesc);
+    }
+
     // put into filter
     ret = av_buffersrc_add_frame(audioSrcContext, inputFrame);
     if (ret < 0) {
@@ -185,13 +196,13 @@ int FFAudioPlayer::decodeAudio() {
         return ret;
     }
 
-    // 音频格式转换
+    // convert audio format and sample_rate
     swr_convert(swrContext, &out_buffer, BUFFER_SIZE,
             (const uint8_t **)(filterFrame->data), filterFrame->nb_samples);
-    // 获取转换后缓冲区大小
+    // get buffer size after converting
     int buffer_size = av_samples_get_buffer_size(nullptr, out_channel,
                                                  filterFrame->nb_samples, out_sample_fmt, 1);
-    LOGI(AUDIO_TAG, "buffer_size=%d", buffer_size);
+
     av_frame_unref(inputFrame);
     av_frame_unref(filterFrame);
     av_packet_unref(packet);
@@ -201,6 +212,14 @@ int FFAudioPlayer::decodeAudio() {
 
 uint8_t *FFAudioPlayer::getDecodeFrame() const {
     return out_buffer;
+}
+
+void FFAudioPlayer::setFilterAgain(bool again) {
+    filterAgain = again;
+}
+
+void FFAudioPlayer::setFilterDesc(const char *filterDescription) {
+    filterDesc = filterDescription;
 }
 
 void FFAudioPlayer::close() {
