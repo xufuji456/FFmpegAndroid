@@ -94,15 +94,6 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         if (ret < 0) {
             break;
         }
-        // calculate pts and dts
-        if (packet.pts == AV_NOPTS_VALUE) {
-            AVRational time_base = in_format->streams[video_index]->time_base;
-            double frame_rate = av_q2d(in_format->streams[video_index]->r_frame_rate);
-            int64_t cal_duration = (int64_t) (AV_TIME_BASE / frame_rate);
-            packet.pts = (int64_t) ((frame_index * cal_duration) / (av_q2d(time_base) * AV_TIME_BASE));
-            packet.dts = packet.pts;
-            packet.duration = (int64_t) (cal_duration / (av_q2d(time_base) * AV_TIME_BASE));
-        }
         if (packet.stream_index == video_index) {
             AVRational time_base = in_format->streams[video_index]->time_base;
             AVRational time_base_q = {1, AV_TIME_BASE};
@@ -116,7 +107,7 @@ PUSHER_FUNC(jint, pushStream, jstring filePath, jstring liveUrl) {
         in_stream = in_format->streams[packet.stream_index];
         out_stream = out_format->streams[packet.stream_index];
 
-        //pts to dts
+        //calculate: pts dts duration
         packet.pts = av_rescale_q_rnd(packet.pts, in_stream->time_base, out_stream->time_base,
                                       (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
         packet.dts = av_rescale_q_rnd(packet.dts, in_stream->time_base, out_stream->time_base,
