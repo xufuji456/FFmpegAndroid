@@ -30,8 +30,8 @@
     <string name="audio_handle">Audio handle</string>
     <string name="media_handle">Media handle</string>
     <string name="video_handle">Video handle</string>
-    <string name="video_push">Video pusher</string>
-    <string name="video_live">Video living</string>
+    <string name="video_push">Http-flv stream</string>
+    <string name="video_live">RTMP living</string>
 
     <string name="media_mux">Media mux</string>
     <string name="media_extra_audio">Audio extract</string>

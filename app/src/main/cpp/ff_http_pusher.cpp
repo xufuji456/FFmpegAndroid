@@ -23,6 +23,8 @@ int FFHttpPusher::open(const char *inputPath, const char *outputPath) {
         return ret;
     }
 
+    // Flv video: h264 audio: aac/mp3
+    // If not h264, should transocde to h264
     for (int i = 0; i < inFormatCtx->nb_streams; ++i) {
         AVStream *in_stream = inFormatCtx->streams[i];
         const auto *codec = in_stream->codec->codec;

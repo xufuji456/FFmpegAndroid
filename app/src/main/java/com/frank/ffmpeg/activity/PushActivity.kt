@@ -12,12 +12,12 @@ import com.frank.ffmpeg.R
 import java.io.File
 
 /**
- * Using FFmpeg to push stream
+ * Using FFmpeg to push http-flv stream
  * Created by frank on 2018/2/2.
  */
 class PushActivity : BaseActivity() {
 
-    private var editFilePath: EditText? = null
+    private var editInputPath: EditText? = null
 
     private var editLiveURL: EditText? = null
 
@@ -32,30 +32,22 @@ class PushActivity : BaseActivity() {
     }
 
     private fun initView() {
-        editFilePath = getView(R.id.edit_file_path)
-        editLiveURL = getView(R.id.edit_live_url)
-        editFilePath!!.setText(FILE_PATH)
+        editInputPath = getView(R.id.edit_file_path)
+        editLiveURL   = getView(R.id.edit_live_url)
+        editInputPath!!.setText(INPUT_PATH)
         editLiveURL!!.setText(LIVE_URL)
 
         initViewsWithClick(R.id.btn_push_stream)
     }
 
     private fun startPushStreaming() {
-        //TODO the video format is flv
-        val filePath = editFilePath!!.text.toString()
-        val liveUrl = editLiveURL!!.text.toString()
-        Log.i(TAG, "filePath=$filePath")
-        Log.i(TAG, "liveUrl=$liveUrl")
+        val filePath = editInputPath!!.text.toString()
+        val liveUrl  = editLiveURL!!.text.toString()
 
         if (!TextUtils.isEmpty(filePath) && !TextUtils.isEmpty(filePath)) {
-            val file = File(filePath)
-            if (file.exists()) {
-                Thread(Runnable {
-                    FFmpegPusher().pushStream(filePath, liveUrl)
-                }).start()
-            } else {
-                showToast(getString(R.string.file_not_found))
-            }
+            Thread(Runnable {
+                FFmpegPusher().pushStream(filePath, liveUrl)
+            }).start()
         }
     }
 
@@ -71,8 +63,8 @@ class PushActivity : BaseActivity() {
 
     companion object {
 
-        private val TAG = PushActivity::class.java.simpleName
-        private const val FILE_PATH = "storage/emulated/0/hello.flv"
+        // storage/emulated/0/beyond.mp4
+        private const val INPUT_PATH = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
         private const val LIVE_URL = "rtmp://192.168.17.168/live/stream"
     }
 }

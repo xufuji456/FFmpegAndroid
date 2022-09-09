@@ -30,8 +30,8 @@
     <string name="audio_handle">音频处理</string>
     <string name="media_handle">音视频处理</string>
     <string name="video_handle">视频处理</string>
-    <string name="video_push">本地推流直播</string>
-    <string name="video_live">实时推流直播</string>
+    <string name="video_push">http-flv推流</string>
+    <string name="video_live">rtmp推流直播</string>
 
     <string name="media_mux">音视频合成</string>
     <string name="media_extra_audio">提取音频</string>
