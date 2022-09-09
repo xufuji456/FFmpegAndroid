@@ -35,8 +35,12 @@ extern "C" { \
     (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
 
 #define PUSHER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
+extern "C" { \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_FFmpegPusher_ ## FUNC_NAME \
-    (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__);\
+} \
+    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_FFmpegPusher_ ## FUNC_NAME \
+    (JNIEnv *env, jobject thiz, ##__VA_ARGS__) \
 
 #define RETRIEVER_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
 extern "C" { \

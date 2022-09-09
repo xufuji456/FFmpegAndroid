@@ -26,7 +26,6 @@ add_library( # Sets the name of the library.
         ffmpeg/ffprobe.c
         ffmpeg/ffmpeg_hw.c
         video_player.cpp
-        ffmpeg_pusher.cpp
         video_filter.c
         ffprobe_cmd.cpp
         video_cutting.cpp
@@ -46,6 +45,8 @@ add_library( # Sets the name of the library.
         common_media_jni.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
+        ff_http_pusher.cpp
+        ffmpeg_pusher_jni.cpp
         )
 
 add_library( ffmpeg
