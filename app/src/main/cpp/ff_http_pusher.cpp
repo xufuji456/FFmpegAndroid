@@ -32,6 +32,14 @@ int FFHttpPusher::open(const char *inputPath, const char *outputPath) {
             out_stream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
         out_stream->codecpar->codec_tag = 0;
+
+        if (in_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            video_index = i;
+        } else if (in_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            if (audio_index == -1) {
+                audio_index = i;
+            }
+        }
     }
 
     if (!(outFormatCtx->oformat->flags & AVFMT_NOFILE)) {
@@ -70,6 +78,10 @@ int FFHttpPusher::push() {
             break;
         }
 
+        if (packet.stream_index != video_index && packet.stream_index != audio_index)
+            continue;
+
+        // sync
         AVRational time_base = inFormatCtx->streams[packet.stream_index]->time_base;
         int64_t pts_time = av_rescale_q(packet.pts, time_base, AV_TIME_BASE_Q);
         int64_t cur_time = av_gettime() - startTime;
