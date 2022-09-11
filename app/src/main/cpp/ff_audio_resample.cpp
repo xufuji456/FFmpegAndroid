@@ -260,10 +260,7 @@ int FFAudioResample::encodeAudioFrame(AVFrame *frame, int *data_present) {
     }
 
     ret = avcodec_receive_packet(resample->outCodecCtx, &resample->outPacket);
-    if (ret == AVERROR(EAGAIN)) {
-        ret = 0;
-        goto cleanup;
-    } else if (ret == AVERROR_EOF) {
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
         ret = 0;
         goto cleanup;
     } else if (ret < 0) {
@@ -319,7 +316,7 @@ int FFAudioResample::resampling(const char *src_file, const char *dst_file, int 
     if (initResample())
         goto cleanup;
     /* Initialize the FIFO buffer to store audio samples to be encoded. */
-    resample->fifo    = av_audio_fifo_alloc(resample->outCodecCtx->sample_fmt,
+    resample->fifo = av_audio_fifo_alloc(resample->outCodecCtx->sample_fmt,
                                          resample->outCodecCtx->channels, 1024 * 10);
     if (initOutputFrame(&resample->outFrame, resample->outCodecCtx))
         goto cleanup;
@@ -329,7 +326,7 @@ int FFAudioResample::resampling(const char *src_file, const char *dst_file, int 
     }
 
     while (true) {
-        int finished                = 0;
+        int finished = 0;
         const int output_frame_size = resample->outCodecCtx->frame_size;
 
         while (av_audio_fifo_size(resample->fifo) < output_frame_size) {
