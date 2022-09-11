@@ -54,8 +54,6 @@ private:
 
     int decodeAudioFrame(AVFrame *frame, int *data_present, int *finished);
 
-    int initConvertedSamples(uint8_t ***converted_input_samples, int frame_size);
-
     int decodeAndConvert(int *finished);
 
     int encodeAudioFrame(AVFrame *frame, int *data_present);

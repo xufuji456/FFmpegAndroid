@@ -15,6 +15,54 @@ FFAudioResample::~FFAudioResample() {
     delete resample;
 }
 
+static int initOutputFrame(AudioResample **pResample) {
+    AudioResample *ar = *pResample;
+
+    AVFrame *frame        = av_frame_alloc();
+    frame->format         = ar->outCodecCtx->sample_fmt;
+    frame->nb_samples     = ar->outCodecCtx->frame_size;
+    frame->sample_rate    = ar->outCodecCtx->sample_rate;
+    frame->channel_layout = ar->outCodecCtx->channel_layout;
+
+    int ret = av_frame_get_buffer(frame, 0);
+    ar->outFrame = frame;
+    *pResample   = ar;
+    return ret;
+}
+
+static int initResample(AudioResample **pResample) {
+    AudioResample *ar = *pResample;
+    SwrContext *context = swr_alloc_set_opts(nullptr,
+                                             av_get_default_channel_layout(ar->outCodecCtx->channels),
+                                             ar->outCodecCtx->sample_fmt,
+                                             ar->outCodecCtx->sample_rate,
+                                             av_get_default_channel_layout(ar->inCodecCtx->channels),
+                                             ar->inCodecCtx->sample_fmt,
+                                             ar->inCodecCtx->sample_rate,
+                                             0, nullptr);
+    int ret = swr_init(context);
+    ar->resampleCtx = context;
+    *pResample = ar;
+    return ret;
+}
+
+static int initConvertedSamples(AudioResample **pResample, uint8_t ***converted_input_samples, int frame_size) {
+    int ret;
+    AudioResample *ar = *pResample;
+    *converted_input_samples = (uint8_t **) calloc(ar->outCodecCtx->channels, sizeof(**converted_input_samples));
+
+    if ((ret = av_samples_alloc(*converted_input_samples, nullptr,
+                                ar->outCodecCtx->channels,
+                                frame_size,
+                                ar->outCodecCtx->sample_fmt, 0)) < 0) {
+        ALOGE("av_samples_alloc error:%s", av_err2str(ret));
+        av_freep(&(*converted_input_samples)[0]);
+        free(*converted_input_samples);
+        return ret;
+    }
+    return 0;
+}
+
 int FFAudioResample::openInputFile(const char *filename) {
     int ret;
     const AVCodec *input_codec;
@@ -105,22 +153,6 @@ int FFAudioResample::openOutputFile(const char *filename, int sample_rate) {
     return 0;
 }
 
-static int initResample(AudioResample **pResample) {
-    AudioResample *ar = *pResample;
-    SwrContext *context = swr_alloc_set_opts(nullptr,
-                                           av_get_default_channel_layout(ar->outCodecCtx->channels),
-                                           ar->outCodecCtx->sample_fmt,
-                                           ar->outCodecCtx->sample_rate,
-                                           av_get_default_channel_layout(ar->inCodecCtx->channels),
-                                           ar->inCodecCtx->sample_fmt,
-                                           ar->inCodecCtx->sample_rate,
-                                           0, nullptr);
-    int ret = swr_init(context);
-    ar->resampleCtx = context;
-    *pResample = ar;
-    return ret;
-}
-
 int FFAudioResample::decodeAudioFrame(AVFrame *frame, int *data_present, int *finished) {
     int ret;
 
@@ -165,26 +197,6 @@ cleanup:
     return ret;
 }
 
-int FFAudioResample::initConvertedSamples(uint8_t ***converted_input_samples, int frame_size) {
-    int ret;
-    if (!(*converted_input_samples = (uint8_t **) calloc(resample->outCodecCtx->channels,
-                                            sizeof(**converted_input_samples)))) {
-        ALOGE("Could not allocate converted input sample pointers\n");
-        return AVERROR(ENOMEM);
-    }
-
-    if ((ret = av_samples_alloc(*converted_input_samples, nullptr,
-                                  resample->outCodecCtx->channels,
-                                  frame_size,
-                                  resample->outCodecCtx->sample_fmt, 0)) < 0) {
-        ALOGE("Could not allocate converted input samples (error:%s)\n", av_err2str(ret));
-        av_freep(&(*converted_input_samples)[0]);
-        free(*converted_input_samples);
-        return ret;
-    }
-    return 0;
-}
-
 /**
  * Read one audio frame from the input file, decode, convert and store
  * it in the FIFO buffer.
@@ -207,7 +219,7 @@ int FFAudioResample::decodeAndConvert(int *finished) {
         int dst_nb_samples = (int) av_rescale_rnd(resample->inFrame->nb_samples, resample->outCodecCtx->sample_rate,
                                             resample->inCodecCtx->sample_rate, AV_ROUND_UP);
 
-        if (initConvertedSamples(&converted_dst_samples, dst_nb_samples))
+        if (initConvertedSamples(&resample, &converted_dst_samples, dst_nb_samples))
             goto cleanup;
 
         ret = swr_convert(resample->resampleCtx, converted_dst_samples, dst_nb_samples,
@@ -228,21 +240,6 @@ cleanup:
         free(converted_dst_samples);
     }
 
-    return ret;
-}
-
-static int initOutputFrame(AudioResample **pResample) {
-    AudioResample *ar = *pResample;
-
-    AVFrame *frame        = av_frame_alloc();
-    frame->format         = ar->outCodecCtx->sample_fmt;
-    frame->nb_samples     = ar->outCodecCtx->frame_size;
-    frame->sample_rate    = ar->outCodecCtx->sample_rate;
-    frame->channel_layout = ar->outCodecCtx->channel_layout;
-
-    int ret = av_frame_get_buffer(frame, 0);
-    ar->outFrame = frame;
-    *pResample   = ar;
     return ret;
 }
 
