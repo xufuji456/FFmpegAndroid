@@ -52,8 +52,6 @@ private:
 
     int openOutputFile(const char *filename, int sample_rate);
 
-    int initResample();
-
     int decodeAudioFrame(AVFrame *frame, int *data_present, int *finished);
 
     int initConvertedSamples(uint8_t ***converted_input_samples, int frame_size);
