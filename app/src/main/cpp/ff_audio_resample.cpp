@@ -229,8 +229,7 @@ int FFAudioResample::decodeAndConvert(int *finished) {
             goto cleanup;
         }
 
-        if (av_audio_fifo_write(resample->fifo, (void **)converted_dst_samples, dst_nb_samples) < dst_nb_samples)
-            goto cleanup;
+        av_audio_fifo_write(resample->fifo, (void **)converted_dst_samples, ret);
     }
     ret = 0;
 

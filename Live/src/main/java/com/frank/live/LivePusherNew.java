@@ -16,20 +16,13 @@ import com.frank.live.stream.VideoStreamNew;
 
 public class LivePusherNew implements OnFrameDataCallback {
 
-    //error of opening video encoder
-    private final static int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-    //error of video encoding
-    private final static int ERROR_VIDEO_ENCODE = 0x02;
-    //error of opening audio encoder
-    private final static int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-    //error of audio encoding
-    private final static int ERROR_AUDIO_ENCODE = 0x04;
-    //error of RTMP connecting server
-    private final static int ERROR_RTMP_CONNECT = 0x05;
-    //error of RTMP connecting stream
-    private final static int ERROR_RTMP_CONNECT_STREAM = 0x06;
-    //error of RTMP sending packet
-    private final static int ERROR_RTMP_SEND_PACKET = 0x07;
+    private final static int ERROR_VIDEO_ENCODER_OPEN   = 0x01;
+    private final static int ERROR_VIDEO_ENCODER_ENCODE = 0x02;
+    private final static int ERROR_AUDIO_ENCODER_OPEN   = 0x03;
+    private final static int ERROR_AUDIO_ENCODER_ENCODE = 0x04;
+    private final static int ERROR_RTMP_CONNECT_SERVER  = 0x05;
+    private final static int ERROR_RTMP_CONNECT_STREAM  = 0x06;
+    private final static int ERROR_RTMP_SEND_PACKET     = 0x07;
 
     static {
         System.loadLibrary("live");
@@ -111,16 +104,16 @@ public class LivePusherNew implements OnFrameDataCallback {
                 case ERROR_VIDEO_ENCODER_OPEN:
                     msg = activity.getString(R.string.error_video_encoder);
                     break;
-                case ERROR_VIDEO_ENCODE:
+                case ERROR_VIDEO_ENCODER_ENCODE:
                     msg = activity.getString(R.string.error_video_encode);
                     break;
                 case ERROR_AUDIO_ENCODER_OPEN:
                     msg = activity.getString(R.string.error_audio_encoder);
                     break;
-                case ERROR_AUDIO_ENCODE:
+                case ERROR_AUDIO_ENCODER_ENCODE:
                     msg = activity.getString(R.string.error_audio_encode);
                     break;
-                case ERROR_RTMP_CONNECT:
+                case ERROR_RTMP_CONNECT_SERVER:
                     msg = activity.getString(R.string.error_rtmp_connect);
                     break;
                 case ERROR_RTMP_CONNECT_STREAM:

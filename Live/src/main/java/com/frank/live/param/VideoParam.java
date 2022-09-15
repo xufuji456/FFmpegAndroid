@@ -13,10 +13,10 @@ public class VideoParam {
     private int frameRate;
 
     public VideoParam(int width, int height, int cameraId, int bitRate, int frameRate) {
-        this.width = width;
-        this.height = height;
-        this.cameraId = cameraId;
-        this.bitRate = bitRate;
+        this.width     = width;
+        this.height    = height;
+        this.cameraId  = cameraId;
+        this.bitRate   = bitRate;
         this.frameRate = frameRate;
     }
 
