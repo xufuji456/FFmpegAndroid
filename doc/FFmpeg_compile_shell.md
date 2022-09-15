@@ -274,7 +274,6 @@ function build_android {
     --disable-debug \
     --disable-doc \
     --enable-avfilter \
-    --enable-avresample \
     --enable-decoders \
     $ADDITIONAL_CONFIGURE_FLAG
 

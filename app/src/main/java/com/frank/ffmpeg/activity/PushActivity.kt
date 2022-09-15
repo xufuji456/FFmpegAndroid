@@ -12,7 +12,8 @@ import com.frank.ffmpeg.R
 import java.io.File
 
 /**
- * Using FFmpeg to push http-flv stream
+ * Using FFmpeg to push rtmp stream,
+ * with SRS media server convert to http-flv stream
  * Created by frank on 2018/2/2.
  */
 class PushActivity : BaseActivity() {
