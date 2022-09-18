@@ -2,11 +2,11 @@
 // Created by xu fulong on 2022/9/9.
 //
 
-#include "ff_http_pusher.h"
+#include "ff_rtmp_pusher.h"
 
 #define PUSH_TAG "HttpPusher"
 
-int FFHttpPusher::open(const char *inputPath, const char *outputPath) {
+int FFRtmpPusher::open(const char *inputPath, const char *outputPath) {
     int ret;
 
     avformat_network_init();
@@ -69,7 +69,7 @@ void rescale(AVFormatContext *in_format_ctx, AVFormatContext *out_format_ctx, AV
     packet->pos      = -1;
 }
 
-int FFHttpPusher::push() {
+int FFRtmpPusher::push() {
     int ret;
     int64_t startTime = av_gettime();
 
@@ -105,7 +105,7 @@ int FFHttpPusher::push() {
     return ret;
 }
 
-void FFHttpPusher::close() {
+void FFRtmpPusher::close() {
     if (outFormatCtx) {
         av_write_trailer(outFormatCtx);
         avformat_close_input(&outFormatCtx);

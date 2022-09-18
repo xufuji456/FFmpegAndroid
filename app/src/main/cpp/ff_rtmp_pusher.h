@@ -2,8 +2,8 @@
 // Created by xu fulong on 2022/9/9.
 //
 
-#ifndef FF_HTTP_PUSHER_H
-#define FF_HTTP_PUSHER_H
+#ifndef FF_RTMP_PUSHER_H
+#define FF_RTMP_PUSHER_H
 
 #include "ffmpeg_jni_define.h"
 
@@ -17,7 +17,7 @@ extern "C" {
 }
 #endif
 
-class FFHttpPusher {
+class FFRtmpPusher {
 private:
     AVFormatContext *inFormatCtx;
     AVFormatContext *outFormatCtx;
@@ -36,4 +36,4 @@ public:
 
 };
 
-#endif //FF_HTTP_PUSHER_H
+#endif //FF_RTMP_PUSHER_H

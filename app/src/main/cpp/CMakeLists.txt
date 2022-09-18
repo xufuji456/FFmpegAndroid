@@ -45,7 +45,7 @@ add_library( # Sets the name of the library.
         common_media_jni.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
-        ff_http_pusher.cpp
+        ff_rtmp_pusher.cpp
         ffmpeg_pusher_jni.cpp
         )
 
