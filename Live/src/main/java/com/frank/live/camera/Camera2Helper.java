@@ -593,10 +593,6 @@ public class Camera2Helper {
                     } else {
                         YUVUtil.YUV420pRotate180(dstData, yuvData, width, height);
                     }
-                    // front camera need to flip
-                    if (CAMERA_ID_FRONT.equals(mCameraId)) {
-                        YUVUtil.flipYUV(dstData, yuvData, width, height);
-                    }
                     if (camera2Listener != null) {
                         camera2Listener.onPreviewFrame(dstData);
                     }
