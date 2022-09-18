@@ -173,7 +173,7 @@ open class LiveActivity : BaseActivity(), CompoundButton.OnCheckedChangeListener
     companion object {
 
         private val TAG = LiveActivity::class.java.simpleName
-        private const val LIVE_URL = "rtmp://192.168.31.28/live/stream"
+        private const val LIVE_URL = "rtmp://192.168.17.168/live/stream"
         private const val MSG_ERROR = 100
     }
 }
