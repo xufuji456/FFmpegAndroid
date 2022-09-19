@@ -12,7 +12,7 @@ class PacketQueue {
 public:
 
     void push(T new_value) {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         if (m_running) {
             m_queue.push(new_value);
             m_cond.notify_one();
@@ -21,7 +21,7 @@ public:
 
     int pop(T &value) {
         int ret = 0;
-        std::unique_lock<std::mutex> lk(m_mutex);
+        std::unique_lock<std::mutex> lock(m_mutex);
         if (!m_running) {
             return ret;
         }
@@ -34,22 +34,22 @@ public:
     }
 
     void setRunning(bool run) {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_running = run;
     }
 
     int empty() {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_queue.empty();
     }
 
     int size() {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         return static_cast<int>(m_queue.size());
     }
 
     void clear() {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         int size = m_queue.size();
         for (int i = 0; i < size; ++i) {
             T value = m_queue.front();

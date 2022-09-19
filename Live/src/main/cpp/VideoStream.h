@@ -17,7 +17,7 @@ public:
 
     void setVideoEncInfo(int width, int height, int fps, int bitrate);
 
-    void encodeVideo(int8_t *data, int8_t camera_type);
+    void encodeVideo(int8_t *data, int camera_type);
 
     void setVideoCallback(VideoCallback videoCallback);
 

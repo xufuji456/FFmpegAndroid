@@ -18,7 +18,7 @@ public:
 
     void setAudioCallback(AudioCallback audioCallback);
 
-    int getInputSamples();
+    int getInputSamples() const;
 
     void encodeData(int8_t *data);
 

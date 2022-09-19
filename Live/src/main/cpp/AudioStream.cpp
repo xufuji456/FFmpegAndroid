@@ -8,7 +8,8 @@ AudioStream::AudioStream() {
 }
 
 AudioStream::~AudioStream() {
-    DELETE(buffer);
+    delete buffer;
+    buffer = nullptr;
     if (audioCodec) {
         faacEncClose(audioCodec);
         audioCodec = nullptr;
@@ -39,7 +40,7 @@ void AudioStream::setAudioEncInfo(int samplesInHZ, int channels) {
     buffer = new u_char[maxOutputBytes];
 }
 
-int AudioStream::getInputSamples() {
+int AudioStream::getInputSamples() const {
     return static_cast<int>(inputSamples);
 }
 

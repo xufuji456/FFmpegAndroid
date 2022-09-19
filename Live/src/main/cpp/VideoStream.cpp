@@ -18,7 +18,8 @@ VideoStream::~VideoStream() {
     }
     if (pic_in) {
         x264_picture_clean(pic_in);
-        DELETE(pic_in);
+        delete pic_in;
+        pic_in = nullptr;
     }
 }
 
@@ -31,7 +32,8 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     }
     if (pic_in) {
         x264_picture_clean(pic_in);
-        DELETE(pic_in);
+        delete pic_in;
+        pic_in = nullptr;
     }
 
     //setting x264 params
@@ -79,8 +81,11 @@ void VideoStream::setVideoCallback(VideoCallback callback) {
     this->videoCallback = callback;
 }
 
-void VideoStream::encodeVideo(int8_t *data, int8_t camera_type) {
+void VideoStream::encodeVideo(int8_t *data, int camera_type) {
     pthread_mutex_lock(&mutex);
+
+    if (!pic_in)
+        return;
 
     if (camera_type == 1) {
         memcpy(pic_in->img.plane[0], data, m_frameLen); // y

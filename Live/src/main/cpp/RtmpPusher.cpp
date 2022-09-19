@@ -12,7 +12,6 @@
 
 PacketQueue<RTMPPacket *> packets;
 VideoStream *videoStream = nullptr;
-int isStart = 0;
 pthread_t pid;
 
 std::atomic<bool> isPushing;
@@ -76,7 +75,7 @@ void releasePackets(RTMPPacket *&packet) {
 
 void *start(void *args) {
     char *url = static_cast<char *>(args);
-    RTMP *rtmp = nullptr;
+    RTMP *rtmp;
     do {
         rtmp = RTMP_Alloc();
         if (!rtmp) {
@@ -131,7 +130,6 @@ void *start(void *args) {
         }
         releasePackets(packet);
     } while (0);
-    isStart = 0;
     isPushing = false;
     packets.setRunning(false);
     packets.clear();
@@ -162,10 +160,9 @@ RTMP_PUSHER_FUNC(void, native_1setVideoCodecInfo,
 
 RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
     LOGI("native start...");
-    if (isStart) {
+    if (isPushing) {
         return;
     }
-    isStart = 1;
     const char *path = env->GetStringUTFChars(path_, nullptr);
     char *url = new char[strlen(path) + 1];
     strcpy(url, path);
@@ -214,6 +211,8 @@ RTMP_PUSHER_FUNC(void, native_1stop) {
 RTMP_PUSHER_FUNC(void, native_1release) {
     LOGI("native release...");
     env->DeleteGlobalRef(jobject_error);
-    DELETE(videoStream);
-    DELETE(audioStream);
+    delete videoStream;
+    videoStream = nullptr;
+    delete audioStream;
+    audioStream = nullptr;
 }
