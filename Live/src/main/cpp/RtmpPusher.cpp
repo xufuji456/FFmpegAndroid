@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <string>
-#include "safe_queue.h"
+#include "PacketQueue.h"
 #include "PushInterface.h"
 #include "VideoStream.h"
 #include "AudioStream.h"
@@ -10,12 +10,12 @@
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_live_LivePusherNew_ ## FUNC_NAME \
     (JNIEnv *env, jobject instance, ##__VA_ARGS__)\
 
-SafeQueue<RTMPPacket *> packets;
+PacketQueue<RTMPPacket *> packets;
 VideoStream *videoStream = nullptr;
 int isStart = 0;
 pthread_t pid;
 
-int readyPushing = 0;
+std::atomic<bool> isPushing;
 uint32_t start_time;
 
 AudioStream *audioStream = nullptr;
@@ -107,13 +107,13 @@ void *start(void *args) {
         //start time
         start_time = RTMP_GetTime();
         //start pushing
-        readyPushing = 1;
-        packets.setWork(1);
+        isPushing = true;
+        packets.setRunning(true);
         callback(audioStream->getAudioTag());
         RTMPPacket *packet = nullptr;
-        while (readyPushing) {
+        while (isPushing) {
             packets.pop(packet);
-            if (!readyPushing) {
+            if (!isPushing) {
                 break;
             }
             if (!packet) {
@@ -132,8 +132,8 @@ void *start(void *args) {
         releasePackets(packet);
     } while (0);
     isStart = 0;
-    readyPushing = 0;
-    packets.setWork(0);
+    isPushing = false;
+    packets.setRunning(false);
     packets.clear();
     if (rtmp) {
         RTMP_Close(rtmp);
@@ -174,7 +174,7 @@ RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
 }
 
 RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray yuv, jint camera_type) {
-    if (!videoStream || !readyPushing) {
+    if (!videoStream || !isPushing) {
         return;
     }
     jbyte *yuv_plane = env->GetByteArrayElements(yuv, JNI_FALSE);
@@ -196,7 +196,7 @@ RTMP_PUSHER_FUNC(jint, native_1getInputSamples) {
 }
 
 RTMP_PUSHER_FUNC(void, native_1pushAudio, jbyteArray data_) {
-    if (!audioStream || !readyPushing) {
+    if (!audioStream || !isPushing) {
         return;
     }
     jbyte *data = env->GetByteArrayElements(data_, nullptr);
@@ -206,8 +206,8 @@ RTMP_PUSHER_FUNC(void, native_1pushAudio, jbyteArray data_) {
 
 RTMP_PUSHER_FUNC(void, native_1stop) {
     LOGI("native stop...");
-    readyPushing = 0;
-    packets.setWork(0);
+    isPushing = false;
+    packets.setRunning(false);
     pthread_join(pid, nullptr);
 }
 

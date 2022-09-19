@@ -8,34 +8,25 @@
 using namespace std;
 
 template<typename T>
-class SafeQueue {
+class PacketQueue {
     typedef void (*ReleaseCallback)(T &);
 
     typedef void (*SyncHandle)(queue<T> &);
 
 public:
-    SafeQueue() {
-
-    }
-
-    ~SafeQueue() {
-
-    }
 
     void push(T new_value) {
         lock_guard<mutex> lk(mt);
-        if (work) {
+        if (running) {
             q.push(new_value);
             cv.notify_one();
         }
     }
 
-
     int pop(T &value) {
         int ret = 0;
-
         unique_lock<mutex> lk(mt);
-        if (!work) {
+        if (!running) {
             return ret;
         }
         if (!q.empty()) {
@@ -46,9 +37,9 @@ public:
         return ret;
     }
 
-    void setWork(int run) {
+    void setRunning(bool run) {
         lock_guard<mutex> lk(mt);
-        this->work = run;
+        this->running = run;
     }
 
     int empty() {
@@ -84,7 +75,7 @@ private:
     condition_variable cv;
 
     queue<T> q;
-    int work;
+    bool running;
     ReleaseCallback releaseCallback;
     SyncHandle syncHandle;
 };
