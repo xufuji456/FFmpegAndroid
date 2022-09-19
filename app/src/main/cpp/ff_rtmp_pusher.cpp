@@ -27,12 +27,9 @@ int FFRtmpPusher::open(const char *inputPath, const char *outputPath) {
     // If not h264, should transocde to h264
     for (int i = 0; i < inFormatCtx->nb_streams; ++i) {
         AVStream *in_stream = inFormatCtx->streams[i];
-        const auto *codec = in_stream->codec->codec;
+        const auto *codec = avcodec_find_encoder(in_stream->codecpar->codec_id);
         AVStream *out_stream = avformat_new_stream(outFormatCtx, codec);
-        avcodec_parameters_from_context(out_stream->codecpar, in_stream->codec);
-        if (outFormatCtx->oformat->flags & AVFMT_GLOBALHEADER) {
-            out_stream->codec->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-        }
+        avcodec_parameters_copy(out_stream->codecpar, in_stream->codecpar);
         out_stream->codecpar->codec_tag = 0;
 
         if (in_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
