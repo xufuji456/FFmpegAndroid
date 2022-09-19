@@ -111,7 +111,7 @@ public:
         int size = q.size();
         for (int i = 0; i < size; ++i) {
             T value = q.front();
-            releaseHandle(value);
+            releaseCallback(value);
             q.pop();
         }
 #else
