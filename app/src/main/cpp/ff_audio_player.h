@@ -5,7 +5,7 @@
 #ifndef FF_AUDIO_PLAYER_H
 #define FF_AUDIO_PLAYER_H
 
-#include <stdatomic.h>
+#include <atomic>
 #include "ffmpeg_jni_define.h"
 #include "visualizer/frank_visualizer.h"
 
@@ -40,8 +40,8 @@ struct AudioPlayerState {
     AVCodecContext *codecContext;
 
     const char *filterDesc;
-    std::atomic_bool filterAgain;
-    std::atomic_bool exitPlaying;
+    std::atomic<bool> filterAgain;
+    std::atomic<bool> exitPlaying;
 
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
