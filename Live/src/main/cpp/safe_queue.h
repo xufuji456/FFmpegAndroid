@@ -62,7 +62,9 @@ public:
         int ret = 0;
 #ifdef C11
         unique_lock<mutex> lk(mt);
-        cv.wait(lk,[this]{return !work || !q.empty();});
+        if (!work) {
+            return ret;
+        }
         if (!q.empty()) {
             value = q.front();
             q.pop();
