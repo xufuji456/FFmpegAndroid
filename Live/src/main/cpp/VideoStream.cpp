@@ -1,6 +1,5 @@
 
 #include <cstring>
-#include <jni.h>
 #include "VideoStream.h"
 #include "PushInterface.h"
 

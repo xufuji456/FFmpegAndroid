@@ -15,8 +15,8 @@ AudioStream::~AudioStream() {
     }
 }
 
-void AudioStream::setAudioCallback(AudioCallback audioCallback) {
-    this->audioCallback = audioCallback;
+void AudioStream::setAudioCallback(AudioCallback callback) {
+    this->audioCallback = callback;
 }
 
 void AudioStream::setAudioEncInfo(int samplesInHZ, int channels) {
