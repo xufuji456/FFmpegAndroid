@@ -7,11 +7,10 @@ VideoStream::VideoStream():m_frameLen(0),
                            videoCodec(nullptr),
                            pic_in(nullptr),
                            videoCallback(nullptr) {
-    pthread_mutex_init(&mutex, nullptr);
+
 }
 
 VideoStream::~VideoStream() {
-    pthread_mutex_destroy(&mutex);
     if (videoCodec) {
         x264_encoder_close(videoCodec);
         videoCodec = nullptr;
@@ -24,7 +23,7 @@ VideoStream::~VideoStream() {
 }
 
 int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
-    pthread_mutex_lock(&mutex);
+    std::lock_guard<std::mutex> l(m_mutex);
     m_frameLen = width * height;
     if (videoCodec) {
         x264_encoder_close(videoCodec);
@@ -40,7 +39,7 @@ int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     x264_param_t param;
     int ret = x264_param_default_preset(&param, "ultrafast", "zerolatency");
     if (ret < 0) {
-        goto end;
+        return ret;
     }
     param.i_level_idc = 32;
     //input format
@@ -74,18 +73,15 @@ int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
 
     ret = x264_param_apply_profile(&param, "baseline");
     if (ret < 0) {
-        goto end;
+        return ret;
     }
     //open encoder
     videoCodec = x264_encoder_open(&param);
     if (!videoCodec) {
-        ret = -1;
-        goto end;
+        return -1;
     }
     pic_in = new x264_picture_t();
     x264_picture_alloc(pic_in, X264_CSP_I420, width, height);
-end:
-    pthread_mutex_unlock(&mutex);
     return ret;
 }
 
@@ -94,8 +90,7 @@ void VideoStream::setVideoCallback(VideoCallback callback) {
 }
 
 void VideoStream::encodeVideo(int8_t *data, int camera_type) {
-    pthread_mutex_lock(&mutex);
-
+    std::lock_guard<std::mutex> l(m_mutex);
     if (!pic_in)
         return;
 
@@ -135,7 +130,6 @@ void VideoStream::encodeVideo(int8_t *data, int camera_type) {
             sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
         }
     }
-    pthread_mutex_unlock(&mutex);
 }
 
 void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len) {
@@ -143,16 +137,17 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
     auto *packet = new RTMPPacket();
     RTMPPacket_Alloc(packet, bodySize);
     int i = 0;
-    //start code
+    // type
     packet->m_body[i++] = 0x17;
-    //type
     packet->m_body[i++] = 0x00;
+    // timestamp
     packet->m_body[i++] = 0x00;
     packet->m_body[i++] = 0x00;
     packet->m_body[i++] = 0x00;
 
     //version
     packet->m_body[i++] = 0x01;
+    // profile
     packet->m_body[i++] = sps[1];
     packet->m_body[i++] = sps[2];
     packet->m_body[i++] = sps[3];
@@ -196,11 +191,11 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
     auto *packet = new RTMPPacket();
     RTMPPacket_Alloc(packet, bodySize);
 
-    packet->m_body[0] = 0x27;
+    packet->m_body[0] = 0x27; // 2:None key frame 7:AVC
     if (type == NAL_SLICE_IDR) {
-        packet->m_body[0] = 0x17;
+        packet->m_body[0] = 0x17; // 1:Key frame  7:AVC
     }
-    //packet type
+    //AVC NALU
     packet->m_body[1] = 0x01;
     //timestamp
     packet->m_body[2] = 0x00;

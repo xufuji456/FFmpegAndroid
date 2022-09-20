@@ -3,7 +3,7 @@
 #define VIDEOSTREAM_H
 
 #include <inttypes.h>
-#include <pthread.h>
+#include <mutex>
 #include "rtmp/rtmp.h"
 #include "include/x264/x264.h"
 
@@ -22,7 +22,7 @@ public:
     void setVideoCallback(VideoCallback videoCallback);
 
 private:
-    pthread_mutex_t mutex{};
+    std::mutex m_mutex;
 
     int m_frameLen;
     x264_t *videoCodec = 0;
