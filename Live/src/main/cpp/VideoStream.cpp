@@ -175,7 +175,7 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
     //video
     packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
     packet->m_nBodySize  = bodySize;
-    packet->m_nChannel   = 10;
+    packet->m_nChannel   = 0x10;
     //sps and pps no timestamp
     packet->m_nTimeStamp = 0;
     packet->m_hasAbsTimestamp = 0;
