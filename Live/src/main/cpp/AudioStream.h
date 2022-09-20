@@ -14,7 +14,7 @@ public:
 
     ~AudioStream();
 
-    void setAudioEncInfo(int samplesInHZ, int channels);
+    int setAudioEncInfo(int samplesInHZ, int channels);
 
     void setAudioCallback(AudioCallback audioCallback);
 

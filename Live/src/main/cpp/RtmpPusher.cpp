@@ -22,24 +22,6 @@ JavaVM *javaVM;
 //callback object
 jobject jobject_error;
 
-/***************relative to Java**************/
-//error code for opening video encoder
-const int ERROR_VIDEO_ENCODER_OPEN = 0x01;
-//error code for video encoding
-const int ERROR_VIDEO_ENCODE = 0x02;
-//error code for opening audio encoder
-const int ERROR_AUDIO_ENCODER_OPEN = 0x03;
-//error code for audio encoding
-const int ERROR_AUDIO_ENCODE = 0x04;
-//error code for RTMP connecting
-const int ERROR_RTMP_CONNECT = 0x05;
-//error code for connecting stream
-const int ERROR_RTMP_CONNECT_STREAM = 0x06;
-//error code for sending packet
-const int ERROR_RTMP_SEND_PACKET = 0x07;
-
-/***************relative to Java**************/
-
 //when calling System.loadLibrary, will callback it
 jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
@@ -152,7 +134,10 @@ RTMP_PUSHER_FUNC(void, native_1init) {
 RTMP_PUSHER_FUNC(void, native_1setVideoCodecInfo,
                  jint width, jint height, jint fps, jint bitrate) {
     if (videoStream) {
-        videoStream->setVideoEncInfo(width, height, fps, bitrate);
+        int ret = videoStream->setVideoEncInfo(width, height, fps, bitrate);
+        if (ret < 0) {
+            throwErrToJava(ERROR_VIDEO_ENCODER_OPEN);
+        }
     }
 }
 
@@ -181,7 +166,10 @@ RTMP_PUSHER_FUNC(void, native_1pushVideo, jbyteArray yuv, jint camera_type) {
 
 RTMP_PUSHER_FUNC(void, native_1setAudioCodecInfo, jint sampleRateInHz, jint channels) {
     if (audioStream) {
-        audioStream->setAudioEncInfo(sampleRateInHz, channels);
+        int ret = audioStream->setAudioEncInfo(sampleRateInHz, channels);
+        if (ret < 0) {
+            throwErrToJava(ERROR_AUDIO_ENCODER_OPEN);
+        }
     }
 }
 

@@ -23,7 +23,7 @@ VideoStream::~VideoStream() {
     }
 }
 
-void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
+int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     pthread_mutex_lock(&mutex);
     m_frameLen = width * height;
     if (videoCodec) {
@@ -38,7 +38,10 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
 
     //setting x264 params
     x264_param_t param;
-    x264_param_default_preset(&param, "ultrafast", "zerolatency");
+    int ret = x264_param_default_preset(&param, "ultrafast", "zerolatency");
+    if (ret < 0) {
+        goto end;
+    }
     param.i_level_idc = 32;
     //input format
     param.i_csp = X264_CSP_I420;
@@ -69,12 +72,21 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     //thread number
     param.i_threads = 1;
 
-    x264_param_apply_profile(&param, "baseline");
+    ret = x264_param_apply_profile(&param, "baseline");
+    if (ret < 0) {
+        goto end;
+    }
     //open encoder
     videoCodec = x264_encoder_open(&param);
+    if (!videoCodec) {
+        ret = -1;
+        goto end;
+    }
     pic_in = new x264_picture_t();
     x264_picture_alloc(pic_in, X264_CSP_I420, width, height);
+end:
     pthread_mutex_unlock(&mutex);
+    return ret;
 }
 
 void VideoStream::setVideoCallback(VideoCallback callback) {
@@ -162,8 +174,8 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
 
     //video
     packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-    packet->m_nBodySize = bodySize;
-    packet->m_nChannel = 10;
+    packet->m_nBodySize  = bodySize;
+    packet->m_nChannel   = 10;
     //sps and pps no timestamp
     packet->m_nTimeStamp = 0;
     packet->m_hasAbsTimestamp = 0;
@@ -203,9 +215,9 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
     memcpy(&packet->m_body[9], payload, static_cast<size_t>(i_payload));
 
     packet->m_hasAbsTimestamp = 0;
-    packet->m_nBodySize = bodySize;
-    packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-    packet->m_nChannel = 0x10;
-    packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
+    packet->m_nBodySize       = bodySize;
+    packet->m_packetType      = RTMP_PACKET_TYPE_VIDEO;
+    packet->m_nChannel        = 0x10;
+    packet->m_headerType      = RTMP_PACKET_SIZE_LARGE;
     videoCallback(packet);
 }

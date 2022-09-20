@@ -20,24 +20,22 @@ void AudioStream::setAudioCallback(AudioCallback callback) {
     this->audioCallback = callback;
 }
 
-void AudioStream::setAudioEncInfo(int samplesInHZ, int channels) {
+int AudioStream::setAudioEncInfo(int samplesInHZ, int channels) {
     mChannels = channels;
     //open faac encoder
     audioCodec = faacEncOpen(static_cast<unsigned long>(samplesInHZ),
                              static_cast<unsigned int>(channels),
                              &inputSamples,
                              &maxOutputBytes);
+    buffer = new u_char[maxOutputBytes];
 
     //set encoder params
     faacEncConfigurationPtr config = faacEncGetCurrentConfiguration(audioCodec);
-    config->mpegVersion = MPEG4;
+    config->mpegVersion   = MPEG4;
     config->aacObjectType = LOW;
-    config->inputFormat = FAAC_INPUT_16BIT;
-    config->outputFormat = 0;
-    faacEncSetConfiguration(audioCodec, config);
-
-    //output buffer
-    buffer = new u_char[maxOutputBytes];
+    config->inputFormat   = FAAC_INPUT_16BIT;
+    config->outputFormat  = 0;
+    return faacEncSetConfiguration(audioCodec, config);
 }
 
 int AudioStream::getInputSamples() const {
@@ -61,10 +59,10 @@ RTMPPacket *AudioStream::getAudioTag() {
     memcpy(&packet->m_body[2], buf, len);
 
     packet->m_hasAbsTimestamp = 0;
-    packet->m_nBodySize = bodySize;
-    packet->m_packetType = RTMP_PACKET_TYPE_AUDIO;
-    packet->m_nChannel = 0x11;
-    packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
+    packet->m_nBodySize       = bodySize;
+    packet->m_packetType      = RTMP_PACKET_TYPE_AUDIO;
+    packet->m_nChannel        = 0x11;
+    packet->m_headerType      = RTMP_PACKET_SIZE_LARGE;
     return packet;
 }
 
@@ -88,10 +86,10 @@ void AudioStream::encodeData(int8_t *data) {
         memcpy(&packet->m_body[2], buffer, static_cast<size_t>(byteLen));
 
         packet->m_hasAbsTimestamp = 0;
-        packet->m_nBodySize = bodySize;
-        packet->m_packetType = RTMP_PACKET_TYPE_AUDIO;
-        packet->m_nChannel = 0x11;
-        packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
+        packet->m_nBodySize       = bodySize;
+        packet->m_packetType      = RTMP_PACKET_TYPE_AUDIO;
+        packet->m_nChannel        = 0x11;
+        packet->m_headerType      = RTMP_PACKET_SIZE_LARGE;
         audioCallback(packet);
     }
 }

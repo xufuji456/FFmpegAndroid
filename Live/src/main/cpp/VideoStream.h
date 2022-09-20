@@ -15,7 +15,7 @@ public:
 
     ~VideoStream();
 
-    void setVideoEncInfo(int width, int height, int fps, int bitrate);
+    int setVideoEncInfo(int width, int height, int fps, int bitrate);
 
     void encodeVideo(int8_t *data, int camera_type);
 
