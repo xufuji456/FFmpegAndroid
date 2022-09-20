@@ -12,12 +12,10 @@
 
 PacketQueue<RTMPPacket *> packets;
 VideoStream *videoStream = nullptr;
-pthread_t pid;
+AudioStream *audioStream = nullptr;
 
 std::atomic<bool> isPushing;
 uint32_t start_time;
-
-AudioStream *audioStream = nullptr;
 
 //use to get thread's JNIEnv
 JavaVM *javaVM;
@@ -143,9 +141,9 @@ void *start(void *args) {
 
 RTMP_PUSHER_FUNC(void, native_1init) {
     LOGI("native init...");
-    videoStream = new VideoStream;
+    videoStream = new VideoStream();
     videoStream->setVideoCallback(callback);
-    audioStream = new AudioStream;
+    audioStream = new AudioStream();
     audioStream->setAudioCallback(callback);
     packets.setReleaseCallback(releasePackets);
     jobject_error = env->NewGlobalRef(instance);
@@ -166,7 +164,9 @@ RTMP_PUSHER_FUNC(void, native_1start, jstring path_) {
     const char *path = env->GetStringUTFChars(path_, nullptr);
     char *url = new char[strlen(path) + 1];
     strcpy(url, path);
-    pthread_create(&pid, nullptr, start, url);
+
+    std::thread pushThread(start, url);
+    pushThread.detach();
     env->ReleaseStringUTFChars(path_, path);
 }
 
@@ -205,7 +205,6 @@ RTMP_PUSHER_FUNC(void, native_1stop) {
     LOGI("native stop...");
     isPushing = false;
     packets.setRunning(false);
-    pthread_join(pid, nullptr);
 }
 
 RTMP_PUSHER_FUNC(void, native_1release) {

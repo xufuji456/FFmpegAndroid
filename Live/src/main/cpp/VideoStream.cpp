@@ -72,7 +72,7 @@ void VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     x264_param_apply_profile(&param, "baseline");
     //open encoder
     videoCodec = x264_encoder_open(&param);
-    pic_in = new x264_picture_t;
+    pic_in = new x264_picture_t();
     x264_picture_alloc(pic_in, X264_CSP_I420, width, height);
     pthread_mutex_unlock(&mutex);
 }
@@ -128,7 +128,7 @@ void VideoStream::encodeVideo(int8_t *data, int camera_type) {
 
 void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len) {
     int bodySize = 13 + sps_len + 3 + pps_len;
-    auto *packet = new RTMPPacket;
+    auto *packet = new RTMPPacket();
     RTMPPacket_Alloc(packet, bodySize);
     int i = 0;
     //start code
@@ -181,7 +181,7 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
         payload += 3;
     }
     int bodySize = 9 + i_payload;
-    auto *packet = new RTMPPacket;
+    auto *packet = new RTMPPacket();
     RTMPPacket_Alloc(packet, bodySize);
 
     packet->m_body[0] = 0x27;
