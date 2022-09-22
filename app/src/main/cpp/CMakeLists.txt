@@ -10,6 +10,28 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+set(SRC_FFMPEG
+        ffmpeg/cmdutils.c
+        ffmpeg/ffmpeg.c
+        ffmpeg/ffmpeg_filter.c
+        ffmpeg/ffmpeg_opt.c
+        ffmpeg_cmd.c
+        ffmpeg/ffprobe.c
+        ffmpeg/ffmpeg_hw.c)
+
+set(SRC_VISUALIZER
+        visualizer/fft.cpp
+        visualizer/fixed_fft.cpp
+        visualizer/frank_visualizer.cpp
+        visualizer/frank_visualizer_jni.cpp
+        visualizer/window.cpp)
+
+set(SRC_METADATA
+        metadata/media_retriever.cpp
+        metadata/media_retriever_jni.cpp
+        metadata/metadata_util.c
+        metadata/ffmpeg_media_retriever.c)
+
 add_library( # Sets the name of the library.
              media-handle
 
@@ -17,31 +39,17 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-
-        ffmpeg/cmdutils.c
-        ffmpeg/ffmpeg.c
-        ffmpeg/ffmpeg_filter.c
-        ffmpeg/ffmpeg_opt.c
-        ffmpeg_cmd.c
-        ffmpeg/ffprobe.c
-        ffmpeg/ffmpeg_hw.c
+        ${SRC_FFMPEG}
+        ${SRC_VISUALIZER}
+        ${SRC_METADATA}
         video_player.cpp
         video_filter.c
         ffprobe_cmd.cpp
         video_cutting.cpp
-        visualizer/fft.cpp
-        visualizer/fixed_fft.cpp
-        visualizer/frank_visualizer.cpp
-        visualizer/frank_visualizer_jni.cpp
-        visualizer/window.cpp
-        metadata/media_retriever.cpp
-        metadata/media_retriever_jni.cpp
-        metadata/metadata_util.c
-        metadata/ffmpeg_media_retriever.c
         yuv/yuv_converter.cpp
+        pcm/pcm_process.cpp
         media_transcode.cpp
         ff_audio_resample.cpp
-        pcm/pcm_process.cpp
         common_media_jni.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
