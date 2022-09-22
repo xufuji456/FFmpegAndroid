@@ -77,49 +77,6 @@ void VideoStream::setVideoCallback(VideoCallback callback) {
     this->videoCallback = callback;
 }
 
-void VideoStream::encodeVideo(int8_t *data, int camera_type) {
-    std::lock_guard<std::mutex> l(m_mutex);
-    if (!pic_in)
-        return;
-
-    if (camera_type == 1) {
-        memcpy(pic_in->img.plane[0], data, m_frameLen); // y
-        for (int i = 0; i < m_frameLen/4; ++i) {
-            *(pic_in->img.plane[1] + i) = *(data + m_frameLen + i * 2 + 1);  // u
-            *(pic_in->img.plane[2] + i) = *(data + m_frameLen + i * 2); // v
-        }
-    } else if (camera_type == 2) {
-        int offset = 0;
-        memcpy(pic_in->img.plane[0], data, (size_t) m_frameLen); // y
-        offset += m_frameLen;
-        memcpy(pic_in->img.plane[1], data + offset, (size_t) m_frameLen / 4); // u
-        offset += m_frameLen / 4;
-        memcpy(pic_in->img.plane[2], data + offset, (size_t) m_frameLen / 4); // v
-    } else {
-        return;
-    }
-
-    x264_nal_t *pp_nal;
-    int pi_nal;
-    x264_picture_t pic_out;
-    x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
-    int pps_len, sps_len = 0;
-    uint8_t sps[100];
-    uint8_t pps[100];
-    for (int i = 0; i < pi_nal; ++i) {
-        if (pp_nal[i].i_type == NAL_SPS) {
-            sps_len = pp_nal[i].i_payload - 4;
-            memcpy(sps, pp_nal[i].p_payload + 4, static_cast<size_t>(sps_len));
-        } else if (pp_nal[i].i_type == NAL_PPS) {
-            pps_len = pp_nal[i].i_payload - 4;
-            memcpy(pps, pp_nal[i].p_payload + 4, static_cast<size_t>(pps_len));
-            sendSpsPps(sps, pps, sps_len, pps_len);
-        } else {
-            sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
-        }
-    }
-}
-
 void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_len) {
     int bodySize = 13 + sps_len + 3 + pps_len;
     auto *packet = new RTMPPacket();
@@ -203,6 +160,49 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
     packet->m_nChannel        = 0x10;
     packet->m_headerType      = RTMP_PACKET_SIZE_LARGE;
     videoCallback(packet);
+}
+
+void VideoStream::encodeVideo(int8_t *data, int camera_type) {
+    std::lock_guard<std::mutex> l(m_mutex);
+    if (!pic_in)
+        return;
+
+    if (camera_type == 1) {
+        memcpy(pic_in->img.plane[0], data, m_frameLen); // y
+        for (int i = 0; i < m_frameLen/4; ++i) {
+            *(pic_in->img.plane[1] + i) = *(data + m_frameLen + i * 2 + 1);  // u
+            *(pic_in->img.plane[2] + i) = *(data + m_frameLen + i * 2); // v
+        }
+    } else if (camera_type == 2) {
+        int offset = 0;
+        memcpy(pic_in->img.plane[0], data, (size_t) m_frameLen); // y
+        offset += m_frameLen;
+        memcpy(pic_in->img.plane[1], data + offset, (size_t) m_frameLen / 4); // u
+        offset += m_frameLen / 4;
+        memcpy(pic_in->img.plane[2], data + offset, (size_t) m_frameLen / 4); // v
+    } else {
+        return;
+    }
+
+    x264_nal_t *pp_nal;
+    int pi_nal;
+    x264_picture_t pic_out;
+    x264_encoder_encode(videoCodec, &pp_nal, &pi_nal, pic_in, &pic_out);
+    int pps_len, sps_len = 0;
+    uint8_t sps[100];
+    uint8_t pps[100];
+    for (int i = 0; i < pi_nal; ++i) {
+        if (pp_nal[i].i_type == NAL_SPS) {
+            sps_len = pp_nal[i].i_payload - 4;
+            memcpy(sps, pp_nal[i].p_payload + 4, static_cast<size_t>(sps_len));
+        } else if (pp_nal[i].i_type == NAL_PPS) {
+            pps_len = pp_nal[i].i_payload - 4;
+            memcpy(pps, pp_nal[i].p_payload + 4, static_cast<size_t>(pps_len));
+            sendSpsPps(sps, pps, sps_len, pps_len);
+        } else {
+            sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
+        }
+    }
 }
 
 VideoStream::~VideoStream() {
