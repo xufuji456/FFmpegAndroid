@@ -9,6 +9,14 @@ template<typename T>
 class PacketQueue {
     typedef void (*ReleaseCallback)(T &);
 
+private:
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
+    std::queue<T> m_queue;
+    bool m_running;
+
+    ReleaseCallback releaseCallback;
+
 public:
 
     void push(T new_value) {
@@ -33,21 +41,6 @@ public:
         return ret;
     }
 
-    void setRunning(bool run) {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_running = run;
-    }
-
-    int empty() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_queue.empty();
-    }
-
-    int size() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return static_cast<int>(m_queue.size());
-    }
-
     void clear() {
         std::lock_guard<std::mutex> lock(m_mutex);
         int size = m_queue.size();
@@ -58,18 +51,25 @@ public:
         }
     }
 
+    void setRunning(bool run) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_running = run;
+    }
+
+    bool empty() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_queue.empty();
+    }
+
+    int size() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return static_cast<int>(m_queue.size());
+    }
+
     void setReleaseCallback(ReleaseCallback callback) {
         releaseCallback = callback;
     }
 
-private:
-
-    std::mutex m_mutex;
-    std::condition_variable m_cond;
-    std::queue<T> m_queue;
-    bool m_running;
-
-    ReleaseCallback releaseCallback;
 };
 
 #endif // PACKET_QUEUE_H

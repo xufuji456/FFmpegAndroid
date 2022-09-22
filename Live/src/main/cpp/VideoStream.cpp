@@ -10,18 +10,6 @@ VideoStream::VideoStream():m_frameLen(0),
 
 }
 
-VideoStream::~VideoStream() {
-    if (videoCodec) {
-        x264_encoder_close(videoCodec);
-        videoCodec = nullptr;
-    }
-    if (pic_in) {
-        x264_picture_clean(pic_in);
-        delete pic_in;
-        pic_in = nullptr;
-    }
-}
-
 int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     std::lock_guard<std::mutex> l(m_mutex);
     m_frameLen = width * height;
@@ -215,4 +203,16 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
     packet->m_nChannel        = 0x10;
     packet->m_headerType      = RTMP_PACKET_SIZE_LARGE;
     videoCallback(packet);
+}
+
+VideoStream::~VideoStream() {
+    if (videoCodec) {
+        x264_encoder_close(videoCodec);
+        videoCodec = nullptr;
+    }
+    if (pic_in) {
+        x264_picture_clean(pic_in);
+        delete pic_in;
+        pic_in = nullptr;
+    }
 }
