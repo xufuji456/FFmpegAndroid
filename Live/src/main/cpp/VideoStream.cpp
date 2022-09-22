@@ -194,15 +194,16 @@ void VideoStream::encodeVideo(int8_t *data, int camera_type) {
     uint8_t sps[100];
     uint8_t pps[100];
     for (int i = 0; i < pi_nal; ++i) {
-        if (pp_nal[i].i_type == NAL_SPS) {
-            sps_len = pp_nal[i].i_payload - 4;
-            memcpy(sps, pp_nal[i].p_payload + 4, static_cast<size_t>(sps_len));
-        } else if (pp_nal[i].i_type == NAL_PPS) {
-            pps_len = pp_nal[i].i_payload - 4;
-            memcpy(pps, pp_nal[i].p_payload + 4, static_cast<size_t>(pps_len));
+        x264_nal_t nal = pp_nal[i];
+        if (nal.i_type == NAL_SPS) {
+            sps_len = nal.i_payload - 4;
+            memcpy(sps, nal.p_payload + 4, static_cast<size_t>(sps_len));
+        } else if (nal.i_type == NAL_PPS) {
+            pps_len = nal.i_payload - 4;
+            memcpy(pps, nal.p_payload + 4, static_cast<size_t>(pps_len));
             sendSpsPps(sps, pps, sps_len, pps_len);
         } else {
-            sendFrame(pp_nal[i].i_type, pp_nal[i].p_payload, pp_nal[i].i_payload);
+            sendFrame(nal.i_type, nal.p_payload, nal.i_payload);
         }
     }
 }
