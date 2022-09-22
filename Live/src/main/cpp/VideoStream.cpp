@@ -101,15 +101,15 @@ void VideoStream::sendSpsPps(uint8_t *sps, uint8_t *pps, int sps_len, int pps_le
     //sps
     packet->m_body[i++] = 0xE1;
     //sps len
-    packet->m_body[i++] = (sps_len >> 8) & 0xff;
-    packet->m_body[i++] = sps_len & 0xff;
+    packet->m_body[i++] = (sps_len >> 8) & 0xFF;
+    packet->m_body[i++] = sps_len & 0xFF;
     memcpy(&packet->m_body[i], sps, sps_len);
     i += sps_len;
 
     //pps
     packet->m_body[i++] = 0x01;
-    packet->m_body[i++] = (pps_len >> 8) & 0xff;
-    packet->m_body[i++] = (pps_len) & 0xff;
+    packet->m_body[i++] = (pps_len >> 8) & 0xFF;
+    packet->m_body[i++] = (pps_len) & 0xFF;
     memcpy(&packet->m_body[i], pps, pps_len);
 
     //video
@@ -132,27 +132,29 @@ void VideoStream::sendFrame(int type, uint8_t *payload, int i_payload) {
         i_payload -= 3;
         payload += 3;
     }
+    int i = 0;
     int bodySize = 9 + i_payload;
     auto *packet = new RTMPPacket();
     RTMPPacket_Alloc(packet, bodySize);
 
-    packet->m_body[0] = 0x27; // 2:None key frame 7:AVC
     if (type == NAL_SLICE_IDR) {
-        packet->m_body[0] = 0x17; // 1:Key frame  7:AVC
+        packet->m_body[i++] = 0x17; // 1:Key frame  7:AVC
+    } else {
+        packet->m_body[i++] = 0x27; // 2:None key frame 7:AVC
     }
     //AVC NALU
-    packet->m_body[1] = 0x01;
+    packet->m_body[i++] = 0x01;
     //timestamp
-    packet->m_body[2] = 0x00;
-    packet->m_body[3] = 0x00;
-    packet->m_body[4] = 0x00;
+    packet->m_body[i++] = 0x00;
+    packet->m_body[i++] = 0x00;
+    packet->m_body[i++] = 0x00;
     //packet len
-    packet->m_body[5] = (i_payload >> 24) & 0xff;
-    packet->m_body[6] = (i_payload >> 16) & 0xff;
-    packet->m_body[7] = (i_payload >> 8) & 0xff;
-    packet->m_body[8] = (i_payload) & 0xff;
+    packet->m_body[i++] = (i_payload >> 24) & 0xFF;
+    packet->m_body[i++] = (i_payload >> 16) & 0xFF;
+    packet->m_body[i++] = (i_payload >> 8) & 0xFF;
+    packet->m_body[i++] = (i_payload) & 0xFF;
 
-    memcpy(&packet->m_body[9], payload, static_cast<size_t>(i_payload));
+    memcpy(&packet->m_body[i], payload, static_cast<size_t>(i_payload));
 
     packet->m_hasAbsTimestamp = 0;
     packet->m_nBodySize       = bodySize;
