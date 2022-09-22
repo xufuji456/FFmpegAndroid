@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <mutex>
 #include "rtmp/rtmp.h"
-#include "include/x264/x264.h"
+#include "x264/x264.h"
 
 class VideoStream {
     typedef void (*VideoCallback)(RTMPPacket *packet);

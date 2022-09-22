@@ -30,7 +30,7 @@ set_target_properties(x264
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
-include_directories(main/cpp/include)
+include_directories(src/main/cpp/include)
 
 add_library(live
         SHARED
