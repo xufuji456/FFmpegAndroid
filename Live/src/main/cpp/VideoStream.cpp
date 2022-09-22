@@ -39,11 +39,11 @@ int VideoStream::setVideoEncInfo(int width, int height, int fps, int bitrate) {
     //i_rc_method:bitrate control, CQP(constant quality), CRF(constant bitrate), ABR(average bitrate)
     param.rc.i_rc_method = X264_RC_ABR;
     //bitrate(Kbps)
-    param.rc.i_bitrate = bitrate / 1000;
+    param.rc.i_bitrate = bitrate / 1024;
     //max bitrate
-    param.rc.i_vbv_max_bitrate = bitrate / 1000 * 1.2;
+    param.rc.i_vbv_max_bitrate = bitrate / 1024 * 1.2;
     //unit:kbps
-    param.rc.i_vbv_buffer_size = bitrate / 1000;
+    param.rc.i_vbv_buffer_size = bitrate / 1024;
 
     //frame rate
     param.i_fps_num = fps;
