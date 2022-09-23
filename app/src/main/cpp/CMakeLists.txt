@@ -32,6 +32,10 @@ set(SRC_METADATA
         metadata/metadata_util.c
         metadata/ffmpeg_media_retriever.c)
 
+set(SRC_FFPLAYER
+        ffplayer/queue/FrameQueue.cpp
+        ffplayer/queue/PacketQueue.cpp)
+
 add_library( # Sets the name of the library.
              media-handle
 
@@ -42,6 +46,7 @@ add_library( # Sets the name of the library.
         ${SRC_FFMPEG}
         ${SRC_VISUALIZER}
         ${SRC_METADATA}
+        ${SRC_FFPLAYER}
         video_player.cpp
         video_filter.c
         ffprobe_cmd.cpp
