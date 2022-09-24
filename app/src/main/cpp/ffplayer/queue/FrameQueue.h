@@ -3,7 +3,7 @@
 #define FFMPEGANDROID_FRAMEQUEUE_H
 
 #include <mutex>
-#include "ffplayer/ffplay_define.h"
+#include "ffplay_define.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
