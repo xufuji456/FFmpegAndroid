@@ -1,6 +1,3 @@
-//
-// Created by xu fulong on 2022/9/22.
-//
 
 #ifndef FFMPEGANDROID_FFPLAY_DEFINE_H
 #define FFMPEGANDROID_FFPLAY_DEFINE_H
@@ -57,7 +54,7 @@ class PlayerParams {
 public:
     std::mutex mutex;
 
-    MessageQueue *messageQueue;
+    FFMessageQueue *messageQueue;
     int64_t videoDuration;
 
     AVInputFormat *iformat;

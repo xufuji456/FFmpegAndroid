@@ -1,6 +1,3 @@
-//
-// Created by xu fulong on 2022/9/24.
-//
 
 #ifndef FFMPEGANDROID_FFMESSAGEQUEUE_H
 #define FFMPEGANDROID_FFMESSAGEQUEUE_H
@@ -26,6 +23,8 @@
 #define FFP_MSG_COMPONENT_OPEN              409
 #define FFP_MSG_VIDEO_SEEK_RENDERING_START  410
 #define FFP_MSG_AUDIO_SEEK_RENDERING_START  411
+#define FFP_MSG_DECODER_OPEN_ERROR          412
+#define FFP_MSG_DEMUX_ERROR                 413
 
 #define FFP_MSG_BUFFERING_START             500
 #define FFP_MSG_BUFFERING_END               501
@@ -36,6 +35,7 @@
 #define FFP_MSG_PLAYBACK_STATE_CHANGED      700
 #define FFP_MSG_TIMED_TEXT                  800
 #define FFP_MSG_VIDEO_DECODER_OPEN          900
+#define FFP_MSG_OPEN_ERROR                  901
 
 #define FFP_REQ_START                       1001
 #define FFP_REQ_PAUSE                       1002

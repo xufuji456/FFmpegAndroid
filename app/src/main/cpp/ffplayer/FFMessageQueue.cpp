@@ -1,6 +1,3 @@
-//
-// Created by xu fulong on 2022/9/24.
-//
 
 #include "FFMessageQueue.h"
 

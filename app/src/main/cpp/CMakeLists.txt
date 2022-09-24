@@ -34,7 +34,14 @@ set(SRC_METADATA
 
 set(SRC_FFPLAYER
         ffplayer/queue/FrameQueue.cpp
-        ffplayer/queue/PacketQueue.cpp)
+        ffplayer/queue/PacketQueue.cpp
+        ffplayer/decode/BaseDecoder.cpp
+        ffplayer/decode/FFAudioDecoder.cpp
+        ffplayer/decode/FFVideoDecoder.cpp
+        ffplayer/clock/MediaClock.cpp
+        ffplayer/render/android/AudioAndroidRender.cpp
+        ffplayer/FFMessageQueue.cpp
+        ffplayer/FFMediaPlayer.cpp)
 
 add_library( # Sets the name of the library.
              media-handle
@@ -74,6 +81,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 include_directories(.)
 include_directories(include)
 include_directories(metadata)
+include_directories(ffplayer)
 
 if(${CMAKE_ANDROID_ARCH_ABI} MATCHES "armeabi-v7a")
     include_directories(include/armeabi-v7a)
