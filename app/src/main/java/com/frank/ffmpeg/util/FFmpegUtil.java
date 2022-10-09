@@ -845,4 +845,12 @@ public class FFmpegUtil {
         return insert(stereo3dCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    public static String[] videoTransition(String inputPath1, int width, int height, int offset, String inputPath2, String outputPath) {
+        String transitionCmd = "ffmpeg -i -i -filter_complex " +
+                "[0]settb=AVTB,fps=24000/1001[v0];[1]settb=AVTB,fps=24000/1001,scale=%d:%d[v1];" +
+                "[v0][v1]xfade=transition=radial:duration=1:offset=%d";
+        transitionCmd = String.format(Locale.getDefault(), transitionCmd, width, height, offset);
+        return insert(transitionCmd.split(" "), 2, inputPath1, 4, inputPath2, outputPath);
+    }
+
 }
