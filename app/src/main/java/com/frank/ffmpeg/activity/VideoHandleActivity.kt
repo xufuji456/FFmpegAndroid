@@ -332,7 +332,8 @@ class VideoHandleActivity : BaseActivity() {
             }
             18 -> { // zoom photo to video
                 outputPath = PATH + File.separator + "zoom.mp4"
-                commandLine = FFmpegUtil.photoZoomToVideo(srcFile, outputPath)
+                val position = 0
+                commandLine = FFmpegUtil.photoZoomToVideo(srcFile, position, outputPath)
             }
             else -> {
             }

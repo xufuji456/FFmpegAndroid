@@ -664,12 +664,36 @@ public class FFmpegUtil {
     /**
      * Photo zoom to video
      * @param inputPath inputPath
+     * @param position position
+     *                 0:center
+     *                 1:left to right
+     *                 2:right to left
+     *                 3:down to up
+     *                 4:up to down
      * @param outputPath outputPath
      * @return zoomCmd
      */
-    public static String[] photoZoomToVideo(String inputPath, String outputPath) {
-        String zoomCmd = "ffmpeg -loop 1 -i -vf zoompan=z='if(lte(zoom,1.0),1.5,max(1.001,zoom-0.0015))':d=125 -t 8";
-        return insert(zoomCmd.split(" "), 4, inputPath, outputPath);
+    public static String[] photoZoomToVideo(String inputPath, int position, String outputPath) {
+        String zoomCmd = "ffmpeg -i -vf ";
+        switch (position) {
+            case 1:
+                zoomCmd += "zoompan='1.3':x='if(lte(on,1),(iw/zoom)/2,x-0.5)':y='if(lte(on,1),(ih-ih/zoom)/2,y)':d=180";
+                break;
+            case 2:
+                zoomCmd += "zoompan='1.3':x='if(lte(on,-1),(iw-iw/zoom)/2,x+0.5)':y='if(lte(on,1),(ih-ih/zoom)/2,y)':d=180";
+                break;
+            case 3:
+                zoomCmd += "zoompan='1.3':x='if(lte(on,1),(iw-iw/zoom)/2,x)':y='if(lte(on,-1),(ih-ih/zoom)/2,y+0.5)':d=180";
+                break;
+            case 4:
+                zoomCmd += "zoompan='1.3':x='if(lte(on,1),(iw-iw/zoom)/2,x)':y='if(lte(on,1),(ih/zoom)/2,y-0.5)':d=180";
+                break;
+            case 0:
+            default:
+                zoomCmd += "zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=180";
+                break;
+        }
+        return insert(zoomCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
