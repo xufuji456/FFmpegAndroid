@@ -39,7 +39,9 @@ set(SRC_FFPLAYER
         ffplayer/decode/FFAudioDecoder.cpp
         ffplayer/decode/FFVideoDecoder.cpp
         ffplayer/clock/MediaClock.cpp
-        ffplayer/render/android/AudioAndroidRender.cpp
+        ffplayer/clock/AVSync.cpp
+        ffplayer/render/AudioRender.cpp
+        ffplayer/ff_mediaplayer_jni.cpp
         ffplayer/FFMessageQueue.cpp
         ffplayer/FFMediaPlayer.cpp)
 
@@ -53,7 +55,7 @@ add_library( # Sets the name of the library.
         ${SRC_FFMPEG}
         ${SRC_VISUALIZER}
         ${SRC_METADATA}
-        ${SRC_FFPLAYER}
+#        ${SRC_FFPLAYER}
         video_player.cpp
         video_filter.c
         ffprobe_cmd.cpp
