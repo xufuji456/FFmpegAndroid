@@ -53,7 +53,8 @@
     <string name="video_extract_frame">Extract frame</string>
     <string name="video_part_zoom">Video zoom</string>
     <string name="video_play">Video play</string>
-    <string name="video_filter">Video filter</string>
+    <string name="video_filter">FFmpeg filter</string>
+    <string name="camera_filter">Camera filter</string>
     <string name="video_slow">Video slow</string>
     <string name="video_fast">Video fast</string>
     <string name="video_multi">Video multi</string>

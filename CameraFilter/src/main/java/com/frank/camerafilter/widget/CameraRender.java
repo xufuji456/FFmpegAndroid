@@ -83,6 +83,7 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         if (cameraManager.getCamera() == null)
             cameraManager.openCamera();
         Camera.Size size = cameraManager.getPreviewSize();
+        // rotation=90 or rotation=270, we need to exchange width and height
         if (cameraManager.getOrientation() == 90 || cameraManager.getOrientation() == 270) {
             mImageWidth = size.height;
             mImageHeight = size.width;
