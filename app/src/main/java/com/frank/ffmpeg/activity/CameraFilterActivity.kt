@@ -2,12 +2,22 @@ package com.frank.ffmpeg.activity
 
 import android.os.Bundle
 import android.view.View
+import com.frank.camerafilter.factory.BeautyFilterType
 import com.frank.camerafilter.widget.BeautyCameraView
 import com.frank.ffmpeg.R
+import com.frank.ffmpeg.util.FilterTypeUtil
 
 class CameraFilterActivity : BaseActivity() {
 
     private var cameraView: BeautyCameraView ?= null
+
+    private var index: Int = 0
+
+    private val filterType: Array<BeautyFilterType> = arrayOf(
+        BeautyFilterType.NONE,
+        BeautyFilterType.CRAYON,
+        BeautyFilterType.SKETCH
+    )
 
     override val layoutId: Int
         get() = R.layout.activity_camera_filter
@@ -34,7 +44,11 @@ class CameraFilterActivity : BaseActivity() {
                 showToast("stop recording...")
             }
         } else if (view.id == R.id.btn_camera_filter) {
-
+            index++
+            if (index >= filterType.size)
+                index = 0
+            cameraView!!.setFilter(filterType[index])
+            showToast(getString(FilterTypeUtil.filterTypeToNameId(filterType[index])))
         }
     }
 
