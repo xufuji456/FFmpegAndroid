@@ -1,10 +1,8 @@
 package com.frank.ffmpeg.activity
 
 import android.os.Bundle
-import android.view.SurfaceView
 import android.view.View
 import com.frank.camerafilter.widget.BeautyCameraView
-import com.frank.ffmpeg.FFMediaPlayer
 import com.frank.ffmpeg.R
 
 class CameraFilterActivity : BaseActivity() {
@@ -22,10 +20,22 @@ class CameraFilterActivity : BaseActivity() {
 
     fun initView() {
         cameraView = getView(R.id.surface_camera_filter)
+        initViewsWithClick(R.id.btn_video_recorder)
+        initViewsWithClick(R.id.btn_camera_filter)
     }
 
     override fun onViewClick(view: View) {
+        if (view.id == R.id.btn_video_recorder) {
+            val isRecording = cameraView!!.isRecording
+            cameraView!!.isRecording = !isRecording
+            if (!isRecording) {
+                showToast("start recording...")
+            } else {
+                showToast("stop recording...")
+            }
+        } else if (view.id == R.id.btn_camera_filter) {
 
+        }
     }
 
     override fun onSelectedFile(filePath: String) {

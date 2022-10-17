@@ -216,6 +216,10 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
         recordEnable = isRecording;
     }
 
+    public boolean isRecording() {
+        return recordEnable;
+    }
+
     public void setFilter(final BeautyFilterType type) {
         mCameraView.queueEvent(new Runnable() {
             @Override

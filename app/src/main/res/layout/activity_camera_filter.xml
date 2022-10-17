@@ -4,13 +4,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.CameraFilterActivity"
-    android:layout_marginTop="66dp"
-    android:layout_marginBottom="66dp">
+    android:layout_marginTop="30dp"
+    android:layout_marginBottom="30dp">
 
     <com.frank.camerafilter.widget.BeautyCameraView
         android:id="@+id/surface_camera_filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="33dp"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/btn_video_recorder"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_video_record"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <ImageView
+            android:id="@+id/btn_camera_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="66dp"
+            android:src="@drawable/ic_camera_filter"
+            android:background="?android:attr/selectableItemBackground"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

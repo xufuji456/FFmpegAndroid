@@ -40,11 +40,21 @@ public class BeautyCameraView extends GLSurfaceView {
     }
 
     public void setFilter(BeautyFilterType type) {
+        if (mCameraRender == null)
+            return;
         mCameraRender.setFilter(type);
     }
 
     public void setRecording(boolean isRecording) {
+        if (mCameraRender == null)
+            return;
         mCameraRender.setRecording(isRecording);
+    }
+
+    public boolean isRecording() {
+        if (mCameraRender == null)
+            return false;
+        return mCameraRender.isRecording();
     }
 
 }
