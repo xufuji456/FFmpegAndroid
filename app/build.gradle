@@ -66,4 +66,5 @@ dependencies {
     implementation project(':AndroidMedia')
     //implementation "libmp3" if you need mp3-lite module
 //    implementation project(':libmp3')
+    implementation project(':CameraFilter')
 }
