@@ -9,5 +9,5 @@ uniform samplerExternalOES inputImageTexture;
 void main(){
 
     vec3 centralColor = texture2D(inputImageTexture, textureCoordinate).rgb;
-    gl_FragColor = vec4(centralColor.rgb,1.0);;
+    gl_FragColor = vec4(centralColor.rgb,1.0);
 }

@@ -8,11 +8,11 @@ import android.opengl.GLSurfaceView;
 import android.os.Environment;
 
 import com.frank.camerafilter.camera.CameraManager;
-import com.frank.camerafilter.filter.BeautyCameraFilter;
-import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.factory.BeautyFilterFactory;
 import com.frank.camerafilter.factory.BeautyFilterType;
-import com.frank.camerafilter.recorder.video.TextureVideoRecorder;
+import com.frank.camerafilter.filter.BeautyCameraFilter;
+import com.frank.camerafilter.filter.BaseFilter;
+import com.frank.camerafilter.recorder.video.CameraVideoRecorder;
 import com.frank.camerafilter.util.OpenGLUtil;
 import com.frank.camerafilter.util.Rotation;
 import com.frank.camerafilter.util.TextureRotateUtil;
@@ -50,7 +50,7 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
     private final File outputFile;
     private int recordStatus;
     protected boolean recordEnable;
-    private final TextureVideoRecorder videoRecorder;
+    private final CameraVideoRecorder videoRecorder;
 
     private final static int RECORDING_OFF    = 0;
     private final static int RECORDING_ON     = 1;
@@ -75,7 +75,7 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
 
         recordEnable    = false;
         recordStatus    = RECORDING_OFF;
-        videoRecorder   = new TextureVideoRecorder(mCameraView.getContext());
+        videoRecorder   = new CameraVideoRecorder(mCameraView.getContext());
         outputFile      = new File(videoPath, videoName);
     }
 
@@ -178,7 +178,7 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
                     videoRecorder.setPreviewSize(mImageWidth, mImageHeight);
                     videoRecorder.setTextureBuffer(mTextureBuffer);
                     videoRecorder.setCubeBuffer(mVertexBuffer);
-                    videoRecorder.startRecording(new TextureVideoRecorder.RecorderConfig(
+                    videoRecorder.startRecording(new CameraVideoRecorder.RecorderConfig(
                             mImageWidth,
                             mImageHeight,
                             videoBitrate,

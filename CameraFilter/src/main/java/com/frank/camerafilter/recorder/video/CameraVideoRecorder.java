@@ -43,9 +43,9 @@ import java.nio.FloatBuffer;
  *     call TextureMovieEncoder#frameAvailable().
  * </ul>
  */
-public class TextureVideoRecorder implements Runnable {
+public class CameraVideoRecorder implements Runnable {
 
-    private final static String TAG = TextureVideoRecorder.class.getSimpleName();
+    private final static String TAG = CameraVideoRecorder.class.getSimpleName();
 
     private final static int MSG_START_RECORDING       = 0;
     private final static int MSG_STOP_RECORDING        = 1;
@@ -80,7 +80,7 @@ public class TextureVideoRecorder implements Runnable {
 
     private BeautyFilterType type = BeautyFilterType.NONE;
 
-    public TextureVideoRecorder(Context context) {
+    public CameraVideoRecorder(Context context) {
         mContext = context;
     }
 
@@ -101,88 +101,17 @@ public class TextureVideoRecorder implements Runnable {
 
     }
 
-    public void startRecording(RecorderConfig config) {
-        synchronized (mReadyFence) {
-            if (mRunning) {
-                return;
-            }
-            mRunning = true;
-            new Thread(this, TAG).start();
-            while (!mReady) {
-                try {
-                    mReadyFence.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_START_RECORDING, config));
-    }
-
-    public void stopRecording() {
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_STOP_RECORDING));
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_QUIT_RECORDING));
-    }
-
-    public boolean isRecording() {
-        synchronized (mReadyFence) {
-            return mRunning;
-        }
-    }
-
-    public void updateSharedContext(EGLContext eglContext) {
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_UPDATE_SHARED_CONTEXT, eglContext));
-    }
-
-    public void frameAvailable(SurfaceTexture surfaceTexture) {
-        synchronized (mReadyFence) {
-            if (!mReady)
-                return;
-        }
-        float[] transform = new float[16];
-        surfaceTexture.getTransformMatrix(transform);
-        long timestamp = surfaceTexture.getTimestamp();
-        if (timestamp == 0) {
-            return;
-        }
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE, (int) (timestamp >> 32), (int) timestamp, transform));
-    }
-
-    public void setTextureId(int id) {
-        synchronized (mReadyFence) {
-            if (!mReady)
-                return;
-        }
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TEXTURE_ID, id, 0, null));
-    }
-
-    @Override
-    public void run() {
-        Looper.prepare();
-        synchronized (mReadyFence) {
-            mHandler = new RecorderHandler(this);
-            mReady = true;
-            mReadyFence.notify();
-        }
-        Looper.loop();
-        synchronized (mReadyFence) {
-            mReady = false;
-            mRunning = false;
-            mHandler = null;
-        }
-    }
-
     private static class RecorderHandler extends Handler {
-        private final WeakReference<TextureVideoRecorder> mWeakRecorder;
+        private final WeakReference<CameraVideoRecorder> mWeakRecorder;
 
-        public RecorderHandler(TextureVideoRecorder recorder) {
+        public RecorderHandler(CameraVideoRecorder recorder) {
             mWeakRecorder = new WeakReference<>(recorder);
         }
 
         @Override
         public void handleMessage(@NonNull Message msg) {
             Object obj = msg.obj;
-            TextureVideoRecorder recorder = mWeakRecorder.get();
+            CameraVideoRecorder recorder = mWeakRecorder.get();
             if (recorder == null) {
                 return;
             }
@@ -305,6 +234,78 @@ public class TextureVideoRecorder implements Runnable {
             mEglCore = null;
         }
     }
+
+    public void startRecording(RecorderConfig config) {
+        synchronized (mReadyFence) {
+            if (mRunning) {
+                return;
+            }
+            mRunning = true;
+            new Thread(this, TAG).start();
+            while (!mReady) {
+                try {
+                    mReadyFence.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_START_RECORDING, config));
+    }
+
+    public void stopRecording() {
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_STOP_RECORDING));
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_QUIT_RECORDING));
+    }
+
+    public boolean isRecording() {
+        synchronized (mReadyFence) {
+            return mRunning;
+        }
+    }
+
+    public void updateSharedContext(EGLContext eglContext) {
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_UPDATE_SHARED_CONTEXT, eglContext));
+    }
+
+    public void frameAvailable(SurfaceTexture surfaceTexture) {
+        synchronized (mReadyFence) {
+            if (!mReady)
+                return;
+        }
+        float[] transform = new float[16];
+        surfaceTexture.getTransformMatrix(transform);
+        long timestamp = surfaceTexture.getTimestamp();
+        if (timestamp == 0) {
+            return;
+        }
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE, (int) (timestamp >> 32), (int) timestamp, transform));
+    }
+
+    public void setTextureId(int id) {
+        synchronized (mReadyFence) {
+            if (!mReady)
+                return;
+        }
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TEXTURE_ID, id, 0, null));
+    }
+
+    @Override
+    public void run() {
+        Looper.prepare();
+        synchronized (mReadyFence) {
+            mHandler = new RecorderHandler(this);
+            mReady = true;
+            mReadyFence.notify();
+        }
+        Looper.loop();
+        synchronized (mReadyFence) {
+            mReady = false;
+            mRunning = false;
+            mHandler = null;
+        }
+    }
+
     public void setFilter(BeautyFilterType type) {
         this.type = type;
     }

@@ -26,9 +26,9 @@ public class VideoRecorderCore {
     private final static String TAG = VideoRecorderCore.class.getSimpleName();
 
     private final static int FRAME_RATE = 30;
-    private final static int IFRAME_INTERVAL = 5;
+    private final static int IFRAME_INTERVAL = 30;
     private final static String MIME_TYPE = "video/avc";
-    private final static int TIMEOUT_USEC = 10000;
+    private final static int TIMEOUT_USEC = 20000;
 
     private int mTrackIndex;
     private boolean mMuxerStarted;
