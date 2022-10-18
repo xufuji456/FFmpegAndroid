@@ -65,8 +65,9 @@ public class CameraVideoRecorder implements Runnable {
 
     private boolean mReady;
     private boolean mRunning;
-    private Context mContext;
     private BaseFilter mFilter;
+    private final Context mContext;
+    private float[] mTransformMatrix;
     private FloatBuffer glVertexBuffer;
     private FloatBuffer glTextureBuffer;
 
@@ -273,13 +274,15 @@ public class CameraVideoRecorder implements Runnable {
             if (!mReady)
                 return;
         }
-        float[] transform = new float[16];
-        surfaceTexture.getTransformMatrix(transform);
+        if (mTransformMatrix == null) {
+            mTransformMatrix = new float[16];
+        }
+        surfaceTexture.getTransformMatrix(mTransformMatrix);
         long timestamp = surfaceTexture.getTimestamp();
         if (timestamp == 0) {
             return;
         }
-        mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE, (int) (timestamp >> 32), (int) timestamp, transform));
+        mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE, (int) (timestamp >> 32), (int) timestamp, mTransformMatrix));
     }
 
     public void setTextureId(int id) {
