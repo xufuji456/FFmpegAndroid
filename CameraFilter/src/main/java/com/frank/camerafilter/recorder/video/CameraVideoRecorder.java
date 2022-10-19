@@ -56,7 +56,7 @@ public class CameraVideoRecorder implements Runnable {
 
     private int mTextureId;
     private EglCore mEglCore;
-    private BeautyCameraFilter mInput;
+    private BeautyCameraFilter mCameraFilter;
     private WindowEglSurface mWindowSurface;
     private VideoRecorderCore mVideoRecorder;
 
@@ -65,7 +65,7 @@ public class CameraVideoRecorder implements Runnable {
 
     private boolean mReady;
     private boolean mRunning;
-    private BaseFilter mFilter;
+    private BaseFilter mAddFilter;
     private final Context mContext;
     private float[] mTransformMatrix;
     private FloatBuffer glVertexBuffer;
@@ -160,11 +160,11 @@ public class CameraVideoRecorder implements Runnable {
 
     private void handleFrameAvailable(float[] transform, long timestamp) {
         mVideoRecorder.drainEncoder(false);
-        mInput.setTextureTransformMatrix(transform);
-        if (mFilter == null) {
-            mInput.onDrawFrame(mTextureId, glVertexBuffer, glTextureBuffer);
+        mCameraFilter.setTextureTransformMatrix(transform);
+        if (mAddFilter == null) {
+            mCameraFilter.onDrawFrame(mTextureId, glVertexBuffer, glTextureBuffer);
         } else {
-            mFilter.onDrawFrame(mTextureId, glVertexBuffer, glTextureBuffer);
+            mAddFilter.onDrawFrame(mTextureId, glVertexBuffer, glTextureBuffer);
         }
         mWindowSurface.setPresentationTime(timestamp);
         mWindowSurface.swapBuffers();
@@ -176,20 +176,20 @@ public class CameraVideoRecorder implements Runnable {
 
     private void handleUpdateSharedContext(EGLContext eglContext) {
         mWindowSurface.releaseEglSurface();
-        mInput.destroy();
+        mCameraFilter.destroy();
         mEglCore.release();
 
         mEglCore = new EglCore(eglContext, EglCore.FLAG_RECORDABLE);
         mWindowSurface.recreate(mEglCore);
         mWindowSurface.makeCurrent();
 
-        mInput = new BeautyCameraFilter(mContext);
-        mInput.init();
-        mFilter = BeautyFilterFactory.getFilter(type, mContext);
-        if (mFilter != null) {
-            mFilter.init();
-            mFilter.onOutputSizeChanged(mVideoWidth, mVideoHeight);
-            mFilter.onInputSizeChanged(mPreviewWidth, mPreviewHeight);
+        mCameraFilter = new BeautyCameraFilter(mContext);
+        mCameraFilter.init();
+        mAddFilter = BeautyFilterFactory.getFilter(type, mContext);
+        if (mAddFilter != null) {
+            mAddFilter.init();
+            mAddFilter.onOutputSizeChanged(mVideoWidth, mVideoHeight);
+            mAddFilter.onInputSizeChanged(mPreviewWidth, mPreviewHeight);
         }
     }
 
@@ -205,13 +205,13 @@ public class CameraVideoRecorder implements Runnable {
         mWindowSurface = new WindowEglSurface(mEglCore, mVideoRecorder.getInputSurface(), true);
         mWindowSurface.makeCurrent();
 
-        mInput = new BeautyCameraFilter(mContext);
-        mInput.init();
-        mFilter = BeautyFilterFactory.getFilter(type, mContext);
-        if (mFilter != null) {
-            mFilter.init();
-            mFilter.onOutputSizeChanged(mVideoWidth, mVideoHeight);
-            mFilter.onInputSizeChanged(mPreviewWidth, mPreviewHeight);
+        mCameraFilter = new BeautyCameraFilter(mContext);
+        mCameraFilter.init();
+        mAddFilter = BeautyFilterFactory.getFilter(type, mContext);
+        if (mAddFilter != null) {
+            mAddFilter.init();
+            mAddFilter.onOutputSizeChanged(mVideoWidth, mVideoHeight);
+            mAddFilter.onInputSizeChanged(mPreviewWidth, mPreviewHeight);
         }
     }
 
@@ -221,13 +221,13 @@ public class CameraVideoRecorder implements Runnable {
             mWindowSurface.release();
             mWindowSurface = null;
         }
-        if (mInput != null) {
-            mInput.destroy();
-            mInput = null;
+        if (mCameraFilter != null) {
+            mCameraFilter.destroy();
+            mCameraFilter = null;
         }
-        if (mFilter != null) {
-            mFilter.destroy();
-            mFilter = null;
+        if (mAddFilter != null) {
+            mAddFilter.destroy();
+            mAddFilter = null;
             type = BeautyFilterType.NONE;
         }
         if (mEglCore != null) {
