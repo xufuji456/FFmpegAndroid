@@ -116,5 +116,6 @@
     <string name="camera_filter_hue">Hue</string>
     <string name="camera_filter_balance">白平衡</string>
     <string name="camera_filter_sketch">素描</string>
+    <string name="camera_filter_blur">模糊</string>
 
 </resources>

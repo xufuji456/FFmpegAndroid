@@ -2,6 +2,7 @@ package com.frank.camerafilter.factory;
 
 import android.content.Context;
 
+import com.frank.camerafilter.filter.advance.BeautyBlurFilter;
 import com.frank.camerafilter.filter.advance.BeautyHueFilter;
 import com.frank.camerafilter.filter.advance.BeautySketchFilter;
 import com.frank.camerafilter.filter.BaseFilter;
@@ -16,6 +17,8 @@ public class BeautyFilterFactory {
         switch (type) {
             case SKETCH:
                 return new BeautySketchFilter(context);
+            case BLUR:
+                return new BeautyBlurFilter(context);
             case HUE:
                 return new BeautyHueFilter(context);
             case WHITE_BALANCE:
