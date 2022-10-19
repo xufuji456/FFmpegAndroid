@@ -15,7 +15,8 @@ class CameraFilterActivity : BaseActivity() {
 
     private val filterType: Array<BeautyFilterType> = arrayOf(
         BeautyFilterType.NONE,
-        BeautyFilterType.CRAYON,
+        BeautyFilterType.HUE,
+        BeautyFilterType.WHITE_BALANCE,
         BeautyFilterType.SKETCH
     )
 
