@@ -1,7 +1,7 @@
 package com.frank.camerafilter.filter.advance;
 
 import android.content.Context;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
@@ -18,8 +18,8 @@ public class BeautySketchFilter extends BaseFilter {
 
     protected void onInit() {
         super.onInit();
-        strengthLocation = GLES20.glGetUniformLocation(getProgramId(), "strength");
-        stepOffsetLocation = GLES20.glGetUniformLocation(getProgramId(), "singleStepOffset");
+        strengthLocation = GLES30.glGetUniformLocation(getProgramId(), "strength");
+        stepOffsetLocation = GLES30.glGetUniformLocation(getProgramId(), "singleStepOffset");
     }
 
     @Override
