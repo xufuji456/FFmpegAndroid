@@ -117,5 +117,6 @@
     <string name="camera_filter_balance">White balance</string>
     <string name="camera_filter_sketch">Sketch</string>
     <string name="camera_filter_blur">Blur</string>
+    <string name="camera_filter_invert">Invert</string>
 
 </resources>

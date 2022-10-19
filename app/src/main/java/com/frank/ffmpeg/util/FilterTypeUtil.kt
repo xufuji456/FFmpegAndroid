@@ -14,6 +14,7 @@ object FilterTypeUtil {
         return when (type) {
             BeautyFilterType.NONE -> R.string.camera_filter_none
             BeautyFilterType.BLUR -> R.string.camera_filter_blur
+            BeautyFilterType.COLOR_INVERT -> R.string.camera_filter_invert
             BeautyFilterType.HUE -> R.string.camera_filter_hue
             BeautyFilterType.WHITE_BALANCE -> R.string.camera_filter_balance
             BeautyFilterType.SKETCH -> R.string.camera_filter_sketch
