@@ -25,7 +25,19 @@ void main(){
 //    } else {
 //        xy.y = (xy.y - 0.5) * 2.0;
 //    }
+    // white black
+//    const vec3 weight = vec3(0.3, 0.59, 0.11);
+//    float gray = dot(textureColor.rgb, weight);
+    // invert
+//    1.0 - textureColor.rgb
+    // mirror
+//    if (xy.x <= 0.5) {
+//        xy.x += 0.25;
+//    } else {
+//        xy.x -= 0.25;
+//        xy.x = 1.0 - xy.x;
+//    }
 
-    vec3 centralColor = texture2D(inputImageTexture, xy).rgb;
-    gl_FragColor = vec4(centralColor.rgb,1.0);
+    vec3 textureColor = texture2D(inputImageTexture, xy).rgb;
+    gl_FragColor = vec4(textureColor.rgb,1.0);
 }
