@@ -2,8 +2,8 @@ package com.frank.camerafilter.recorder.video;
 
 import android.view.Surface;
 
-import com.frank.camerafilter.recorder.gles.EglCore;
-import com.frank.camerafilter.recorder.gles.EglSurfaceBase;
+import com.frank.camerafilter.recorder.egl.EglCore;
+import com.frank.camerafilter.recorder.egl.EglSurfaceBase;
 
 /**
  * @author xufulong

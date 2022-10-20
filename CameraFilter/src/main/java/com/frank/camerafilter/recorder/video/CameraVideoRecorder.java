@@ -13,7 +13,7 @@ import com.frank.camerafilter.filter.BeautyCameraFilter;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.factory.BeautyFilterFactory;
 import com.frank.camerafilter.factory.BeautyFilterType;
-import com.frank.camerafilter.recorder.gles.EglCore;
+import com.frank.camerafilter.recorder.egl.EglCore;
 
 import java.io.File;
 import java.io.IOException;

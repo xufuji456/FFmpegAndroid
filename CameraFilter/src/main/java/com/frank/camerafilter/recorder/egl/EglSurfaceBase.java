@@ -1,4 +1,4 @@
-package com.frank.camerafilter.recorder.gles;
+package com.frank.camerafilter.recorder.egl;
 
 import android.graphics.Bitmap;
 import android.opengl.EGL14;
