@@ -177,7 +177,7 @@ public class CameraRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFr
                 case RECORDING_OFF:
                     videoRecorder.setPreviewSize(mImageWidth, mImageHeight);
                     videoRecorder.setTextureBuffer(mTextureBuffer);
-                    videoRecorder.setCubeBuffer(mVertexBuffer);
+                    videoRecorder.setVertexBuffer(mVertexBuffer);
                     videoRecorder.startRecording(new CameraVideoRecorder.RecorderConfig(
                             mImageWidth,
                             mImageHeight,
