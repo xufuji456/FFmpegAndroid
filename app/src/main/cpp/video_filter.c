@@ -344,7 +344,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
                 if (ret >= 0) {
                     // lock native window
                     ANativeWindow_Buffer windowBuffer;
-                    ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
+                    ANativeWindow_lock(nativeWindow, &windowBuffer, NULL);
                     // convert
                     sws_scale(sws_ctx, (uint8_t const *const *) filter_frame->data,
                               filter_frame->linesize, 0, pCodecCtx->height,

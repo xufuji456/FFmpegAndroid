@@ -105,7 +105,7 @@ VIDEO_PLAYER_FUNC(jint, play, jstring filePath, jobject surface) {
             avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);
             if (frameFinished) {
                 // lock native window
-                ANativeWindow_lock(nativeWindow, &windowBuffer, 0);
+                ANativeWindow_lock(nativeWindow, &windowBuffer, nullptr);
                 sws_scale(sws_ctx, (uint8_t const *const *) pFrame->data,
                           pFrame->linesize, 0, pCodecCtx->height,
                           pFrameRGBA->data, pFrameRGBA->linesize);
