@@ -56,7 +56,6 @@ add_library( # Sets the name of the library.
         ${SRC_VISUALIZER}
         ${SRC_METADATA}
 #        ${SRC_FFPLAYER}
-        video_player.cpp
         video_filter.c
         ffprobe_cmd.cpp
         video_cutting.cpp
