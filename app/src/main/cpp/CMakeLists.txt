@@ -32,18 +32,7 @@ set(SRC_METADATA
         metadata/metadata_util.c
         metadata/ffmpeg_media_retriever.c)
 
-set(SRC_FFPLAYER
-        ffplayer/queue/FrameQueue.cpp
-        ffplayer/queue/PacketQueue.cpp
-        ffplayer/decode/BaseDecoder.cpp
-        ffplayer/decode/FFAudioDecoder.cpp
-        ffplayer/decode/FFVideoDecoder.cpp
-        ffplayer/clock/MediaClock.cpp
-        ffplayer/clock/AVSync.cpp
-        ffplayer/render/AudioRender.cpp
-        ffplayer/ff_mediaplayer_jni.cpp
-        ffplayer/FFMessageQueue.cpp
-        ffplayer/FFMediaPlayer.cpp)
+set(SRC_FFPLAYER ffplayer)
 
 add_library( # Sets the name of the library.
              media-handle
