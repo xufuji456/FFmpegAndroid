@@ -639,6 +639,32 @@ public class FFmpegUtil {
     }
 
     /**
+     * convert videos into picture-in-picture mode
+     *
+     * @param whichCorner 0: top-left; 1: top-right; 2: bottom-left; 3: bottom-right
+     * @return convert success or not
+     */
+    public static String[] picInPicVideoInCorner(String inputPath1, String inputPath2, int whichCorner, String outputPath) {
+        String pipCmd = "ffmpeg -i -i -filter_complex ";
+        switch (whichCorner) {
+            case 1:
+                pipCmd += "overlay=W-w";
+                break;
+            case 2:
+                pipCmd += "overlay=0:H-h";
+                break;
+            case 3:
+                pipCmd += "overlay=W-w:H-h";
+                break;
+            case 0:
+            default:
+                pipCmd += "overlay";
+                break;
+        }
+        return insert(pipCmd.split(" "), 2, inputPath1, 4, inputPath2, outputPath);
+    }
+
+    /**
      * move moov box in the front of mdat box, when moox box is behind mdat box(only mp4)
      *
      * @param inputPath  inputFile
