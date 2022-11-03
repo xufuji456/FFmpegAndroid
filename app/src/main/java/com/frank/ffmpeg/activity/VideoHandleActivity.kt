@@ -53,6 +53,9 @@ class VideoHandleActivity : BaseActivity() {
     private var list :List<String> ?= null
     private var isJointing = false
 
+    private var firstSrcFile: String = ""
+    private var selectingSecondFile = false
+
     @SuppressLint("HandlerLeak")
     private val mHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -295,17 +298,25 @@ class VideoHandleActivity : BaseActivity() {
                 commandLine = FFmpegUtil.videoToImage(srcFile, mStartTime, mDuration, mFrameRate, outputPath)
             }
             12 -> { //combine into picture-in-picture video
-                val inputFile1 = PATH + File.separator + "beyond.mp4"
-                val inputFile2 = PATH + File.separator + "small_girl.mp4"
-                if (!FileUtil.checkFileExist(inputFile1) && !FileUtil.checkFileExist(inputFile2)) {
-                    return
+                // NOTE: The first video should be bigger than the second one.
+                if (selectingSecondFile) { // User has selected 2 files
+                    selectingSecondFile = false
+                    if (!FileUtil.checkFileExist(firstSrcFile) && !FileUtil.checkFileExist(srcFile)) {
+                        showToast("请选择两个源文件")
+                        return
+                    }
+                    //x and y coordinate points need to be calculated according to the size of full video and small video
+                    //For example: full video is 320x240, small video is 120x90, so x=200 y=150
+                    //val x = 200
+                    //val y = 150
+                    outputPath = PATH + File.separator + "PicInPic.mp4"
+                    commandLine = FFmpegUtil.picInPicVideoInCorner(firstSrcFile, srcFile, 2, outputPath)
+                } else {
+                    firstSrcFile = srcFile
+                    selectingSecondFile = true
+                    showToast("画中画：请再选择一个文件")
+                    selectFile() // pop up to select another source file
                 }
-                //x and y coordinate points need to be calculated according to the size of full video and small video
-                //For example: full video is 320x240, small video is 120x90, so x=200 y=150
-                val x = 200
-                val y = 150
-                outputPath = PATH + File.separator + "PicInPic.mp4"
-                commandLine = FFmpegUtil.picInPicVideo(inputFile1, inputFile2, x, y, outputPath)
             }
             13 -> { //playing speed of video
                 outputPath = PATH + File.separator + "speed.mp4"

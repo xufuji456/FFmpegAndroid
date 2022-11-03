@@ -261,7 +261,7 @@ class AudioHandleActivity : BaseActivity() {
             12 -> { // audio waveform
                 outputPath = PATH + File.separator + "waveform.png"
                 val resolution = "1280x720"
-                commandLine = FFmpegUtil.showAudioWaveform(srcFile, resolution, outputPath)
+                commandLine = FFmpegUtil.showAudioWaveform(srcFile, resolution, 1, outputPath)
             }
             13 -> { //audio encode
                 val pcmFile = PATH + File.separator + "raw.pcm"
