@@ -870,9 +870,9 @@ public class FFmpegUtil {
         return insert(trimCmd.split(" "), 2, inputPath, outputPath);
     }
 
-    public static String[] showAudioWaveform(String inputPath, String resolution, String outputPath) {
-        String waveformCmd = "ffmpeg -i -filter_complex showwavespic=s=%s";
-        waveformCmd = String.format(Locale.getDefault(), waveformCmd, resolution);
+    public static String[] showAudioWaveform(String inputPath, String resolution, int splitChannels, String outputPath) {
+        String waveformCmd = "ffmpeg -i -filter_complex showwavespic=s=%s:split_channels=%d";
+        waveformCmd = String.format(Locale.getDefault(), waveformCmd, resolution, splitChannels);
         return insert(waveformCmd.split(" "), 2, inputPath, outputPath);
     }
 
