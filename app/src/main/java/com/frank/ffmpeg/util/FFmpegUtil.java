@@ -354,7 +354,7 @@ public class FFmpegUtil {
      */
     public static String[] jointVideo(String fileListPath, String outputPath) {
         // ffmpeg -f concat -safe 0 -i %s -c copy %s
-        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i file.txt -c copy %s";
+        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i -c copy -y";
         return insert(jointVideoCmd.split(" "), 6, fileListPath, outputPath);
     }
 
