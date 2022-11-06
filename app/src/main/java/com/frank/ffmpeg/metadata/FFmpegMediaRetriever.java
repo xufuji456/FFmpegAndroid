@@ -31,7 +31,7 @@ public class FFmpegMediaRetriever {
 
     public FFmpegMediaRetriever() {
         native_init();
-    	native_setup();
+        native_setup();
     }
 
     public void setDataSource(String path) {

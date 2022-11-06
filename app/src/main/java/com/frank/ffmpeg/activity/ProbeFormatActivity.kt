@@ -57,9 +57,8 @@ class ProbeFormatActivity : BaseActivity() {
                 MSG_FINISH -> {
                     progressProbe!!.visibility = View.GONE
                     layoutProbe!!.visibility = View.VISIBLE
-                    val result = msg.obj?: msg.obj
-                    if (result != null) {
-                        val mediaInfo = JsonParseTool.stringFormat(result as MediaBean)
+                    if (msg.obj != null) {
+                        val mediaInfo = JsonParseTool.stringFormat(msg.obj as MediaBean)
                         if (!mediaInfo.isNullOrEmpty() && txtProbeFormat != null) {
                             txtProbeFormat!!.text = mediaInfo
                         }
@@ -108,6 +107,7 @@ class ProbeFormatActivity : BaseActivity() {
 
         when (view?.id) {
             R.id.btn_probe_format -> {
+                findViewById<ImageView>(R.id.img_frame).setImageBitmap(null)
                 doHandleProbe(filePath)
             }
             R.id.btn_retrieve_format -> {
@@ -188,7 +188,12 @@ class ProbeFormatActivity : BaseActivity() {
             mHandler.obtainMessage(MSG_INFO, resultBuilder.toString()).sendToTarget()
 
             // Retrieve frame with timeUs
-            val bitmap = retriever.getFrameAtTime(5 * 1000000)
+            val frameTime = if (duration != null) {
+                duration.toLong() / 3 * 1000
+            } else {
+                5 * 1000000
+            }
+            val bitmap = retriever.getFrameAtTime(frameTime)
             // Retrieve audio thumbnail, if it has embedded
 //            val bitmap = retriever.audioThumbnail
             if (bitmap != null) {
