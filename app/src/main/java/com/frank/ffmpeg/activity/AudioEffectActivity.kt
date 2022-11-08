@@ -15,7 +15,7 @@ import com.frank.androidmedia.controller.AudioEffectController
 import com.frank.androidmedia.listener.AudioEffectCallback
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
-import com.frank.ffmpeg.listener.OnSeeBarListener
+import com.frank.ffmpeg.listener.OnSeekBarListener
 import com.frank.ffmpeg.util.FileUtil
 import com.frank.ffmpeg.view.VisualizerView
 import java.io.IOException
@@ -25,11 +25,11 @@ import java.util.ArrayList
  * Audio effect: equalizer, enhancer, visualizer, bassBoost
  * Created by frank on 2020/10/20.
  */
-class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallback {
+class AudioEffectActivity : BaseActivity(), OnSeekBarListener, AudioEffectCallback {
 
     companion object {
 
-        private val audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
+        private var audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
     }
 
     private var mPlayer: MediaPlayer? = null
@@ -48,12 +48,13 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
             Manifest.permission.MODIFY_AUDIO_SETTINGS)
 
     private val onPreparedListener = MediaPlayer.OnPreparedListener {
-        mAudioEffectController = AudioEffectController(this)
-        mAudioEffectController?.setupEqualizer(mPlayer!!.audioSessionId)
-        mAudioEffectController?.setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
-        mAudioEffectController?.setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
-        mAudioEffectController?.setLoudnessEnhancer(mPlayer!!.audioSessionId, barEnhancer!!)
-        mAudioEffectController?.setupVisualizer(mPlayer!!.audioSessionId)
+        mAudioEffectController = AudioEffectController(this).apply {
+            setupEqualizer(mPlayer!!.audioSessionId)
+            setupPresetStyle(this@AudioEffectActivity, spinnerStyle!!)
+            setupBassBoost(mPlayer!!.audioSessionId, barBassBoost!!)
+            setLoudnessEnhancer(mPlayer!!.audioSessionId, barEnhancer!!)
+            setupVisualizer(mPlayer!!.audioSessionId)
+        }
 
         mPlayer!!.start()
     }
@@ -95,10 +96,11 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
             return
         }
         try {
-            mPlayer = MediaPlayer()
-            mPlayer!!.setDataSource(audioPath)
-            mPlayer!!.setOnPreparedListener(onPreparedListener)
-            mPlayer!!.prepareAsync()
+            mPlayer = MediaPlayer().apply {
+                setDataSource(audioPath)
+                setOnPreparedListener(onPreparedListener)
+                prepareAsync()
+            }
         } catch (e: IOException) {
             Log.e("AudioEffect", "play error=$e")
         }
@@ -113,17 +115,18 @@ class AudioEffectActivity : BaseActivity(), OnSeeBarListener, AudioEffectCallbac
     }
 
     override fun onSelectedFile(filePath: String) {
-
+        audioPath = filePath
+        initPlayer()
     }
 
     override fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>) {
-        if (equalizerAdapter != null) {
-            equalizerAdapter!!.setMaxProgress(maxProgress)
-            equalizerAdapter!!.setEqualizerList(equalizerList)
+        equalizerAdapter?.let {
+            it.setMaxProgress(maxProgress)
+            it.setEqualizerList(equalizerList)
         }
     }
 
-    override fun getSeeBarList(): List<SeekBar>? {
+    override fun getSeekBarList(): List<SeekBar>? {
         return equalizerAdapter?.getSeekBarList()
     }
 

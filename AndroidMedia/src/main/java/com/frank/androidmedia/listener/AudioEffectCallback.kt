@@ -12,7 +12,7 @@ import java.util.ArrayList
  */
 interface AudioEffectCallback {
 
-    fun getSeeBarList(): List<SeekBar>?
+    fun getSeekBarList(): List<SeekBar>?
 
     fun setEqualizerList(maxProgress: Int, equalizerList: ArrayList<Pair<*, *>>)
 

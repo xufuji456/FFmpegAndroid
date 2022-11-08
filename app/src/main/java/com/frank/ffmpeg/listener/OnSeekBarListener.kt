@@ -1,5 +1,5 @@
 package com.frank.ffmpeg.listener
 
-interface OnSeeBarListener {
+interface OnSeekBarListener {
     fun onProgress(index: Int, progress: Int)
 }

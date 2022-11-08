@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 import com.frank.ffmpeg.R
-import com.frank.ffmpeg.listener.OnSeeBarListener
+import com.frank.ffmpeg.listener.OnSeekBarListener
 
 import java.util.ArrayList
 
@@ -20,7 +20,7 @@ import java.util.ArrayList
  * @desc Adapter of equalizer
  */
 
-class EqualizerAdapter(private val context: Context, private val onSeeBarListener: OnSeeBarListener?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class EqualizerAdapter(private val context: Context, private val onSeekBarListener: OnSeekBarListener?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var equalizerList: List<Pair<*, *>>? = ArrayList()
     private val seekBarList = ArrayList<SeekBar>()
@@ -51,7 +51,7 @@ class EqualizerAdapter(private val context: Context, private val onSeeBarListene
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                onSeeBarListener?.onProgress(i, seekBar.progress)
+                onSeekBarListener?.onProgress(i, seekBar.progress)
             }
         })
     }

@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
-import com.frank.ffmpeg.listener.OnSeeBarListener
+import com.frank.ffmpeg.listener.OnSeekBarListener
 import com.frank.ffmpeg.view.VisualizerView
 import java.lang.StringBuilder
 import java.util.ArrayList
 
-class EqualizerActivity : BaseActivity(), OnSeeBarListener {
+class EqualizerActivity : BaseActivity(), OnSeekBarListener {
 
     // unit: Hz  gain:0-20
     /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
