@@ -244,14 +244,9 @@ public class FFmpegUtil {
          |   10b  |   11b  |   12b  |   13b  |   14b  |   15b  |   16b  |   17b  |   18b  |
          |   1480 |   2093 |   2960 |   4186 |   5920 |   8372 |  11840 |  16744 |  20000 |
          |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-        StringBuilder builder = new StringBuilder();
-        for (String band:bandList) {
-            builder.append(band).append(":");
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        // "ffmpeg -i %s -af superequalizer=%s -y %s"
+        String bands = String.join(":", bandList);
         String equalizerCmd = "ffmpeg -i -af superequalizer=%s -y";
-        equalizerCmd = String.format(Locale.getDefault(), equalizerCmd, builder.toString());
+        equalizerCmd = String.format(Locale.getDefault(), equalizerCmd, bands);
         return insert(equalizerCmd.split(" "), 2, inputPath, outputPath);
     }
 
@@ -359,7 +354,7 @@ public class FFmpegUtil {
      */
     public static String[] jointVideo(String fileListPath, String outputPath) {
         // ffmpeg -f concat -safe 0 -i %s -c copy %s
-        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i file.txt -c copy %s";
+        String jointVideoCmd = "ffmpeg -f concat -safe 0 -i -c copy -y";
         return insert(jointVideoCmd.split(" "), 6, fileListPath, outputPath);
     }
 

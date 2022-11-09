@@ -377,15 +377,10 @@ class VideoHandleActivity : BaseActivity() {
             Log.e(TAG, "width=$width--height=$height")
         }
         val transformCmd2 = FFmpegUtil.transformVideoWithEncode(appendPath, width, height, outputPath2)
-        val fileList = ArrayList<String>()
-        fileList.add(outputPath1)
-        fileList.add(outputPath2)
+        val fileList = listOf(outputPath1, outputPath2)
         FileUtil.createListFile(listPath, fileList)
         val jointVideoCmd = FFmpegUtil.jointVideo(listPath, targetPath)
-        val commandList = ArrayList<Array<String>>()
-        commandList.add(transformCmd1)
-        commandList.add(transformCmd2)
-        commandList.add(jointVideoCmd)
+        val commandList = listOf(transformCmd1, transformCmd2, jointVideoCmd)
         ffmpegHandler!!.executeFFmpegCmds(commandList)
     }
 

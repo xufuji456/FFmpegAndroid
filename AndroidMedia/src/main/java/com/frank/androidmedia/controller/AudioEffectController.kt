@@ -91,7 +91,7 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
             override fun onItemSelected(arg0: AdapterView<*>, arg1: View, arg2: Int, arg3: Long) {
                 try {
                     mEqualizer!!.usePreset(arg2.toShort())
-                    val seekBarList: List<SeekBar>? = mAudioEffectCallback?.getSeeBarList()
+                    val seekBarList: List<SeekBar>? = mAudioEffectCallback?.getSeekBarList()
                     if (mBands > 0 && seekBarList != null && mEqualizer != null) {
                         for (band in 0 until mBands) {
                             seekBarList[band].progress = mEqualizer!!.getBandLevel(band.toShort()) - minEQLevel
