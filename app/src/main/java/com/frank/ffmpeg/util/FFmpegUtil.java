@@ -403,7 +403,8 @@ public class FFmpegUtil {
                 return "overlay='(main_w-overlay_w)-" + offsetX + ":(main_h-overlay_h)-" + offsetY + "'";
             case 1:
             default:
-                return "overlay=" + offsetX + ":" + offsetY;
+                // move from to right
+                return "overlay=(10+t*20):" + offsetY;
         }
     }
 
@@ -422,7 +423,7 @@ public class FFmpegUtil {
                                            int offsetXY, String outputPath) {
         String mBitRate = bitRate + "k";
         String overlay = obtainOverlay(offsetXY, offsetXY, location);
-        String waterMarkCmd = "ffmpeg -i -i -b:v %s -filter_complex %s -preset:v superfast";
+        String waterMarkCmd = "ffmpeg -i -i -b:v %s -filter_complex %s -preset:v superfast -y";
         waterMarkCmd = String.format(waterMarkCmd, mBitRate, overlay);
         return insert(waterMarkCmd.split(" "), 2, inputPath, 4, imgPath, outputPath);
     }
@@ -780,17 +781,6 @@ public class FFmpegUtil {
     }
 
     /**
-     * Rebuild the keyframe index of FLV, make it seekable
-     * @param inputPath inputFile
-     * @param outputPath targetFile
-     * @return command of building flv index
-     */
-    public static String[] buildFlvIndex(String inputPath, String outputPath) {
-        String buildIndex = "ffmpeg -i -flvflags add_keyframe_index";
-        return insert(buildIndex.split(" "), 2, inputPath, outputPath);
-    }
-
-    /**
      * Insert the picture into the header of video, which as a thumbnail
      * @param inputPath inputFile
      * @param picturePath the path of thumbnail
@@ -836,12 +826,6 @@ public class FFmpegUtil {
         String rotateCmd = "ffmpeg -i -c copy -metadata:s:v:0 rotate=%d";
         rotateCmd = String.format(Locale.getDefault(), rotateCmd, rotateDegree);
         return insert(rotateCmd.split(" "), 2, inputPath, outputPath);
-    }
-
-    public static String[] changeGOP(String inputPath, int gop, String outputPath) {
-        String gopCmd = "ffmpeg -i -g %d";
-        gopCmd = String.format(Locale.getDefault(), gopCmd, gop);
-        return insert(gopCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
