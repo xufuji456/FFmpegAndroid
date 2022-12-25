@@ -36,6 +36,8 @@ public class FFmpegHandler {
 
     private boolean isContinue = false;
 
+    private long startTimestamp = 0;
+
     public FFmpegHandler(Handler mHandler) {
         this.mHandler = mHandler;
     }
@@ -60,6 +62,7 @@ public class FFmpegHandler {
             public void onBegin() {
                 Log.i(TAG, "handle onBegin...");
                 mHandler.obtainMessage(MSG_BEGIN).sendToTarget();
+                startTimestamp = System.currentTimeMillis();
             }
 
             @Override
@@ -74,7 +77,16 @@ public class FFmpegHandler {
 
             @Override
             public void onEnd(int resultCode, String resultMsg) {
-                Log.i(TAG, "handle onEnd...");
+                long time = System.currentTimeMillis() - startTimestamp;
+                long seconds = time / 1000;
+                long minute = seconds / 60;
+                long second = seconds % 60;
+                long millisecond = time % 1000;
+                if (minute > 0) {
+                    Log.i(TAG, "handle onEnd time=" + minute + ":" + second + "." + millisecond);
+                } else {
+                    Log.i(TAG, "handle onEnd time=" + second + "." + millisecond);
+                }
                 if (isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 } else {
