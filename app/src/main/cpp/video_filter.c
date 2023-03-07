@@ -143,7 +143,7 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
 
     int i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             video_stream_index = i;
             break;
         }
@@ -153,12 +153,14 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
         return -1;
     }
 
-    pCodecCtx = pFormatCtx->streams[video_stream_index]->codec;
-    AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+    AVCodecParameters *videoCodec = pFormatCtx->streams[video_stream_index]->codecpar;
+    AVCodec *pCodec = avcodec_find_decoder(videoCodec->codec_id);
     if (pCodec == NULL) {
         LOGE(TAG, "couldn't find Codec.");
         return -1;
     }
+    pCodecCtx = avcodec_alloc_context3(pCodec);
+    avcodec_parameters_to_context(pCodecCtx, videoCodec);
     if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
         LOGE(TAG, "Couldn't open codec.");
         return -1;
@@ -200,18 +202,20 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
 int init_audio(JNIEnv *env, jclass jthiz) {
     int i;
     for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_index = i;
             break;
         }
     }
 
-    audioCodecCtx = pFormatCtx->streams[audio_stream_index]->codec;
-    AVCodec *codec = avcodec_find_decoder(audioCodecCtx->codec_id);
+    AVCodecParameters *audioCodec = pFormatCtx->streams[audio_stream_index]->codecpar;
+    AVCodec *codec = avcodec_find_decoder(audioCodec->codec_id);
     if (codec == NULL) {
         LOGE(TAG, "could not find audio decoder");
         return -1;
     }
+    audioCodecCtx = avcodec_alloc_context3(codec);
+    avcodec_parameters_to_context(audioCodecCtx, audioCodec);
     if (avcodec_open2(audioCodecCtx, codec, NULL) < 0) {
         LOGE(TAG, "could not open audio decoder");
         return -1;
