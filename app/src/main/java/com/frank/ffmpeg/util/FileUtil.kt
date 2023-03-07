@@ -27,7 +27,7 @@ object FileUtil {
     private const val TYPE_RAW = "pcm"
     private const val TYPE_OPUS = "opus"
 
-    const val TYPE_MP4 = "mp4"
+    private const val TYPE_MP4 = "mp4"
     private const val TYPE_MKV = "mkv"
     private const val TYPE_WEBM = "webm"
     private const val TYPE_AVI = "avi"
