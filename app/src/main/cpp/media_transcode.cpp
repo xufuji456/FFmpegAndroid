@@ -58,7 +58,7 @@ static int open_input_file(const char *filename)
 
     for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
         AVStream *stream = ifmt_ctx->streams[i];
-        AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
+        const AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
         AVCodecContext *codec_ctx;
         if (!dec) {
             ALOGE("Failed to find decoder for stream #%u\n", i);
@@ -99,7 +99,7 @@ static int open_output_file(const char *filename)
     AVStream *out_stream;
     AVStream *in_stream;
     AVCodecContext *dec_ctx, *enc_ctx;
-    AVCodec *encoder;
+    const AVCodec *encoder;
     int ret;
 
     ofmt_ctx = nullptr;

@@ -30,7 +30,7 @@ int CutVideo::open_output_file(AVFormatContext *ifmt_ctx, const char *filename)
         AVStream* in_stream = ifmt_ctx->streams[i];
         AVCodecParameters* codecpar = in_stream->codecpar;
 
-        AVCodec* dec = avcodec_find_decoder(codecpar->codec_id);
+        const AVCodec* dec = avcodec_find_decoder(codecpar->codec_id);
         AVStream* out_stream = avformat_new_stream(ofmt_ctx, dec);
         if (!out_stream) {
             LOGE("Failed allocating output stream\n");
