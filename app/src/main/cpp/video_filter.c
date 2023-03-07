@@ -131,7 +131,6 @@ end:
 //init player
 int open_input(JNIEnv *env, const char *file_name, jobject surface) {
     LOGI(TAG, "open file:%s\n", file_name);
-    av_register_all();
     pFormatCtx = avformat_alloc_context();
     if (avformat_open_input(&pFormatCtx, file_name, NULL, NULL) != 0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
@@ -290,8 +289,6 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
         LOGE(TAG, "Couldn't allocate video frame.");
         goto end;
     }
-    //register filter
-    avfilter_register_all();
     filter_frame = av_frame_alloc();
     if (filter_frame == NULL) {
         LOGE(TAG, "Couldn't allocate filter frame.");

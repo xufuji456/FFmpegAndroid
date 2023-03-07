@@ -98,7 +98,6 @@ RETRIEVER_FUNC(void, native_1init)
         return;
     }
 
-    av_register_all();
     avformat_network_init();
 }
 
