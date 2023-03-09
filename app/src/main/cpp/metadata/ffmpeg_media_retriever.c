@@ -82,12 +82,14 @@ int stream_component_open(State *s, int stream_index) {
 		return FAILURE;
 	}
 
-	codecCtx = pFormatCtx->streams[stream_index]->codec;
-	codec = avcodec_find_decoder(codecCtx->codec_id);
+	AVCodecParameters *codecPar = pFormatCtx->streams[stream_index]->codecpar;
+	codec = avcodec_find_decoder(codecPar->codec_id);
 	if (codec == NULL) {
-		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecCtx->codec_id);
+		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecPar->codec_id);
 	    return FAILURE;
 	}
+	codecCtx = avcodec_alloc_context3(codec);
+	avcodec_parameters_to_context(codecCtx, codecPar);
     if (avcodec_open2(codecCtx, codec, NULL) < 0) {
 		LOGE("avcodec_open2() failed\n");
 		return FAILURE;
@@ -97,10 +99,12 @@ int stream_component_open(State *s, int stream_index) {
 		case AVMEDIA_TYPE_AUDIO:
 			s->audio_stream = stream_index;
 		    s->audio_st = pFormatCtx->streams[stream_index];
+            s->audio_codec = codecCtx;
 			break;
 		case AVMEDIA_TYPE_VIDEO:
 			s->video_stream = stream_index;
 		    s->video_st = pFormatCtx->streams[stream_index];
+            s->video_codec = codecCtx;
 			const AVCodec *targetCodec = avcodec_find_encoder(AV_CODEC_ID_PNG);
 			if (!targetCodec) {
 			    LOGE("avcodec_find_decoder() failed to find encoder\n");
@@ -519,7 +523,7 @@ int get_audio_thumbnail(State **state_ptr, AVPacket *pkt) {
 						break;
 					}
 
-					AVCodecContext *pCodecContext = state->video_st->codec;
+					AVCodecContext *pCodecContext = state->video_codec;
                     avcodec_send_packet(pCodecContext, pkt);
                     int ret = avcodec_receive_frame(pCodecContext, frame);
 					if (ret == 0) {
@@ -578,7 +582,7 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
 			if (!is_supported_format(codec_id, pix_fmt)) {
 				*got_frame = 0;
 
-				AVCodecContext *pCodecContext = state->video_st->codec;
+				AVCodecContext *pCodecContext = state->video_codec;
 				avcodec_send_packet(pCodecContext, pkt);
                 int ret = avcodec_receive_frame(pCodecContext, frame);
 				if (ret == 0) {
@@ -655,11 +659,11 @@ int get_scaled_frame_at_time(State **state_ptr, int64_t timeUs, int option, AVPa
 			return FAILURE;
 		} else {
 			if (state->audio_stream >= 0) {
-				avcodec_flush_buffers(state->audio_st->codec);
+				avcodec_flush_buffers(state->audio_codec);
 			}
 
 			if (state->video_stream >= 0) {
-				avcodec_flush_buffers(state->video_st->codec);
+				avcodec_flush_buffers(state->video_codec);
 			}
 		}
 	}
@@ -695,12 +699,12 @@ void release_retriever(State **state_ptr) {
 	State *state = *state_ptr;
 	
     if (state) {
-        if (state->audio_st && state->audio_st->codec) {
-            avcodec_close(state->audio_st->codec);
+        if (state->audio_st && state->audio_codec) {
+            avcodec_close(state->audio_codec);
         }
         
-        if (state->video_st && state->video_st->codec) {
-            avcodec_close(state->video_st->codec);
+        if (state->video_st && state->video_codec) {
+            avcodec_close(state->video_codec);
         }
         
         if (state->pFormatCtx) {

@@ -29,6 +29,8 @@ typedef struct State {
 	int             video_stream;
 	AVStream        *audio_st;
 	AVStream        *video_st;
+	AVCodecContext  *audio_codec;
+	AVCodecContext  *video_codec;
 	int             fd;
 	int64_t         offset;
 	const char      *headers;
