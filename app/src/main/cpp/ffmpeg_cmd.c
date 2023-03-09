@@ -59,6 +59,8 @@ FFMPEG_FUNC(void, cancelTaskJni, jint cancel) {
 void msg_callback(const char *format, va_list args, int level) {
     if (ff_env && msg_method) {
         char *ff_msg = (char *) malloc(sizeof(char) * INPUT_SIZE);
+        if (!ff_msg)
+            return;
         vsprintf(ff_msg, format, args);
         jstring jstr = (*ff_env)->NewStringUTF(ff_env, ff_msg);
         (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr, level);
