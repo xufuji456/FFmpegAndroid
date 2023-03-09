@@ -31,7 +31,7 @@ int is_supported_format(int codec_id, int pix_fmt) {
 }
 
 int get_scaled_context(State *s, AVCodecContext *pCodecCtx, int width, int height) {
-    AVCodec *targetCodec = avcodec_find_encoder(TARGET_IMAGE_CODEC);
+    const AVCodec *targetCodec = avcodec_find_encoder(TARGET_IMAGE_CODEC);
     if (!targetCodec) {
         LOGE("avcodec_find_decoder() failed to find encoder\n");
         return FAILURE;
@@ -76,19 +76,21 @@ int get_scaled_context(State *s, AVCodecContext *pCodecCtx, int width, int heigh
 int stream_component_open(State *s, int stream_index) {
 	AVFormatContext *pFormatCtx = s->pFormatCtx;
 	AVCodecContext *codecCtx;
-	AVCodec *codec;
+	const AVCodec *codec;
 
 	if (stream_index < 0 || stream_index >= pFormatCtx->nb_streams) {
 		return FAILURE;
 	}
 
-	codecCtx = pFormatCtx->streams[stream_index]->codec;
-	codec = avcodec_find_decoder(codecCtx->codec_id);
+	AVCodecParameters *codecPar = pFormatCtx->streams[stream_index]->codecpar;
+	codec = avcodec_find_decoder(codecPar->codec_id);
 	if (codec == NULL) {
-		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecCtx->codec_id);
+		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecPar->codec_id);
 	    return FAILURE;
 	}
-    if (!codec || (avcodec_open2(codecCtx, codec, NULL) < 0)) {
+    codecCtx = avcodec_alloc_context3(codec);
+    avcodec_parameters_to_context(codecCtx, codecPar);
+    if (avcodec_open2(codecCtx, codec, NULL) < 0) {
 		LOGE("avcodec_open2() failed\n");
 		return FAILURE;
 	}
@@ -101,7 +103,7 @@ int stream_component_open(State *s, int stream_index) {
 		case AVMEDIA_TYPE_VIDEO:
 			s->video_stream = stream_index;
 		    s->video_st = pFormatCtx->streams[stream_index];
-			AVCodec *targetCodec = avcodec_find_encoder(AV_CODEC_ID_PNG);
+			const AVCodec *targetCodec = avcodec_find_encoder(AV_CODEC_ID_PNG);
 			if (!targetCodec) {
 			    LOGE("avcodec_find_decoder() failed to find encoder\n");
 				return FAILURE;
