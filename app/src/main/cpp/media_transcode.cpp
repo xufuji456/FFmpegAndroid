@@ -27,6 +27,8 @@ typedef struct FilteringContext {
     AVFilterContext *buffersink_ctx;
     AVFilterContext *buffersrc_ctx;
     AVFilterGraph *filter_graph;
+    AVPacket *enc_pkt;
+    AVFrame *filter_frame;
 } FilteringContext;
 static FilteringContext *filter_ctx;
 
@@ -373,7 +375,6 @@ static int init_filters()
               || ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO))
             continue;
 
-
         if (ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
             filter_spec = "null";
         else
@@ -382,39 +383,41 @@ static int init_filters()
                           stream_ctx[i].enc_ctx, filter_spec);
         if (ret)
             return ret;
+
+        filter_ctx[i].enc_pkt = av_packet_alloc();
+        filter_ctx[i].filter_frame = av_frame_alloc();
     }
     return 0;
 }
 
-static int encode_write_frame(AVFrame *filt_frame, int stream_index, int *got_frame) {
+static int encode_write_frame(AVFrame *filter_frame, int stream_index, int flush) {
     int ret;
-    int got_frame_local;
-    AVPacket enc_pkt;
-    int (*enc_func)(AVCodecContext *, AVPacket *, const AVFrame *, int *) =
-    (ifmt_ctx->streams[stream_index]->codecpar->codec_type ==
-     AVMEDIA_TYPE_VIDEO) ? avcodec_encode_video2 : avcodec_encode_audio2;
+    StreamContext *stream = &stream_ctx[stream_index];
+    AVPacket *enc_pkt = filter_ctx[stream_index].enc_pkt;
+    av_packet_unref(enc_pkt);
+    if (flush) {
+        filter_frame = nullptr;
+    }
 
-    if (!got_frame)
-        got_frame = &got_frame_local;
+    ret = avcodec_send_frame(stream->enc_ctx, filter_frame);
 
-    enc_pkt.data = nullptr;
-    enc_pkt.size = 0;
-    av_init_packet(&enc_pkt);
-    ret = enc_func(stream_ctx[stream_index].enc_ctx, &enc_pkt, filt_frame, got_frame);
-    av_frame_free(&filt_frame);
     if (ret < 0)
         return ret;
-    if (!(*got_frame))
-        return 0;
 
-    /* prepare packet for muxing */
-    enc_pkt.stream_index = stream_index;
-    av_packet_rescale_ts(&enc_pkt,
-                         stream_ctx[stream_index].enc_ctx->time_base,
-                         ofmt_ctx->streams[stream_index]->time_base);
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(stream->enc_ctx, enc_pkt);
 
-    /* mux encoded frame */
-    ret = av_interleaved_write_frame(ofmt_ctx, &enc_pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            return 0;
+        }
+
+        enc_pkt->stream_index = stream_index;
+        av_packet_rescale_ts(enc_pkt, stream->enc_ctx->time_base,
+                             ofmt_ctx->streams[stream_index]->time_base);
+
+        /* mux encoded frame */
+        ret = av_interleaved_write_frame(ofmt_ctx, enc_pkt);
+    }
     return ret;
 }
 
@@ -447,7 +450,7 @@ static int filter_encode_write_frame(AVFrame *frame, int stream_index)
         }
 
         filter_frame->pict_type = AV_PICTURE_TYPE_NONE;
-        ret = encode_write_frame(filter_frame, stream_index, nullptr);
+        ret = encode_write_frame(filter_frame, stream_index, 0);
         if (ret < 0)
             break;
     }
@@ -457,22 +460,11 @@ static int filter_encode_write_frame(AVFrame *frame, int stream_index)
 
 static int flush_encoder(int stream_index)
 {
-    int ret;
-    int got_frame;
-
     if (!(stream_ctx[stream_index].enc_ctx->codec->capabilities &
           AV_CODEC_CAP_DELAY))
         return 0;
 
-    while (1) {
-        ALOGE("Flushing stream #%d encoder\n", stream_index);
-        ret = encode_write_frame(nullptr, stream_index, &got_frame);
-        if (ret < 0)
-            break;
-        if (!got_frame)
-            return 0;
-    }
-    return ret;
+    return encode_write_frame(nullptr, stream_index, 1);
 }
 
 int transcode(const char *input_file, const char *output_file)
@@ -565,8 +557,11 @@ end:
         avcodec_free_context(&stream_ctx[i].dec_ctx);
         if (ofmt_ctx && ofmt_ctx->nb_streams > i && ofmt_ctx->streams[i] && stream_ctx[i].enc_ctx)
             avcodec_free_context(&stream_ctx[i].enc_ctx);
-        if (filter_ctx && filter_ctx[i].filter_graph)
+        if (filter_ctx && filter_ctx[i].filter_graph) {
             avfilter_graph_free(&filter_ctx[i].filter_graph);
+            av_packet_free(&filter_ctx[i].enc_pkt);
+            av_frame_free(&filter_ctx[i].filter_frame);
+        }
     }
     if (filter_ctx)
         av_free(filter_ctx);
@@ -588,7 +583,9 @@ extern "C" {
 VIDEO_PLAYER_FUNC(int, executeTranscode, jstring inputFile, jstring outputFile) {
     const char *input_file = env->GetStringUTFChars(inputFile, JNI_FALSE);
     const char *output_file = env->GetStringUTFChars(outputFile, JNI_FALSE);
+    ALOGE("transcode input=%s", input_file);
     int ret = transcode(input_file, output_file);
+    ALOGE("transcode output=%s", output_file);
     env->ReleaseStringUTFChars(inputFile, input_file);
     env->ReleaseStringUTFChars(outputFile, output_file);
     return ret;

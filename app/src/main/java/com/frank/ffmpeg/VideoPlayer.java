@@ -14,10 +14,6 @@ public class VideoPlayer {
         System.loadLibrary("media-handle");
     }
 
-    public native int play(String filePath, Object surface);
-
-    public native void setPlayRate(float playRate);
-
     public native int filter(String filePath, Object surface, int position);
 
     public native void again(int position);
