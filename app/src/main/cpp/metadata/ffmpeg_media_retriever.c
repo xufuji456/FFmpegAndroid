@@ -52,7 +52,7 @@ int get_scaled_context(State *s, AVCodecContext *pCodecCtx, int width, int heigh
     s->scaled_codecCtx->time_base.num = pCodecCtx->time_base.num;
     s->scaled_codecCtx->time_base.den = pCodecCtx->time_base.den;
 
-    if (!targetCodec || avcodec_open2(s->scaled_codecCtx, targetCodec, NULL) < 0) {
+    if (avcodec_open2(s->scaled_codecCtx, targetCodec, NULL) < 0) {
         LOGE("avcodec_open2() failed\n");
         return FAILURE;
     }
@@ -82,14 +82,12 @@ int stream_component_open(State *s, int stream_index) {
 		return FAILURE;
 	}
 
-	AVCodecParameters *codecPar = pFormatCtx->streams[stream_index]->codecpar;
-	codec = avcodec_find_decoder(codecPar->codec_id);
+	codecCtx = pFormatCtx->streams[stream_index]->codec;
+	codec = avcodec_find_decoder(codecCtx->codec_id);
 	if (codec == NULL) {
-		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecPar->codec_id);
+		LOGE("avcodec_find_decoder() failed to find decoder=%d", codecCtx->codec_id);
 	    return FAILURE;
 	}
-    codecCtx = avcodec_alloc_context3(codec);
-    avcodec_parameters_to_context(codecCtx, codecPar);
     if (avcodec_open2(codecCtx, codec, NULL) < 0) {
 		LOGE("avcodec_open2() failed\n");
 		return FAILURE;
@@ -120,10 +118,10 @@ int stream_component_open(State *s, int stream_index) {
 			s->codecCtx->bit_rate      = codecP->bit_rate;
 			s->codecCtx->pix_fmt       = TARGET_IMAGE_FORMAT;
 			s->codecCtx->codec_type    = AVMEDIA_TYPE_VIDEO;
-			s->codecCtx->time_base.num = s->video_st->codec->time_base.num;
-			s->codecCtx->time_base.den = s->video_st->codec->time_base.den;
+            s->codecCtx->time_base.num = s->video_st->avg_frame_rate.den;
+            s->codecCtx->time_base.den = s->video_st->avg_frame_rate.num;
 
-			if (!targetCodec || avcodec_open2(s->codecCtx, targetCodec, NULL) < 0) {
+			if (avcodec_open2(s->codecCtx, targetCodec, NULL) < 0) {
 				LOGE("avcodec_open2() failed\n");
 				return FAILURE;
 			}
@@ -593,8 +591,7 @@ void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_f
 				}
 
                 if (*got_frame) {
-                    if (desired_frame_number == -1 ||
-                        (desired_frame_number != -1 && frame->pts >= desired_frame_number)) {
+                    if (desired_frame_number == -1 || frame->pts >= desired_frame_number != 0) {
                         if (pkt->data) {
                             av_packet_unref(pkt);
                         }
