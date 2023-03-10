@@ -63,7 +63,8 @@ void msg_callback(const char *format, va_list args, int level) {
             return;
         vsprintf(ff_msg, format, args);
         jstring jstr = (*ff_env)->NewStringUTF(ff_env, ff_msg);
-        (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr, level);
+        if (jstr)
+            (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, msg_method, jstr, level);
         free(ff_msg);
     }
 }
