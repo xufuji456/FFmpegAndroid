@@ -21,33 +21,34 @@
 #include "ffmpeg_jni_define.h"
 
 #define TAG "VideoFilter"
+#define MAX_AUDIO_FRAME_SIZE (48000 * 4)
 
-AVFormatContext *pFormatCtx;
-AVCodecContext *pCodecCtx;
-ANativeWindow *nativeWindow;
+AVFormatContext *format_ctx;
+AVCodecContext *audio_codec_ctx;
+AVCodecContext *video_codec_ctx;
 
-int again;
-int release;
 uint8_t *buffer;
-AVFrame *pFrame;
-AVFrame *pFrameRGBA;
-struct SwsContext *sws_ctx;
-int video_stream_index = -1;
-
-int pos;
-int got_frame;
-int out_channel_nb;
+AVFrame *frame_src;
+AVFrame *frame_rgb;
 uint8_t *out_buffer;
-jobject audio_track;
-bool playAudio = true;
-SwrContext *audio_swr_ctx;
-int audio_stream_index = -1;
-AVCodecContext *audioCodecCtx;
-jmethodID audio_track_write_mid;
 enum AVSampleFormat out_sample_fmt;
 
+ANativeWindow *native_window;
 
-#define MAX_AUDIO_FRAME_SIZE (48000 * 4)
+struct SwsContext *sws_ctx;
+SwrContext *audio_swr_ctx;
+
+int video_stream_index = -1;
+int audio_stream_index = -1;
+
+int pos = 0;
+int again = 0;
+int release = 0;
+int playAudio = 0;
+int out_channel_nb = 0;
+
+jobject audio_track;
+jmethodID audio_track_write_mid;
 
 const char* filters[] = {"lutyuv='u=128:v=128'",
                    "hue='h=60:s=-3'",
@@ -130,19 +131,19 @@ end:
 //init player
 int open_input(JNIEnv *env, const char *file_name, jobject surface) {
     LOGI(TAG, "open file:%s\n", file_name);
-    pFormatCtx = avformat_alloc_context();
-    if (avformat_open_input(&pFormatCtx, file_name, NULL, NULL) != 0) {
+    format_ctx = avformat_alloc_context();
+    if (avformat_open_input(&format_ctx, file_name, NULL, NULL) != 0) {
         LOGE(TAG, "Couldn't open file:%s\n", file_name);
         return -1;
     }
-    if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
+    if (avformat_find_stream_info(format_ctx, NULL) < 0) {
         LOGE(TAG, "Couldn't find stream information.");
         return -1;
     }
 
     int i;
-    for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+    for (i = 0; i < format_ctx->nb_streams; i++) {
+        if (format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             video_stream_index = i;
             break;
         }
@@ -152,43 +153,43 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
         return -1;
     }
 
-    AVCodecParameters *videoCodec = pFormatCtx->streams[video_stream_index]->codecpar;
+    AVCodecParameters *videoCodec = format_ctx->streams[video_stream_index]->codecpar;
     AVCodec *pCodec = avcodec_find_decoder(videoCodec->codec_id);
     if (pCodec == NULL) {
         LOGE(TAG, "couldn't find Codec.");
         return -1;
     }
-    pCodecCtx = avcodec_alloc_context3(pCodec);
-    avcodec_parameters_to_context(pCodecCtx, videoCodec);
-    if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
+    video_codec_ctx = avcodec_alloc_context3(pCodec);
+    avcodec_parameters_to_context(video_codec_ctx, videoCodec);
+    if (avcodec_open2(video_codec_ctx, pCodec, NULL) < 0) {
         LOGE(TAG, "Couldn't open codec.");
         return -1;
     }
 
-    nativeWindow = ANativeWindow_fromSurface(env, surface);
-    if (!nativeWindow) {
+    native_window = ANativeWindow_fromSurface(env, surface);
+    if (!native_window) {
         LOGE(TAG, "nativeWindow is null...");
         return -1;
     }
-    ANativeWindow_setBuffersGeometry(nativeWindow, pCodecCtx->width, pCodecCtx->height,
+    ANativeWindow_setBuffersGeometry(native_window, video_codec_ctx->width, video_codec_ctx->height,
                                      WINDOW_FORMAT_RGBA_8888);
-    pFrame = av_frame_alloc();
-    pFrameRGBA = av_frame_alloc();
-    if (pFrameRGBA == NULL || pFrame == NULL) {
+    frame_src = av_frame_alloc();
+    frame_rgb = av_frame_alloc();
+    if (frame_rgb == NULL || frame_src == NULL) {
         LOGE(TAG, "Couldn't allocate video frame.");
         return -1;
     }
-    int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA, pCodecCtx->width, pCodecCtx->height,
+    int numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGBA, video_codec_ctx->width, video_codec_ctx->height,
                                             1);
 
     buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-    av_image_fill_arrays(pFrameRGBA->data, pFrameRGBA->linesize, buffer, AV_PIX_FMT_RGBA,
-                         pCodecCtx->width, pCodecCtx->height, 1);
-    sws_ctx = sws_getContext(pCodecCtx->width,
-                             pCodecCtx->height,
-                             pCodecCtx->pix_fmt,
-                             pCodecCtx->width,
-                             pCodecCtx->height,
+    av_image_fill_arrays(frame_rgb->data, frame_rgb->linesize, buffer, AV_PIX_FMT_RGBA,
+                         video_codec_ctx->width, video_codec_ctx->height, 1);
+    sws_ctx = sws_getContext(video_codec_ctx->width,
+                             video_codec_ctx->height,
+                             video_codec_ctx->pix_fmt,
+                             video_codec_ctx->width,
+                             video_codec_ctx->height,
                              AV_PIX_FMT_RGBA,
                              SWS_BILINEAR,
                              NULL,
@@ -199,34 +200,33 @@ int open_input(JNIEnv *env, const char *file_name, jobject surface) {
 }
 
 int init_audio(JNIEnv *env, jclass jthiz) {
-    int i;
-    for (i = 0; i < pFormatCtx->nb_streams; i++) {
-        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+    for (int i = 0; i < format_ctx->nb_streams; i++) {
+        if (format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_index = i;
             break;
         }
     }
 
-    AVCodecParameters *audioCodec = pFormatCtx->streams[audio_stream_index]->codecpar;
+    AVCodecParameters *audioCodec = format_ctx->streams[audio_stream_index]->codecpar;
     AVCodec *codec = avcodec_find_decoder(audioCodec->codec_id);
     if (codec == NULL) {
         LOGE(TAG, "could not find audio decoder");
         return -1;
     }
-    audioCodecCtx = avcodec_alloc_context3(codec);
-    avcodec_parameters_to_context(audioCodecCtx, audioCodec);
-    if (avcodec_open2(audioCodecCtx, codec, NULL) < 0) {
+    audio_codec_ctx = avcodec_alloc_context3(codec);
+    avcodec_parameters_to_context(audio_codec_ctx, audioCodec);
+    if (avcodec_open2(audio_codec_ctx, codec, NULL) < 0) {
         LOGE(TAG, "could not open audio decoder");
         return -1;
     }
 
-    audio_swr_ctx = swr_alloc();
-    enum AVSampleFormat in_sample_fmt = audioCodecCtx->sample_fmt;
-    out_sample_fmt = AV_SAMPLE_FMT_S16;
-    int in_sample_rate = audioCodecCtx->sample_rate;
-    int out_sample_rate = in_sample_rate;
-    uint64_t in_ch_layout = audioCodecCtx->channel_layout;
+    audio_swr_ctx          = swr_alloc();
+    out_sample_fmt         = AV_SAMPLE_FMT_S16;
+    int in_sample_rate     = audio_codec_ctx->sample_rate;
+    int out_sample_rate    = in_sample_rate;
+    uint64_t in_ch_layout  = audio_codec_ctx->channel_layout;
     uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+    enum AVSampleFormat in_sample_fmt = audio_codec_ctx->sample_fmt;
 
     swr_alloc_set_opts(audio_swr_ctx,
                        (int64_t)out_ch_layout, out_sample_fmt, out_sample_rate,
@@ -258,12 +258,12 @@ int init_audio(JNIEnv *env, jclass jthiz) {
 }
 
 int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame) {
-    int ret = avcodec_send_packet(audioCodecCtx, packet);
+    int ret = avcodec_send_packet(audio_codec_ctx, packet);
     if (ret < 0)
         return ret;
 
     while (ret >= 0) {
-        ret = avcodec_receive_frame(audioCodecCtx, frame);
+        ret = avcodec_receive_frame(audio_codec_ctx, frame);
         if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
             break;
         else if (ret < 0) {
@@ -271,10 +271,7 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame) {
             break;
         }
     }
-    if (ret < 0) {
-        return ret;
-    }
-    if (got_frame > 0) {
+    if (ret >= 0) {
         swr_convert(audio_swr_ctx, &out_buffer, MAX_AUDIO_FRAME_SIZE,
                     (const uint8_t **) frame->data, frame->nb_samples);
         int out_buffer_size = av_samples_get_buffer_size(NULL, out_channel_nb,
@@ -289,11 +286,11 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame) {
         (*env)->DeleteLocalRef(env, audio_sample_array);
         usleep(1000);//1000 * 16
     }
-    return 0;
+    return ret;
 }
 
 int render_video(AVFilterContext *buffersrc_ctx, AVFilterContext *buffersink_ctx, AVFrame *filter_frame) {
-    int ret = av_buffersrc_add_frame_flags(buffersrc_ctx, pFrame,
+    int ret = av_buffersrc_add_frame_flags(buffersrc_ctx, frame_src,
                                            AV_BUFFERSRC_FLAG_KEEP_REF);
     if (ret < 0) {
         LOGE(TAG, "Error while feeding the filter_graph\n");
@@ -304,20 +301,19 @@ int render_video(AVFilterContext *buffersrc_ctx, AVFilterContext *buffersink_ctx
     if (ret >= 0) {
         // lock native window
         ANativeWindow_Buffer windowBuffer;
-        ANativeWindow_lock(nativeWindow, &windowBuffer, NULL);
+        ANativeWindow_lock(native_window, &windowBuffer, NULL);
         // convert
         sws_scale(sws_ctx, (uint8_t const *const *) filter_frame->data,
-                  filter_frame->linesize, 0, pCodecCtx->height,
-                  pFrameRGBA->data, pFrameRGBA->linesize);
-        uint8_t *dst = windowBuffer.bits;
+                  filter_frame->linesize, 0, video_codec_ctx->height,
+                  frame_rgb->data, frame_rgb->linesize);
+        uint8_t *dst  = windowBuffer.bits;
         int dstStride = windowBuffer.stride * 4;
-        uint8_t *src = pFrameRGBA->data[0];
-        int srcStride = pFrameRGBA->linesize[0];
-        int h;
-        for (h = 0; h < pCodecCtx->height; h++) {
+        uint8_t *src  = frame_rgb->data[0];
+        int srcStride = frame_rgb->linesize[0];
+        for (int h = 0; h < video_codec_ctx->height; h++) {
             memcpy(dst + h * dstStride, src + h * srcStride, (size_t) srcStride);
         }
-        ANativeWindow_unlockAndPost(nativeWindow);
+        ANativeWindow_unlockAndPost(native_window);
     }
     av_frame_unref(filter_frame);
     return ret;
@@ -329,7 +325,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
     AVFilterGraph *filter_graph;
     AVFilterContext *buffersrc_ctx;
     AVFilterContext *buffersink_ctx;
-    AVPacket *packet = av_packet_alloc();
+    AVPacket *packet      = av_packet_alloc();
     AVFrame *filter_frame = av_frame_alloc();
     const char *file_name = (*env)->GetStringUTFChars(env, filePath, JNI_FALSE);
 
@@ -345,19 +341,19 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
     }
 
     //init filter
-    AVRational time_base = pFormatCtx->streams[video_stream_index]->time_base;
-    if ((ret = init_filters(filters[pos], time_base, pCodecCtx,
+    AVRational time_base = format_ctx->streams[video_stream_index]->time_base;
+    if ((ret = init_filters(filters[pos], time_base, video_codec_ctx,
             &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
 
-    while (av_read_frame(pFormatCtx, packet) >= 0 && !release) {
+    while (av_read_frame(format_ctx, packet) >= 0 && !release) {
         //switch filter
         if (again) {
             again = 0;
             avfilter_graph_free(&filter_graph);
-            if ((ret = init_filters(filters[pos], time_base, pCodecCtx,
+            if ((ret = init_filters(filters[pos], time_base, video_codec_ctx,
                     &filter_graph, &buffersrc_ctx, &buffersink_ctx)) < 0) {
                 LOGE(TAG, "init_filter error, ret=%d\n", ret);
                 goto end;
@@ -366,12 +362,12 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
         }
         //is video stream or not
         if (packet->stream_index == video_stream_index) {
-            ret = avcodec_send_packet(pCodecCtx, packet);
+            ret = avcodec_send_packet(video_codec_ctx, packet);
             if (ret < 0)
                 goto end;
 
             while (ret >= 0) {
-                ret = avcodec_receive_frame(pCodecCtx, pFrame);
+                ret = avcodec_receive_frame(video_codec_ctx, frame_src);
                 if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
                     break;
                 else if (ret < 0) {
@@ -386,7 +382,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
             }
         } else if (packet->stream_index == audio_stream_index) {//audio stream
             if (playAudio) {
-                play_audio(env, packet, pFrame);
+                play_audio(env, packet, frame_src);
             }
         }
         av_packet_unref(packet);
@@ -397,17 +393,17 @@ end:
     sws_freeContext(sws_ctx);
     swr_free(&audio_swr_ctx);
     avfilter_graph_free(&filter_graph);
-//    avcodec_free_context(&pCodecCtx);
-//    avcodec_free_context(&audioCodecCtx);
-    avformat_close_input(&pFormatCtx);
-    av_frame_free(&pFrameRGBA);
+//    avcodec_free_context(&video_codec_ctx);
+//    avcodec_free_context(&audio_codec_ctx);
+    avformat_close_input(&format_ctx);
+    av_frame_free(&frame_rgb);
     av_frame_free(&filter_frame);
-    av_frame_free(&pFrame);
+    av_frame_free(&frame_src);
     av_packet_free(&packet);
 
     audio_track = NULL;
     audio_track_write_mid = NULL;
-    ANativeWindow_release(nativeWindow);
+    ANativeWindow_release(native_window);
     (*env)->ReleaseStringUTFChars(env, filePath, file_name);
     again = 0;
     release = 0;
