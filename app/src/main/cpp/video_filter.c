@@ -271,8 +271,7 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame, VideoFilterContext
             LOGE(TAG, "decode error=%s", av_err2str(ret));
             break;
         }
-    }
-    if (ret >= 0) {
+
         swr_convert(s->audio_swr_ctx, &s->out_buffer, MAX_AUDIO_FRAME_SIZE,
                     (const uint8_t **) frame->data, frame->nb_samples);
         int out_buffer_size = av_samples_get_buffer_size(NULL, s->out_channel_nb,
@@ -285,7 +284,7 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame, VideoFilterContext
         (*env)->CallIntMethod(env, audio_track, audio_track_write_mid,
                               audio_sample_array, 0, out_buffer_size);
         (*env)->DeleteLocalRef(env, audio_sample_array);
-        usleep(1000);//1000 * 16
+        usleep(16 * 1000);//1000 * 16
     }
     return ret;
 }
@@ -396,8 +395,8 @@ end:
     sws_freeContext(s->sws_ctx);
     swr_free(&s->audio_swr_ctx);
     avfilter_graph_free(&filter_graph);
-//    avcodec_free_context(&s->video_codec_ctx);
-//    avcodec_free_context(&s->audio_codec_ctx);
+    avcodec_free_context(&s->video_codec_ctx);
+    avcodec_free_context(&s->audio_codec_ctx);
     avformat_close_input(&s->format_ctx);
     av_frame_free(&s->frame_rgb);
     av_frame_free(&filter_frame);
