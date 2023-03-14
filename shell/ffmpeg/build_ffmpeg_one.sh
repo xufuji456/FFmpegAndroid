@@ -1,18 +1,13 @@
 #!/bin/bash
 make clean
-cd compat
-rm -rf strtod.d
-rm -rf strtod.o
-cd ../
-
 set -e
-
 archbit=64
 
 if [ $archbit -eq 32 ];then
   echo "build for 32bit"
   ARCH='arm'
   CPU='armv7-a'
+  ABI='armeabi-v7a'
   API=21
   PLATFORM='armv7a'
   PLATFORM_ARCH='arm'
@@ -22,6 +17,7 @@ else
   echo "build for 64bit"
   ARCH='aarch64'
   CPU='armv8-a'
+  ABI='arm64-v8a'
   API=21
   PLATFORM='aarch64'
   PLATFORM_ARCH='arm64'
@@ -153,3 +149,15 @@ function link_one_ffmpeg() {
 }
 
 link_one_ffmpeg
+
+#mp3lame
+#--enable-libmp3lame \
+#--enable-encoder=libmp3lame \
+
+#x264
+#--enable-libx264 \
+#--enable-encoder=libx264 \
+
+#https
+#--enable-openssl \
+#--enable-protocol=https \
