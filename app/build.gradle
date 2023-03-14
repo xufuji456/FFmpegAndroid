@@ -53,6 +53,12 @@ android {
         pickFirst 'lib/armeabi-v7a/libffmpeg.so'
         pickFirst 'lib/arm64-v8a/libffmpeg.so'
     }
+
+    packagingOptions {
+        doNotStrip "*/arm64-v8a/*.so"
+        doNotStrip "*/armeabi-v7a/*.so"
+    }
+
 }
 
 dependencies {
