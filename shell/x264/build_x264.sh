@@ -17,13 +17,13 @@ ARCH='arm64'
 ANDROID='android'
 fi
 
-export NDK=/home/frank/android/android-ndk-r10e 
+export NDK=/home/frank/android/sdk/ndk-bundle
 export PREBUILT=$NDK/toolchains/$CPU-linux-$ANDROID-4.9/prebuilt
 export PLATFORM=$NDK/platforms/android-21/arch-$ARCH
 export TOOLCHAIN=$PREBUILT/linux-x86_64
 export PREFIX=$(pwd)/android/$ABI
 
-build_x264(){
+function build_x264() {
 ./configure \
 --prefix=$PREFIX \
 --enable-static \
