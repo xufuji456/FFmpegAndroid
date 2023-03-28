@@ -102,11 +102,12 @@
     <string name="tip_not_mp4_video">It is not a mp4 file</string>
 
     <string name="filter_sketch">sketch</string>
-    <string name="filter_distinct">distinct</string>
+    <string name="filter_luminance">luma</string>
+    <string name="filter_saturation">saturation</string>
+    <string name="filter_contrast">contrast</string>
     <string name="filter_edge">edge</string>
     <string name="filter_division">division</string>
     <string name="filter_equalize">equalize</string>
-    <string name="filter_rectangle">rectangle</string>
     <string name="filter_flip">flip</string>
     <string name="filter_blur">blur</string>
     <string name="filter_rotate">rotate</string>

@@ -31,7 +31,7 @@ import java.util.ArrayList
 
 class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
 
-    private var videoPath = Environment.getExternalStorageDirectory().path + "/beyond.mp4"
+    private var videoPath = Environment.getExternalStorageDirectory().path + "/what.mp4"
 
     private var videoPlayer: VideoPlayer? = null
     private var surfaceView: SurfaceView? = null
@@ -40,15 +40,16 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     //vflip is up and down, hflip is left and right
     private val txtArray = arrayOf(
             FFmpegApplication.getInstance().getString(R.string.filter_sketch),
-            FFmpegApplication.getInstance().getString(R.string.filter_distinct),
+            FFmpegApplication.getInstance().getString(R.string.filter_luminance),
+            FFmpegApplication.getInstance().getString(R.string.filter_saturation),
+            FFmpegApplication.getInstance().getString(R.string.filter_contrast),
+            FFmpegApplication.getInstance().getString(R.string.filter_sharpening),
             FFmpegApplication.getInstance().getString(R.string.filter_edge),
             FFmpegApplication.getInstance().getString(R.string.filter_division),
-            FFmpegApplication.getInstance().getString(R.string.filter_equalize),
-            FFmpegApplication.getInstance().getString(R.string.filter_rectangle),
             FFmpegApplication.getInstance().getString(R.string.filter_flip),
+            FFmpegApplication.getInstance().getString(R.string.filter_equalize),
             FFmpegApplication.getInstance().getString(R.string.filter_blur),
-            FFmpegApplication.getInstance().getString(R.string.filter_rotate),
-            FFmpegApplication.getInstance().getString(R.string.filter_sharpening))
+            FFmpegApplication.getInstance().getString(R.string.filter_rotate))
     private var horizontalAdapter: HorizontalAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var playAudio = true
@@ -189,7 +190,7 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
 
     override fun onSelectedFile(filePath: String) {
         videoPath = filePath
-        doFilterPlay(4)
+        doFilterPlay(8)
         //sound off by default
         btnSound!!.isChecked = true
     }

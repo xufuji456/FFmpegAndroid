@@ -52,16 +52,19 @@ bool enable_audio;
 jobject audio_track;
 jmethodID audio_track_write_mid;
 
-const char* filters[] = {"lutyuv='u=128:v=128'",
-                   "hue='h=60:s=-3'",
-                   "edgedetect=low=0.1:high=0.4",
-                   "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
-                   "colorbalance=bs=0.3",
-                   "drawbox=x=100:y=100:w=100:h=100:color=red@0.5'",
-                   "hflip",
-                   "gblur=sigma=2:steps=1:planes=1:sigmaV=1",
-                   "rotate=180*PI/180",
-                   "unsharp"};
+const char* filters[] = {
+        "lutyuv='u=128:v=128'",
+        "eq=brightness=0.1", // -1.0 to 1.0 (default 0)
+        "eq=saturation=1.5", // 0.0 to 3.0 (default 1)
+        "eq=contrast=1.8",   // -1000.0 to 1000.0 (default 1)
+        "unsharp",
+        "edgedetect=low=0.1:high=0.4",
+        "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
+        "hflip",
+        "colorbalance=bs=0.3",
+        "gblur=sigma=2:steps=1:planes=1:sigmaV=1",
+        "rotate=180*PI/180"
+};
 
 int init_filters(const char *filters_descr, AVRational time_base, AVCodecContext *codecCtx,
         AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {

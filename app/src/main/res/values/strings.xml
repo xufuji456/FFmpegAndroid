@@ -102,11 +102,12 @@
     <string name="tip_not_mp4_video">该视频不是mp4,无法进行moov前移操作</string>
 
     <string name="filter_sketch">素描</string>
-    <string name="filter_distinct">鲜明</string>
+    <string name="filter_luminance">亮度</string>
+    <string name="filter_saturation">饱和度</string>
+    <string name="filter_contrast">对比度</string>
     <string name="filter_edge">边缘</string>
     <string name="filter_division">九宫格</string>
     <string name="filter_equalize">均衡</string>
-    <string name="filter_rectangle">矩形</string>
     <string name="filter_flip">镜像</string>
     <string name="filter_blur">模糊</string>
     <string name="filter_rotate">旋转</string>
