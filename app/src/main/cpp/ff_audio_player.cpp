@@ -224,6 +224,9 @@ int FFAudioPlayer::decodeAudio() {
     // get buffer size after converting
     int buffer_size = av_samples_get_buffer_size(nullptr, m_state->out_channel,
                                                  m_state->filterFrame->nb_samples, m_state->out_sample_fmt, 1);
+    // update position
+    AVRational time_base = m_state->formatContext->streams[m_state->audioIndex]->time_base;
+    m_state->m_position  = (int64_t)(m_state->filterFrame->pts * av_q2d(time_base) * 1000);
 
     av_frame_unref(m_state->inputFrame);
     av_frame_unref(m_state->filterFrame);
@@ -265,6 +268,16 @@ void FFAudioPlayer::setFilterDesc(const char *filterDescription) {
 
 void FFAudioPlayer::setExit(bool exit) {
     m_state->exitPlaying = exit;
+}
+
+int64_t FFAudioPlayer::getCurrentPosition() {
+    return m_state->m_position;
+}
+
+int64_t FFAudioPlayer::getDuration() {
+    if (!m_state || !m_state->formatContext)
+        return 0;
+    return m_state->formatContext->duration / AV_TIME_BASE * 1000;
 }
 
 void FFAudioPlayer::close() {

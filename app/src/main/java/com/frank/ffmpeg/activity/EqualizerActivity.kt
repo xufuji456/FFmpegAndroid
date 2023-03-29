@@ -1,18 +1,24 @@
 package com.frank.ffmpeg.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.util.Pair
 import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.frank.ffmpeg.AudioPlayer
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.listener.OnSeekBarListener
+import com.frank.ffmpeg.util.TimeUtil
 import com.frank.ffmpeg.view.VisualizerView
 import java.lang.StringBuilder
 import java.util.ArrayList
@@ -32,6 +38,10 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
             523, 740, 1047, 1480, 2093, 2960,
             4180, 5920, 8372, 11840, 16744, 20000)
 
+    private var audioBar: SeekBar? = null
+    private var txtTime: TextView? = null
+    private var txtDuration: TextView? = null
+
     private val selectBandList = IntArray(bandsList.size)
     private val minEQLevel = 0
     private var filterThread: Thread? = null
@@ -39,6 +49,30 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
     private var visualizerView: VisualizerView? = null
     private var equalizerAdapter: EqualizerAdapter? = null
     private var audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
+
+    companion object {
+        private const val MSG_POSITION = 0x01
+        private const val MSG_DURATION = 0x02
+    }
+
+    private val mHandler: Handler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            when (msg?.what) {
+                MSG_POSITION -> {
+                    audioBar?.progress = mAudioPlayer!!.currentPosition.toInt()
+                    txtTime?.text = TimeUtil.getVideoTime(mAudioPlayer!!.currentPosition)
+                    sendEmptyMessageDelayed(MSG_POSITION, 1000)
+                }
+                MSG_DURATION -> {
+                    val duration = msg.obj as Long
+                    txtDuration?.text = TimeUtil.getVideoTime(duration)
+                    audioBar?.max = duration.toInt()
+                }
+            }
+        }
+    }
 
     override val layoutId: Int
         get() = R.layout.activity_equalizer
@@ -52,27 +86,30 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
     }
 
     private fun initView() {
-        visualizerView = findViewById(R.id.visualizer_fft)
+        audioBar    = findViewById(R.id.eq_bar)
+        txtTime     = findViewById(R.id.txt_eq_time)
+        txtDuration = findViewById(R.id.txt_eq_duration)
+        visualizerView    = findViewById(R.id.visualizer_fft)
         val equalizerView = findViewById<RecyclerView>(R.id.list_equalizer)
         val layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = RecyclerView.VERTICAL
+        layoutManager.orientation   = RecyclerView.VERTICAL
         equalizerView.layoutManager = layoutManager
-        equalizerAdapter = EqualizerAdapter(this, this)
+        equalizerAdapter      = EqualizerAdapter(this, this)
         equalizerView.adapter = equalizerAdapter
 
-        val effectEcho: RadioButton = findViewById(R.id.btn_effect_echo)
-        val effectFunny: RadioButton = findViewById(R.id.btn_effect_funny)
+        val effectEcho: RadioButton    = findViewById(R.id.btn_effect_echo)
+        val effectFunny: RadioButton   = findViewById(R.id.btn_effect_funny)
         val effectTremolo: RadioButton = findViewById(R.id.btn_effect_tremolo)
-        val effectLolita: RadioButton = findViewById(R.id.btn_effect_lolita)
-        val effectUncle: RadioButton = findViewById(R.id.btn_effect_uncle)
-        val effectGroup: RadioGroup = findViewById(R.id.group_audio_effect)
+        val effectLolita: RadioButton  = findViewById(R.id.btn_effect_lolita)
+        val effectUncle: RadioButton   = findViewById(R.id.btn_effect_uncle)
+        val effectGroup: RadioGroup    = findViewById(R.id.group_audio_effect)
         effectGroup.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
-                effectEcho.id -> doAudioEffect(0)
-                effectFunny.id -> doAudioEffect(1)
+                effectEcho.id    -> doAudioEffect(0)
+                effectFunny.id   -> doAudioEffect(1)
                 effectTremolo.id -> doAudioEffect(2)
-                effectLolita.id -> doAudioEffect(3)
-                effectUncle.id -> doAudioEffect(4)
+                effectLolita.id  -> doAudioEffect(3)
+                effectUncle.id   -> doAudioEffect(4)
             }
         }
     }
@@ -95,6 +132,19 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
                 visualizerView!!.post { visualizerView!!.setWaveData(it) }
             }
         }
+        mAudioPlayer?.setOnPlayInfoListener(object : AudioPlayer.OnPlayInfoListener {
+            override fun onPrepared() {
+                val duration = mAudioPlayer!!.duration
+                mHandler.obtainMessage(MSG_POSITION).sendToTarget()
+                mHandler.obtainMessage(MSG_DURATION, duration).sendToTarget()
+            }
+
+            override fun onComplete() {
+                Log.e("EQ", "onComplete")
+                mHandler.removeMessages(MSG_POSITION)
+                mHandler.removeCallbacks(null)
+            }
+        })
     }
 
     private fun doEqualize() {
@@ -104,9 +154,9 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
     private fun doEqualize(index: Int, progress: Int) {
         if (filterThread == null) {
             val filter = "superequalizer=6b=4:8b=5:10b=5"
-            filterThread = Thread(Runnable {
+            filterThread = Thread {
                 mAudioPlayer!!.play(audioPath, filter)
-            })
+            }
             filterThread!!.start()
         } else {
             if (index < 0 || index >= selectBandList.size) return
@@ -143,9 +193,9 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
         val filter = ",superequalizer=8b=5"
         effect += filter
         if (filterThread == null) {
-            filterThread = Thread(Runnable {
+            filterThread = Thread {
                 mAudioPlayer!!.play(audioPath, effect)
-            })
+            }
             filterThread!!.start()
         } else {
             mAudioPlayer!!.again(effect)

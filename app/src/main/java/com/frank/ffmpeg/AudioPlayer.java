@@ -24,6 +24,10 @@ public class AudioPlayer {
 
     private native void native_again(long context, String filterDesc);
 
+    private native long native_get_position(long context);
+
+    private native long native_get_duration(long context);
+
     private native void native_release(long context);
 
     public void play(String audioPath, String filter) {
@@ -36,6 +40,20 @@ public class AudioPlayer {
             return;
         }
         native_again(audioContext, filterDesc);
+    }
+
+    public long getCurrentPosition() {
+        if (audioContext == 0) {
+            return 0;
+        }
+        return native_get_position(audioContext);
+    }
+
+    public long getDuration() {
+        if (audioContext == 0) {
+            return 0;
+        }
+        return native_get_duration(audioContext);
     }
 
     public void release() {
@@ -92,6 +110,32 @@ public class AudioPlayer {
     public void fftCallbackFromJNI(byte[] data) {
         if (data != null && onFFTCallback != null) {
            onFFTCallback.onFFT(data);
+        }
+    }
+
+    private OnPlayInfoListener onPlayInfoListener;
+
+    public interface OnPlayInfoListener {
+        void onPrepared();
+        void onComplete();
+    }
+
+    public void setOnPlayInfoListener(OnPlayInfoListener onPlayInfoListener) {
+        this.onPlayInfoListener = onPlayInfoListener;
+    }
+
+    public void playInfoFromJNI(int id) {
+        if (onPlayInfoListener == null)
+            return;
+        switch (id) {
+            case 1:
+                onPlayInfoListener.onPrepared();
+                break;
+            case 2:
+                onPlayInfoListener.onComplete();
+                break;
+            default:
+                break;
         }
     }
 

@@ -28,6 +28,7 @@ struct AudioPlayerState {
     int out_ch_layout;
     int out_sample_rate;
     enum AVSampleFormat out_sample_fmt;
+    int64_t m_position;
 
     AVPacket *packet;
     AVFrame *inputFrame;
@@ -85,6 +86,10 @@ public:
     int getFFTSize() const;
 
     void setExit(bool exit);
+
+    int64_t getCurrentPosition();
+
+    int64_t getDuration();
 
     void close();
 };

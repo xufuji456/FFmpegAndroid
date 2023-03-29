@@ -58,8 +58,37 @@
     <com.frank.ffmpeg.view.VisualizerView
         android:id="@+id/visualizer_fft"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="120dp"
         android:layout_marginEnd="16dp"/>
+
+    <RelativeLayout
+        android:id="@+id/layout_eq_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <SeekBar
+            android:id="@+id/eq_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/txt_eq_time"
+            android:layout_below="@id/eq_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/eq_bar"
+            android:textColor="@color/colorPrimary"/>
+
+        <TextView
+            android:id="@+id/txt_eq_duration"
+            android:layout_below="@+id/eq_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/eq_bar"
+            android:textColor="@color/colorPrimary"/>
+
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"

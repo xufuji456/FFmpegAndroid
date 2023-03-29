@@ -39,10 +39,10 @@ AUDIO_PLAYER_FUNC(void, native_1play, long context, jstring path, jstring filter
     jclass audio_track_class = env->GetObjectClass(audio_track);
     jmethodID play_method = env->GetMethodID(audio_track_class, "play", "()V");
     env->CallVoidMethod(audio_track, play_method);
-    // method if of write
-    jmethodID write_method = env->GetMethodID(audio_track_class, "write", "([BII)I");
-
-    jmethodID fft_method = env->GetMethodID(audio_class, "fftCallbackFromJNI", "([B)V");
+    jmethodID write_method     = env->GetMethodID(audio_track_class, "write", "([BII)I");
+    jmethodID fft_method       = env->GetMethodID(audio_class, "fftCallbackFromJNI", "([B)V");
+    jmethodID play_info_method = env->GetMethodID(audio_class, "playInfoFromJNI", "(I)V");
+    env->CallVoidMethod(thiz, play_info_method, 1);
 
     // demux decode and play
     while (result >= 0) {
@@ -69,6 +69,7 @@ AUDIO_PLAYER_FUNC(void, native_1play, long context, jstring path, jstring filter
         usleep(SLEEP_TIME);
     }
 
+    env->CallVoidMethod(thiz, play_info_method, 2);
     env->ReleaseStringUTFChars(path, native_path);
     jmethodID release_method = env->GetMethodID(audio_class, "releaseAudioTrack", "()V");
     env->CallVoidMethod(thiz, release_method);
@@ -84,10 +85,25 @@ AUDIO_PLAYER_FUNC(void, native_1again, long context, jstring filter_jstr) {
     audioPlayer->setFilterDesc(desc);
 }
 
+AUDIO_PLAYER_FUNC(long, native_1get_1position, long context) {
+    auto *audioPlayer = (FFAudioPlayer*) context;
+    if (!audioPlayer)
+        return 0;
+    return audioPlayer->getCurrentPosition();
+}
+
+AUDIO_PLAYER_FUNC(long, native_1get_1duration, long context) {
+    auto *audioPlayer = (FFAudioPlayer*) context;
+    if (!audioPlayer)
+        return 0;
+    return audioPlayer->getDuration();
+}
+
 AUDIO_PLAYER_FUNC(void, native_1release, long context) {
     auto *audioPlayer = (FFAudioPlayer*) context;
     if (!audioPlayer)
         return;
     audioPlayer->setExit(true);
+    delete audioPlayer;
 }
 
