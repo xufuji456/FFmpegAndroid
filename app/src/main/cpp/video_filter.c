@@ -13,10 +13,11 @@
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/opt.h"
+#include "libavutil/time.h"
 #include "libavfilter/buffersink.h"
 #include "libavfilter/buffersrc.h"
 #include "libavfilter/avfiltergraph.h"
-#include "libavutil/opt.h"
 #include "libswresample/swresample.h"
 #include "ffmpeg_jni_define.h"
 
@@ -43,6 +44,7 @@ typedef struct VideoFilterContext {
     int audio_stream_index;
 
     int out_channel_nb;
+    int64_t start_time;
 } VideoFilterContext;
 
 int pos;
@@ -56,7 +58,7 @@ const char* filters[] = {
         "lutyuv='u=128:v=128'",
         "eq=brightness=0.1", // -1.0 to 1.0 (default 0)
         "eq=saturation=1.5", // 0.0 to 3.0 (default 1)
-        "eq=contrast=1.8",   // -1000.0 to 1000.0 (default 1)
+        "eq=contrast=1.2",   // -1000.0 to 1000.0 (default 1)
         "unsharp",
         "edgedetect=low=0.1:high=0.4",
         "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
@@ -287,7 +289,7 @@ int play_audio(JNIEnv *env, AVPacket *packet, AVFrame *frame, VideoFilterContext
         (*env)->CallIntMethod(env, audio_track, audio_track_write_mid,
                               audio_sample_array, 0, out_buffer_size);
         (*env)->DeleteLocalRef(env, audio_sample_array);
-        usleep(16 * 1000);//1000 * 16
+
     }
     return ret;
 }
@@ -319,7 +321,16 @@ int render_video(AVFilterContext *buffersrc_ctx, AVFilterContext *buffersink_ctx
         }
         ANativeWindow_unlockAndPost(s->native_window);
     }
+    int64_t pts = filter_frame->pts;
     av_frame_unref(filter_frame);
+
+    AVRational time_base = s->format_ctx->streams[s->video_stream_index]->time_base;
+    double timestamp = (double)pts * av_q2d(time_base);
+    int64_t master_clock = av_gettime_relative() - s->start_time;
+    int64_t diff = (int64_t)(timestamp * 1000 * 1000) - master_clock; // microseconds
+    if (diff > 0) {
+        usleep(diff);
+    }
     return ret;
 }
 
@@ -352,6 +363,7 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
         LOGE(TAG, "init_filter error, ret=%d\n", ret);
         goto end;
     }
+    s->start_time = av_gettime_relative();
 
     while (av_read_frame(s->format_ctx, packet) >= 0 && !release) {
         //switch filter
@@ -380,10 +392,6 @@ VIDEO_PLAYER_FUNC(jint, filter, jstring filePath, jobject surface, jint position
                     goto end;
                 }
                 ret = render_video(buffersrc_ctx, buffersink_ctx, filter_frame, s);
-            }
-            //sleep to keep waiting
-            if (!enable_audio) {
-                usleep((unsigned long) (1000 * 40));//1000 * 40
             }
         } else if (packet->stream_index == s->audio_stream_index) {//audio stream
             if (enable_audio) {
