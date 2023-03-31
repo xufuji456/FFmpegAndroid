@@ -40,7 +40,6 @@ AUDIO_PLAYER_FUNC(void, native_1play, long context, jstring path, jstring filter
     jmethodID play_method = env->GetMethodID(audio_track_class, "play", "()V");
     env->CallVoidMethod(audio_track, play_method);
     jmethodID write_method     = env->GetMethodID(audio_track_class, "write", "([BII)I");
-    jmethodID fft_method       = env->GetMethodID(audio_class, "fftCallbackFromJNI", "([B)V");
     jmethodID play_info_method = env->GetMethodID(audio_class, "playInfoFromJNI", "(I)V");
     env->CallVoidMethod(thiz, play_info_method, 1);
 
@@ -61,15 +60,13 @@ AUDIO_PLAYER_FUNC(void, native_1play, long context, jstring path, jstring filter
         env->CallIntMethod(audio_track, write_method, audio_array, 0, size);
         env->DeleteLocalRef(audio_array);
 
-        if (audioPlayer->enableVisualizer()) {
-            fftCallback(env, thiz, fft_method, audioPlayer->getFFTData(), audioPlayer->getFFTSize());
-        }
-
         // audio sync
         usleep(SLEEP_TIME);
     }
 
-    env->CallVoidMethod(thiz, play_info_method, 2);
+    if (result == AVERROR_EOF) {
+        env->CallVoidMethod(thiz, play_info_method, 2);
+    }
     env->ReleaseStringUTFChars(path, native_path);
     jmethodID release_method = env->GetMethodID(audio_class, "releaseAudioTrack", "()V");
     env->CallVoidMethod(thiz, release_method);
@@ -104,6 +101,5 @@ AUDIO_PLAYER_FUNC(void, native_1release, long context) {
     if (!audioPlayer)
         return;
     audioPlayer->setExit(true);
-    delete audioPlayer;
 }
 

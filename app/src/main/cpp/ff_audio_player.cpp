@@ -79,7 +79,6 @@ end:
 
 FFAudioPlayer::FFAudioPlayer() {
     m_state = new AudioPlayerState();
-    m_visualizer = nullptr;
 }
 
 FFAudioPlayer::~FFAudioPlayer() {
@@ -141,9 +140,6 @@ int FFAudioPlayer::open(const char *path) {
     m_state->filterFrame = av_frame_alloc();
     initFilter(FILTER_DESC, m_state->codecContext, &m_state->audioFilterGraph,
                    &m_state->audioSrcContext, &m_state->audioSinkContext);
-    // init visualizer
-    m_visualizer = new FrankVisualizer();
-    m_visualizer->init_visualizer();
 
     return 0;
 }
@@ -158,7 +154,10 @@ int FFAudioPlayer::getSampleRate() const {
 
 int FFAudioPlayer::decodeAudio() {
     int ret;
-    if (m_state->exitPlaying.load()) {
+    std::unique_lock<std::mutex> lock(m_state->m_playMutex);
+    bool exit = m_state->exitPlaying;
+    lock.unlock();
+    if (exit) {
         return -1;
     }
     // demux: read a frame(should be demux thread)
@@ -182,12 +181,6 @@ int FFAudioPlayer::decodeAudio() {
         } else {
             return ret;
         }
-    }
-
-    // visualizer: do fft
-    int nb_samples = m_state->inputFrame->nb_samples < MAX_FFT_SIZE ? m_state->inputFrame->nb_samples : MAX_FFT_SIZE;
-    if (m_enableVisualizer && nb_samples >= MIN_FFT_SIZE) {
-        m_visualizer->fft_run(m_state->inputFrame->data[0], nb_samples);
     }
 
     // change filter
@@ -238,26 +231,6 @@ uint8_t *FFAudioPlayer::getDecodeFrame() const {
     return m_state->outBuffer;
 }
 
-void FFAudioPlayer::setEnableVisualizer(bool enable) {
-    m_enableVisualizer = enable;
-}
-
-bool FFAudioPlayer::enableVisualizer() const {
-    return m_enableVisualizer;
-}
-
-int8_t* FFAudioPlayer::getFFTData() const {
-    if (!m_visualizer)
-        return nullptr;
-    return m_visualizer->getFFTData();
-}
-
-int FFAudioPlayer::getFFTSize() const {
-    if (!m_visualizer)
-        return 0;
-    return m_visualizer->getOutputSample();
-}
-
 void FFAudioPlayer::setFilterAgain(bool again) {
     m_state->filterAgain = again;
 }
@@ -267,7 +240,9 @@ void FFAudioPlayer::setFilterDesc(const char *filterDescription) {
 }
 
 void FFAudioPlayer::setExit(bool exit) {
+    std::unique_lock<std::mutex> lock(m_state->m_playMutex);
     m_state->exitPlaying = exit;
+    lock.unlock();
 }
 
 int64_t FFAudioPlayer::getCurrentPosition() {
@@ -304,7 +279,4 @@ void FFAudioPlayer::close() {
         avfilter_graph_free(&m_state->audioFilterGraph);
     }
     delete[] m_state->outBuffer;
-    if (m_visualizer) {
-        m_visualizer->release_visualizer();
-    }
 }

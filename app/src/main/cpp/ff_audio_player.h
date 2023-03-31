@@ -42,7 +42,8 @@ struct AudioPlayerState {
 
     const char *filterDesc;
     std::atomic<bool> filterAgain;
-    std::atomic<bool> exitPlaying;
+    bool exitPlaying;
+    std::mutex m_playMutex;
 
     AVFilterGraph *audioFilterGraph;
     AVFilterContext *audioSrcContext;
@@ -53,9 +54,6 @@ class FFAudioPlayer {
 private:
 
     AudioPlayerState *m_state;
-
-    bool m_enableVisualizer = false;
-    FrankVisualizer *m_visualizer;
 
 public:
 
@@ -76,14 +74,6 @@ public:
     void setFilterAgain(bool again);
 
     void setFilterDesc(const char *filterDescription);
-
-    void setEnableVisualizer(bool enable);
-
-    bool enableVisualizer() const;
-
-    int8_t* getFFTData() const;
-
-    int getFFTSize() const;
 
     void setExit(bool exit);
 

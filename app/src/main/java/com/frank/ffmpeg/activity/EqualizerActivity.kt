@@ -19,7 +19,6 @@ import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.listener.OnSeekBarListener
 import com.frank.ffmpeg.util.TimeUtil
-import com.frank.ffmpeg.view.VisualizerView
 import java.lang.StringBuilder
 import java.util.ArrayList
 
@@ -46,7 +45,6 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
     private val minEQLevel = 0
     private var filterThread: Thread? = null
     private var mAudioPlayer: AudioPlayer? = null
-    private var visualizerView: VisualizerView? = null
     private var equalizerAdapter: EqualizerAdapter? = null
     private var audioPath = Environment.getExternalStorageDirectory().path + "/tiger.mp3"
 
@@ -89,7 +87,7 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
         audioBar    = findViewById(R.id.eq_bar)
         txtTime     = findViewById(R.id.txt_eq_time)
         txtDuration = findViewById(R.id.txt_eq_duration)
-        visualizerView    = findViewById(R.id.visualizer_fft)
+
         val equalizerView = findViewById<RecyclerView>(R.id.list_equalizer)
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation   = RecyclerView.VERTICAL
@@ -127,11 +125,7 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
             equalizerAdapter!!.setEqualizerList(equalizerList)
         }
         mAudioPlayer = AudioPlayer()
-        mAudioPlayer?.setOnFftCallback {
-            if (visualizerView != null && it != null) {
-                visualizerView!!.post { visualizerView!!.setWaveData(it) }
-            }
-        }
+
         mAudioPlayer?.setOnPlayInfoListener(object : AudioPlayer.OnPlayInfoListener {
             override fun onPrepared() {
                 val duration = mAudioPlayer!!.duration
@@ -141,8 +135,7 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
 
             override fun onComplete() {
                 Log.e("EQ", "onComplete")
-                mHandler.removeMessages(MSG_POSITION)
-                mHandler.removeCallbacks(null)
+                mHandler.removeCallbacksAndMessages(null)
             }
         })
     }
