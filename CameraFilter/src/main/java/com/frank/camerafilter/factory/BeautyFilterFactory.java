@@ -5,6 +5,7 @@ import android.content.Context;
 import com.frank.camerafilter.filter.advance.BeautyBlurFilter;
 import com.frank.camerafilter.filter.advance.BeautyColorInvertFilter;
 import com.frank.camerafilter.filter.advance.BeautyHueFilter;
+import com.frank.camerafilter.filter.advance.BeautyOverlayFilter;
 import com.frank.camerafilter.filter.advance.BeautySketchFilter;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.filter.advance.BeautyWhiteBalanceFilter;
@@ -26,6 +27,8 @@ public class BeautyFilterFactory {
                 return new BeautyHueFilter(context);
             case WHITE_BALANCE:
                 return new BeautyWhiteBalanceFilter(context);
+            case OVERLAY:
+                return new BeautyOverlayFilter(context);
             default:
                 return null;
         }

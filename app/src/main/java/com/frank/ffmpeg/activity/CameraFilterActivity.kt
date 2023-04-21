@@ -19,7 +19,8 @@ class CameraFilterActivity : BaseActivity() {
         BeautyFilterType.COLOR_INVERT,
         BeautyFilterType.HUE,
         BeautyFilterType.WHITE_BALANCE,
-        BeautyFilterType.SKETCH
+        BeautyFilterType.SKETCH,
+        BeautyFilterType.OVERLAY
     )
 
     override val layoutId: Int

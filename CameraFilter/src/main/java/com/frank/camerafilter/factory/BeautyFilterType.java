@@ -6,5 +6,6 @@ public enum BeautyFilterType {
     COLOR_INVERT,
     HUE,
     WHITE_BALANCE,
-    SKETCH
+    SKETCH,
+    OVERLAY
 }

@@ -119,5 +119,6 @@
     <string name="camera_filter_sketch">Sketch</string>
     <string name="camera_filter_blur">Blur</string>
     <string name="camera_filter_invert">Invert</string>
+    <string name="camera_filter_overlay">Overlay</string>
 
 </resources>
