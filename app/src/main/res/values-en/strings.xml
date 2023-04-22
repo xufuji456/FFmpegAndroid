@@ -120,5 +120,6 @@
     <string name="camera_filter_blur">Blur</string>
     <string name="camera_filter_invert">Invert</string>
     <string name="camera_filter_overlay">Overlay</string>
+    <string name="camera_filter_circle">Breath Circle</string>
 
 </resources>

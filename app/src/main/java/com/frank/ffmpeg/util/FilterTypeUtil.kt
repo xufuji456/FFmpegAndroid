@@ -19,6 +19,7 @@ object FilterTypeUtil {
             BeautyFilterType.WHITE_BALANCE -> R.string.camera_filter_balance
             BeautyFilterType.SKETCH -> R.string.camera_filter_sketch
             BeautyFilterType.OVERLAY -> R.string.camera_filter_overlay
+            BeautyFilterType.BREATH_CIRCLE -> R.string.camera_filter_overlay
             else -> R.string.camera_filter_none
         }
     }

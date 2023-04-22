@@ -7,5 +7,6 @@ public enum BeautyFilterType {
     HUE,
     WHITE_BALANCE,
     SKETCH,
-    OVERLAY
+    OVERLAY,
+    BREATH_CIRCLE
 }

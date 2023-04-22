@@ -120,5 +120,6 @@
     <string name="camera_filter_blur">模糊</string>
     <string name="camera_filter_invert">反相</string>
     <string name="camera_filter_overlay">Overlay</string>
+    <string name="camera_filter_circle">呼吸圆</string>
 
 </resources>

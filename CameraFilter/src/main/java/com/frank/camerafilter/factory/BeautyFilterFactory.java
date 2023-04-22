@@ -3,6 +3,7 @@ package com.frank.camerafilter.factory;
 import android.content.Context;
 
 import com.frank.camerafilter.filter.advance.BeautyBlurFilter;
+import com.frank.camerafilter.filter.advance.BeautyBreathCircleFilter;
 import com.frank.camerafilter.filter.advance.BeautyColorInvertFilter;
 import com.frank.camerafilter.filter.advance.BeautyHueFilter;
 import com.frank.camerafilter.filter.advance.BeautyOverlayFilter;
@@ -29,6 +30,8 @@ public class BeautyFilterFactory {
                 return new BeautyWhiteBalanceFilter(context);
             case OVERLAY:
                 return new BeautyOverlayFilter(context);
+            case BREATH_CIRCLE:
+                return new BeautyBreathCircleFilter(context);
             default:
                 return null;
         }
