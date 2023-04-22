@@ -120,5 +120,9 @@
     <string name="camera_filter_blur">模糊</string>
     <string name="camera_filter_overlay">Overlay</string>
     <string name="camera_filter_circle">呼吸圆</string>
+    <string name="camera_filter_brightness">亮度</string>
+    <string name="camera_filter_saturation">饱和度</string>
+    <string name="camera_filter_contrast">对比度</string>
+    <string name="camera_filter_sharpen">锐化</string>
 
 </resources>

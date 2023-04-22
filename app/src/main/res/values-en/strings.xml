@@ -120,5 +120,9 @@
     <string name="camera_filter_blur">Blur</string>
     <string name="camera_filter_overlay">Overlay</string>
     <string name="camera_filter_circle">Breath Circle</string>
+    <string name="camera_filter_brightness">Brightness</string>
+    <string name="camera_filter_saturation">Saturation</string>
+    <string name="camera_filter_contrast">Contrast</string>
+    <string name="camera_filter_sharpen">Sharpen</string>
 
 </resources>

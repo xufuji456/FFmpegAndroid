@@ -13,6 +13,10 @@ object FilterTypeUtil {
     fun filterTypeToNameId(type: BeautyFilterType): Int {
         return when (type) {
             BeautyFilterType.NONE -> R.string.camera_filter_none
+            BeautyFilterType.BRIGHTNESS -> R.string.camera_filter_brightness
+            BeautyFilterType.SATURATION -> R.string.camera_filter_saturation
+            BeautyFilterType.CONTRAST -> R.string.camera_filter_contrast
+            BeautyFilterType.SHARPEN -> R.string.camera_filter_sharpen
             BeautyFilterType.BLUR -> R.string.camera_filter_blur
             BeautyFilterType.HUE -> R.string.camera_filter_hue
             BeautyFilterType.WHITE_BALANCE -> R.string.camera_filter_balance
