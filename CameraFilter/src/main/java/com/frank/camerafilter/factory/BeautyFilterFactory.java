@@ -10,6 +10,7 @@ import com.frank.camerafilter.filter.advance.BeautyOverlayFilter;
 import com.frank.camerafilter.filter.advance.BeautySketchFilter;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.filter.advance.BeautyWhiteBalanceFilter;
+import com.frank.camerafilter.filter.advance.SaturationBeautyFilter;
 
 public class BeautyFilterFactory {
 
@@ -20,6 +21,8 @@ public class BeautyFilterFactory {
         switch (type) {
             case BRIGHTNESS:
                 return new BeautyBrightnessFilter(context);
+            case SATURATION:
+                return new SaturationBeautyFilter(context);
             case SKETCH:
                 return new BeautySketchFilter(context);
             case BLUR:
