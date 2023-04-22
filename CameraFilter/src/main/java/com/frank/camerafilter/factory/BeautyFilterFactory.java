@@ -8,6 +8,7 @@ import com.frank.camerafilter.filter.advance.BrightnessBeautyFilter;
 import com.frank.camerafilter.filter.advance.ContrastBeautyFilter;
 import com.frank.camerafilter.filter.advance.HueBeautyFilter;
 import com.frank.camerafilter.filter.advance.OverlayBeautyFilter;
+import com.frank.camerafilter.filter.advance.SharpenBeautyFilter;
 import com.frank.camerafilter.filter.advance.SketchBeautyFilter;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.filter.advance.WhiteBalanceBeautyFilter;
@@ -26,6 +27,8 @@ public class BeautyFilterFactory {
                 return new SaturationBeautyFilter(context);
             case CONTRAST:
                 return new ContrastBeautyFilter(context);
+            case SHARPEN:
+                return new SharpenBeautyFilter(context);
             case SKETCH:
                 return new SketchBeautyFilter(context);
             case BLUR:

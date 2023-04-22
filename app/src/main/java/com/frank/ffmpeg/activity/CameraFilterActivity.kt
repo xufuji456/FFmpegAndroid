@@ -18,6 +18,7 @@ class CameraFilterActivity : BaseActivity() {
         BeautyFilterType.SATURATION,
         BeautyFilterType.CONTRAST,
         BeautyFilterType.BRIGHTNESS,
+        BeautyFilterType.SHARPEN,
         BeautyFilterType.BLUR,
         BeautyFilterType.HUE,
         BeautyFilterType.WHITE_BALANCE,
