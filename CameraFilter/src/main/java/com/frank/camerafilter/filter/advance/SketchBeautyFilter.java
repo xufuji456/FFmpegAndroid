@@ -7,12 +7,12 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautySketchFilter extends BaseFilter {
+public class SketchBeautyFilter extends BaseFilter {
 
     private int strengthLocation;
     private int stepOffsetLocation;
 
-    public BeautySketchFilter(Context context) {
+    public SketchBeautyFilter(Context context) {
         super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.sketch));
     }
 

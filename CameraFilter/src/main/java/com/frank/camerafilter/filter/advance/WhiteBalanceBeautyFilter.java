@@ -7,12 +7,12 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautyWhiteBalanceFilter extends BaseFilter {
+public class WhiteBalanceBeautyFilter extends BaseFilter {
 
     private int tint;
     private int temperature;
 
-    public BeautyWhiteBalanceFilter(Context context) {
+    public WhiteBalanceBeautyFilter(Context context) {
         super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.whitebalance));
     }
 

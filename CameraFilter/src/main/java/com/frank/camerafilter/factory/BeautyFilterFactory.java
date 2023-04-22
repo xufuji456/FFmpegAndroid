@@ -2,14 +2,14 @@ package com.frank.camerafilter.factory;
 
 import android.content.Context;
 
-import com.frank.camerafilter.filter.advance.BeautyBlurFilter;
-import com.frank.camerafilter.filter.advance.BeautyBreathCircleFilter;
-import com.frank.camerafilter.filter.advance.BeautyBrightnessFilter;
-import com.frank.camerafilter.filter.advance.BeautyHueFilter;
-import com.frank.camerafilter.filter.advance.BeautyOverlayFilter;
-import com.frank.camerafilter.filter.advance.BeautySketchFilter;
+import com.frank.camerafilter.filter.advance.BlurBeautyFilter;
+import com.frank.camerafilter.filter.advance.BreathCircleBeautyFilter;
+import com.frank.camerafilter.filter.advance.BrightnessBeautyFilter;
+import com.frank.camerafilter.filter.advance.HueBeautyFilter;
+import com.frank.camerafilter.filter.advance.OverlayBeautyFilter;
+import com.frank.camerafilter.filter.advance.SketchBeautyFilter;
 import com.frank.camerafilter.filter.BaseFilter;
-import com.frank.camerafilter.filter.advance.BeautyWhiteBalanceFilter;
+import com.frank.camerafilter.filter.advance.WhiteBalanceBeautyFilter;
 import com.frank.camerafilter.filter.advance.SaturationBeautyFilter;
 
 public class BeautyFilterFactory {
@@ -20,21 +20,21 @@ public class BeautyFilterFactory {
         filterType = type;
         switch (type) {
             case BRIGHTNESS:
-                return new BeautyBrightnessFilter(context);
+                return new BrightnessBeautyFilter(context);
             case SATURATION:
                 return new SaturationBeautyFilter(context);
             case SKETCH:
-                return new BeautySketchFilter(context);
+                return new SketchBeautyFilter(context);
             case BLUR:
-                return new BeautyBlurFilter(context);
+                return new BlurBeautyFilter(context);
             case HUE:
-                return new BeautyHueFilter(context);
+                return new HueBeautyFilter(context);
             case WHITE_BALANCE:
-                return new BeautyWhiteBalanceFilter(context);
+                return new WhiteBalanceBeautyFilter(context);
             case OVERLAY:
-                return new BeautyOverlayFilter(context);
+                return new OverlayBeautyFilter(context);
             case BREATH_CIRCLE:
-                return new BeautyBreathCircleFilter(context);
+                return new BreathCircleBeautyFilter(context);
             default:
                 return null;
         }

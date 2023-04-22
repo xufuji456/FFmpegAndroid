@@ -8,7 +8,7 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautyBreathCircleFilter extends BaseFilter {
+public class BreathCircleBeautyFilter extends BaseFilter {
 
   private static final float BREATH_PERIOD = 3_000_000f;
 
@@ -23,7 +23,7 @@ public class BeautyBreathCircleFilter extends BaseFilter {
 
   private final float deltaInnerRadius;
 
-  public BeautyBreathCircleFilter(Context context) {
+  public BreathCircleBeautyFilter(Context context) {
     super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.breath_circle));
 
     this.deltaInnerRadius = maxInnerRadius - minInnerRadius;

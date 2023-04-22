@@ -14,7 +14,7 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautyOverlayFilter extends BaseFilter {
+public class OverlayBeautyFilter extends BaseFilter {
 
     private static final int BITMAP_WIDTH  = 512;
     private static final int BITMAP_HEIGHT = 512;
@@ -27,7 +27,7 @@ public class BeautyOverlayFilter extends BaseFilter {
     private final int[] texId = new int[1];
     private final Matrix mMatrix = new Matrix();
 
-    public BeautyOverlayFilter(Context context) {
+    public OverlayBeautyFilter(Context context) {
         super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.overlay));
     }
 

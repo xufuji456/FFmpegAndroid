@@ -7,11 +7,11 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautyBrightnessFilter extends BaseFilter {
+public class BrightnessBeautyFilter extends BaseFilter {
 
     private int brightness;
 
-    public BeautyBrightnessFilter(Context context) {
+    public BrightnessBeautyFilter(Context context) {
         super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.brightness));
     }
 

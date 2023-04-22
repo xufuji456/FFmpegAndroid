@@ -7,22 +7,22 @@ import com.frank.camerafilter.R;
 import com.frank.camerafilter.filter.BaseFilter;
 import com.frank.camerafilter.util.OpenGLUtil;
 
-public class BeautyBlurFilter extends BaseFilter {
+public class HueBeautyFilter extends BaseFilter {
 
-    private int blurSize;
+    private int hueAdjust;
 
-    public BeautyBlurFilter(Context context) {
-        super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.zoomblur));
+    public HueBeautyFilter(Context context) {
+        super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.hue));
     }
 
     protected void onInit() {
         super.onInit();
-        blurSize = GLES30.glGetUniformLocation(getProgramId(), "blurSize");
+        hueAdjust = GLES30.glGetUniformLocation(getProgramId(), "hueAdjust");
     }
 
     protected void onInitialized() {
         super.onInitialized();
-        setFloat(blurSize, 0.3f);
+        setFloat(hueAdjust, 3.0f);
     }
 
     @Override
