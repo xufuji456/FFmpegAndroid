@@ -118,7 +118,6 @@
     <string name="camera_filter_balance">白平衡</string>
     <string name="camera_filter_sketch">素描</string>
     <string name="camera_filter_blur">模糊</string>
-    <string name="camera_filter_invert">反相</string>
     <string name="camera_filter_overlay">Overlay</string>
     <string name="camera_filter_circle">呼吸圆</string>
 
