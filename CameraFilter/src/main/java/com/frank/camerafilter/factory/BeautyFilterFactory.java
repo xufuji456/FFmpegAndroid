@@ -5,6 +5,7 @@ import android.content.Context;
 import com.frank.camerafilter.filter.advance.BlurBeautyFilter;
 import com.frank.camerafilter.filter.advance.BreathCircleBeautyFilter;
 import com.frank.camerafilter.filter.advance.BrightnessBeautyFilter;
+import com.frank.camerafilter.filter.advance.ContrastBeautyFilter;
 import com.frank.camerafilter.filter.advance.HueBeautyFilter;
 import com.frank.camerafilter.filter.advance.OverlayBeautyFilter;
 import com.frank.camerafilter.filter.advance.SketchBeautyFilter;
@@ -23,6 +24,8 @@ public class BeautyFilterFactory {
                 return new BrightnessBeautyFilter(context);
             case SATURATION:
                 return new SaturationBeautyFilter(context);
+            case CONTRAST:
+                return new ContrastBeautyFilter(context);
             case SKETCH:
                 return new SketchBeautyFilter(context);
             case BLUR:
