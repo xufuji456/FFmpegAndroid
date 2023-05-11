@@ -55,9 +55,9 @@ class EqualizerActivity : BaseActivity(), OnSeekBarListener {
 
     private val mHandler: Handler = @SuppressLint("HandlerLeak")
     object : Handler() {
-        override fun handleMessage(msg: Message?) {
+        override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            when (msg?.what) {
+            when (msg.what) {
                 MSG_POSITION -> {
                     audioBar?.progress = mAudioPlayer!!.currentPosition.toInt()
                     txtTime?.text = TimeUtil.getVideoTime(mAudioPlayer!!.currentPosition)

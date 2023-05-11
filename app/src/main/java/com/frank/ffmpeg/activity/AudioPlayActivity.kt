@@ -48,9 +48,9 @@ class AudioPlayActivity : AppCompatActivity() {
 
     private val mHandler: Handler = @SuppressLint("HandlerLeak")
     object : Handler() {
-        override fun handleMessage(msg: Message?) {
+        override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            when (msg?.what) {
+            when (msg.what) {
                 MSG_TIME -> {
                     audioBar?.progress = audioPlayer.currentPosition
                     txtTime?.text = TimeUtil.getVideoTime(audioPlayer.currentPosition.toLong())

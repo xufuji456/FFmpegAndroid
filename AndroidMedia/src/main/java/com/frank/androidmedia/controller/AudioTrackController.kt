@@ -49,7 +49,7 @@ open class AudioTrackController {
 
     private fun initMediaCodec(mediaFormat: MediaFormat): Boolean {
         val mimeType = mediaFormat.getString(MediaFormat.KEY_MIME)
-        mediaCodec = MediaCodec.createDecoderByType(mimeType)
+        mediaCodec = mimeType?.let { MediaCodec.createDecoderByType(it) }
         return try {
             mediaCodec!!.configure(mediaFormat, null, null, 0)
             mediaCodec!!.start()
