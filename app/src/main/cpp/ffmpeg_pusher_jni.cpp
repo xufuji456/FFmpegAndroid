@@ -12,7 +12,7 @@ PUSHER_FUNC(int, pushStream, jstring inputPath, jstring outputPath) {
     auto *rtmpPusher = new FFRtmpPusher();
     ret = rtmpPusher->open(input_path, output_path);
     if (ret < 0) {
-        LOGE("HttpPusher", "open error=%d", ret);
+        LOGE("ffmpeg_pusher_jni", "open error=%d", ret);
         return ret;
     }
     ret = rtmpPusher->push();

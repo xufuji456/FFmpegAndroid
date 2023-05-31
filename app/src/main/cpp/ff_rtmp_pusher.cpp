@@ -24,7 +24,7 @@ int FFRtmpPusher::open(const char *inputPath, const char *outputPath) {
     }
 
     // Flv video: h264 audio: aac/mp3
-    // If not h264, should transocde to h264
+    // If not h264, should transcode to h264
     for (int i = 0; i < inFormatCtx->nb_streams; ++i) {
         AVStream *in_stream = inFormatCtx->streams[i];
         const auto *codec = avcodec_find_encoder(in_stream->codecpar->codec_id);
@@ -59,6 +59,12 @@ int FFRtmpPusher::open(const char *inputPath, const char *outputPath) {
 void rescale(AVFormatContext *in_format_ctx, AVFormatContext *out_format_ctx, AVPacket *packet) {
     AVStream *in_stream  = in_format_ctx->streams[packet->stream_index];
     AVStream *out_stream = out_format_ctx->streams[packet->stream_index];
+
+    if (in_stream->time_base.num == out_stream->time_base.num
+        && in_stream->time_base.den == out_stream->time_base.den) {
+        packet->pos  = -1;
+        return;
+    }
 
     packet->pts      = av_rescale_q(packet->pts, in_stream->time_base, out_stream->time_base);
     packet->dts      = av_rescale_q(packet->dts, in_stream->time_base, out_stream->time_base);
