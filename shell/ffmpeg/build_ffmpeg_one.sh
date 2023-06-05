@@ -71,7 +71,7 @@ function build_one() {
   --disable-doc \
   --enable-neon \
   --enable-asm \
-  --enable-small \
+  --disable-small \
   --enable-jni \
   --enable-mediacodec \
   --enable-decoder=h264_mediacodec \
