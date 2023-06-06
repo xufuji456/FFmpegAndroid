@@ -306,8 +306,9 @@ public class FFmpegUtil {
      */
     public static String[] transformVideo(String inputPath, String outputPath) {
         // preset: ultrafast > superfast > veryfast > fast > medium > slow > veryslow
-        String transformVideoCmd = "ffmpeg -i -vcodec libx264 -acodec libmp3lame -threads 8 -preset superfast";
-        return insert(transformVideoCmd.split(" "), 2, inputPath, outputPath);
+        String transformCmd = "ffmpeg -i -vcodec libx264 -preset superfast -profile baseline " +
+                "-acodec libmp3lame -y";
+        return insert(transformCmd.split(" "), 2, inputPath, outputPath);
     }
 
     /**
