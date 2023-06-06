@@ -902,4 +902,16 @@ extern const char * const opt_name_codec_tags[];
 extern const char * const opt_name_frame_rates[];
 extern const char * const opt_name_top_field_first[];
 
+int run(int argc, char **argv);
+void cancel_task(int cancel);
+
+enum ProgressState {
+    STATE_INIT,
+    STATE_RUNNING,
+    STATE_FINISH,
+    STATE_ERROR,
+};
+
+void progress_callback(int position, int duration, int state);
+
 #endif /* FFTOOLS_FFMPEG_H */

@@ -34,6 +34,10 @@
 #undef main /* We don't want SDL to override our main() */
 #endif
 
+#include <setjmp.h>
+
+extern jmp_buf jump_buf;
+
 /**
  * program name, defined by the program for show_version().
  */

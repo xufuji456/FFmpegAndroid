@@ -107,6 +107,9 @@
 
 #include "libavutil/avassert.h"
 
+jmp_buf jump_buf;
+int cancel_execute = 0;
+
 const char program_name[] = "ffmpeg";
 const int program_birth_year = 2000;
 
@@ -579,6 +582,11 @@ static void ffmpeg_cleanup(int ret)
         av_log(NULL, AV_LOG_INFO, "Conversion failed!\n");
     }
     term_exit();
+
+    nb_input_files  = 0;
+    nb_output_files = 0;
+    nb_filtergraphs = 0;
+
     ffmpeg_exited = 1;
 }
 
@@ -1757,6 +1765,15 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     }
 
     first_report = 0;
+
+    int64_t report_position = FFABS(pts) / AV_TIME_BASE;
+    int64_t report_duration = 0;
+    if(input_files) {
+        report_duration = input_files[0]->ctx->duration / AV_TIME_BASE;
+    }
+    if (report_position <= report_duration) {
+        progress_callback((int) report_position, (int) report_duration, STATE_RUNNING);
+    }
 
     if (is_last_report)
         print_final_stats(total_size);
@@ -4035,6 +4052,12 @@ static int transcode(void)
             break;
         }
 
+        if (cancel_execute) {
+            cancel_execute = 0;
+            av_log(NULL, AV_LOG_ERROR, "cancel task by user...");
+            break;
+        }
+
         ret = transcode_step();
         if (ret < 0 && ret != AVERROR_EOF) {
             av_log(NULL, AV_LOG_ERROR, "Error while filtering: %s\n", av_err2str(ret));
@@ -4134,10 +4157,11 @@ static int64_t getmaxrss(void)
 #endif
 }
 
-int main(int argc, char **argv)
+int run(int argc, char **argv)
 {
     int ret;
     BenchmarkTimeStamps ti;
+    main_return_code = 0;
 
     init_dynload();
 
@@ -4147,6 +4171,11 @@ int main(int argc, char **argv)
 
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
     parse_loglevel(argc, argv, options);
+
+    if (setjmp(jump_buf)) {
+        main_return_code = 1;
+        goto end;
+    }
 
 #if CONFIG_AVDEVICE
     avdevice_register_all();
@@ -4190,6 +4219,15 @@ int main(int argc, char **argv)
     if ((decode_error_stat[0] + decode_error_stat[1]) * max_error_rate < decode_error_stat[1])
         exit_program(69);
 
-    exit_program(received_nb_signals ? 255 : main_return_code);
+//    exit_program(received_nb_signals ? 255 : main_return_code);
+end:
+    av_log(NULL, AV_LOG_INFO, "FFmpeg result=%d\n", main_return_code);
+    progress_callback(100, 100, main_return_code == 0 ? STATE_FINISH : STATE_ERROR);
+    ffmpeg_cleanup(0);
+
     return main_return_code;
+}
+
+void cancel_task(int cancel) {
+    cancel_execute = cancel;
 }
