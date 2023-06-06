@@ -75,6 +75,8 @@
 #  define pthread_mutex_unlock(a) do{}while(0)
 #endif
 
+#include "ffprobe.h"
+
 typedef struct InputStream {
     AVStream *st;
 
@@ -322,6 +324,79 @@ typedef struct LogBuffer {
 static LogBuffer *log_buffer;
 static int log_buffer_size;
 
+static int buffer_length = 0;
+static int buffer_size = 256 * 1024;
+char *print_buffer = NULL;
+
+int get_category(void *ptr) {
+    AVClass *avc = *(AVClass **) ptr;
+    if (!avc
+        || (avc->version & 0xFF) < 100
+        || avc->version < (51 << 16 | 59 << 8)
+        || avc->category >= AV_CLASS_CATEGORY_NB)
+        return AV_CLASS_CATEGORY_NA + 16;
+
+    if (avc->get_category)
+        return avc->get_category(ptr) + 16;
+
+    return avc->category + 16;
+}
+
+void format_line(void *avcl, const char *fmt, va_list vl,
+                 AVBPrint part[4], int *print_prefix, int type[2]) {
+    AVClass *avc = avcl ? *(AVClass **) avcl : NULL;
+    av_bprint_init(part + 0, 0, 1);
+    av_bprint_init(part + 1, 0, 1);
+    av_bprint_init(part + 2, 0, 1);
+    av_bprint_init(part + 3, 0, 65536);
+
+    if (type) type[0] = type[1] = AV_CLASS_CATEGORY_NA + 16;
+    if (*print_prefix && avc) {
+        if (avc->parent_log_context_offset) {
+            AVClass **parent = *(AVClass ***) (((uint8_t *) avcl) +
+                                               avc->parent_log_context_offset);
+            if (parent && *parent) {
+                av_bprintf(part + 0, "[%s @ %p] ",
+                           (*parent)->item_name(parent), parent);
+                if (type) type[0] = get_category(parent);
+            }
+        }
+        av_bprintf(part + 1, "[%s @ %p] ",
+                   avc->item_name(avcl), avcl);
+        if (type) type[1] = get_category(avcl);
+    }
+
+    av_vbprintf(part + 3, fmt, vl);
+
+    if (*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
+        char lastc = part[3].len && part[3].len <= part[3].size ? part[3].str[part[3].len - 1] : 0;
+        *print_prefix = lastc == '\n' || lastc == '\r';
+    }
+}
+
+int printf_json(char *buffer, int maxsize, char *fmt, va_list args) {
+
+    static int print_prefix = 1;
+    int type[2];
+    AVBPrint part[4];
+    format_line(NULL, fmt, args, part, &print_prefix, type);
+    int length = snprintf(buffer, maxsize, "%s%s%s%s", part[0].str, part[1].str, part[2].str,
+                          part[3].str);
+    return length;
+}
+
+/**
+ * print the output result as json string
+ *
+ */
+void frank_printf_json(char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    int length = printf_json(print_buffer + buffer_length, buffer_size - buffer_length, fmt, args);
+    buffer_length += length;
+    va_end(args);
+}
+
 static void log_callback(void *ptr, int level, const char *fmt, va_list vl)
 {
     AVClass* avc = ptr ? *(AVClass **) ptr : NULL;
@@ -377,6 +452,9 @@ static void ffprobe_cleanup(int ret)
     for (i = 0; i < FF_ARRAY_ELEMS(sections); i++)
         av_dict_free(&(sections[i].entries_to_show));
 
+    buffer_length = 0;
+    input_filename = NULL;
+    output_filename = NULL;
 #if HAVE_THREADS
     pthread_mutex_destroy(&log_mutex);
 #endif
@@ -1599,7 +1677,7 @@ static const char *json_escape_str(AVBPrint *dst, const char *src, void *log_ctx
     return dst->str;
 }
 
-#define JSON_INDENT() writer_printf(wctx, "%*c", json->indent_level * 4, ' ')
+#define JSON_INDENT() frank_printf_json("%*c", json->indent_level * 4, ' ')
 
 static void json_print_section_header(WriterContext *wctx)
 {
@@ -1610,10 +1688,10 @@ static void json_print_section_header(WriterContext *wctx)
         wctx->section[wctx->level-1] : NULL;
 
     if (wctx->level && wctx->nb_item[wctx->level-1])
-        writer_put_str(wctx, ",\n");
+        frank_printf_json(",\n");
 
     if (section->flags & SECTION_FLAG_IS_WRAPPER) {
-        writer_put_str(wctx, "{\n");
+        frank_printf_json("{\n");
         json->indent_level++;
     } else {
         av_bprint_init(&buf, 1, AV_BPRINT_SIZE_UNLIMITED);
@@ -1622,17 +1700,17 @@ static void json_print_section_header(WriterContext *wctx)
 
         json->indent_level++;
         if (section->flags & SECTION_FLAG_IS_ARRAY) {
-            writer_printf(wctx, "\"%s\": [\n", buf.str);
+            frank_printf_json("\"%s\": [\n", buf.str);
         } else if (parent_section && !(parent_section->flags & SECTION_FLAG_IS_ARRAY)) {
-            writer_printf(wctx, "\"%s\": {%s", buf.str, json->item_start_end);
+            frank_printf_json("\"%s\": {%s", buf.str, json->item_start_end);
         } else {
-            writer_printf(wctx, "{%s", json->item_start_end);
+            frank_printf_json("{%s", json->item_start_end);
 
             /* this is required so the parser can distinguish between packets and frames */
             if (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES) {
                 if (!json->compact)
                     JSON_INDENT();
-                writer_printf(wctx, "\"type\": \"%s\"", section->name);
+                frank_printf_json("\"type\": \"%s\"", section->name);
                 wctx->nb_item[wctx->level]++;
             }
         }
@@ -1647,18 +1725,18 @@ static void json_print_section_footer(WriterContext *wctx)
 
     if (wctx->level == 0) {
         json->indent_level--;
-        writer_put_str(wctx, "\n}\n");
+        frank_printf_json("\n}\n");
     } else if (section->flags & SECTION_FLAG_IS_ARRAY) {
-        writer_w8(wctx, '\n');
+        frank_printf_json("\n");
         json->indent_level--;
         JSON_INDENT();
-        writer_w8(wctx, ']');
+        frank_printf_json( "]");
     } else {
-        writer_put_str(wctx, json->item_start_end);
+        frank_printf_json("%s",json->item_start_end);
         json->indent_level--;
         if (!json->compact)
             JSON_INDENT();
-        writer_w8(wctx, '}');
+        frank_printf_json("}");
     }
 }
 
@@ -1668,9 +1746,9 @@ static inline void json_print_item_str(WriterContext *wctx,
     AVBPrint buf;
 
     av_bprint_init(&buf, 1, AV_BPRINT_SIZE_UNLIMITED);
-    writer_printf(wctx, "\"%s\":", json_escape_str(&buf, key,   wctx));
+    frank_printf_json("\"%s\":", json_escape_str(&buf, key,   wctx));
     av_bprint_clear(&buf);
-    writer_printf(wctx, " \"%s\"", json_escape_str(&buf, value, wctx));
+    frank_printf_json(" \"%s\"", json_escape_str(&buf, value, wctx));
     av_bprint_finalize(&buf, NULL);
 }
 
@@ -1681,7 +1759,7 @@ static void json_print_str(WriterContext *wctx, const char *key, const char *val
         wctx->section[wctx->level-1] : NULL;
 
     if (wctx->nb_item[wctx->level] || (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES))
-        writer_put_str(wctx, json->item_sep);
+        frank_printf_json(json->item_sep);
     if (!json->compact)
         JSON_INDENT();
     json_print_item_str(wctx, key, value);
@@ -1695,12 +1773,12 @@ static void json_print_int(WriterContext *wctx, const char *key, long long int v
     AVBPrint buf;
 
     if (wctx->nb_item[wctx->level] || (parent_section && parent_section->id == SECTION_ID_PACKETS_AND_FRAMES))
-        writer_put_str(wctx, json->item_sep);
+        frank_printf_json(json->item_sep);
     if (!json->compact)
         JSON_INDENT();
 
     av_bprint_init(&buf, 1, AV_BPRINT_SIZE_UNLIMITED);
-    writer_printf(wctx, "\"%s\": %lld", json_escape_str(&buf, key, wctx), value);
+    frank_printf_json("\"%s\": %lld", json_escape_str(&buf, key, wctx), value);
     av_bprint_finalize(&buf, NULL);
 }
 
@@ -3764,7 +3842,7 @@ static int opt_print_filename(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
-void show_help_default(const char *opt, const char *arg)
+void probe_show_help_default(const char *opt, const char *arg)
 {
     av_log_set_callback(log_callback_help);
     show_usage();
@@ -4044,13 +4122,24 @@ static inline int check_section_show_entries(int section_id)
             do_show_##varname = 1;                                      \
     } while (0)
 
-int main(int argc, char **argv)
+char* ffprobe_run(int argc, char **argv)
 {
     const Writer *w;
     WriterContext *wctx;
     char *buf;
     char *w_name = NULL, *w_args = NULL;
     int ret, input_ret, i;
+
+    buffer_length = 0;
+    if(print_buffer == NULL) {
+        print_buffer = av_malloc(sizeof(char) * buffer_size);
+    }
+    memset(print_buffer, '\0', (size_t) buffer_size);
+
+    if (setjmp(jump_buf)) {
+        ret = 1;
+        goto end;
+    }
 
     init_dynload();
 
@@ -4061,7 +4150,6 @@ int main(int argc, char **argv)
     }
 #endif
     av_log_set_flags(AV_LOG_SKIP_REPEATED);
-    register_exit(ffprobe_cleanup);
 
     options = real_options;
     parse_loglevel(argc, argv, options);
@@ -4194,6 +4282,7 @@ end:
         av_dict_free(&(sections[i].entries_to_show));
 
     avformat_network_deinit();
+    ffprobe_cleanup(ret);
 
-    return ret < 0;
+    return print_buffer;
 }
