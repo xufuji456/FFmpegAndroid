@@ -18,7 +18,7 @@ extern "C" {
 
 #include "libavfilter/buffersink.h"
 #include "libavfilter/buffersrc.h"
-#include "libavfilter/avfiltergraph.h"
+#include "libavfilter/avfilter.h"
 #ifdef __cplusplus
 }
 #endif

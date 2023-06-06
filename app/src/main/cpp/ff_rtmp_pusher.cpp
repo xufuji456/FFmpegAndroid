@@ -4,7 +4,7 @@
 
 #include "ff_rtmp_pusher.h"
 
-#define PUSH_TAG "HttpPusher"
+#define PUSH_TAG "ff_rtmp_pusher"
 
 int FFRtmpPusher::open(const char *inputPath, const char *outputPath) {
     int ret;
