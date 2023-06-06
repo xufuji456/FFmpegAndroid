@@ -38,7 +38,7 @@
 #include <stddef.h>
 #include <assert.h>
 #include <stdio.h>
-#include "config.h"
+#include "ffmpeg/config.h"
 #include "attributes.h"
 #include "timer.h"
 #include "macros.h"

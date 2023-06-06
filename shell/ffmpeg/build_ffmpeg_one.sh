@@ -161,3 +161,5 @@ link_one_ffmpeg
 #https
 #--enable-openssl \
 #--enable-protocol=https \
+
+#libx264: require_pkg_config --> check_pkg_config
