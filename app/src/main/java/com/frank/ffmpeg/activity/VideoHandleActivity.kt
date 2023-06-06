@@ -286,8 +286,8 @@ class VideoHandleActivity : BaseActivity() {
             }
             11 -> { //convert video to picture
                 outputPath = PATH + File.separator + "Video2Image/"
-                val imageFile = File(outputPath)
-                if (!imageFile.exists()) {
+                val imageFile = outputPath?.let { File(it) }
+                if (imageFile != null && !imageFile.exists()) {
                     if (!imageFile.mkdir()) {
                         return
                     }
@@ -400,7 +400,7 @@ class VideoHandleActivity : BaseActivity() {
         val cmdList = ArrayList<Array<String>>()
         //the resolution of photo which you want to convert
         val resolution = "640x480"
-        for (file in files) {
+        for (file in files!!) {
             val inputPath = file.absolutePath
             val outputPath = tempPath + file.name
             val convertCmd = FFmpegUtil.convertResolution(inputPath, resolution, outputPath)
@@ -421,19 +421,23 @@ class VideoHandleActivity : BaseActivity() {
             var width = 0
             var height = 0
             var rotateDegree = 0
+            var retriever: MediaMetadataRetriever ?= null
             try {
-                val retriever = MediaMetadataRetriever()
+                retriever = MediaMetadataRetriever()
                 retriever.setDataSource(videoPath)
                 val mWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
                 val mHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
-                width = Integer.valueOf(mWidth)
-                height = Integer.valueOf(mHeight)
+                width = mWidth?.let { Integer.valueOf(it) }!!
+                height = mHeight?.let { Integer.valueOf(it) }!!
                 val rotate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
-                rotateDegree = Integer.valueOf(rotate)
-                retriever.release()
+                if (!rotate.isNullOrEmpty()) {
+                    rotateDegree = Integer.valueOf(rotate)
+                }
                 Log.e(TAG, "retrieve width=$width--height=$height--rotate=$rotate")
             } catch (e: Exception) {
                 Log.e(TAG, "retrieve error=$e")
+            } finally {
+                retriever?.release()
             }
 
             val start = System.currentTimeMillis()
