@@ -26,7 +26,7 @@
 #ifndef AVUTIL_TIMER_H
 #define AVUTIL_TIMER_H
 
-#include "ffmpeg/config.h"
+#include "config.h"
 
 #if CONFIG_LINUX_PERF
 # ifndef _GNU_SOURCE
@@ -42,23 +42,26 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#if HAVE_MACH_ABSOLUTE_TIME
+#if CONFIG_MACOS_KPERF
+#include "macos_kperf.h"
+#elif HAVE_MACH_ABSOLUTE_TIME
 #include <mach/mach_time.h>
 #endif
 
+#include "common.h"
 #include "log.h"
 
-//TODO
-#include "libavutil/arm/timer.h"
-//#if   ARCH_AARCH64
-//#   include "aarch64/timer.h"
-//#elif ARCH_ARM
-//#   include "arm/timer.h"
-//#elif ARCH_PPC
-//#   include "ppc/timer.h"
-//#elif ARCH_X86
-//#   include "x86/timer.h"
-//#endif
+#if   ARCH_AARCH64
+#   include "aarch64/timer.h"
+#elif ARCH_ARM
+#   include "arm/timer.h"
+#elif ARCH_PPC
+#   include "ppc/timer.h"
+#elif ARCH_RISCV
+#   include "riscv/timer.h"
+#elif ARCH_X86
+#   include "x86/timer.h"
+#endif
 
 #if !defined(AV_READ_TIME)
 #   if HAVE_GETHRTIME
@@ -89,7 +92,7 @@
         if (((tcount + tskip_count) & (tcount + tskip_count - 1)) == 0) { \
             int i;                                                        \
             av_log(NULL, AV_LOG_ERROR,                                    \
-                   "%7"PRIu64" " FF_TIMER_UNITS " in %s,%8d runs,%7d skips",          \
+                   "%7" PRIu64 " " FF_TIMER_UNITS " in %s,%8d runs,%7d skips",\
                    tsum * 10 / tcount, id, tcount, tskip_count);          \
             for (i = 0; i < 32; i++)                                      \
                 av_log(NULL, AV_LOG_VERBOSE, " %2d", av_log2(2*thistogram[i]));\
@@ -126,6 +129,16 @@
     ioctl(linux_perf_fd, PERF_EVENT_IOC_DISABLE, 0);                        \
     read(linux_perf_fd, &tperf, sizeof(tperf));                             \
     TIMER_REPORT(id, tperf)
+
+#elif CONFIG_MACOS_KPERF
+
+#define START_TIMER                                                         \
+    uint64_t tperf;                                                         \
+    ff_kperf_init();                                                        \
+    tperf = ff_kperf_cycles();
+
+#define STOP_TIMER(id)                                                      \
+    TIMER_REPORT(id, ff_kperf_cycles() - tperf);
 
 #elif defined(AV_READ_TIME)
 #define START_TIMER                             \

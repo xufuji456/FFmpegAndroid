@@ -27,9 +27,8 @@
 #ifndef AVUTIL_HASH_H
 #define AVUTIL_HASH_H
 
+#include <stddef.h>
 #include <stdint.h>
-
-#include "version.h"
 
 /**
  * @defgroup lavu_hash Hash Functions
@@ -181,11 +180,7 @@ void av_hash_init(struct AVHashContext *ctx);
  * @param[in]     src Data to be added to the hash context
  * @param[in]     len Size of the additional data
  */
-#if FF_API_CRYPTO_SIZE_T
-void av_hash_update(struct AVHashContext *ctx, const uint8_t *src, int len);
-#else
 void av_hash_update(struct AVHashContext *ctx, const uint8_t *src, size_t len);
-#endif
 
 /**
  * Finalize a hash context and compute the actual hash value.
