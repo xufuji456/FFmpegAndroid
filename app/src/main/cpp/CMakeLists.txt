@@ -11,13 +11,20 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 set(SRC_FFMPEG
+        ffmpeg_cmd.c
         ffmpeg/cmdutils.c
         ffmpeg/ffmpeg.c
+        ffmpeg/ffmpeg_demux.c
         ffmpeg/ffmpeg_filter.c
+        ffmpeg/ffmpeg_hw.c
+        ffmpeg/ffmpeg_mux.c
+        ffmpeg/ffmpeg_mux_init.c
         ffmpeg/ffmpeg_opt.c
-        ffmpeg_cmd.c
         ffmpeg/ffprobe.c
-        ffmpeg/ffmpeg_hw.c)
+        ffmpeg/objpool.c
+        ffmpeg/opt_common.c
+        ffmpeg/sync_queue.c
+        ffmpeg/thread_queue.c)
 
 set(SRC_VISUALIZER
         visualizer/fft.cpp
