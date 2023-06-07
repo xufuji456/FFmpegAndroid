@@ -32,6 +32,7 @@ import com.frank.ffmpeg.handler.FFmpegHandler.MSG_BEGIN
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_FINISH
 import com.frank.ffmpeg.handler.FFmpegHandler.MSG_PROGRESS
 import com.frank.ffmpeg.listener.OnItemClickListener
+import java.util.Locale
 
 /**
  * video process by FFmpeg command
@@ -78,6 +79,8 @@ class VideoHandleActivity : BaseActivity() {
                         showToast("Save to:$outputPath")
                         outputPath = ""
                     }
+                    // reset progress
+                    txtProgress!!.text = String.format(Locale.getDefault(), "%d%%", 0)
                 }
                 MSG_PROGRESS -> {
                     val progress = msg.arg1

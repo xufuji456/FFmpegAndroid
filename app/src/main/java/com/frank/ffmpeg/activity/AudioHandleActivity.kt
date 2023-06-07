@@ -77,6 +77,8 @@ class AudioHandleActivity : BaseActivity() {
                         showToast("Save to:$outputPath")
                         outputPath = ""
                     }
+                    // reset progress
+                    txtProgress!!.text = String.format(Locale.getDefault(), "%d%%", 0)
                 }
                 MSG_PROGRESS -> {
                     val progress = msg.arg1

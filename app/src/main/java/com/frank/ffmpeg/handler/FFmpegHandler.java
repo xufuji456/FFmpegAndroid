@@ -55,8 +55,7 @@ public class FFmpegHandler {
         if (commandLine == null) {
             return;
         }
-        mHandler.removeMessages(MSG_PROGRESS);
-        mHandler.removeCallbacksAndMessages(null);
+
         FFmpegCmd.execute(commandLine, new OnHandleListener() {
             @Override
             public void onBegin() {
@@ -90,6 +89,7 @@ public class FFmpegHandler {
                 if (isContinue) {
                     mHandler.obtainMessage(MSG_CONTINUE).sendToTarget();
                 } else {
+                    mHandler.removeMessages(MSG_PROGRESS);
                     mHandler.obtainMessage(MSG_FINISH).sendToTarget();
                 }
             }
