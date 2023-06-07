@@ -3,6 +3,7 @@ package com.frank.ffmpeg.activity
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.media.MediaMetadataRetriever
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -106,9 +107,11 @@ class VideoHandleActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        hideActionBar()
         intView()
         ffmpegHandler = FFmpegHandler(mHandler)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            PATH = cacheDir.absolutePath
+        }
     }
 
     private fun intView() {
@@ -459,7 +462,7 @@ class VideoHandleActivity : BaseActivity() {
     companion object {
 
         private val TAG = VideoHandleActivity::class.java.simpleName
-        private val PATH = Environment.getExternalStorageDirectory().path
+        private var PATH = Environment.getExternalStorageDirectory().path
         private var outputPath :String ?= null
 
         private const val TYPE_IMAGE = 1

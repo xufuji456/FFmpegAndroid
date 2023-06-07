@@ -24,7 +24,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:name">
+        tools:replace="android:name"
+        android:requestLegacyExternalStorage="true">
 
         <activity android:name=".activity.MainActivity" android:exported="true">
             <intent-filter>

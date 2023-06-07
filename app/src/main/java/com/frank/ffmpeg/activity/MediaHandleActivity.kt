@@ -1,6 +1,7 @@
 package com.frank.ffmpeg.activity
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -80,6 +81,9 @@ class MediaHandleActivity : BaseActivity() {
         hideActionBar()
         initView()
         ffmpegHandler = FFmpegHandler(mHandler)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            PATH = cacheDir.absolutePath
+        }
     }
 
     private fun initView() {
@@ -190,7 +194,7 @@ class MediaHandleActivity : BaseActivity() {
     companion object {
 
         private val TAG = MediaHandleActivity::class.java.simpleName
-        private val PATH = Environment.getExternalStorageDirectory().path
+        private var PATH = Environment.getExternalStorageDirectory().path
         private var outputPath :String ?= null
     }
 }

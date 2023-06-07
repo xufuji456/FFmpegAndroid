@@ -3,6 +3,7 @@ package com.frank.ffmpeg.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
@@ -107,6 +108,9 @@ class AudioHandleActivity : BaseActivity() {
 
         initView()
         ffmpegHandler = FFmpegHandler(mHandler)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            PATH = cacheDir.absolutePath
+        }
     }
 
     private fun initView() {
@@ -308,7 +312,7 @@ class AudioHandleActivity : BaseActivity() {
 
     companion object {
 
-        private val PATH = Environment.getExternalStorageDirectory().path
+        private var PATH = Environment.getExternalStorageDirectory().path
 
         private const val useFFmpeg = true
 
