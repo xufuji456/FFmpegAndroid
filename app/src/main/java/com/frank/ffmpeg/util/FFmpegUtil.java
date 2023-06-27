@@ -257,6 +257,13 @@ public class FFmpegUtil {
         return insert(surroundCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    public static String[] audioReverb(String inputPath, String outputPath) {
+        // delay:20ms feedback:0.3 crossfeed:0.3 drymix:0.8
+        String surroundCmd = "ffmpeg -i -af stereowiden -y";
+        surroundCmd = String.format(Locale.getDefault(), surroundCmd);
+        return insert(surroundCmd.split(" "), 2, inputPath, outputPath);
+    }
+
     /**
      * mux audio and video together
      *

@@ -131,7 +131,9 @@ class AudioHandleActivity : BaseActivity() {
             getString(R.string.audio_volume),
             getString(R.string.audio_waveform),
             getString(R.string.audio_encode),
-            getString(R.string.audio_surround))
+            getString(R.string.audio_surround),
+            getString(R.string.audio_reverb)
+        )
 
         layoutAudioHandle = findViewById(R.id.list_audio_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -282,6 +284,10 @@ class AudioHandleActivity : BaseActivity() {
             14 -> { // change to surround sound
                 outputPath = PATH + File.separator + "surround.mp3"
                 commandLine = FFmpegUtil.audioSurround(srcFile, outputPath)
+            }
+            15 -> {
+                outputPath = PATH + File.separator + "reverb.mp3"
+                commandLine = FFmpegUtil.audioReverb(srcFile, outputPath)
             }
             else -> {
             }
