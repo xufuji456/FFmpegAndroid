@@ -251,6 +251,12 @@ public class FFmpegUtil {
         return insert(equalizerCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    public static String[] audioSurround(String inputPath, String outputPath) {
+        String surroundCmd = "ffmpeg -i -af surround -y";
+        surroundCmd = String.format(Locale.getDefault(), surroundCmd);
+        return insert(surroundCmd.split(" "), 2, inputPath, outputPath);
+    }
+
     /**
      * mux audio and video together
      *

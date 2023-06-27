@@ -117,20 +117,21 @@ class AudioHandleActivity : BaseActivity() {
         layoutProgress = getView(R.id.layout_progress)
         txtProgress = getView(R.id.txt_progress)
         val list = listOf(
-                getString(R.string.audio_transform),
-                getString(R.string.audio_cut),
-                getString(R.string.audio_concat),
-                getString(R.string.audio_mix),
-                getString(R.string.audio_play),
-                getString(R.string.audio_speed),
-                getString(R.string.audio_echo),
-                getString(R.string.audio_tremolo),
-                getString(R.string.audio_denoise),
-                getString(R.string.audio_add_equalizer),
-                getString(R.string.audio_silence),
-                getString(R.string.audio_volume),
-                getString(R.string.audio_waveform),
-                getString(R.string.audio_encode))
+            getString(R.string.audio_transform),
+            getString(R.string.audio_cut),
+            getString(R.string.audio_concat),
+            getString(R.string.audio_mix),
+            getString(R.string.audio_play),
+            getString(R.string.audio_speed),
+            getString(R.string.audio_echo),
+            getString(R.string.audio_tremolo),
+            getString(R.string.audio_denoise),
+            getString(R.string.audio_add_equalizer),
+            getString(R.string.audio_silence),
+            getString(R.string.audio_volume),
+            getString(R.string.audio_waveform),
+            getString(R.string.audio_encode),
+            getString(R.string.audio_surround))
 
         layoutAudioHandle = findViewById(R.id.list_audio_item)
         val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -277,6 +278,10 @@ class AudioHandleActivity : BaseActivity() {
                 //channel num of pcm
                 val channel = 2
                 commandLine = FFmpegUtil.encodeAudio(pcmFile, outputPath, sampleRate, channel)
+            }
+            14 -> { // change to surround sound
+                outputPath = PATH + File.separator + "surround.mp3"
+                commandLine = FFmpegUtil.audioSurround(srcFile, outputPath)
             }
             else -> {
             }

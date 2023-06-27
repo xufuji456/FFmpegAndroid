@@ -14,11 +14,13 @@
     <string name="audio_denoise">音频降噪</string>
     <string name="audio_silence">静音检测</string>
     <string name="audio_volume">修改音量</string>
+    <string name="audio_reverb">混响</string>
+    <string name="audio_surround">全景声</string>
     <string name="audio_add_equalizer">均衡器+</string>
     <string name="audio_effect">音效</string>
     <string name="audio_equalizer">均衡器:</string>
     <string name="audio_style">风格:</string>
-    <string name="audio_reverb">混响:</string>
+    <string name="audio_effect_reverb">混响:</string>
     <string name="audio_bass_boost">重低音:</string>
     <string name="audio_voice_enhancer">声音增强:</string>
     <string name="audio_effect_echo">空灵</string>

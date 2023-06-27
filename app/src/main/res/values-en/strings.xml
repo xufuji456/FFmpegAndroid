@@ -14,11 +14,13 @@
     <string name="audio_denoise">Audio denoise</string>
     <string name="audio_silence">Silence detect</string>
     <string name="audio_volume">Audio volume</string>
+    <string name="audio_reverb">Reverb</string>
+    <string name="audio_surround">Surround</string>
     <string name="audio_add_equalizer">Add equalizer</string>
     <string name="audio_effect">Audio effect</string>
     <string name="audio_equalizer">Audio equalizer:</string>
     <string name="audio_style">Audio style:</string>
-    <string name="audio_reverb">Audio reverb:</string>
+    <string name="audio_effect_reverb">Audio reverb:</string>
     <string name="audio_bass_boost">Bass boost:</string>
     <string name="audio_voice_enhancer">Voice enhancer:</string>
     <string name="audio_effect_echo">Ethereal</string>
