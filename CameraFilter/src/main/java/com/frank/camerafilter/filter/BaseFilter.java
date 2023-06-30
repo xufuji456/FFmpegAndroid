@@ -38,6 +38,9 @@ public class BaseFilter {
     protected FloatBuffer mVertexBuffer;
     protected FloatBuffer mTextureBuffer;
 
+    private int mOverlayTexture;
+    private int[] mOverlayTextureId;
+
     public BaseFilter(String vertexShader, String fragmentShader) {
         mRunnableDraw = new LinkedList<>();
         mVertexShader = vertexShader;
@@ -70,6 +73,12 @@ public class BaseFilter {
         onInit();
         mHasInitialized = true;
         onInitialized();
+    }
+
+    protected void initOverlayTexture() {
+        mOverlayTexture = GLES30.glGetUniformLocation(mProgramId, "inputImageTexture2");
+        mOverlayTextureId = new int[1];
+        GLES30.glGenTextures(1, mOverlayTextureId, 0);
     }
 
     protected void onDestroy() {
@@ -124,6 +133,12 @@ public class BaseFilter {
             GLES30.glUniform1i(mUniformTexture, 0);
         }
 
+        if (mOverlayTextureId != null && mOverlayTextureId[0] != OpenGLUtil.NO_TEXTURE) {
+            GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mOverlayTextureId[0]);
+            GLES30.glUniform1i(mOverlayTexture, 0);
+        }
+
         onDrawArrayBefore();
         GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, 4);
         GLES30.glDisableVertexAttribArray(mAttributePosition);
@@ -145,6 +160,15 @@ public class BaseFilter {
         synchronized (mRunnableDraw) {
             mRunnableDraw.addLast(runnable);
         }
+    }
+
+    public void setInteger(final int location, final int intVal) {
+        runOnDraw(new Runnable() {
+            @Override
+            public void run() {
+                GLES30.glUniform1i(location, intVal);
+            }
+        });
     }
 
     public void setFloat(final int location, final float floatVal) {
