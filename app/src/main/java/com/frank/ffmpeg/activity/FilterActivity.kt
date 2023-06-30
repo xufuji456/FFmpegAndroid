@@ -39,17 +39,19 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
     private var surfaceCreated: Boolean = false
     //vflip is up and down, hflip is left and right
     private val txtArray = arrayOf(
-            FFmpegApplication.getInstance().getString(R.string.filter_sketch),
-            FFmpegApplication.getInstance().getString(R.string.filter_luminance),
-            FFmpegApplication.getInstance().getString(R.string.filter_saturation),
-            FFmpegApplication.getInstance().getString(R.string.filter_contrast),
-            FFmpegApplication.getInstance().getString(R.string.filter_sharpening),
-            FFmpegApplication.getInstance().getString(R.string.filter_edge),
-            FFmpegApplication.getInstance().getString(R.string.filter_division),
-            FFmpegApplication.getInstance().getString(R.string.filter_flip),
-            FFmpegApplication.getInstance().getString(R.string.filter_equalize),
-            FFmpegApplication.getInstance().getString(R.string.filter_blur),
-            FFmpegApplication.getInstance().getString(R.string.filter_rotate))
+        FFmpegApplication.getInstance().getString(R.string.filter_sketch),
+        FFmpegApplication.getInstance().getString(R.string.filter_luminance),
+        FFmpegApplication.getInstance().getString(R.string.filter_saturation),
+        FFmpegApplication.getInstance().getString(R.string.filter_contrast),
+        FFmpegApplication.getInstance().getString(R.string.filter_sharpening),
+        FFmpegApplication.getInstance().getString(R.string.filter_edge),
+        FFmpegApplication.getInstance().getString(R.string.filter_vr),
+        FFmpegApplication.getInstance().getString(R.string.filter_division),
+        FFmpegApplication.getInstance().getString(R.string.filter_flip),
+        FFmpegApplication.getInstance().getString(R.string.filter_equalize),
+        FFmpegApplication.getInstance().getString(R.string.filter_blur),
+        FFmpegApplication.getInstance().getString(R.string.filter_rotate)
+    )
     private var horizontalAdapter: HorizontalAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var playAudio = true
@@ -139,9 +141,9 @@ class FilterActivity : BaseActivity(), SurfaceHolder.Callback {
      */
     private fun doFilterPlay(position: Int) {
         if (filterThread == null) {
-            filterThread = Thread(Runnable {
+            filterThread = Thread {
                 videoPlayer!!.filter(videoPath, surfaceHolder!!.surface, position)
-            })
+            }
             filterThread!!.start()
         } else {
             videoPlayer!!.again(position)

@@ -114,6 +114,8 @@
     <string name="filter_blur">blur</string>
     <string name="filter_rotate">rotate</string>
     <string name="filter_sharpening">sharpen</string>
+    <string name="filter_vr">VR</string>
+    <string name="filter_denoise">denoise</string>
 
     <string name="camera_filter_none">None</string>
     <string name="camera_filter_hue">Hue</string>

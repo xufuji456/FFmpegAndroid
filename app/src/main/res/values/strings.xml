@@ -114,6 +114,8 @@
     <string name="filter_blur">模糊</string>
     <string name="filter_rotate">旋转</string>
     <string name="filter_sharpening">锐化</string>
+    <string name="filter_vr">VR</string>
+    <string name="filter_denoise">降噪</string>
 
     <string name="camera_filter_none">正常</string>
     <string name="camera_filter_hue">Hue</string>

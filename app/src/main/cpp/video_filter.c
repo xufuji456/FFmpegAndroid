@@ -61,6 +61,7 @@ const char* filters[] = {
         "eq=contrast=1.2",   // -1000.0 to 1000.0 (default 1)
         "unsharp",
         "edgedetect=low=0.1:high=0.4",
+        "stereo3d=sbsl:arcd", // arbg
         "drawgrid=w=iw/3:h=ih/3:t=2:c=white@0.5",
         "hflip",
         "colorbalance=bs=0.3",
