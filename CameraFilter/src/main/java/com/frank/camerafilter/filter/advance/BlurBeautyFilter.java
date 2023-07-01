@@ -10,6 +10,7 @@ import com.frank.camerafilter.util.OpenGLUtil;
 public class BlurBeautyFilter extends BaseFilter {
 
     private int blurSize;
+    private int blurCenter;
 
     public BlurBeautyFilter(Context context) {
         super(NORMAL_VERTEX_SHADER, OpenGLUtil.readShaderFromSource(context, R.raw.zoomblur));
@@ -18,11 +19,13 @@ public class BlurBeautyFilter extends BaseFilter {
     protected void onInit() {
         super.onInit();
         blurSize = GLES30.glGetUniformLocation(getProgramId(), "blurSize");
+        blurCenter = GLES30.glGetUniformLocation(getProgramId(), "blurCenter");
     }
 
     protected void onInitialized() {
         super.onInitialized();
-        setFloat(blurSize, 0.3f);
+        setFloat(blurSize, 1.0f);
+        setFloatVec2(blurCenter, new float[]{0.5f, 0.5f});
     }
 
     @Override
