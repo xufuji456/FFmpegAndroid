@@ -25,6 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:name"
+        android:largeHeap="true"
         android:requestLegacyExternalStorage="true">
 
         <activity android:name=".activity.MainActivity" android:exported="true">
