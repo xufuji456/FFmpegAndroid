@@ -186,7 +186,9 @@ class VideoHandleActivity : BaseActivity() {
         when (currentPosition) {
             0 -> { //transform format
                 outputPath = PATH + File.separator + "transformVideo.mp4"
-                commandLine = FFmpegUtil.transformVideo(srcFile, outputPath)
+                val width = 1280
+                val height = 720
+                commandLine = FFmpegUtil.transformVideoWithEncode(srcFile, width, height, outputPath)
             }
             1 -> { //cut video
                 outputPath = PATH + File.separator + "cutVideo" + suffix

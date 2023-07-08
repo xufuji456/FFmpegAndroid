@@ -312,20 +312,6 @@ public class FFmpegUtil {
     }
 
     /**
-     * transform video, according to your assigning the output format
-     *
-     * @param inputPath  input file
-     * @param outputPath output file
-     * @return transform video success or not
-     */
-    public static String[] transformVideo(String inputPath, String outputPath) {
-        // preset: ultrafast > superfast > veryfast > fast > medium > slow > veryslow
-        String transformCmd = "ffmpeg -i -vcodec libx264 -preset superfast -profile baseline " +
-                "-acodec libmp3lame -y";
-        return insert(transformCmd.split(" "), 2, inputPath, outputPath);
-    }
-
-    /**
      * Using FFmpeg to transform video, with re-encode
      *
      * @param inputPath  the source file
@@ -346,12 +332,11 @@ public class FFmpegUtil {
      * @return transform video success or not
      */
     public static String[] transformVideoWithEncode(String inputPath, int width, int height, String outputPath) {
-        String transformVideoCmd;
+        // preset: ultrafast > superfast > veryfast > fast > medium > slow > veryslow
+        String transformVideoCmd = "ffmpeg -i -vcodec libx264 -preset superfast -acodec libmp3lame -y";
         if (width > 0 && height > 0) {
             String scale = "-vf scale=" + width + ":" + height;
-            transformVideoCmd = "ffmpeg -i -vcodec libx264 -threads 8 -preset superfast -acodec aac -y " + scale;
-        } else {
-            transformVideoCmd = "ffmpeg -i -vcodec libx264 -threads 8 -preset superfast -acodec aac -y";
+            transformVideoCmd += " " + scale;
         }
         return insert(transformVideoCmd.split(" "), 2, inputPath, outputPath);
     }
