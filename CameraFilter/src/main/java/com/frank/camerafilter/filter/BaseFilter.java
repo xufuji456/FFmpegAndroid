@@ -59,6 +59,8 @@ public class BaseFilter {
     }
 
     protected void onInit() {
+        if (mVertexShader == null || mFragmentShader == null)
+            return;
         mProgramId = OpenGLUtil.loadProgram(mVertexShader, mFragmentShader);
         mAttributePosition = GLES30.glGetAttribLocation(mProgramId, "position");
         mUniformTexture = GLES30.glGetUniformLocation(mProgramId, "inputImageTexture");
