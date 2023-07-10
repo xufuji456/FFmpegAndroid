@@ -15,7 +15,7 @@ import com.frank.camerafilter.util.OpenGLUtil;
 
 public class GaussianOriginBlurFilter extends BaseFilter {
 
-    private float blurSize = 1.0f;
+    private float blurSize = 1.5f;
 
     private int blurRadius;
     private int blurCenter;
@@ -54,4 +54,7 @@ public class GaussianOriginBlurFilter extends BaseFilter {
         setFloat(textureHeightOffset, blurSize / height);
     }
 
+    public void setBlurSize(float blurSize) {
+        this.blurSize = blurSize;
+    }
 }
