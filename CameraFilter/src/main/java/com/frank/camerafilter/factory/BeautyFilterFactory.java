@@ -2,10 +2,10 @@ package com.frank.camerafilter.factory;
 
 import android.content.Context;
 
-import com.frank.camerafilter.filter.advance.BlurBeautyFilter;
 import com.frank.camerafilter.filter.advance.BreathCircleBeautyFilter;
 import com.frank.camerafilter.filter.advance.BrightnessBeautyFilter;
 import com.frank.camerafilter.filter.advance.ContrastBeautyFilter;
+import com.frank.camerafilter.filter.advance.GaussianBlurFilter;
 import com.frank.camerafilter.filter.advance.HueBeautyFilter;
 import com.frank.camerafilter.filter.advance.OverlayBeautyFilter;
 import com.frank.camerafilter.filter.advance.SharpenBeautyFilter;
@@ -32,7 +32,7 @@ public class BeautyFilterFactory {
             case SKETCH:
                 return new SketchBeautyFilter(context);
             case BLUR:
-                return new BlurBeautyFilter(context);
+                return new GaussianBlurFilter(context);
             case HUE:
                 return new HueBeautyFilter(context);
             case WHITE_BALANCE:

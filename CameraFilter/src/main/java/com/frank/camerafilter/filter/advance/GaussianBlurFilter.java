@@ -13,7 +13,7 @@ import com.frank.camerafilter.util.OpenGLUtil;
  * @date 2023/7/9 9:06 PM
  */
 
-public class GaussianOriginBlurFilter extends BaseFilter {
+public class GaussianBlurFilter extends BaseFilter {
 
     private float blurSize = 1.5f;
 
@@ -25,7 +25,7 @@ public class GaussianOriginBlurFilter extends BaseFilter {
 
     private int textureHeightOffset;
 
-    public GaussianOriginBlurFilter(Context context) {
+    public GaussianBlurFilter(Context context) {
         super(OpenGLUtil.readShaderFromSource(context, R.raw.vert_gaussian_blur),
                 OpenGLUtil.readShaderFromSource(context, R.raw.frag_gaussian_blur));
     }
