@@ -132,7 +132,8 @@ class AudioHandleActivity : BaseActivity() {
             getString(R.string.audio_waveform),
             getString(R.string.audio_encode),
             getString(R.string.audio_surround),
-            getString(R.string.audio_reverb)
+            getString(R.string.audio_reverb),
+            getString(R.string.audio_fade)
         )
 
         layoutAudioHandle = findViewById(R.id.list_audio_item)
@@ -288,6 +289,10 @@ class AudioHandleActivity : BaseActivity() {
             15 -> {
                 outputPath = PATH + File.separator + "reverb.mp3"
                 commandLine = FFmpegUtil.audioReverb(srcFile, outputPath)
+            }
+            16 -> {
+                outputPath = PATH + File.separator + "fade.mp3"
+                commandLine = FFmpegUtil.audioFadeTransition(srcFile, outputPath)
             }
             else -> {
             }

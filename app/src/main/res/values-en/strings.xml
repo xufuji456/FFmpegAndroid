@@ -15,6 +15,7 @@
     <string name="audio_silence">Silence detect</string>
     <string name="audio_volume">Audio volume</string>
     <string name="audio_reverb">Reverb</string>
+    <string name="audio_fade">Fade</string>
     <string name="audio_surround">Surround</string>
     <string name="audio_add_equalizer">Add equalizer</string>
     <string name="audio_effect">Audio effect</string>

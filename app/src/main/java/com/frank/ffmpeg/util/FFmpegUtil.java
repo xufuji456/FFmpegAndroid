@@ -264,6 +264,12 @@ public class FFmpegUtil {
         return insert(surroundCmd.split(" "), 2, inputPath, outputPath);
     }
 
+    public static String[] audioFadeTransition(String inputPath, String outputPath) {
+        String fadeCmd = "ffmpeg -i -af afade=t=in:ss=0:d=10 -y";
+        fadeCmd = String.format(Locale.getDefault(), fadeCmd);
+        return insert(fadeCmd.split(" "), 2, inputPath, outputPath);
+    }
+
     /**
      * mux audio and video together
      *
