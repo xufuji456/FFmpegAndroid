@@ -51,7 +51,7 @@ public class MediaFormatIdentify {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(path);
-            data = new byte[32];
+            data = new byte[36];
             int result = inputStream.read(data);
         } catch (IOException e) {
             Log.e(TAG, "read error:" + e);
@@ -126,7 +126,8 @@ public class MediaFormatIdentify {
                 && data[28] == 0x6F && data[29] == 0x73 && data[30] == 0x6B && data[31] == 0x61) {
             return TYPE_MKV;
         }
-        if (data[24] == 0x77 && data[25] == 0x65 && data[26] == 0x62 && data[27] == 0x6D) {
+        if ((data[24] == 0x77 && data[25] == 0x65 && data[26] == 0x62 && data[27] == 0x6D)
+                || (data[31] == 0x77 && data[32] == 0x65 && data[33] == 0x62 && data[34] == 0x6D)) {
             return TYPE_WEBM;
         }
         if (data[0] == 0x47) {
