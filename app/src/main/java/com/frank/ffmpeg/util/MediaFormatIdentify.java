@@ -18,6 +18,7 @@ public class MediaFormatIdentify {
     private final static String TYPE_MP4  = "mp4";
     private final static String TYPE_3GP  = "3gp";
     private final static String TYPE_MOV  = "mov";
+    private final static String TYPE_M4V  = "m4v";
     private final static String TYPE_AVI  = "avi";
     private final static String TYPE_FLV  = "flv";
     private final static String TYPE_F4V  = "f4v";
@@ -110,8 +111,8 @@ public class MediaFormatIdentify {
             return TYPE_WMV; // wma
         }
         if (data[4] == 0x66 && data[5] == 0x74 && data[6] == 0x79 && data[7] == 0x70) {
-            if (data[8] == 0x69 && data[9] == 0x73 && data[10] == 0x6F && data[11] == 0x6D) {
-                return TYPE_MP4;
+            if (data[8] == 0x4D && data[9] == 0x34 && data[10] == 0x56) {
+                return TYPE_M4V;
             } else if (data[8] == 0x4D && data[9] == 0x34 && data[10] == 0x41) {
                 return TYPE_M4A;
             } else if (data[8] == 0x71 && data[9] == 0x74) { // qt
@@ -120,6 +121,8 @@ public class MediaFormatIdentify {
                 return TYPE_3GP;
             } else if (data[8] == 0x66 && data[9] == 0x34 && data[10] == 0x76) {
                 return TYPE_F4V;
+            } else {
+                return TYPE_MP4;
             }
         }
         if (data[24] == 0x6D && data[25] == 0x61 && data[26] == 0x74 && data[27] == 0x72
