@@ -98,14 +98,16 @@ function build_one() {
   --enable-bsfs \
   --disable-postproc \
   --enable-filters \
-  --enable-encoders \
+  --disable-encoders \
   --enable-libmp3lame \
   --enable-libx264 \
   --enable-encoder=libmp3lame,libx264 \
-  --disable-encoder=a64multi,a64multi5,alias_pix,amv,apng,aptx,aptx_hd,asv1,asv2,avrp,avui,cinepak,cljr,\
-comfortnoise,dpx,ffvhuff,fits,hap,ilbc_at,mlp,nellymoser,pam,pbm,pcx,pgm,pgmyuv,ppm,prores,prores_aw,\
-prores_ks,qtrle,r10k,r210,ra_144,roq,roq_dpcm,rv10,rv20,s302m,sbc,sgi,snow,sunrast,svq1,targa,tta,utvideo,\
-v210,v308,v408,v410,vc2,wrapped_avframe,xbm,xface,xsub,xwd,y41p,zmbv \
+  --enable-encoder=apng,bmp,dvvideo,flv,gif,h263,h264,hdr,jpeg2000,ljpeg,mjpeg,\
+mpeg1video,mpeg2video,mpeg4,msmpeg4v2,msmpeg4,png,prores,qtrle,rawvideo,tiff,\
+wmv1,wmv2,xbm,zlib,aac,ac3,g722,g726,adpcm_ima_qt,adpcm_ima_wav,adpcm_ms,alac,\
+eac3,flac,mp2,opus,pcm_alaw,pcm_mulaw,pcm_f32le,pcm_f64le,pcm_s16be,pcm_s16le,\
+pcm_s32be,pcm_s32le,pcm_s64be,pcm_s64le,pcm_s8,pcm_u16le,pcm_u32le,pcm_u8,sonic,\
+truehd,tta,vorbis,wavpack,wmav1,wmav2,ssa,ass,dvbsub,dvdsub,mov_text,srt,subrip,ttml,webvtt \
   --disable-decoders \
   --enable-decoder=av1,dvvideo,flv,gif,h263,h264,hevc,mjpeg,mpeg1video,mpeg2video,mpegvideo,mpeg4,\
 msmpeg4v2,msmpeg4v3,msvideo1,png,tscc,tscc2,vc1,vp8,vp9,webp,wmv1,wmv2,wmv3,zlib,\
