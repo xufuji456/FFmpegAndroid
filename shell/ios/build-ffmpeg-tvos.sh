@@ -27,6 +27,7 @@ CONFIGURE_FLAGS="--enable-cross-compile
 --disable-shared \
 --enable-hwaccels \
 --enable-neon \
+--enable-avfilter \
 --disable-indevs \
 --disable-outdevs \
 --disable-decoders \
