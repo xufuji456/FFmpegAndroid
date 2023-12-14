@@ -72,12 +72,6 @@ function build_one() {
   --enable-neon \
   --enable-asm \
   --disable-small \
-  --enable-jni \
-  --enable-mediacodec \
-  --enable-decoder=h264_mediacodec \
-  --enable-decoder=hevc_mediacodec \
-  --enable-decoder=mpeg4_mediacodec \
-  --enable-decoder=vp9_mediacodec \
   --disable-ffmpeg \
   --disable-ffplay \
   --disable-ffprobe \
@@ -117,6 +111,12 @@ pcm_mulaw,pcm_dvd,pcm_f16le,pcm_f24le,pcm_f32be,pcm_f32le,pcm_f64be,pcm_f64le,pc
 pcm_s24be,pcm_s24le,pcm_s32be,pcm_s32le,pcm_s64be,pcm_s64le,pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,\
 pcm_u32be,pcm_u32le,pcm_vidc,pcm_zork,truehd,truespeech,vorbis,wmav1,wmav2,\
 ssa,ass,dvbsub,dvdsub,pgssub,mov_text,sami,srt,subrip,text,webvtt \
+  --enable-jni \
+  --enable-mediacodec \
+  --enable-decoder=h264_mediacodec \
+  --enable-decoder=hevc_mediacodec \
+  --enable-decoder=mpeg4_mediacodec \
+  --enable-decoder=vp9_mediacodec \
   --enable-muxers \
   --enable-parsers \
   --enable-nonfree \
