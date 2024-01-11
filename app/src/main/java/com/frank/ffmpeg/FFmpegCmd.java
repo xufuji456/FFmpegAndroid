@@ -142,6 +142,8 @@ public class FFmpegCmd {
 
     private native static String handleProbe(String[] commands);
 
+    public native static String getInfo();
+
     public static void onProgressCallback(int position, int duration, @FFmpegState int state) {
         Log.e(TAG, "onProgress position=" + position
                 + "--duration=" + duration + "--state=" + state);

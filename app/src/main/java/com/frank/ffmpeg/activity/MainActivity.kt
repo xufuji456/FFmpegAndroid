@@ -1,10 +1,16 @@
 package com.frank.ffmpeg.activity
 
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
+import android.widget.TextView
+import androidx.core.content.ContentProviderCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.frank.ffmpeg.FFmpegCmd
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.WaterfallAdapter
@@ -16,6 +22,7 @@ import com.frank.ffmpeg.listener.OnItemClickListener
  */
 class MainActivity : BaseActivity() {
 
+    private val MANAGE_STORAGE_RC: Int = 100
     override val layoutId: Int
         get() = R.layout.activity_main
 
@@ -23,8 +30,28 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
+        getQueryPermission()
     }
 
+    fun getQueryPermission(){
+        fun isRPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        if(!isRPlus()) {
+           return
+        }
+        val packageName = this.packageName
+        try {
+//            "queryPermission".toast(ContentProviderCompat.requireContext())
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse("package:$packageName")
+            this.startActivityForResult(intent, MANAGE_STORAGE_RC)
+        } catch (e: Exception) {
+//            "error:".toast(ContentProviderCompat.requireContext())
+            val intent = Intent()
+            intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+            startActivityForResult(intent, MANAGE_STORAGE_RC)
+        }
+    }
     private fun initView() {
         val list = listOf(
                 getString(R.string.audio_handle),
@@ -49,6 +76,7 @@ class MainActivity : BaseActivity() {
             }
         })
         viewWaterfall.adapter = adapter
+        findViewById<TextView>(R.id.tv_version).text =" Version:"+FFmpegCmd.getInfo()
     }
 
     private fun doClick(pos: Int) {
