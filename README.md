@@ -11,7 +11,7 @@
 ----------------------------------------------------------------------------------------------------
 
 常见的流媒体传输协议包括：RTP、RTMP、RTCP、RTSP，流媒体应用协议有HLS、DASH，</br>
-WebRTC设计传输协议有SDP、SRTP、ICE、NAT、STUN等，常用视频编码协议有H264，</br>
+WebRTC设计传输协议有SDP、ICE、NAT、STUN等，常用视频编码协议有H264、HEVC、VVC，</br>
 常用的视频封装格式有mp4，关于C/C++语言标准有C11、C20++等，书籍包括音视频编解码等。</br>
 详细列表可以查阅：[多媒体协议与书籍](https://github.com/xufuji456/FFmpegAndroid/blob/master/doc/multimedia_protocol.md)
 
