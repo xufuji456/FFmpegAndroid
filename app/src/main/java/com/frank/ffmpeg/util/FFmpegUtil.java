@@ -587,7 +587,7 @@ public class FFmpegUtil {
      * @return noise reduction success or not
      */
     public static String[] denoiseVideo(String inputPath, String outputPath) {
-        String denoiseVideo = "ffmpeg -i -nr 500 -y";
+        String denoiseVideo = "ffmpeg -i -vf nlmeans -y";
         return insert(denoiseVideo.split(" "), 2, inputPath, outputPath);
     }
 
