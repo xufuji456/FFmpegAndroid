@@ -28,8 +28,6 @@ WebRTC设计传输协议有SDP、ICE、NAT、STUN等，常用视频编码协议�
 ### 音视频开源库:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/multimedia_library.png)
 
-### 音视频教程: [一起学习音视频](https://ke.qq.com/course/5613182#term_id=105809583)
-
 ### Joining the group to learn FFmpeg:
 ![preview](https://github.com/xufuji456/FFmpegAndroid/blob/master/picture/ffmpeg_group.png)
 
