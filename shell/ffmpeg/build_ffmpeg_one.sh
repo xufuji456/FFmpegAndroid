@@ -27,11 +27,11 @@ fi
 
 uname=`uname`
 if [ $uname = "Darwin" ];then
-  COMPILE_PLAT="darwin"
+  COMPILE_OS="darwin"
   CORE_NUM=$(getconf _NPROCESSORS_ONLN)
   echo "compile on mac, core=$CORE_NUM"
 elif [ $uname = "Linux" ]; then
-  COMPILE_PLAT="linux"
+  COMPILE_OS="linux"
   CORE_NUM=$(nproc)
   echo "compile on linux, core=$CORE_NUM"
 else
@@ -39,9 +39,9 @@ else
 fi
 
 export NDK=/Users/xufulong/Library/Android/sdk/ndk-bundle
-export TOOL=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64
-export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64/bin
-export SYSROOT=$NDK/toolchains/llvm/prebuilt/$COMPILE_PLAT-x86_64/sysroot
+export TOOL=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64/bin
+export SYSROOT=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64/sysroot
 export CROSS_PREFIX=$TOOLCHAIN/$ARCH-linux-$ANDROID-
 export CC=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang
 export CXX=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang++
