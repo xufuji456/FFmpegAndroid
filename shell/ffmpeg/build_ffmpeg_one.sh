@@ -40,8 +40,8 @@ fi
 
 export NDK=/Users/xufulong/Library/Android/sdk/ndk-bundle
 export TOOL=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64
-export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64/bin
-export SYSROOT=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64/sysroot
+export TOOLCHAIN=$TOOL/bin
+export SYSROOT=$TOOL/sysroot
 export CROSS_PREFIX=$TOOLCHAIN/$ARCH-linux-$ANDROID-
 export CC=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang
 export CXX=$TOOLCHAIN/$PLATFORM-linux-$ANDROID$API-clang++
