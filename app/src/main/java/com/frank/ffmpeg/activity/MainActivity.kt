@@ -6,11 +6,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.widget.TextView
-import androidx.core.content.ContentProviderCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.frank.ffmpeg.FFmpegCmd
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.WaterfallAdapter
@@ -76,7 +73,6 @@ class MainActivity : BaseActivity() {
             }
         })
         viewWaterfall.adapter = adapter
-        findViewById<TextView>(R.id.tv_version).text =" Version:"+FFmpegCmd.getInfo()
     }
 
     private fun doClick(pos: Int) {

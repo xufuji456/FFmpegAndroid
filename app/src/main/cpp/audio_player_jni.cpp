@@ -103,11 +103,3 @@ AUDIO_PLAYER_FUNC(void, native_1release, long context) {
     audioPlayer->setExit(true);
 }
 
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_frank_ffmpeg_FFmpegCmd_getInfo(JNIEnv *env, jclass clazz) {
-    const char* ffmpeg_version = av_version_info();
-    LOGE("Version","ffmpeg version: %s",ffmpeg_version);
-    return env->NewStringUTF( ffmpeg_version);
-}

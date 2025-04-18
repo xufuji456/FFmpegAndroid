@@ -8,7 +8,6 @@
 #define ALOGI(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_INFO, TAG, FORMAT, ##__VA_ARGS__)
 #define ALOGE(TAG, FORMAT, ...) __android_log_vprint(ANDROID_LOG_ERROR, TAG, FORMAT, ##__VA_ARGS__)
 
-
 int err_count;
 JNIEnv *ff_env;
 jclass ff_class;
