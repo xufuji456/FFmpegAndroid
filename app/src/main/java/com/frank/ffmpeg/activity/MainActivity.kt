@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -19,7 +20,6 @@ import com.frank.ffmpeg.listener.OnItemClickListener
  */
 class MainActivity : BaseActivity() {
 
-    private val MANAGE_STORAGE_RC: Int = 100
     override val layoutId: Int
         get() = R.layout.activity_main
 
@@ -27,28 +27,31 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
-        getQueryPermission()
+        managerPermission()
     }
 
-    fun getQueryPermission(){
-        fun isRPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-        if(!isRPlus()) {
+    private fun managerPermission() {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
            return
         }
+
+        if (Environment.isExternalStorageManager()) {
+            return
+        }
+
         val packageName = this.packageName
         try {
-//            "queryPermission".toast(ContentProviderCompat.requireContext())
             val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.addCategory("android.intent.category.DEFAULT")
             intent.data = Uri.parse("package:$packageName")
-            this.startActivityForResult(intent, MANAGE_STORAGE_RC)
+            startActivity(intent)
         } catch (e: Exception) {
-//            "error:".toast(ContentProviderCompat.requireContext())
             val intent = Intent()
             intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-            startActivityForResult(intent, MANAGE_STORAGE_RC)
+            startActivity(intent)
         }
     }
+
     private fun initView() {
         val list = listOf(
                 getString(R.string.audio_handle),
