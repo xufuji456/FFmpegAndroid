@@ -14,7 +14,8 @@ LOCAL_SRC_FILES := mp3lame/bitstream.c mp3lame/encoder.c \
                    mp3lame/VbrTag.c mp3lame/version.c
 
 LOCAL_C_INCLUDES := mp3lame
-LOCAL_LDLIBS    := -llog -lz -lm -landroid
+LOCAL_LDLIBS     := -llog -lz -lm -landroid
+LOCAL_LDFLAGS    := -Wl,-z,max-page-size=16384
 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
