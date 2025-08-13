@@ -50,7 +50,7 @@ export PREFIX=../ffmpeg-android/$ABI
 
 THIRD_LIB=$PREFIX
 export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$THIRD_LIB/include"
-export EXTRA_LDFLAGS="-lc -lm -ldl -llog -lgcc -lz -landroid -L$THIRD_LIB/lib"
+export EXTRA_LDFLAGS="-Wl,-z,max-page-size=16384 -L$THIRD_LIB/lib"
 
 function build_one() {
   ./configure \
@@ -150,7 +150,7 @@ function link_one_ffmpeg() {
   $PREFIX/lib/libx264.a \
   $PREFIX/lib/libssl.a \
   $PREFIX/lib/libcrypto.a \
-  -lc -lm -lz -ldl -llog -landroid --dynamic-linker=/system/bin/linker $TOOL/lib/gcc/$ARCH-linux-$ANDROID/4.9.x/libgcc_real.a
+  -lc -lm -lz -ldl -llog -landroid -lmediandk --dynamic-linker=/system/bin/linker $TOOL/lib/gcc/$ARCH-linux-$ANDROID/4.9.x/libgcc_real.a
 }
 
 link_one_ffmpeg
