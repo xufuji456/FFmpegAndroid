@@ -17,11 +17,11 @@ ARCH='arm64'
 ANDROID='android'
 fi
 
-export NDK=/home/frank/android/sdk/ndk-bundle
+export NDK=/Users/frank/Downloads/android-ndk-r22b
 export PREBUILT=$NDK/toolchains/$CPU-linux-$ANDROID-4.9/prebuilt
 export PLATFORM=$NDK/platforms/android-21/arch-$ARCH
 export TOOLCHAIN=$PREBUILT/linux-x86_64
-export PREFIX=$(pwd)/android/$ABI
+export PREFIX=android/$ABI
 
 function build_x264() {
 ./configure \
@@ -32,7 +32,8 @@ function build_x264() {
 --host=arm-linux \
 --cross-prefix=$TOOLCHAIN/bin/$CPU-linux-$ANDROID- \
 --sysroot=$PLATFORM \
-make clean
+--extra-ldflags="-Wl,-z,max-page-size=16384"
+
 make
 make install
 }
