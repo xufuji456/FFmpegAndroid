@@ -15,8 +15,14 @@ else
 fi
 
 export NDK=/Users/frank/Downloads/android-ndk-r22b
-export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$COMPILE_OS-x86_64
-export PREFIX=$(pwd)/android/$ARCH-16k
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/darwin-x86_64
+export CC=$TOOLCHAIN/bin/$ARCH-linux-$ANDROID$API-clang
+export CXX=$TOOLCHAIN/bin/$ARCH-linux-$ANDROID$API-clang++
+export AR=$TOOLCHAIN/bin/$ARCH-linux-$ANDROID-AR
+export RANLIB=$TOOLCHAIN/bin/$ARCH-linux-$ANDROID-ranlib
+export STRIP=$TOOLCHAIN/bin/$ARCH-linux-$ANDROID-strip
+export LD=$TOOLCHAIN/bin/ld
+export PREFIX=$(pwd)/android/$ARCH
 
 function build_lame() {
 ./configure \
@@ -26,8 +32,8 @@ function build_lame() {
 --disable-shared \
 --disable-frontend \
 --with-sysroot=$TOOLCHAIN/sysroot \
-CFLAGS="-DPAGE_SIZE=16384" \
-LDFLAGS="-DPAGE_SIZE=16384"
+CFLAGS="-Os -fPIC" \
+LDFLAGS="-Wl,-z,max-page-size=16384"
 make
 make install
 }
