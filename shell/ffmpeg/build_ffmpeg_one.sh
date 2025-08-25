@@ -51,6 +51,7 @@ export PREFIX=../ffmpeg-android/$ABI
 THIRD_LIB=$PREFIX
 export EXTRA_CFLAGS="-Os -fPIC $OPTIMIZE_CFLAGS -I$THIRD_LIB/include"
 export EXTRA_LDFLAGS="-Wl,-z,max-page-size=16384 -L$THIRD_LIB/lib"
+export PKG_CONFIG_PATH=$EXTRA_LIB/lib/pkgconfig:$PKG_CONFIG_PATH
 
 function build_one() {
   ./configure \
@@ -78,6 +79,7 @@ function build_one() {
   --disable-ffprobe \
   --disable-debug \
   --enable-gpl \
+  --pkg-config="pkg-config --static" \
   --disable-avdevice \
   --disable-indevs \
   --disable-outdevs \

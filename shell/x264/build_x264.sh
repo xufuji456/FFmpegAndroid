@@ -17,10 +17,11 @@ CPU='aarch64'
 ANDROID='android'
 fi
 
-export NDK=/Users/frank/Downloads/android-ndk-r21e
+export NDK=/Users/frank/Downloads/android-ndk-r22b
 export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/darwin-x86_64
 export TARGET=$CPU-linux-$ANDROID
 export CC=$TOOLCHAIN/bin/$TARGET$API-clang
+export Cxx=$TOOLCHAIN/bin/$TARGET$API-clang++
 export AR=$TOOLCHAIN/bin/llvm-ar
 export LD=$TOOLCHAIN/bin/ld
 export PREFIX=$(pwd)/android/$ABI
@@ -34,6 +35,7 @@ function build_x264() {
 --host=$CPU-linux-$ANDROID \
 --cross-prefix=$TOOLCHAIN/bin/$CPU-linux-$ANDROID- \
 --sysroot=$TOOLCHAIN/sysroot \
+--extra-cflags="-Os -fPIC" \
 --extra-ldflags="-Wl,-z,max-page-size=16384"
 
 make
