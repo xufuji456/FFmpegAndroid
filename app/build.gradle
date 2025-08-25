@@ -48,10 +48,12 @@ android {
 
     packagingOptions {
         exclude 'META-INF/proguard/coroutines.pro'
-        pickFirst 'lib/armeabi-v7a/libmp3lame.so'
-        pickFirst 'lib/arm64-v8a/libmp3lame.so'
         pickFirst 'lib/armeabi-v7a/libffmpeg.so'
         pickFirst 'lib/arm64-v8a/libffmpeg.so'
+
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 
     packagingOptions {

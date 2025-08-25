@@ -94,6 +94,8 @@ find_library( # Sets the name of the path variable.
               log-lib
               log )
 
+target_link_options(media-handle PRIVATE "-Wl,-z,max-page-size=16384")
+
 target_link_libraries( # Specifies the target library.
                        media-handle
                        ffmpeg
