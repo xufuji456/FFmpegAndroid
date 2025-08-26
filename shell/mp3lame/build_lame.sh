@@ -32,7 +32,6 @@ function build_lame() {
 --disable-shared \
 --disable-frontend \
 --with-sysroot=$TOOLCHAIN/sysroot \
---extra-ldflags="-Wl,-z,max-page-size=16384" \
 LDFLAGS="-Wl,-z,max-page-size=16384"
 make
 make install
