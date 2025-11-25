@@ -1,0 +1,162 @@
+/**
+ * Note: common define of next player
+ * Date: 2025/11/25
+ * Author: frank
+ */
+
+#ifndef RS_DEFINE_H
+#define RS_DEFINE_H
+
+#define MAX_DEVIATION 60000
+#define MIN_MIN_FRAMES 2
+#define MAX_QUEUE_SIZE (15 * 1024 * 1024)
+#define QUEUE_WAIT_TIMEOUT 100
+#define DEFAULT_MIN_FRAMES 50000
+#define AV_NO_SYNC_THRESHOLD 100.0
+#define BUFFERING_CHECK_PERIOD 500
+#define MAX_ACCURATE_SEEK_TIMEOUT 5000
+
+enum VideoPixelFormat {
+    PIXEL_FORMAT_UNKNOWN      = 0,
+    PIXEL_FORMAT_YUV420P      = 1,
+    PIXEL_FORMAT_YUV420SP     = 2,
+    PIXEL_FORMAT_VIDEOTOOLBOX = 3,
+    PIXEL_FORMAT_YUV420P10LE  = 4,
+    PIXEL_FORMAT_YUVJ420P     = 5,
+    PIXEL_FORMAT_MEDIACODEC   = 6,
+    PIXEL_FORMAT_RGB565       = 7,
+    PIXEL_FORMAT_RGB888       = 8,
+    PIXEL_FORMAT_RGBA8888     = 9,
+    PIXEL_FORMAT_HARMONY      = 10
+};
+
+enum FrameQueueSize {
+    FRAME_QUEUE_SIZE                 = 16,
+    SAMPLE_QUEUE_SIZE                = 9,
+    SUBTITLE_PICTURE_QUEUE_SIZE      = 16,
+    VIDEO_PICTURE_QUEUE_SIZE_MIN     = 3,
+    VIDEO_PICTURE_QUEUE_SIZE_MAX     = 16,
+    VIDEO_PICTURE_QUEUE_SIZE_DEFAULT = 3
+};
+
+enum BufferWaterMark {
+    DEFAULT_FIRST_HIGH_WATER_MARK_IN_MS = 500,
+    DEFAULT_NEXT_HIGH_WATER_MARK_IN_MS  = 1000,
+    DEFAULT_LAST_HIGH_WATER_MARK_IN_MS  = 5000,
+    DEFAULT_HIGH_WATER_MARK_IN_BYTES    = 256 * 1024
+};
+
+enum LogLevel {
+    LOG_VERBOSE = 2,
+    LOG_DEBUG   = 4,
+    LOG_INFO    = 8,
+    LOG_WARN    = 16,
+    LOG_ERROR   = 32,
+    LOG_FATAL   = 64,
+    LOG_SILENT  = 128
+};
+
+enum PlayerOption {
+    OPTION_FLOAT_AV_DIFF           = 1001,
+    OPTION_FLOAT_AV_DELAY          = 1002,
+    OPTION_FLOAT_PLAYBACK_RATE     = 1003,
+    OPTION_FLOAT_PLAYBACK_VOLUME   = 1004,
+    OPTION_FLOAT_DROP_FRAME_RATE   = 1005,
+    OPTION_FLOAT_DROP_PACKET_RATE  = 1006,
+    OPTION_FLOAT_VIDEO_FRAME_RATE  = 1007,
+    OPTION_FLOAT_VIDEO_DECODE_RATE = 1008,
+    OPTION_FLOAT_VIDEO_RENDER_RATE = 1009,
+
+    OPTION_INT64_BIT_RATE          = 2001,
+    OPTION_INT64_FILE_SIZE         = 2002,
+    OPTION_INT64_TCP_SPEED         = 2003,
+    OPTION_INT64_PIXEL_FORMAT      = 2004,
+    OPTION_INT64_VIDEO_DECODER     = 2005,
+    OPTION_INT64_AUDIO_DECODER     = 2006,
+    OPTION_INT64_LAST_TCP_SPEED    = 2007,
+    OPTION_INT64_CACHE_SIZE        = 2008,
+    OPTION_INT64_CACHE_POSITION    = 2009, // cache relative position
+    OPTION_INT64_CACHE_FILE_POS    = 2010, // cache position in file
+    OPTION_INT64_SEEK_LOAD_TIME    = 2011,
+    OPTION_INT64_TRANSFER_BYTES    = 2012,
+    OPTION_INT64_MAX_BUFFER_SIZE   = 2013,
+    OPTION_INT64_CUR_VIDEO_STREAM  = 2014,
+    OPTION_INT64_CUR_AUDIO_STREAM  = 2015,
+    OPTION_INT64_VIDEO_CACHE_PKT   = 2016,
+    OPTION_INT64_AUDIO_CACHE_PKT   = 2017,
+    OPTION_INT64_VIDEO_CACHE_DUR   = 2018,
+    OPTION_INT64_AUDIO_CACHE_DUR   = 2019,
+    OPTION_INT64_VIDEO_CACHE_BYTES = 2020,
+    OPTION_INT64_AUDIO_CACHE_BYTES = 2021,
+
+    OPTION_STR_DECODER_AVCODEC     = 3001, // ffmpeg avcodec
+    OPTION_STR_DECODER_MEDIACODEC  = 3002, // android MediaCodec
+    OPTION_STR_DECODER_VTB         = 3003, // iOS VideoToolBox
+    OPTION_STR_DECODER_HARMONY     = 3004, // HarmonyOS decoder
+
+};
+
+// NAL unit type
+enum NALUnitType {
+    NAL_SLICE           = 1,
+    NAL_DPA             = 2,
+    NAL_DPB             = 3,
+    NAL_DPC             = 4,
+    NAL_IDR_SLICE       = 5,
+    NAL_SEI             = 6,
+    NAL_SPS             = 7,
+    NAL_PPS             = 8,
+    NAL_AUD             = 9,
+    NAL_END_SEQUENCE    = 10,
+    NAL_END_STREAM      = 11,
+    NAL_FILLER_DATA     = 12,
+    NAL_SPS_EXT         = 13,
+    NAL_AUXILIARY_SLICE = 19
+};
+
+// HEVC frame type
+enum HEVCNALUnitType {
+    HEVC_NAL_TRAIL_N    = 0,
+    HEVC_NAL_TRAIL_R    = 1,
+    HEVC_NAL_TSA_N      = 2,
+    HEVC_NAL_TSA_R      = 3,
+    HEVC_NAL_STSA_N     = 4,
+    HEVC_NAL_STSA_R     = 5,
+    HEVC_NAL_RADL_N     = 6,
+    HEVC_NAL_RADL_R     = 7,
+    HEVC_NAL_RASL_N     = 8,
+    HEVC_NAL_RASL_R     = 9,
+    HEVC_NAL_VCL_N10    = 10,
+    HEVC_NAL_VCL_R11    = 11,
+    HEVC_NAL_VCL_N12    = 12,
+    HEVC_NAL_VCL_R13    = 13,
+    HEVC_NAL_VCL_N14    = 14,
+    HEVC_NAL_VCL_R15    = 15,
+    HEVC_NAL_BLA_W_LP   = 16,
+    HEVC_NAL_BLA_W_RADL = 17,
+    HEVC_NAL_BLA_N_LP   = 18,
+    HEVC_NAL_IDR_W_RADL = 19,
+    HEVC_NAL_IDR_N_LP   = 20,
+    HEVC_NAL_CRA_NUT    = 21,
+    HEVC_NAL_IRAP_VCL22 = 22,
+    HEVC_NAL_IRAP_VCL23 = 23,
+    HEVC_NAL_RSV_VCL24  = 24,
+    HEVC_NAL_RSV_VCL25  = 25,
+    HEVC_NAL_RSV_VCL26  = 26,
+    HEVC_NAL_RSV_VCL27  = 27,
+    HEVC_NAL_RSV_VCL28  = 28,
+    HEVC_NAL_RSV_VCL29  = 29,
+    HEVC_NAL_RSV_VCL30  = 30,
+    HEVC_NAL_RSV_VCL31  = 31,
+    HEVC_NAL_VPS        = 32,
+    HEVC_NAL_SPS        = 33,
+    HEVC_NAL_PPS        = 34,
+    HEVC_NAL_AUD        = 35,
+    HEVC_NAL_EOS_NUT    = 36,
+    HEVC_NAL_EOB_NUT    = 37,
+    HEVC_NAL_FD_NUT     = 38,
+    HEVC_NAL_SEI_PREFIX = 39,
+    HEVC_NAL_SEI_SUFFIX = 40
+};
+
+#endif
