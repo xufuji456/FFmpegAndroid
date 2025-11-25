@@ -5,6 +5,8 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
+    namespace "com.frank.ffmpeg"
+
     defaultConfig {
         applicationId "com.frank.ffmpeg"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -44,6 +46,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     packagingOptions {

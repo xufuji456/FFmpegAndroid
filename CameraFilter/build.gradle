@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
+    namespace "com.frank.camerafilter"
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
