@@ -28,7 +28,7 @@ class LrcParser {
         try {
             var charsetName: String? = getCharsetName(path)
             inputStream = FileInputStream(path)
-            if (charsetName!!.toLowerCase(Locale.getDefault()) == "utf-8") {
+            if (charsetName!!.lowercase(Locale.getDefault()) == "utf-8") {
                 inputStream = UnicodeInputStream(inputStream, charsetName)
                 charsetName = inputStream.getEncoding()
             }

@@ -7,6 +7,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.Locale.getDefault
 
 /**
  * file tool
@@ -111,7 +112,7 @@ object FileUtil {
         if (TextUtils.isEmpty(path)) {
             return false
         }
-        path = path.toLowerCase()
+        path = path.lowercase(getDefault())
         return (path.endsWith(TYPE_MP3)
                 || path.endsWith(TYPE_AAC)
                 || path.endsWith(TYPE_AMR)
@@ -130,7 +131,7 @@ object FileUtil {
         if (TextUtils.isEmpty(path)) {
             return false
         }
-        path = path.toLowerCase()
+        path = path.lowercase(getDefault())
         return (path.endsWith(TYPE_MP4)
                 || path.endsWith(TYPE_MKV)
                 || path.endsWith(TYPE_WEBM)

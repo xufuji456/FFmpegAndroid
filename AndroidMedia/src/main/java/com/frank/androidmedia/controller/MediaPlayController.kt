@@ -46,14 +46,11 @@ open class MediaPlayController(playerCallback: PlayerCallback) {
             playerCallback?.onPrepare()
         }
 
-        mediaPlayer!!.setOnInfoListener { mp: MediaPlayer?, what: Int, extra: Int ->
-            (
-                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-                        if (!renderFirstFrame) {
-                            renderFirstFrame = true
-                            playerCallback?.onRenderFirstFrame()
-                        }
-                    })
+        mediaPlayer!!.setOnInfoListener { mp: MediaPlayer?, what: Int, extra: Int -> (
+            if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START && !renderFirstFrame) {
+                renderFirstFrame = true
+                playerCallback?.onRenderFirstFrame()
+            } else {})
             return@setOnInfoListener true
         }
 
