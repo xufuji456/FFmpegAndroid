@@ -4,8 +4,8 @@
  * Author: frank
  */
 
-#ifndef RS_DEFINE_H
-#define RS_DEFINE_H
+#ifndef NEXT_DEFINE_H
+#define NEXT_DEFINE_H
 
 #define MAX_DEVIATION 60000
 #define MIN_MIN_FRAMES 2
