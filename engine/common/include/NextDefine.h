@@ -46,16 +46,6 @@ enum BufferWaterMark {
     DEFAULT_HIGH_WATER_MARK_IN_BYTES    = 256 * 1024
 };
 
-enum LogLevel {
-    LOG_VERBOSE = 2,
-    LOG_DEBUG   = 4,
-    LOG_INFO    = 8,
-    LOG_WARN    = 16,
-    LOG_ERROR   = 32,
-    LOG_FATAL   = 64,
-    LOG_SILENT  = 128
-};
-
 enum PlayerOption {
     OPTION_FLOAT_AV_DIFF           = 1001,
     OPTION_FLOAT_AV_DELAY          = 1002,
