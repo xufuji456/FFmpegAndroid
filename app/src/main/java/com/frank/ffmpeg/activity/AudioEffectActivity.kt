@@ -11,8 +11,8 @@ import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.frank.androidmedia.controller.AudioEffectController
-import com.frank.androidmedia.listener.AudioEffectCallback
+import com.frank.ffmpeg.controller.AudioEffectController
+import com.frank.ffmpeg.listener.AudioEffectCallback
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.EqualizerAdapter
 import com.frank.ffmpeg.listener.OnSeekBarListener

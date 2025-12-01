@@ -10,8 +10,8 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
-import com.frank.androidmedia.controller.MediaPlayController
-import com.frank.androidmedia.listener.PlayerCallback
+import com.frank.ffmpeg.controller.MediaPlayController
+import com.frank.ffmpeg.listener.PlayerCallback
 
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.view.VideoPreviewBar

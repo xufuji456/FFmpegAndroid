@@ -1,9 +1,8 @@
-package com.frank.androidmedia.controller
+package com.frank.ffmpeg.controller
 
 import android.R
 import android.content.Context
 import android.media.audiofx.*
-import android.os.Build
 import android.util.Log
 import android.util.Pair
 import android.view.View
@@ -11,9 +10,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Spinner
-import androidx.annotation.RequiresApi
-import com.frank.androidmedia.listener.AudioEffectCallback
-import com.frank.androidmedia.wrap.AudioVisualizer
+import com.frank.ffmpeg.listener.AudioEffectCallback
+import com.frank.ffmpeg.effect.AudioVisualizer
 import java.util.ArrayList
 
 /**
@@ -132,7 +130,6 @@ open class AudioEffectController(audioEffectCallback: AudioEffectCallback) {
     /**
      * Setup AudioEffect of LoudnessEnhancer, which uses to enhance loudness
      */
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun setLoudnessEnhancer(audioSessionId: Int, barEnhancer: SeekBar) {
         mLoudnessEnhancer = LoudnessEnhancer(audioSessionId)
         mLoudnessEnhancer!!.enabled = true

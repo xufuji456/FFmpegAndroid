@@ -1,4 +1,4 @@
-package com.frank.androidmedia.controller
+package com.frank.ffmpeg.controller
 
 import android.media.MediaCodec
 import android.media.MediaExtractor
@@ -17,65 +17,6 @@ import android.view.Surface
  */
 
 open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, val mCallback: OnDataCallback?) {
-
-    /**
-     *
-     * MediaExtractor extractor = new MediaExtractor();
-     * extractor.setDataSource(...);
-     * int numTracks = extractor.getTrackCount();
-     * for (int i = 0; i <= numTracks; ++i) {
-     *   MediaFormat format = extractor.getTrackFormat(i);
-     *   String mime = format.getString(MediaFormat.KEY_MIME);
-     *   if (weAreInterestedInThisTrack) {
-     *     extractor.selectTrack(i);
-     *   }
-     * }
-     * ByteBuffer inputBuffer = ByteBuffer.allocate(...)
-     * while (extractor.readSampleData(inputBuffer, ...) != 0) {
-     *   int trackIndex = extractor.getSampleTrackIndex();
-     *   long presentationTimeUs = extractor.getSampleTime();
-     *   ...
-     *   extractor.advance();
-     * }
-     * extractor.release();
-     * extractor = null;
-     */
-
-/*
-    // MediaCodec is typically used like this in asynchronous mode:
-    MediaCodec codec = MediaCodec.createByCodecName(name);
-    MediaFormat mOutputFormat;
-    codec.setCallback(new MediaCodec.Callback() {
-        @Override
-        void onInputBufferAvailable(MediaCodec mc, int inputBufferId) {
-            ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferId);
-            codec.queueInputBuffer(inputBufferId, …);
-        }
-
-        @Override
-        void onOutputBufferAvailable(MediaCodec mc, int outputBufferId, …) {
-            ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
-            MediaFormat bufferFormat = codec.getOutputFormat(outputBufferId);
-            codec.releaseOutputBuffer(outputBufferId, …);
-        }
-
-        @Override
-        void onOutputFormatChanged(MediaCodec mc, MediaFormat format) {
-            mOutputFormat = format;
-        }
-
-        @Override
-        void onError(…) {
-
-        }
-    });
-    codec.configure(format, …);
-    mOutputFormat = codec.getOutputFormat();
-    codec.start();
-    // wait for processing to complete
-    codec.stop();
-    codec.release();
-*/
 
     private var videoDecodeThread: VideoDecodeThread? = null
 
@@ -185,7 +126,7 @@ open class MediaDecodeController(val mSurface: Surface, val mFilePath: String, v
                 mediaExtractor!!.setDataSource(mFilePath)
                 for (i in 0 until mediaExtractor!!.trackCount) {
                     mediaFormat = mediaExtractor!!.getTrackFormat(i)
-                    mimeType = mediaFormat!!.getString(MediaFormat.KEY_MIME)
+                    mimeType = mediaFormat.getString(MediaFormat.KEY_MIME)
                     if (mimeType != null && mimeType.startsWith("video/")) {
                         mediaExtractor!!.selectTrack(i)
                         break

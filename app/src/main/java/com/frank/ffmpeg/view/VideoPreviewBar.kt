@@ -13,7 +13,7 @@ import android.widget.TextView
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.util.ScreenUtil
 import com.frank.ffmpeg.util.TimeUtil
-import com.frank.androidmedia.controller.MediaDecodeController
+import com.frank.ffmpeg.controller.MediaDecodeController
 
 /**
  * the custom view of preview SeekBar

@@ -1,11 +1,10 @@
-package com.frank.androidmedia.controller
+package com.frank.ffmpeg.controller
 
 import android.media.MediaPlayer
-import android.media.PlaybackParams
 import android.media.TimedText
 import android.util.Log
 import android.view.Surface
-import com.frank.androidmedia.listener.PlayerCallback
+import com.frank.ffmpeg.listener.PlayerCallback
 import java.io.IOException
 
 /**
@@ -85,55 +84,6 @@ open class MediaPlayController(playerCallback: PlayerCallback) {
 
     fun seekTo(position: Int) {
         mediaPlayer?.seekTo(position)
-    }
-
-    fun togglePlay() {
-        if (mediaPlayer == null)
-            return
-
-        if (mediaPlayer!!.isPlaying) {
-            mediaPlayer!!.pause()
-        } else {
-            mediaPlayer!!.start()
-        }
-    }
-
-    fun getVideoWidth(): Int {
-        return mediaPlayer!!.videoWidth
-    }
-
-    fun getVideoHeight(): Int {
-        return mediaPlayer!!.videoHeight
-    }
-
-    fun mute() {
-        mediaPlayer?.setVolume(0.0f, 0.0f)
-    }
-
-    fun setVolume(volume: Float) {
-        if (volume < 0 || volume > 1)
-            return
-        mediaPlayer?.setVolume(volume, volume)
-    }
-
-    /**
-     * Set playback rate
-     */
-    fun setSpeed(speed: Float) {
-        if (speed <= 0 || speed > 8)
-            return
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            val params = PlaybackParams()
-            params.speed = speed
-            mediaPlayer?.playbackParams = params
-        }
-    }
-
-    /**
-     * Select audio or subtitle track, when there are multi tracks
-     */
-    fun selectTrack(trackId: Int) {
-        mediaPlayer?.selectTrack(trackId)
     }
 
     fun releasePlayer() {
