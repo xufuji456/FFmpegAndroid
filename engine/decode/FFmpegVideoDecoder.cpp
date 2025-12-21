@@ -190,14 +190,10 @@ int FFmpegVideoDecoder::Flush() {
 }
 
 int FFmpegVideoDecoder::Release() {
-    NEXT_LOGI(FFMPEG_VIDEO_TAG, "Release...");
+    NEXT_LOGD(FFMPEG_VIDEO_TAG, "Release...");
     if (mCodecContext) {
         avcodec_free_context(&mCodecContext);
         mCodecContext = nullptr;
     }
     return RESULT_OK;
-}
-
-void FFmpegVideoDecoder::SetDecodeCallback(VideoDecodeCallback *callback) {
-    mVideoDecodeCallback = callback;
 }

@@ -20,8 +20,6 @@ public:
 
     int Init(const MetaData *metadata) override;
 
-    void SetDecodeCallback(VideoDecodeCallback *callback) override;
-
     int Decode(const AVPacket *pkt) override;
 
     int Flush() override;
