@@ -51,10 +51,8 @@ add_library( # Sets the name of the library.
         ${SRC_FFMPEG}
         ${SRC_VISUALIZER}
         ${SRC_METADATA}
-#        ${SRC_FFPLAYER}
         video_filter.c
         ffprobe_cmd.cpp
-        video_cutting.cpp
         yuv/yuv_converter.cpp
         pcm/pcm_process.cpp
         media_transcode.cpp
