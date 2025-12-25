@@ -50,12 +50,4 @@ extern "C" { \
     JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_metadata_FFmpegMediaRetriever_ ## FUNC_NAME \
     (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
 
-#define COMMON_MEDIA_FUNC(RETURN_TYPE, FUNC_NAME, ...) \
-extern "C" { \
-    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_CommonMediaHelper_ ## FUNC_NAME \
-    (JNIEnv *env, jobject thiz, ##__VA_ARGS__);\
-}\
-    JNIEXPORT RETURN_TYPE JNICALL Java_com_frank_ffmpeg_CommonMediaHelper_ ## FUNC_NAME \
-    (JNIEnv *env, jobject thiz, ##__VA_ARGS__)\
-
 #endif //FFMPEGANDROID_FFMPEG_JNI_DEFINE_H

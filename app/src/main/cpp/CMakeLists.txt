@@ -56,8 +56,6 @@ add_library( # Sets the name of the library.
         yuv/yuv_converter.cpp
         pcm/pcm_process.cpp
         media_transcode.cpp
-        ff_audio_resample.cpp
-        common_media_jni.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
         ff_rtmp_pusher.cpp
