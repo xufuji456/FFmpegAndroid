@@ -5,7 +5,6 @@ import android.view.View
 import com.frank.camerafilter.factory.BeautyFilterType
 import com.frank.camerafilter.widget.BeautyCameraView
 import com.frank.ffmpeg.R
-import com.frank.ffmpeg.util.FilterTypeUtil
 
 class CameraFilterActivity : BaseActivity() {
 
@@ -56,12 +55,30 @@ class CameraFilterActivity : BaseActivity() {
             if (index >= filterType.size)
                 index = 0
             cameraView!!.setFilter(filterType[index])
-            showToast(getString(FilterTypeUtil.filterTypeToNameId(filterType[index])))
+            showToast(getString(filterTypeToNameId(filterType[index])))
         }
     }
 
     override fun onSelectedFile(filePath: String) {
 
     }
+
+    fun filterTypeToNameId(type: BeautyFilterType): Int {
+        return when (type) {
+            BeautyFilterType.NONE -> R.string.camera_filter_none
+            BeautyFilterType.BRIGHTNESS -> R.string.camera_filter_brightness
+            BeautyFilterType.SATURATION -> R.string.camera_filter_saturation
+            BeautyFilterType.CONTRAST -> R.string.camera_filter_contrast
+            BeautyFilterType.SHARPEN -> R.string.camera_filter_sharpen
+            BeautyFilterType.BLUR -> R.string.camera_filter_blur
+            BeautyFilterType.HUE -> R.string.camera_filter_hue
+            BeautyFilterType.WHITE_BALANCE -> R.string.camera_filter_balance
+            BeautyFilterType.SKETCH -> R.string.camera_filter_sketch
+            BeautyFilterType.OVERLAY -> R.string.camera_filter_overlay
+            BeautyFilterType.BREATH_CIRCLE -> R.string.camera_filter_circle
+            else -> R.string.camera_filter_none
+        }
+    }
+
 
 }
