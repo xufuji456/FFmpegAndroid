@@ -53,8 +53,6 @@ add_library( # Sets the name of the library.
         ${SRC_METADATA}
         video_filter.c
         ffprobe_cmd.cpp
-        yuv/yuv_converter.cpp
-        pcm/pcm_process.cpp
         media_transcode.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
