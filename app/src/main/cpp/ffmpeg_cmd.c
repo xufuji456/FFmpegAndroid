@@ -1,5 +1,7 @@
+
 #include <jni.h>
 #include "ffmpeg/ffmpeg.h"
+#include "ffmpeg/ffprobe.h"
 #include "ffmpeg_jni_define.h"
 
 #define FFMPEG_TAG "FFmpegCmd"
@@ -93,4 +95,26 @@ void progress_callback(int position, int duration, int state) {
     if (ff_env && ff_class && ff_method) {
         (*ff_env)->CallStaticVoidMethod(ff_env, ff_class, ff_method, position, duration, state);
     }
+}
+
+FFMPEG_FUNC(jstring, handleProbe, jobjectArray commands) {
+    int argc = (*env)->GetArrayLength(env, commands);
+    char **argv = (char **) malloc(argc * sizeof(char *));
+    int i;
+    for (i = 0; i < argc; i++) {
+        jstring jstr = (jstring) (*env)->GetObjectArrayElement(env, commands, i);
+        char *temp = (char *) (*env)->GetStringUTFChars(env, jstr, 0);
+        argv[i] = (char *)(malloc(1024));
+        strcpy(argv[i], temp);
+        (*env)->ReleaseStringUTFChars(env, jstr, temp);
+    }
+    //execute ffprobe command
+    char *result = ffprobe_run(argc, argv);
+    //release memory
+    for (i = 0; i < argc; i++) {
+        free(argv[i]);
+    }
+    free(argv);
+
+    return (*env)->NewStringUTF(env, result);
 }
