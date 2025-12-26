@@ -56,9 +56,7 @@ add_library( # Sets the name of the library.
         media_transcode.cpp
         ff_audio_player.cpp
         audio_player_jni.cpp
-        ff_rtmp_pusher.cpp
-        ffmpeg_pusher_jni.cpp
-        )
+)
 
 add_library( ffmpeg
              SHARED

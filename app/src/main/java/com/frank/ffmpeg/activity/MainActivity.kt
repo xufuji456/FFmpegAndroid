@@ -87,19 +87,17 @@ class MainActivity : BaseActivity() {
             -> intent.setClass(this@MainActivity, VideoHandleActivity::class.java)
             2 //handle media
             -> intent.setClass(this@MainActivity, MediaHandleActivity::class.java)
-            3 //pushing
-            -> intent.setClass(this@MainActivity, PushActivity::class.java)
-            4 //realtime living with rtmp stream
+            3 //realtime living with rtmp stream
             -> intent.setClass(this@MainActivity, LiveActivity::class.java)
-            5 //filter effect
+            4 //filter effect
             -> intent.setClass(this@MainActivity, FilterActivity::class.java)
-            6 //preview thumbnail
+            5 //preview thumbnail
             -> intent.setClass(this@MainActivity, VideoPreviewActivity::class.java)
-            7 //probe media format
+            6 //probe media format
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
-            8 //audio effect
+            7 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
-            9 //camera filter
+            8 //camera filter
             -> intent.setClass(this@MainActivity, CameraFilterActivity::class.java)
             else -> {
             }
