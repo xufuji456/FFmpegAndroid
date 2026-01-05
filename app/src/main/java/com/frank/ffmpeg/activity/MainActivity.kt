@@ -1,7 +1,6 @@
 package com.frank.ffmpeg.activity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.frank.ffmpeg.R
 import com.frank.ffmpeg.adapter.WaterfallAdapter
 import com.frank.ffmpeg.listener.OnItemClickListener
+import androidx.core.net.toUri
 
 /**
  * The main entrance of all Activity
@@ -43,7 +43,7 @@ class MainActivity : BaseActivity() {
         try {
             val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.addCategory("android.intent.category.DEFAULT")
-            intent.data = Uri.parse("package:$packageName")
+            intent.data = "package:$packageName".toUri()
             startActivity(intent)
         } catch (e: Exception) {
             val intent = Intent()
@@ -56,8 +56,6 @@ class MainActivity : BaseActivity() {
         val list = listOf(
                 getString(R.string.audio_handle),
                 getString(R.string.video_handle),
-                getString(R.string.media_handle),
-                getString(R.string.video_push),
                 getString(R.string.video_live),
                 getString(R.string.video_filter),
                 getString(R.string.video_preview),
@@ -85,19 +83,17 @@ class MainActivity : BaseActivity() {
             -> intent.setClass(this@MainActivity, AudioHandleActivity::class.java)
             1 //handle video
             -> intent.setClass(this@MainActivity, VideoHandleActivity::class.java)
-            2 //handle media
-            -> intent.setClass(this@MainActivity, MediaHandleActivity::class.java)
-            3 //realtime living with rtmp stream
+            2 //realtime living with rtmp stream
             -> intent.setClass(this@MainActivity, LiveActivity::class.java)
-            4 //filter effect
+            3 //filter effect
             -> intent.setClass(this@MainActivity, FilterActivity::class.java)
-            5 //preview thumbnail
+            4 //preview thumbnail
             -> intent.setClass(this@MainActivity, VideoPreviewActivity::class.java)
-            6 //probe media format
+            5 //probe media format
             -> intent.setClass(this@MainActivity, ProbeFormatActivity::class.java)
-            7 //audio effect
+            6 //audio effect
             -> intent.setClass(this@MainActivity, AudioEffectActivity::class.java)
-            8 //camera filter
+            7 //camera filter
             -> intent.setClass(this@MainActivity, CameraFilterActivity::class.java)
             else -> {
             }

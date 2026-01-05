@@ -39,7 +39,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.AudioHandleActivity" />
-        <activity android:name=".activity.MediaHandleActivity" />
         <activity android:name=".activity.VideoHandleActivity" />
         <activity
             android:name=".activity.LiveActivity"

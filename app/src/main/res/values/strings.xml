@@ -31,18 +31,12 @@
     <string name="audio_effect_uncle">大叔</string>
 
     <string name="audio_handle">音频处理</string>
-    <string name="media_handle">音视频处理</string>
     <string name="video_handle">视频处理</string>
-    <string name="video_push">ffmpeg推流</string>
-    <string name="video_live">rtmp推流直播</string>
+    <string name="video_live">rtmp直播</string>
 
-    <string name="media_mux">音视频合成</string>
-    <string name="media_extra_audio">提取音频</string>
-    <string name="media_extract_video">提取视频</string>
     <string name="media_play">音视频播放</string>
     <string name="media_probe">probe信息</string>
     <string name="media_retrieve">retrieve信息</string>
-    <string name="media_dubbing">配音</string>
 
     <string name="video_cut">视频剪切</string>
     <string name="video_concat">视频拼接</string>
