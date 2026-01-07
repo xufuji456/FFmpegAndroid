@@ -5,7 +5,7 @@ plugins {
 
 android {
     compileSdk 34
-    namespace "com.frank.playengine"
+    namespace "com.frank.next"
 
     defaultConfig {
         minSdk 21
