@@ -28,20 +28,20 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
 
     public SurfaceRenderView(Context context) {
         super(context);
-        initView(context);
+        initView();
     }
 
     public SurfaceRenderView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initView(context);
+        initView();
     }
 
     public SurfaceRenderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context);
+        initView();
     }
 
-    private void initView(Context context) {
+    private void initView() {
         mMeasureHelper = new MeasureHelper(this);
         mSurfaceCallback = new SurfaceCallback(this);
         getHolder().addCallback(mSurfaceCallback);

@@ -29,7 +29,7 @@ public interface IRenderView {
 
     void setVideoSize(int videoWidth, int videoHeight);
 
-    void setVideoSampleAspectRatio(int videoSarNum, int videoSarDen);
+    void setVideoAspectRatio(int videoSarNum, int videoSarDen);
 
     interface ISurfaceHolder {
 
