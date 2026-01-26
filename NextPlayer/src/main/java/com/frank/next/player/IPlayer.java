@@ -144,12 +144,14 @@ public interface IPlayer {
 
     void setOnCompletionListener(OnCompleteListener listener);
 
+    void setOnPlayingListener(OnPlayingListener listener);
+
     interface OnPreparedListener {
         void onPrepared(IPlayer mp);
     }
 
     interface OnBufferUpdateListener {
-        void onBufferUpdate(int percent);
+        void onBufferUpdate(int progress);
     }
 
     interface OnVideoSizeChangedListener {
@@ -170,6 +172,10 @@ public interface IPlayer {
 
     interface OnCompleteListener {
         void onComplete(IPlayer mp);
+    }
+
+    interface OnPlayingListener {
+        void onPlaying(boolean playing);
     }
 
 }

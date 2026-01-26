@@ -16,4 +16,12 @@ public class FFmpegApplication extends Application {
         return context;
     }
 
+    public boolean enableSurfaceView() {
+        return true;
+    }
+
+    public boolean useMediaCodec() {
+        return false;
+    }
+
 }
