@@ -53,6 +53,11 @@ public abstract class BasePlayer implements IPlayer {
         this.mOnInfoListener = listener;
     }
 
+    @Override
+    public void setOnPlayingListener(OnPlayingListener listener) {
+
+    }
+
     public void resetListeners() {
         this.mOnInfoListener             = null;
         this.mOnErrorListener            = null;
