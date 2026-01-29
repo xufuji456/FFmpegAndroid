@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <RelativeLayout
+        android:id="@+id/layout_player_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.frank.ffmpeg.view.PlayerView
+            android:id="@+id/view_player_controller"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/layout_player_top"
+        layout="@layout/layout_top_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/layout_player_info"
+        layout="@layout/layout_player_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="68dp"
+        android:layout_centerHorizontal="true"/>
+
+    <include
+        android:id="@+id/layout_player_bottom"
+        layout="@layout/layout_bottom_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>
