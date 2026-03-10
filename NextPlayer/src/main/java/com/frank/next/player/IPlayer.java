@@ -60,8 +60,6 @@ public interface IPlayer {
 
     void setCachePath(String path);
 
-    void setLiveMode(boolean enable);
-
     void setEnableMediaCodec(boolean enable);
 
     void setDataSource(String path) throws IOException, IllegalStateException;
