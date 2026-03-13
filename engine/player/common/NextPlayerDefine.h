@@ -8,7 +8,7 @@
 #define NEXTPLAYER_DEFINE_H
 
 #include "NextMediaClock.h"
-#include "NextSpeedSample.h"
+#include "NextSpeedMeter.h"
 
 // thread name
 #define THREAD_MEDIA_PARSER "MediaParser"
@@ -91,7 +91,7 @@ typedef struct AVStatistic {
     AVCacheStatistic video_cache;
     AVCacheStatistic audio_cache;
 
-    SpeedSampler2 net_speed_sampler;
+    NetworkSpeedMeter net_speed_meter;
 
 } AVStatistic;
 
