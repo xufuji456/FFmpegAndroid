@@ -7,7 +7,7 @@
 #ifndef NEXTPLAYER_DEFINE_H
 #define NEXTPLAYER_DEFINE_H
 
-#include "NextMediaClock.h"
+#include "MediaClock.h"
 #include "NextSpeedMeter.h"
 
 // thread name
