@@ -167,7 +167,6 @@ class PlayerView : FrameLayout {
     private fun createMediaPlayer(): IPlayer {
         val nextPlayer: IPlayer = NextPlayer()
         nextPlayer.setEnableMediaCodec(FFmpegApplication.getInstance().useMediaCodec())
-        nextPlayer.setLiveMode(false)
         return nextPlayer
     }
 
