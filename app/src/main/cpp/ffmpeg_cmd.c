@@ -43,6 +43,7 @@ FFMPEG_FUNC(jint, handle, jobjectArray commands) {
         argv[i] = malloc(INPUT_SIZE);
         strcpy(argv[i], temp);
         (*env)->ReleaseStringUTFChars(env, jstr, temp);
+        (*env)->DeleteLocalRef(env, jstr);
     }
     //execute ffmpeg cmd
     result = run(argc, argv);
@@ -107,6 +108,7 @@ FFMPEG_FUNC(jstring, handleProbe, jobjectArray commands) {
         argv[i] = (char *)(malloc(1024));
         strcpy(argv[i], temp);
         (*env)->ReleaseStringUTFChars(env, jstr, temp);
+        (*env)->DeleteLocalRef(env, jstr);
     }
     //execute ffprobe command
     char *result = ffprobe_run(argc, argv);
