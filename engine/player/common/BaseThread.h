@@ -1,6 +1,7 @@
 #ifndef BASE_THREAD_H
 #define BASE_THREAD_H
 
+#include <atomic>
 #include <thread>
 
 class BaseThread {
@@ -16,8 +17,8 @@ public:
     void start();
 
 protected:
-    int mSerial = 0;
-    bool bAbort = false;
+    std::atomic_int mSerial{0};
+    std::atomic_bool bAbort{false};
     std::thread mThread;
     std::string mThreadName;
 
