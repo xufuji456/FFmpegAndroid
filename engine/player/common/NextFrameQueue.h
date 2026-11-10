@@ -17,7 +17,7 @@ public:
 
     int putFrame(std::unique_ptr<FrameBuffer> &frame);
 
-    int getFrame(std::unique_ptr<FrameBuffer> &frame);
+    int getFrame(std::unique_ptr<FrameBuffer> &frame, int timeoutMs = -1);
 
     int size();
 
