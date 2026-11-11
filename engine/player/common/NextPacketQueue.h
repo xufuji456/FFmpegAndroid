@@ -31,9 +31,12 @@ public:
 
     void flush();
 
+    void abort();
+
     void release();
 
 private:
+    bool bAbort        = false;
     int64_t mDuration  = 0;
     int64_t mByteCount = 0;
 

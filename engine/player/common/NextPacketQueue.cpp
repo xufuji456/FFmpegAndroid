@@ -25,7 +25,7 @@ int NextPacketQueue::putPacket(std::unique_ptr<NextPacket> &pkt) {
     mByteCount += packet ? packet->size : 0;
     mDuration  += packet ? std::max(packet->duration, (int64_t) MIN_PKT_DURATION) : 0;
     mPktQueue.push(std::move(pkt));
-    mCond.notify_one();
+    mCond.notify_all();
     return RESULT_OK;
 }
 
@@ -34,7 +34,7 @@ int NextPacketQueue::getPacket(std::unique_ptr<NextPacket> &pkt, bool block) {
     if (mPktQueue.empty() && !block)
         return ERROR_PLAYER_TRY_AGAIN;
     int count = 0;
-    while (mPktQueue.empty() && block) {
+    while (mPktQueue.empty() && !bAbort) {
         if (mCond.wait_for(lock, std::chrono::milliseconds (QUEUE_WAIT_TIMEOUT))
             == std::cv_status::timeout) {
             if (count++ > 10) {
@@ -42,6 +42,9 @@ int NextPacketQueue::getPacket(std::unique_ptr<NextPacket> &pkt, bool block) {
                 NEXT_LOGD(TAG, "empty, wait for 1000ms timeout!\n");
             }
         }
+    }
+    if (mPktQueue.empty()) {
+        return ERROR_PLAYER_TRY_AGAIN;
     }
     pkt = std::move(mPktQueue.front());
     AVPacket *packet = pkt ? pkt->getPacket() : nullptr;
@@ -82,7 +85,7 @@ void NextPacketQueue::flush() {
     int flushCount = 0;
     while (!mPktQueue.empty()) {
         auto pkt = std::move(mPktQueue.front());
-        if (pkt->isFlushPacket()) {
+        if (pkt && pkt->isFlushPacket()) {
             flushCount++;
         }
         mPktQueue.pop();
@@ -94,6 +97,12 @@ void NextPacketQueue::flush() {
 
     mDuration  = 0;
     mByteCount = 0;
+}
+
+void NextPacketQueue::abort() {
+    UNIQUE_LOCK lock(mLock);
+    bAbort = true;
+    mCond.notify_all();
 }
 
 void NextPacketQueue::release() {
