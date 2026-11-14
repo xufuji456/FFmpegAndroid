@@ -154,12 +154,8 @@ void MediaParseHandler::notifyListener(int what, int arg1, int arg2) {
 }
 
 sp<NextPacketQueue> MediaParseHandler::getQueueByStreamType(int streamType) {
-    sp<NextPacketQueue> queue;
-    auto it = mPktQueueMap.begin();
-    if ((it = mPktQueueMap.find(streamType)) != mPktQueueMap.end()) {
-        queue = mPktQueueMap[streamType];
-    }
-    return queue;
+    auto it = mPktQueueMap.find(streamType);
+    return it != mPktQueueMap.end() ? it->second : nullptr;
 }
 
 // 1=flush 2=eof
@@ -237,8 +233,8 @@ void MediaParseHandler::executeTask() {
             } else {
                 performFlush();
                 putPacketByType(PKT_OP_TYPE_FLUSH);
-                mPlayerLink->last_video_seek_serial = mSerial;
-                mPlayerLink->last_audio_seek_serial = mSerial;
+                mPlayerLink->last_video_seek_serial = mSerial.load();
+                mPlayerLink->last_audio_seek_serial = mSerial.load();
                 mPlayerLink->last_seek_load_start   = CurrentTimeUs();
             }
             mPlayerLink->seek_req = false;
@@ -376,6 +372,10 @@ int MediaParseHandler::stop() {
     bAbort = true;
     if (mExtractor) {
         mExtractor->setInterrupt();
+    }
+    // wakeup decode threads blocked on reading packets
+    for (auto & it : mPktQueueMap) {
+        it.second->abort();
     }
     updateCacheStatistic();
     mCond.notify_all();
@@ -557,9 +557,10 @@ bool MediaParseHandler::checkDropNonRefFrame(AVPacket *pkt) {
         mPlayerLink->vid_accurate_seek_req && !mPlayerLink->seek_req &&
         !mPlayerLink->is_video_high_fps &&
         mPlayerLink->skip_frame >= AVDISCARD_NONREF) {
-        int64_t pts = (pkt->pts == AV_NOPTS_VALUE) ? 0 : pkt->pts * static_cast<int64_t>(av_q2d(tb));
-        int64_t dts = (pkt->dts == AV_NOPTS_VALUE) ? 0 : pkt->dts * static_cast<int64_t>(av_q2d(tb));
-        if (pts > mPlayerLink->seek_pos / 1000000 || dts > mPlayerLink->seek_pos / 1000000) {
+        const AVRational timebase = {1, AV_TIME_BASE};
+        int64_t pts = (pkt->pts == AV_NOPTS_VALUE) ? 0 : av_rescale_q(pkt->pts, tb, timebase);
+        int64_t dts = (pkt->dts == AV_NOPTS_VALUE) ? 0 : av_rescale_q(pkt->dts, tb, timebase);
+        if (pts > mPlayerLink->seek_pos || dts > mPlayerLink->seek_pos) {
             mPlayerLink->skip_frame =
                     std::min(mPlayerLink->skip_frame, static_cast<int>(AVDISCARD_DEFAULT));
         }
