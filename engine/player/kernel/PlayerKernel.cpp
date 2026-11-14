@@ -151,7 +151,7 @@ int PlayerKernel::getCurrentPosition(int64_t &pos) {
     } else if (mParseHandler && !mSeeking.load() &&
                getMasterClockSerial(mVideoState) == mParseHandler->getSerial()) {
         double clock = getMasterClock(mVideoState);
-        pos = clock > 0.0 ? static_cast<int64_t>(clock) * 1000 : 0;
+        pos = clock > 0.0 ? static_cast<int64_t>(clock * 1000) : 0;
     } else {
         int64_t curSeekPos = mCurSeekPos.load();
         pos = curSeekPos > 0 ? curSeekPos : 0;

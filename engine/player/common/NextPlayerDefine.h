@@ -27,6 +27,9 @@
 #define SLEEP_10MS_CONVERT_US (10 * 1000)
 #define SLEEP_20MS_CONVERT_US (20 * 1000)
 
+// max wait time of audio callback for a decoded frame
+#define AUDIO_FRAME_WAIT_TIMEOUT_MS 50
+
 #define MAX_PKT_QUEUE_DEEP 300
 #define MAX_RETRY_COUNT    3
 #define MIN_BUFFER_NOTIFY  5

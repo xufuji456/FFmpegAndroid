@@ -318,7 +318,7 @@ int AudioDecodeHandler::getFrame(std::unique_ptr<FrameBuffer> &buffer) {
             return ERROR_PLAYER_EOF;
         }
     }
-    return mFrameQueue->getFrame(buffer);
+    return mFrameQueue->getFrame(buffer, AUDIO_FRAME_WAIT_TIMEOUT_MS);
 }
 
 void AudioDecodeHandler::executeTask() {
@@ -344,9 +344,7 @@ void AudioDecodeHandler::executeTask() {
             }
             std::unique_lock<std::mutex> lock(mLock);
             bEOF = true;
-            if (!bAbort) {
-                mCond.wait(lock);
-            }
+            mCond.wait(lock, [this] { return bAbort || !bEOF; });
             continue;
         } else if (pkt->getSerial() != mSerial) {
             continue;
