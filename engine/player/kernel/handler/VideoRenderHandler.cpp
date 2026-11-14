@@ -417,16 +417,19 @@ int VideoRenderHandler::convertPixelFormat(std::unique_ptr<FrameBuffer> &buffer)
     int ret = 0;
     if (buffer->pixel_format == PIXEL_FORMAT_YUV420P10LE &&
         mRenderType != VIDEO_RENDER_SAMPLEBUFFER) {
-        mVideoFrameMetaData.pixel_format = PIXEL_FORMAT_YUV420P;
-        buffer->pixel_format = PIXEL_FORMAT_YUV420P;
-
         auto *srcFrame = reinterpret_cast<AVFrame *>(
                 (reinterpret_cast<FFmpegBufferContext *>(buffer->opaque))->av_frame);
         AVFrame *dstFrame = av_frame_alloc();
+        if (!dstFrame) {
+            return ERROR_RENDER_VIDEO_SWS;
+        }
         dstFrame->format  = AV_PIX_FMT_YUV420P;
         dstFrame->width   = buffer->width;
         dstFrame->height  = buffer->height;
-        av_frame_get_buffer(dstFrame, 32);
+        if (av_frame_get_buffer(dstFrame, 32) < 0) {
+            av_frame_free(&dstFrame);
+            return ERROR_RENDER_VIDEO_SWS;
+        }
 
         mSwsContext = sws_getCachedContext(
                 mSwsContext, srcFrame->width, srcFrame->height,
@@ -450,6 +453,8 @@ int VideoRenderHandler::convertPixelFormat(std::unique_ptr<FrameBuffer> &buffer)
         buffer->yBuffer = dstFrame->data[0];
         buffer->uBuffer = dstFrame->data[1];
         buffer->vBuffer = dstFrame->data[2];
+        buffer->pixel_format = PIXEL_FORMAT_YUV420P;
+        mVideoFrameMetaData.pixel_format = PIXEL_FORMAT_YUV420P;
 
         (reinterpret_cast<FFmpegBufferContext *>(buffer->opaque))
                 ->av_frame = reinterpret_cast<void *>(dstFrame);
@@ -516,8 +521,11 @@ void VideoRenderHandler::executeTask() {
         if (ret == ERROR_PLAYER_EOF) {
             std::unique_lock<std::mutex> lock(mLock);
             if (!bAbort) {
-                mCond.wait(lock);
+                mCond.wait_for(lock, std::chrono::milliseconds(SLEEP_20MS));
             }
+            continue;
+        } else if (ret == ERROR_PLAYER_TRY_AGAIN) {
+            // getFrame already waited for a while
             continue;
         } else if (ret != RESULT_OK || !frameBuffer) {
             usleep(SLEEP_20MS_CONVERT_US);
