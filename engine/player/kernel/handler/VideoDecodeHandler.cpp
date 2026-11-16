@@ -391,7 +391,7 @@ int VideoDecodeHandler::getFrame(std::unique_ptr<FrameBuffer> &buffer) {
             return ERROR_PLAYER_EOF;
         }
     }
-    return mFrameQueue->getFrame(buffer);
+    return mFrameQueue->getFrame(buffer, QUEUE_WAIT_TIMEOUT);
 }
 
 int VideoDecodeHandler::performFlush() {
@@ -478,8 +478,7 @@ int VideoDecodeHandler::getSerial() {
 }
 
 int VideoDecodeHandler::getQueueSize() {
-    std::unique_lock<std::mutex> lock(mLock);
-    return mFrameQueue->size();
+    return mFrameQueue ? mFrameQueue->size() : 0;
 }
 
 // decode thread
@@ -564,7 +563,7 @@ void VideoDecodeHandler::executeTask() {
             }
             continue;
         } else if (pkt->getSerial() != mSerial) {
-            NEXT_LOGI(TAG, "packet serial=%d, current serial=%d\n", pkt->getSerial(), mSerial);
+            NEXT_LOGI(TAG, "packet serial=%d, current serial=%d\n", pkt->getSerial(), mSerial.load());
             continue;
         }
 
@@ -618,12 +617,13 @@ void VideoDecodeHandler::executeTask() {
 int VideoDecodeHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
 
+    bAbort = true;
     if (mGeneralConfig->playerConfig->get()->enable_accurate_seek) {
         std::unique_lock<std::mutex> seekLock(mPlayerLink->accurate_seek_mutex);
         mPlayerLink->vid_accurate_seek_req = false;
+        mPlayerLink->audio_accurate_seek_cond.notify_all();
         mPlayerLink->video_accurate_seek_cond.notify_all();
     }
-    bAbort = true;
     mCond.notify_all();
     if (mFrameQueue) {
         mFrameQueue->abort();
