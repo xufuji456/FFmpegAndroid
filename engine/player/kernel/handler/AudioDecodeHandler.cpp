@@ -373,12 +373,13 @@ void AudioDecodeHandler::resetEof() {
 int AudioDecodeHandler::stop() {
     std::unique_lock<std::mutex> lock(mLock);
 
+    bAbort = true;
     if (mGeneralConfig->playerConfig->get()->enable_accurate_seek) {
         std::unique_lock<std::mutex> seekLock(mPlayerLink->accurate_seek_mutex);
         mPlayerLink->aud_accurate_seek_req = false;
         mPlayerLink->audio_accurate_seek_cond.notify_all();
+        mPlayerLink->video_accurate_seek_cond.notify_all();
     }
-    bAbort = true;
     mCond.notify_all();
     if (mFrameQueue) {
         mFrameQueue->abort();

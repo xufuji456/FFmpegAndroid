@@ -191,7 +191,13 @@ void MediaParseHandler::executeTask() {
                      : mMaxBufferSize;
 
     do {
-        mExtractor = std::make_shared<NextExtractor>(mNotifyCb);
+        {
+            std::lock_guard<std::mutex> lock(mLock);
+            mExtractor = std::make_shared<NextExtractor>(mNotifyCb);
+            if (bAbort.load()) {
+                mExtractor->setInterrupt();
+            }
+        }
         mMetaData  = std::make_shared<MetaData>();
         if (!mExtractor || !mMetaData) {
             NEXT_LOGE(TAG, "Create extractor failed!\n");
