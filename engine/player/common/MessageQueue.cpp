@@ -142,13 +142,15 @@ int32_t MessageQueue::flush() {
 
 int32_t MessageQueue::remove(int what) {
     std::lock_guard<std::mutex> lock(mMsgMutex);
-    while (!mMessageQueue.empty()) {
+    size_t count = mMessageQueue.size();
+    for (size_t i = 0; i < count; ++i) {
         auto msg = mMessageQueue.front();
+        mMessageQueue.pop();
         if (msg && msg->mWhat == what) {
             msg->clear();
             mRecycledQueue.push(msg);
-            mMessageQueue.pop();
-            break;
+        } else {
+            mMessageQueue.push(msg);
         }
     }
     return RESULT_OK;
@@ -167,6 +169,6 @@ int32_t MessageQueue::recycle(sp<AVMessage> &msg) {
 int32_t MessageQueue::abort() {
     std::lock_guard<std::mutex> lock(mMsgMutex);
     mMsgAbort = true;
-    mMsgCondition.notify_one();
+    mMsgCondition.notify_all();
     return RESULT_OK;
 }
