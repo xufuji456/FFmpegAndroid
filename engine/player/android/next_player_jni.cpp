@@ -6,6 +6,7 @@
 #include <jni.h>
 #include <map>
 #include <pthread.h>
+#include <thread>
 #include <unistd.h>
 
 #include "android/JniEnv.h"
@@ -455,8 +456,26 @@ static void nativeRelease(JNIEnv *env, jobject thiz) {
     auto weakObj = static_cast<jobject>(mp->setWeakThiz(nullptr));
     sp<NextPlayer> empty = nullptr;
     setPlayer(env, thiz, empty);
-    mp->release();
-    env->DeleteGlobalRef(weakObj);
+
+    // Use worker thread to release
+    auto releaseTask = [](sp<NextPlayer> player, jobject weak) {
+        NEXT_LOGI(TAG, "release begin...");
+        player->release();
+        JniEnvPtr jniEnv;
+        if (weak && jniEnv.Env()) {
+            jniEnv->DeleteGlobalRef(weak);
+        }
+        player.reset();
+        NEXT_LOGI(TAG, "release end...");
+    };
+    try {
+        std::thread(releaseTask, mp, weakObj).detach();
+    } catch (const std::system_error &e) {
+        mp->release();
+        if (weakObj) {
+            env->DeleteGlobalRef(weakObj);
+        }
+    }
 }
 
 static void nativeReset(JNIEnv *env, jobject thiz) {
